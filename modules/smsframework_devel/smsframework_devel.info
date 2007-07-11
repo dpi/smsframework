@@ -1,0 +1,5 @@
+; $Id$
+name = "SMS Framework Developer"
+description = "Developer tools for the SMS Framework. Provides testing features."
+package = SMS Framework
+dependencies = smsframework

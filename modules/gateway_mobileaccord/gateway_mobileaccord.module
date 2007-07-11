@@ -1,0 +1,25 @@
+<?php
+// $Id$
+
+function gateway_mobileaccord_smsframework_info() {
+  $options['ssl'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use SSL Encyption'),
+  );
+  $options['API ID'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+    '#description' => t('The title you enter here appears on the page.'),
+    '#size' => 40,
+    '#maxlength' => 255,
+  );
+  
+  
+  return array(
+    'mobileaccord' => array(
+      'name' => 'Mobile Accord',
+      'options' => $options,
+      'validate' => 'gateway_clickatell_validate',
+    ),
+  );
+}

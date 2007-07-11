@@ -1,0 +1,28 @@
+<?php
+
+function smsgateway_install()
+{
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $success = db_query('
+         CREATE TABLE {sms_messages} (
+         mid int(10) NOT NULL,
+         sent int(11) NOT NULL,
+         status int(11) NOT NULL,
+         destination varchar(64) NOT NULL,
+         message text default NULL,
+         gateway varchar(64) NOT NULL,
+         PRIMARY KEY (mid)) /*!40100 DEFAULT CHARACTER SET utf8 */;
+      ');
+      break;
+  }
+
+  if ($success) {
+    drupal_set_message(t('SMS Framework installed succesfully.'));
+  } else {
+    drupal_set_message(t('SMS Framework installation failed. Database tables must be created manually.', 'error'));
+  }
+}
+
+?>
