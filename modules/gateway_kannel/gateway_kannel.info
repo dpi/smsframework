@@ -1,5 +1,0 @@
-; $Id$
-name = "Kannel"
-description = "Allows the SMS Framework to use Kannel as a gateway."
-package = SMS Framework
-dependencies = smsframework

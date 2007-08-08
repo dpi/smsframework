@@ -1,5 +1,0 @@
-; $Id$
-name = "Mobile Accord"
-description = "Allows the SMS Framework to use Mobile Accord as a gateway."
-package = SMS Framework
-dependencies = smsframework

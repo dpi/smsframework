@@ -1,5 +1,0 @@
-; $Id$
-name = "Gnokii"
-description = "Allows the SMS Framework to use Gnokii as a gateway."
-package = SMS Framework
-dependencies = smsframework
