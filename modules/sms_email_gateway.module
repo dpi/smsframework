@@ -1,0 +1,57 @@
+<?php
+// $Id$
+
+function sms_email_gateway_gateway_info() {
+  
+  return array(
+    'email' => array(
+      // 'number_formatter' => 
+      'name' => 'E-mail',
+      'identifier' => 'email',
+      'send_form' => 'sms_email_gateway_send_form',
+      'send' => 'sms_email_gateway_send',
+    ),
+  );
+}
+
+/**
+ * Adds custom additions to send forms
+ */
+function sms_email_gateway_send_form(&$form) {
+  $form['carrier'] = array(
+    '#type' => 'select',
+    '#title' => t('Carrier'),
+    '#multiple' => FALSE,
+    '#description' => t('Select your wireless carrier.'),
+    '#options' => _sms_email_gateway_providers(),
+    '#default_value' => -1,
+    '#required' => TRUE,
+  );
+}
+
+function sms_email_gateway_send($number, $message, $mid, $extra) {
+  $to = $number . '@' . $extra['carrier'];
+  $from = variable_get('site_mail', ini_get('sendmail_from'));
+  // TODO: Configurable subject line
+  $subject = t('Clipping from ' . variable_get('site_name', 'Drupal'));
+  if ($mail = drupal_mail('sms_email_gateway', $to, '', $message, $from)) {
+    return TRUE;
+  }
+}
+
+function _sms_email_gateway_providers() {
+  return array(
+    'msg.acsalaska.com' => t('Alaska Communications Systems'),
+    'message.alltel.com' => t('Alltel Wireless'),
+    'txt.att.net' => t('AT&T/Cingular'),
+    'mobile.celloneusa.com' => t('CellularOne'),
+    'cwemail.com' => t('Centennial Wireless'),
+    'messaging.sprintpcs.com' => t('Helio'),
+    'page.nextel.com' => t('Nextel'),
+    'qwestmp.com' => t('Qwest'),
+    'messaging.sprintpcs.com' => t('Sprint'),
+    'tmomail.net' => t('T-Mobile'),
+    'vmobl.com' => t('Virgin Mobile'),
+    'vtext.com' => t('Verizon'),
+  );
+}
