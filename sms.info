@@ -1,0 +1,4 @@
+; $Id$
+name = "SMS Framework"
+description = "Provides a extensible API that facilitates communication between Drupal and various SMS gateways."
+package = SMS Framework

@@ -1,7 +1,6 @@
 <?php
 
-function smsgateway_install()
-{
+function sms_install() {
   switch ($GLOBALS['db_type']) {
     case 'mysql':
     case 'mysqli':
@@ -23,6 +22,18 @@ function smsgateway_install()
   } else {
     drupal_set_message(t('SMS Framework installation failed. Database tables must be created manually.', 'error'));
   }
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function sms_uninstall() {
+
+  if (db_table_exists('sms_messages')) {
+    db_query('DROP TABLE {sms_messages}');
+  }
+
+	drupal_set_message(t('SMS Framework uninstalled successfully.'));
 }
 
 ?>
