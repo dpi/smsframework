@@ -13,6 +13,11 @@ function sms_install() {
          message text default NULL,
          gateway varchar(64) NOT NULL,
          PRIMARY KEY (mid)) /*!40100 DEFAULT CHARACTER SET utf8 */;
+         
+         CREATE TABLE {sms_mapping} (
+           module varchar(64) NOT NULL,
+           behavior varchar(64) NOT NULL,
+           gateway varchar(64) NOT NULL);
       ');
       break;
   }
