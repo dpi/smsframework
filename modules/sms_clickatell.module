@@ -61,7 +61,7 @@ function sms_clickatell_validate($form_id, $form_values) {
 function sms_clickatell_send_form(&$form) {
   $form['country'] = array(
     '#type' => 'select',
-    '#title' => t('Couuntry'),
+    '#title' => t('Country'),
     '#multiple' => FALSE,
     '#options' => sms_clickatell_country_codes(),
     '#default_value' => -1,
@@ -71,7 +71,6 @@ function sms_clickatell_send_form(&$form) {
 
 function sms_clickatell_send($number, $message, $mid, $extra = array()) {
   $number = $extra['country'] . $number;
-  dprint_r($number);
   // $result = sms_clickatell_command('sendmsg', array('number' => $number, 'message' => $message, 'mid' => $mid));
 }
 
@@ -111,7 +110,6 @@ function sms_clickatell_command($command = 'auth', $data = array(), $config = NU
 
   // Run the command
   $result = drupal_http_request($scheme . '://api.clickatell.com/http/' . $command . '?' . $query);
-  // dprint_r($scheme . '://api.clickatell.com/http/' . $command . '?' . $query);
   // Check for HTTP errors
   if ($result->error) {
     drupal_set_message(t('An error occured during the HTTP request: ' . $result->error), 'error');
@@ -124,7 +122,6 @@ function sms_clickatell_command($command = 'auth', $data = array(), $config = NU
         list($response['status'], $response['data']) = explode(': ', $result->data);
         $response['code'] = drupal_substr($response['data'], 0, 3);
         $response['message'] = drupal_substr($response['data'], 5, drupal_strlen($response['data']) - 1);
-        dprint_r($response);
         break;
       case 'sendmsg':
         $response = explode(': ', $result->data);

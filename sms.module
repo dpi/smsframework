@@ -66,7 +66,7 @@ function sms_admin_default_form() {
   $gateways = sms_gateways();
   
   foreach ($gateways as $identifier => $gateway) {
-    $active = ($identifier == variable_get('sms_active_gateway', 0));
+    $active = ($identifier == variable_get('sms_default_gateway', 0));
     $options[$identifier] = '';
     $form[$gateway['name']]['id'] = array('#value' => $identifier);
     if (is_array($gateway['options'])) {
@@ -90,7 +90,7 @@ function sms_admin_default_form_submit($form_id, $form_values) {
   // Process form submission to set the default gateway
   if ($form_values['default']) {
     drupal_set_message(t('Default gateway updated.'));
-    variable_set('sms_default_gateway', $form_values['active']);
+    variable_set('sms_default_gateway', $form_values['default']);
   }
 }
 
@@ -352,10 +352,16 @@ function _behaviors_build() {
 function sms_send($number, $message, $extra = array()) {
   if ($extra['module'] && $extra['behavior']) {
     $gateway_id = sms_behavior_gateway($extra['module'], $extra['behavior']);
-    $gateway = sms_gateways('gateway', $gateway_id);
+    
+    if ($gateway_id) {
+      $gateway = sms_gateways('gateway', $gateway_id);
+    }
+    else {
+      $gateway = sms_gateways('gateway', variable_get('sms_default_gateway', 0));
+    }
   }
   else {
-    $gateway = sms_default_gateway();
+    $gateway = sms_gateways('gateway', variable_get('sms_default_gateway', 0));
   }
   if (function_exists($gateway['send'])) {
     if (is_array($number)) {
@@ -381,15 +387,13 @@ function sms_send($number, $message, $extra = array()) {
 }
 
 function sms_number_format($number) {
-  $gateway = sms_active_gateway();
+  $gateway = sms_gateways('gateway', variable_get('sms_default_gateway', 0));
   
   if ($gateway['number_formatter'] && function_exists($gateway['number_formatter'])) {
     return $gateway['number_formatter']($number_formatter);
   }
   else {
     return $number;
-    // Default format
-    
   }
 }
 
@@ -410,13 +414,6 @@ function sms_formatter($number, $format = 1) {
 }
 
 /**
- * Returns the active gateway
- */
-function sms_active_gateway() {
-  return sms_gateways('gateway', variable_get('sms_active_gateway', 0));
-}
-
-/**
  * Generates a SMS sending form and adds gateway defined elements
  * 
  * TODO
@@ -425,7 +422,14 @@ function sms_active_gateway() {
  */
 function sms_send_form($form) {
   $gateway_id = sms_behavior_gateway($form['module']['#value'], $form['behavior']['#value']);
-  $gateway = sms_gateways('gateway', $gateway_id);
+  if ($gateway_id) {
+    $gateway = sms_gateways('gateway', $gateway_id);
+  }
+  else {
+    $gateway = sms_gateways('gateway', variable_get('sms_default_gateway', 0));
+  }
+  
+  
   
   $form['sms']['number'] = array(
     '#type' => 'textfield',

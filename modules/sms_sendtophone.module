@@ -388,7 +388,7 @@ function sms_sendtophone_inline_form() {
 
 function sms_sendtophone_cck_form() {
   $form['module'] = array('#type' => 'value', '#value' => 'sms_sendtophone');
-  $form['behavior'] = array('#type' => 'value', '#value' => 'inline');
+  $form['behavior'] = array('#type' => 'value', '#value' => 'cck');
 
   if ($_GET['text']) {    
     if (strlen($_GET['text']) > 120) {

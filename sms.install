@@ -36,12 +36,8 @@ function sms_install() {
  * Implementation of hook_uninstall().
  */
 function sms_uninstall() {
-
-  if (db_table_exists('sms_messages')) {
-    db_query('DROP TABLE {sms_messages}');
-  }
+  db_query('DROP TABLE {sms_messages}');
+  db_query('DROP TABLE {sms_mapping}');
 
 	drupal_set_message(t('SMS Framework uninstalled successfully.'));
 }
-
-?>
