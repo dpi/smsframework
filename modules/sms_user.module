@@ -1,0 +1,153 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Provides integration between the SMS Framework and Drupal users.
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function sms_user_menu($may_cache) {
+  $items = array();
+
+  if ($may_cache) {
+    $items[] = array(
+      'path' => 'admin/smsframework/sms_user',
+      'title' => t('SMS User'),
+      'description' => t('Edit options for SMS and user integration.'),
+      'callback' => 'drupal_get_form',
+      'callback arguments' => array('sms_user_admin'),
+      'access' => user_access('administer sms_user'),
+      'type' => MENU_NORMAL_ITEM,
+    );
+    
+  }
+  else {
+    
+  }
+  return $items;
+}
+
+function sms_user_user($op, &$edit, &$account, $category = NULL) {
+  $gateway = sms_gateways('gateway', variable_get('sms_default_gateway', 0));
+  switch ($op) {
+    case 'register':
+      return sms_user_form($edit, $account, $category, TRUE);
+    case 'update':
+    case 'insert':
+      return sms_user_save(&$edit, &$account, $category);
+    case 'form':
+      return sms_user_form($edit, $account, $category);
+    case 'validate':
+      return sms_user_validate($edit, $account);
+  }
+}
+
+function sms_user_form($edit, $account, $category, $register = FALSE) {
+  if ($category == 'account') {
+    $form['sms_user'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Mobile information'),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+      '#tree' => TRUE,
+    );
+        
+    $destination->number = $edit['sms_user']['number'];
+    if (is_array($edit['sms_user']['gateway'])) {
+      foreach ($edit['sms_user']['gateway'] as $key => $field) {
+        $destination->$key = $field;
+      }
+    }
+    $form['sms_user'] += sms_send_form(NULL, $destination, FALSE);
+    
+    if ($account->sms_user['status'] == 1 && $account->sms_user['code']) { 
+      $form['sms_user']['confirm_code'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Confirmation code'),
+        '#description' => t('Enter the confirmation code that was sent to your phone.'),
+        '#size' => 4,
+        '#maxlength' => 4,
+      );
+    }
+    elseif ($account->sms_user['status'] == 2) {
+      $form['sms_user']['status_message'] = array('#value' => t('Your mobile number has been confirmed.'));
+    }
+    
+    return $form;
+  }
+}
+
+function sms_user_validate($edit, $category) {
+  if ($edit['sms_user']['number']) {
+    if (!sms_formatter($edit['sms_user']['number'])) {
+      form_set_error('number', t('You must enter a valid ten digit phone number.'));
+      $edit['sms_user']['status'] = 0;
+      break;
+    }
+    else {
+      $errors = FALSE;
+      foreach ($edit['sms_user']['gateway'] as $key => $field) {
+        if (!$field) {
+          $errors = TRUE;
+          form_set_error('sms_user', t('Please check your input.'));
+        }
+        if ($edit['sms_user']['confirm_code'] && $edit['sms_user']['confirm_code'] != $edit['_account']->sms_user['code']) {
+          form_set_error('sms_user][confirm_code', t('The confirmation code is invalid.'));
+        }
+      }
+    }
+  }
+}
+
+function sms_user_save(&$edit, &$account, $category) {
+  if ($edit['sms_user']['number']) {
+    $edit['sms_user']['number'] = sms_formatter($edit['sms_user']['number']);
+
+    if ($edit['sms_user']['number'] != $account->sms_user['number']) {
+      $code = rand(1000, 9999);
+      $edit['sms_user']['code'] = $code;
+      $edit['sms_user']['status'] = 1;
+      
+      $destination->number = $edit['sms_user']['number'];
+      foreach ($edit['sms_user']['gateway'] as $key => $field) {
+        $destination->$key = $field;
+      }
+      sms_send(array($destination), sms_user_confirm_message($code));
+      drupal_set_message(t('A message containing a confirmation code has been sent to your mobile phone. Please enter the code on your !edit_account page.', array('!edit_account' => l(t('edit account'), 'user/' . $account->uid . '/edit'))), 'status');
+    }
+    else {
+      $edit['sms_user']['code'] = $account->sms_user['code'];
+      $edit['sms_user']['status'] = $account->sms_user['status'];
+      
+      if ($edit['sms_user']['confirm_code'] && $edit['sms_user']['confirm_code'] != $edit['_account']->sms_user['code']) {
+        $edit['sms_user']['status'] = 2;
+        drupal_set_message(t('Your mobile number has been confirmed.'), 'status');
+      }
+    }
+  }
+  else {
+    $edit['sms_user']['status'] = 0;
+    $edit['sms_user']['code'] = 0;
+    
+    foreach ($edit['sms_user']['gateway'] as $key => $field) {
+      unset($edit['sms_user']['gateway'][$key]);
+    }
+  }
+}
+
+function sms_user_confirm_message($code) {
+  return t('Use the code !code to confirm your mobile number.', array('!code' => $code));
+}
+
+function sms_user_admin() {
+  $form['sms_user_registration_form'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show on user registration form.'),
+    '#default_value' => variable_get('sms_user_registration_form', 0),
+  );
+  
+  return system_settings_form($form);
+}
