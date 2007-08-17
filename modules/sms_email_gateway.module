@@ -5,7 +5,6 @@ function sms_email_gateway_gateway_info() {
   
   return array(
     'email' => array(
-      // 'number_formatter' => 
       'name' => 'E-mail',
       'identifier' => 'email',
       'send_form' => 'sms_email_gateway_send_form',
@@ -15,27 +14,38 @@ function sms_email_gateway_gateway_info() {
 }
 
 /**
- * Adds custom additions to send forms
+ * Returns custom additions to be added to the send forms
  */
-function sms_email_gateway_send_form(&$form) {
+function sms_email_gateway_send_form($destination = NULL, $required = TRUE) {  
+  $options = array();
+  if (!$required) {
+    $options[0] = '<'. t('none') .'>';
+  }
+  
+   $options += _sms_email_gateway_providers();
+    
   $form['carrier'] = array(
     '#type' => 'select',
     '#title' => t('Carrier'),
     '#multiple' => FALSE,
     '#description' => t('Select your wireless carrier.'),
-    '#options' => _sms_email_gateway_providers(),
-    '#default_value' => -1,
-    '#required' => TRUE,
+    '#options' => $options,
+    '#default_value' => $destination->carrier,
+    '#required' => $required,
   );
+  
+  return $form;
 }
 
-function sms_email_gateway_send($number, $message, $mid, $extra) {
-  $to = $number . '@' . $extra['carrier'];
+/**
+ * Callback for sending messages.
+ */
+function sms_email_gateway_send($destinations, $message) {
   $from = variable_get('site_mail', ini_get('sendmail_from'));
-  // TODO: Configurable subject line
-  $subject = t('Clipping from ' . variable_get('site_name', 'Drupal'));
-  if ($mail = drupal_mail('sms_email_gateway', $to, '', $message, $from)) {
-    return TRUE;
+  
+  foreach ($destinations as $destination) {
+    $to = $destination->number . '@' . $destination->carrier;
+    drupal_mail('sms_email_gateway', $to, '', $message, $from);
   }
 }
 

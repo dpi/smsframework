@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Write this
+ * SMS API that acts as an interface between Drupal and various gateway engines.
  */
 
 /**
@@ -204,29 +204,6 @@ function sms_admin_mapping_form_submit($form_id, $form_values) {
   drupal_set_message(t('Gateway mappings saved.'));
 }
 
-function sms_behavior_gateway($module, $behavior) {
-  $mappings = _sms_mappings();
-  if ($mappings[$module][$behavior]) {
-    return $mappings[$module][$behavior];
-  }
-  
-  return 0;
-}
-
-function _sms_mappings($reset = FALSE) {
-  static $mappings;
-  
-  if ($reset || !isset($mappings)) {
-    $mappings = array();
-    $gateway_result = db_query('SELECT module, behavior, gateway FROM {sms_mapping}');
-    while ($row = db_fetch_array($gateway_result)) {
-      $mappings[$row['module']][$row['behavior']] = $row['gateway'];
-    }
-  }
-
-  return $mappings;
-}
-
 function sms_admin_gateway_form($gateway = NULL, $gateway_id = '') {
   if(isset($gateway) && is_array($gateway)) {
     $form = $gateway['options'];
@@ -341,48 +318,59 @@ function _behaviors_build() {
   return array($_behaviors, $_names);
 }
 
+function sms_behavior_gateway($module, $behavior) {
+  $mappings = _sms_mappings();
+  if ($mappings[$module][$behavior]) {
+    return $mappings[$module][$behavior];
+  }
+  
+  return 0;
+}
+
+function _sms_mappings($reset = FALSE) {
+  static $mappings;
+  
+  if ($reset || !isset($mappings)) {
+    $mappings = array();
+    $gateway_result = db_query('SELECT module, behavior, gateway FROM {sms_mapping}');
+    while ($row = db_fetch_array($gateway_result)) {
+      $mappings[$row['module']][$row['behavior']] = $row['gateway'];
+    }
+  }
+
+  return $mappings;
+}
+
 /**
  * Sends a message using the active gateway.
  * 
- * @param $number
- *   A single destination or an array containing multiple destinations.
+ * @param $destination
+ *   An array of $destination objects. Each object must at least contain $destination->number. Additional properties may be defined by gateways.
  * @param $message
  *   The text of the messsage to send.
+ * @param $extra
  */
-function sms_send($number, $message, $extra = array()) {
-  if ($extra['module'] && $extra['behavior']) {
-    $gateway_id = sms_behavior_gateway($extra['module'], $extra['behavior']);
-    
-    if ($gateway_id) {
-      $gateway = sms_gateways('gateway', $gateway_id);
-    }
-    else {
-      $gateway = sms_gateways('gateway', variable_get('sms_default_gateway', 0));
-    }
+function sms_send($destinations, $message, $extra = array()) {
+  if (!is_array($destinations)) {
+    return 0;
   }
-  else {
-    $gateway = sms_gateways('gateway', variable_get('sms_default_gateway', 0));
+  $gateway_id = sms_behavior_gateway($extra['module'], $extra['behavior']);
+  
+  if (!$gateway_id) {
+    $gateway_id = variable_get('sms_default_gateway', 0);
   }
+  
+  $gateway = sms_gateways('gateway', $gateway_id);
+  
   if (function_exists($gateway['send'])) {
-    if (is_array($number)) {
-      foreach ($number as $this_destination) {
-        $mid = db_next_id('{sms_messages}');
-        db_query('INSERT INTO {sms_messages} (mid, sent, status, destination, message, gateway) VALUES(%d, %d, %d, "%s", "%s", "%s")', $mid, time(), 0, $this_destination, $message, $gateway['identifier']);
-        
-        // Execute the active gateway's send function
-        $gateway['send']($this_destination, $message, $mid, $extra);
-      }
-    }
-    else {
-      $mid = db_next_id('{sms_messages}');
-      db_query('INSERT INTO {sms_messages} (mid, sent, status, destination, message, gateway) VALUES(%d, %d, %d, "%s", "%s", "%s")', $mid, time(), 0, $number, $message, $gateway['identifier']);
-      
-      // Format the number
-      $number = sms_number_format($number);
-      
-      // Execute the active gateway's send function
-      $gateway['send']($number, $message, $mid, $extra);
-    }
+    $gateway['send']($destinations, $message);
+  }
+}
+
+function sms_log_message($number, $message, $gateway) {
+  $mid = db_next_id('{sms_messages}');
+  if (db_query('INSERT INTO {sms_messages} (mid, sent, status, destination, message, gateway) VALUES(%d, %d, %d, "%s", "%s", "%s")', $mid, time(), 0, $number, $message, $gateway['identifier'])) {
+    return $mid;
   }
 }
 
@@ -409,6 +397,9 @@ function sms_formatter($number, $format = 1) {
       return FALSE;
     }
   }
+  elseif (strlen($number) < 10) {
+    return FALSE;
+  }
 
   return $number;
 }
@@ -420,7 +411,7 @@ function sms_formatter($number, $format = 1) {
  * - If the user is logged in, look for a number stored
  * - Show a 'remeber this info' field and store as a cookie depending on admin settings
  */
-function sms_send_form($form) {
+function sms_send_form($form = NULL, $destination = NULL, $required = TRUE) {
   $gateway_id = sms_behavior_gateway($form['module']['#value'], $form['behavior']['#value']);
   if ($gateway_id) {
     $gateway = sms_gateways('gateway', $gateway_id);
@@ -429,41 +420,48 @@ function sms_send_form($form) {
     $gateway = sms_gateways('gateway', variable_get('sms_default_gateway', 0));
   }
   
-  
-  
-  $form['sms']['number'] = array(
+  $sms_form['number'] = array(
     '#type' => 'textfield',
     '#title' => t('Phone number'),
     '#size' => 40,
     '#maxlength' => 255,
-    '#required' => TRUE,
+    '#required' => $required,
     '#weight' => -5,
+    '#default_value' => $destination->number,
   );
 
   if ($gateway['send_form'] && function_exists($gateway['send_form'])) {
-    $form['sms']['gateway'] = $gateway['send_form']($form);
-    $form['sms']['gateway']['#weight'] = -5;
+    $sms_form['gateway']['#tree'] = TRUE;
+    $sms_form['gateway']['#weight'] = -5;
+    $sms_form['gateway'] += $gateway['send_form']($destination, $required);
   }
   
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Send'),
-    '#weight' => 20,
-  );
+  if (is_array($form)) {
+    $form['sms'] = $sms_form;
+    $form['#base'] = 'sms_send_form';
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Send'),
+      '#weight' => 20,
+    );
+    
+    return $form;
+  }
   
-  $form['#base'] = 'sms_send_form';
-  
-  return $form;
+  return $sms_form;
 }
 
 /**
  * Performs a simple send on submit. 
  * 
- * Other modules can override this for more complex functionality.
  */
 function sms_send_form_submit($form_id, $form_values) {
   $form_values['number'] = sms_formatter($form_values['number']);
-  sms_send($form_values['number'], $form_values['message'], $form_values);
+  foreach ($form_values['gateway'] as $key => $gateway_fields) {
+    $destination->$key = $gateway_fields;
+  }
+  $destination->number = $form_values['number'];
+  sms_send(array($destination), $form_values['message'], $form_values);
 }
 
 function sms_send_form_validate($form_id, &$form_values) {

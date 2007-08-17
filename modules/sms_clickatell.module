@@ -41,11 +41,13 @@ function sms_clickatell_gateway_info() {
       'validate' => 'sms_clickatell_validate',
       'send' => 'sms_clickatell_send',
       'send_form' => 'sms_clickatell_send_form',
-      'delivery_status' => 'sms_clickatell_status',
     ),
   );
 }
 
+/**
+ * Validates the submission of the configuration form.
+ */ 
 function sms_clickatell_validate($form_id, $form_values) {
   $result = sms_clickatell_command('auth', array(), $form_values);
   $codes = sms_clickatell_error_codes();
@@ -56,22 +58,33 @@ function sms_clickatell_validate($form_id, $form_values) {
 }
 
 /**
- * Adds custom additions to send forms
+ * Returns custom additions to be added to the send forms
  */
-function sms_clickatell_send_form(&$form) {
+function sms_clickatell_send_form() {
   $form['country'] = array(
     '#type' => 'select',
     '#title' => t('Country'),
     '#multiple' => FALSE,
     '#options' => sms_clickatell_country_codes(),
     '#default_value' => -1,
-    '#required' => TRUE,
+    // '#required' => TRUE,
   );
+  
+  return $form;
 }
 
-function sms_clickatell_send($number, $message, $mid, $extra = array()) {
-  $number = $extra['country'] . $number;
-  // $result = sms_clickatell_command('sendmsg', array('number' => $number, 'message' => $message, 'mid' => $mid));
+/**
+ * Callback for sending messages.
+ */
+function sms_clickatell_send($destinations, $message) {
+  $numbers = $extra['country'] . $numbers;
+  
+  foreach ($destinations as $destination) {
+    $processed_numbers[] = $destination->country . $destination->number;
+  }
+  
+  $number_string = implode(',', $processed_numbers);
+  $result = sms_clickatell_command('sendmsg', array('number' => $number_string, 'message' => $message));
 }
 
 function sms_clickatell_balance() {
@@ -101,7 +114,7 @@ function sms_clickatell_command($command = 'auth', $data = array(), $config = NU
       $query = 'api_id=' . $config['sms_clickatell_api_id'] . '&user=' . $config['sms_clickatell_user'] . '&password=' . $config['sms_clickatell_password'];
       break;
     case 'sendmsg':
-      $query = 'session_id=' . sms_clickatell_get_session_id() . '&to=' . $data['number'] . '&text=' . drupal_urlencode($data['message']) . '&climsgid=' . $data['mid'];
+      $query = 'session_id=' . sms_clickatell_get_session_id() . '&to=' . $data['number'] . '&text=' . drupal_urlencode($data['message']);
       break;
     case 'getbalance':
       $query = 'session_id=' . sms_clickatell_get_session_id();
@@ -110,6 +123,7 @@ function sms_clickatell_command($command = 'auth', $data = array(), $config = NU
 
   // Run the command
   $result = drupal_http_request($scheme . '://api.clickatell.com/http/' . $command . '?' . $query);
+
   // Check for HTTP errors
   if ($result->error) {
     drupal_set_message(t('An error occured during the HTTP request: ' . $result->error), 'error');

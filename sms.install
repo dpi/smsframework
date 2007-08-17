@@ -22,6 +22,8 @@ function sms_install() {
            behavior varchar(64) NOT NULL,
            gateway varchar(64) NOT NULL);
       ');
+      
+      db_query('UPDATE {system} SET weight = -5 WHERE name = "sms_sendtophone"');
       break;
   }
 

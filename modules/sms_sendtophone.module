@@ -35,10 +35,18 @@ function sms_sendtophone_menu($may_cache) {
     );
     
   }
+  
+  drupal_add_css(drupal_get_path('module', 'sms_sendtophone') . '/sms_sendtophone.css');
+  if (module_exists('thickbox')) {
+    drupal_add_js(drupal_get_path('module', 'sms_sendtophone') . '/sms_sendtophone.js');
+  }
 
   return $items;
 }
 
+/**
+ * Implementation of hook_behavior_info().
+ */
 function sms_sendtophone_behavior_info() {
   return array(
     'inline' => array(
@@ -57,24 +65,6 @@ function sms_sendtophone_behavior_info() {
       'form' => 'sms_sendtophone_cck_form',
     )
   );
-}
-
-/**
- * Implementation of hook_nodeapi().
- */
-function sms_sendtophone_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
-  switch ($op) {
-    case 'view':
-      drupal_add_css(drupal_get_path('module', 'sms_sendtophone') . '/sms_sendtophone.css');
-      if (module_exists('thickbox')) {
-        drupal_add_js(drupal_get_path('module', 'sms_sendtophone') . '/sms_sendtophone.js');
-      }
-      break;
-  } 
-}
-
-function sms_sendtophone_admin_overview() {
-  
 }
 
 /**
@@ -102,8 +92,6 @@ function sms_sendtophone_page($type = NULL) {
   }
   
   return $form;
-  
-  // return drupal_get_form('sms_sendtophone_send_form');
 }
 
 /**
@@ -264,11 +252,6 @@ function sms_sendtophone_widget_settings($op, $widget) {
         '#default_value' => $widget['rows'] ? $widget['rows'] : 1,
         '#required' => TRUE,
       );
-/**
- * Settings:
- * - Do not limit the length of this field, but only send what will fit in <number> text messages.
- * - Limit the length of this field to <number> text messages.
- */  
             
       return $form;
       
@@ -325,8 +308,8 @@ function sms_sendtophone_widget($op, &$node, $field, &$items, $delta = NULL) {
  */
 function sms_sendtophone_field_formatter_info() {
   return array(
-    'default' => array(
-      'label' => t('Default'),
+    'sms_sendtophone' => array(
+      'label' => t('SMS Link'),
       'field types' => array('text'),
     ),
   );
@@ -337,20 +320,13 @@ function sms_sendtophone_field_formatter_info() {
  */
 function sms_sendtophone_field_formatter($field, $item, $formatter, $node) {
   switch ($formatter) {
-    case 'default':
-      $text = strip_tags($item['value']);
-    break;
+    case 'sms_sendtophone':
+      $text = check_plain(strip_tags($item['value']));
+      
+      if ($text) {
+        return $text . theme('sms_sendtophone_field' , $text);
+      }
   }
-  
-  if ($field['text_processing']) {
-    $text = check_markup($text, $item['format'], is_null($node) || isset($node->in_preview));
-  }
-  else {
-    $text = check_plain($text);
-  }
-  $text .= theme('sms_sendtophone_field' , $text);
-  
-  return $text;
 }
 
 function theme_sms_sendtophone_field($text) {
@@ -365,10 +341,13 @@ function sms_sendtophone_inline_form() {
 
   if ($_GET['text']) {    
     if (strlen($_GET['text']) > 120) {
+      $form['notice'] = array(
+        '#value' => '<div class="messages status">test</div>',
+      );
       $form['message'] = array(
         '#type' => 'textarea',
         '#title' => t('Message'),
-        '#cols' => 60,
+        '#cols' => 35,
         '#rows' => 5,
         '#default_value' => $_GET['text'],
       );
@@ -395,7 +374,7 @@ function sms_sendtophone_cck_form() {
       $form['message'] = array(
         '#type' => 'textarea',
         '#title' => t('Message'),
-        '#cols' => 60,
+        '#cols' => 35,
         '#rows' => 5,
         '#default_value' => $_GET['text'],
       );
