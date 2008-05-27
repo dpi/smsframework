@@ -52,7 +52,7 @@ function sms_clickatell_validate($form_id, $form_values) {
   $result = sms_clickatell_command('auth', array(), $form_values);
   $codes = sms_clickatell_error_codes();
   if ($result['status'] == 'ERR') {
-    form_set_error('', t('A Clickatell gateway error occured: ' . $codes[floor($result['code'])]));
+    form_set_error('', t('A Clickatell gateway error occured: '. $codes[floor($result['code'])]));
   }
   variable_set('sms_clickatell_session_id_timestamp', 0);
 }
@@ -111,22 +111,22 @@ function sms_clickatell_command($command = 'auth', $data = array(), $config = NU
   
   switch ($command) {
     case 'auth':
-      $query = 'api_id=' . $config['sms_clickatell_api_id'] . '&user=' . $config['sms_clickatell_user'] . '&password=' . $config['sms_clickatell_password'];
+      $query = 'api_id='. $config['sms_clickatell_api_id'] .'&user='. $config['sms_clickatell_user'] .'&password='. $config['sms_clickatell_password'];
       break;
     case 'sendmsg':
-      $query = 'session_id=' . sms_clickatell_get_session_id() . '&to=' . $data['number'] . '&text=' . drupal_urlencode($data['message']);
+      $query = 'session_id='. sms_clickatell_get_session_id() .'&to='. $data['number'] .'&text='. drupal_urlencode($data['message']);
       break;
     case 'getbalance':
-      $query = 'session_id=' . sms_clickatell_get_session_id();
+      $query = 'session_id='. sms_clickatell_get_session_id();
       break;
   }
 
   // Run the command
-  $result = drupal_http_request($scheme . '://api.clickatell.com/http/' . $command . '?' . $query);
+  $result = drupal_http_request($scheme .'://api.clickatell.com/http/'. $command .'?'. $query);
 
   // Check for HTTP errors
   if ($result->error) {
-    drupal_set_message(t('An error occured during the HTTP request: ' . $result->error), 'error');
+    drupal_set_message(t('An error occured during the HTTP request: '. $result->error), 'error');
     return 0;
   }
   
@@ -155,7 +155,7 @@ function sms_clickatell_get_session_id() {
       if ($result['status'] == 'OK') {
         variable_set('sms_clickatell_session_id', $result['data']);
         variable_set('sms_clickatell_session_id_timestamp', time());
-        watchdog('sms', t('Clickatell session ID refreshed: ' . $result['data']));
+        watchdog('sms', t('Clickatell session ID refreshed: '. $result['data']));
       }
     }
   }

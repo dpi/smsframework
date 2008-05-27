@@ -33,9 +33,9 @@ function sms_menu($may_cache) {
   else {
     if (arg(0) == 'admin' && arg(1) == 'smsframework' && arg(2) == 'gateways' && arg(3)) {
       $gateways = sms_gateways();
-      if(isset($gateways[arg(3)])) {
+      if (isset($gateways[arg(3)])) {
         $items[] = array(
-          'path' => 'admin/smsframework/gateways/' . arg(3),
+          'path' => 'admin/smsframework/gateways/'. arg(3),
           'title' => t("!gateway gateway", array('!gateway' => $gateways[arg(3)]['name'])),
           'callback' => 'drupal_get_form',
           'callback arguments' => array('sms_admin_gateway_form', $gateways[arg(3)], arg(3)),
@@ -70,7 +70,7 @@ function sms_admin_default_form() {
     $options[$identifier] = '';
     $form[$gateway['name']]['id'] = array('#value' => $identifier);
     if (is_array($gateway['options'])) {
-      $form[$gateway['name']]['configure'] = array('#value' => l(t('configure'), 'admin/smsframework/gateways/' . $identifier));
+      $form[$gateway['name']]['configure'] = array('#value' => l(t('configure'), 'admin/smsframework/gateways/'. $identifier));
     }
     else {
       $form[$gateway['name']]['configure'] = array('#value' => t('No configuration options'));
@@ -205,7 +205,7 @@ function sms_admin_mapping_form_submit($form_id, $form_values) {
 }
 
 function sms_admin_gateway_form($gateway = NULL, $gateway_id = '') {
-  if(isset($gateway) && is_array($gateway)) {
+  if (isset($gateway) && is_array($gateway)) {
     $form = $gateway['options'];
     $form['submit'] = array(
       '#type' => 'submit', 
@@ -222,7 +222,7 @@ function sms_admin_gateway_form($gateway = NULL, $gateway_id = '') {
 function sms_admin_gateway_form_submit($form_id, $form_values) {
   $gateway = $form_values['gateway'];
   if (is_array($gateway['options'])) {
-    foreach ($gateway['options'] as $key=>$option) {
+    foreach ($gateway['options'] as $key => $option) {
       variable_set($key, $form_values[$key]);
     }
   }
@@ -267,7 +267,7 @@ function _gateways_build() {
   $gateway_array = module_invoke_all('gateway_info');
   foreach ($gateway_array as $identifier => $info) {
     if (is_array($info['options'])) {
-      foreach ($info['options'] as $key=>$option) {
+      foreach ($info['options'] as $key => $option) {
         $info['configuration'][$key] = variable_get($key, '');
       }
     }
@@ -305,7 +305,7 @@ function _behaviors_build() {
   $behavior_array = module_invoke_all('behavior_info');
   foreach ($behavior_array as $identifier => $info) {
     if (is_array($info['options'])) {
-      foreach ($info['options'] as $key=>$option) {
+      foreach ($info['options'] as $key => $option) {
         $info['configuration'][$key] = variable_get($key, '');
       }
     }

@@ -50,7 +50,7 @@ function sms_blast_form() {
 }
 
 function sms_blast_form_submit($form_id, $form_values) {
-  $result = db_query("SELECT uid FROM {users} WHERE uid != 0");
+  $result = db_query("SELECT uid FROM {users} WHERE uid <> 0");
   while ($row = db_fetch_array($result)) {
     $users[] = $row;
   }

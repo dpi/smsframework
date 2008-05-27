@@ -44,7 +44,7 @@ function sms_email_gateway_send($destinations, $message) {
   $from = variable_get('site_mail', ini_get('sendmail_from'));
   
   foreach ($destinations as $destination) {
-    $to = $destination->number . '@' . $destination->carrier;
+    $to = $destination->number .'@'. $destination->carrier;
     drupal_mail('sms_email_gateway', $to, '', $message, $from);
   }
 }

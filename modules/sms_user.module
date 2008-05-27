@@ -37,7 +37,7 @@ function sms_user_user($op, &$edit, &$account, $category = NULL) {
       return sms_user_form($edit, $account, $category, TRUE);
     case 'update':
     case 'insert':
-      return sms_user_save(&$edit, &$account, $category);
+      return sms_user_save($edit, $account, $category);
     case 'form':
       return sms_user_form($edit, $account, $category);
     case 'validate':
@@ -85,7 +85,6 @@ function sms_user_validate($edit, $category) {
     if (!sms_formatter($edit['sms_user']['number'])) {
       form_set_error('number', t('You must enter a valid ten digit phone number.'));
       $edit['sms_user']['status'] = 0;
-      break;
     }
     else {
       $errors = FALSE;
@@ -116,7 +115,7 @@ function sms_user_save(&$edit, &$account, $category) {
         $destination->$key = $field;
       }
       sms_send(array($destination), sms_user_confirm_message($code));
-      drupal_set_message(t('A message containing a confirmation code has been sent to your mobile phone. Please enter the code on your !edit_account page.', array('!edit_account' => l(t('edit account'), 'user/' . $account->uid . '/edit'))), 'status');
+      drupal_set_message(t('A message containing a confirmation code has been sent to your mobile phone. Please enter the code on your !edit_account page.', array('!edit_account' => l(t('edit account'), 'user/'. $account->uid .'/edit'))), 'status');
     }
     else {
       $edit['sms_user']['code'] = $account->sms_user['code'];

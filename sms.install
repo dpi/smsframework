@@ -1,5 +1,5 @@
 <?php
-
+// $Id$
 function sms_install() {
   switch ($GLOBALS['db_type']) {
     case 'mysql':
@@ -29,7 +29,8 @@ function sms_install() {
 
   if ($success) {
     drupal_set_message(t('SMS Framework installed succesfully.'));
-  } else {
+  } 
+  else {
     drupal_set_message(t('SMS Framework installation failed. Database tables must be created manually.', 'error'));
   }
 }
@@ -40,6 +41,6 @@ function sms_install() {
 function sms_uninstall() {
   db_query('DROP TABLE {sms_messages}');
   db_query('DROP TABLE {sms_mapping}');
-
-	drupal_set_message(t('SMS Framework uninstalled successfully.'));
+  
+  drupal_set_message(t('SMS Framework uninstalled successfully.'));
 }
