@@ -1,0 +1,26 @@
+<?php
+// $Id$
+function sms_receive_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE  {sms_receive} (
+                    `mid` int(10) unsigned NOT NULL,
+                    `number` varchar(255) NOT NULL,
+                    `message` varchar(255) NOT NULL,
+                    `time` varchar(255) NOT NULL,
+                    PRIMARY KEY  (`mid`)
+                  )/*!40100 DEFAULT CHARACTER SET utf8 */");
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function sms_receive_uninstall() {
+  db_query('DROP TABLE {sms_receive}');
+  // remove set_variables here
+
+  drupal_set_message(t('SMS Framework uninstalled successfully.'));
+}

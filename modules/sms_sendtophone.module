@@ -49,10 +49,10 @@ function sms_sendtophone_menu($may_cache) {
 function sms_sendtophone_admin_overview() {
   $entire_types = node_get_types();
   $types = array();
-  foreach($entire_types as $type) {
+  foreach ($entire_types as $type) {
     $types[$type->type] = $type->name;
   }
-	$form['sms_sendtophone_content_types'] = array(
+  $form['sms_sendtophone_content_types'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Content types'),
     '#default_value' => variable_get('sms_sendtophone_content_types', array()),
@@ -434,7 +434,7 @@ function sms_sendtophone_link($type, $node = NULL, $teaser = FALSE) {
   if ($type == 'node') {
     $types = variable_get('sms_sendtophone_content_types', array());
     if (in_array($node->type, $types)) {
-      if($types[$node->type]) {
+      if ($types[$node->type]) {
         $links['sms_sendtophone'] = array(
           'title' => t('Send to phone'),
           'href' => "sms/sendtophone/node/$node->nid",

@@ -1,0 +1,218 @@
+<?php
+// $Id$
+function sms_receive_menu() {
+  $items[] = array(
+    'path' => 'admin/smsframework/receive',
+    'title' => t('SMS Receive'),
+    'description' => t('Setting for the SMS receive module.'),
+    'access' => user_access('administer smsframework'),
+    'callback' => 'drupal_get_form',
+    'callback arguments' => array('sms_receive_admin_form'),
+  );
+  $items[] = array(
+    'path' => variable_get('sms_receive_path', 'sms/in'),
+    'title' => t('SMS Receive'),
+    'access' => user_access('receive sms message'),
+    'callback' => 'sms_receive_in',
+    'type' => MENU_CALLBACK);
+  return $items;
+}
+
+function sms_receive_perm() { 
+  return array('receive sms message');
+}
+
+function sms_receive_admin_form() {
+  $types = node_get_types();
+  $node_types = array();
+  foreach ($types as $type) {
+    $node_types[$type->type] = $type->name;
+  }
+  $form['sms_receive_path'] = array(
+    '#type' => 'textfield',
+    '#title' => t('SMS Receive Path'),
+    '#description' => t('Set the path for the callback URL'),
+    '#default_value' => variable_get('sms_receive_path', 'sms/in'),
+  );
+  $form['sms_receive_content_type'] = array(
+    '#type' => 'select',
+    '#title' => 'Message content type',
+    '#default_value' => variable_get('sms_receive_content_type', 'page'),
+    '#options' => $node_types,
+    '#description' => t('Set the content type that the message is mapped to.'),
+  );
+  
+  // This should be reworked to be much more configurable... multiple fields assigned either way
+  $node_fields = sms_receive_type_fields(variable_get('sms_receive_content_type', 'page'));
+  $sms_fields = sms_receive_sms_fields();
+  if (!empty($sms_fields)) {
+    foreach ($sms_fields as $sms_field) {
+      $form['sms_receive_fields']['sms_receive_field_'. $sms_field] = array(
+        '#type' => 'select',
+        '#title' => t("Map '%field' to this text field", array('%field' => $sms_field)),
+        '#default_value' => variable_get('sms_receive_field_'. $sms_field, ''),
+        '#options' => $node_fields,
+      );
+    }
+  }
+  
+  $form['submit'] = array(
+    '#type' => 'submit', 
+    '#value' => t('Submit'),
+  );
+  return $form;
+}
+
+function sms_receive_admin_form_submit($form_id, $form_values) {
+  if ($form_values['sms_receive_path']) {
+    variable_set('sms_receive_path', $form_values['sms_receive_path']);
+  }
+  if ($form_values['sms_receive_content_type']) {
+    variable_set('sms_receive_content_type', $form_values['sms_receive_content_type']);
+  }
+  $sms_fields = sms_receive_sms_fields();
+  foreach ($sms_fields as $sms_field) {
+    variable_set('sms_receive_field_'. $sms_field , $form_values['sms_receive_field_'. $sms_field]);
+  }
+}
+/*
+ * This whole function needs to be broken out into hooks
+ */
+function sms_receive_in() {
+  $output = '';
+  $content_type = variable_get('sms_receive_content_type', 'page');
+  $sms_message = sms_receive_parse();
+  $node_fields = sms_receive_type_fields($content_type);
+  $sms_fields = sms_receive_sms_fields();
+  //$form_state = array();
+  
+  // Insert message into database
+  $mid = db_next_id('{sms_messages}');
+  db_query("INSERT INTO {sms_receive} (mid, number, message, time) VALUES(%d, '%s', '%s', '%s')", $mid, $sms_message['from'], $sms_message['text'], time());
+  
+  $node = new stdClass();
+                                      /*// This is from mailhandler.module
+                                      
+                                      // check if mail originates from an authenticated user
+                                      $node = mailhandler_authenticate($node, $header, $origbody, $mailbox);
+                                      
+                                      // we need to change the current user
+                                      // this has to be done here to allow modules
+                                      // to create users
+                                      mailhandler_switch_user($node->uid);
+                                      */
+  // Implements hook_sms_receive()
+  // Allows modules to manipulate the node
+  foreach (module_list() as $name) {
+    if (module_hook($name, 'sms_receive')) {
+      $function = $name .'_sms_receive';
+      if (!($node = $function($node, $sms_message))) {
+        // Exit if a module has handled the submitted data.
+        break;
+      }
+    }
+  }
+  // This hook currently implements sms_user_sms_receive()
+  // Should handle og and node creation
+                                      /*
+                                      if ($node) {
+                                        if ($node->type == 'comment') {
+                                          mailhandler_comment_submit($node, $header, $mailbox, $origbody);
+                                        }
+                                        else {
+                                          mailhandler_node_submit($node, $header, $mailbox, $origbody);
+                                        }
+                                      }
+                                      
+                                      // switch back to original user
+                                      mailhandler_switch_user();
+                                      */
+  
+  // Create a new node and set its options
+  $node->type = $content_type;
+  $node_options = variable_get('node_options_'. $content_type, array('status', 'promote'));
+  foreach ($node_options as $node_option) {
+    $node->$node_option = 1;
+    //$form_state[$node_option] = 1;
+  }
+  
+  // Match first four letters to a group tag
+  //$groups = og_get_subscriptions($node->uid);
+  $tag = substr($sms_message['text'], 0, 4); // what if we're using a 5 digit tag??
+  // This is not a general case, ie. we're looking in 'field_short_code_value'
+  $result = db_query("SELECT * FROM {content_type_channel} WHERE `field_short_code_value` = '%s'", $tag);
+  if ($group = db_fetch_object($result)) {
+    $node->og_groups = array($group->nid => $group->nid);
+    $sms_message['text'] = substr($sms_message['text'], 5); // sketchyyy, when inserting message into body, should check if short tag exists and remove
+  }
+  
+  
+  // Put the received data into their set fields
+  foreach ($sms_fields as $sms_field) {
+    if (!empty($sms_field)) {
+      $node_field = variable_get('sms_receive_field_'. $sms_field, '');
+      if (!empty($node_field)) {
+        if ($node_field == 'title' || $node_field == 'body') {
+        $node->$node_field = $sms_message[$sms_field];
+	//$form_state[$node_field] = $sms_message[$sms_field];
+        }
+        else {
+          $cck_field['0']['value'] = $sms_message[$sms_field];
+          $node->$node_field = $cck_field;
+	  //$form_state[$node_field] = $cck_field;
+        }
+      }
+    }
+  }
+  
+  // Drupal_execute is useful to get all of the correct hooks but fails for us
+  // because it tries to enter the correct user (anonymous) into the form.
+  // Should find out why because invoking hook_nodeapi here is not the best.
+  
+  //drupal_execute($content_type .'_node_form', $form_state, (object)$node);
+  node_invoke_nodeapi(&$node, 'validate');
+  $new = node_submit($node);
+  node_save($new);
+  
+  // Show what was received, mostly for debugging
+  $output = 'Type: '. $sms_message['type'] .'<br />From: '. $sms_message['from'] .'<br />Text: '. $sms_message['text'];
+  return $output;
+}
+
+function sms_receive_type_fields($node_type) {
+  $field_mappers = array(
+    NULL => '', // what does this do?
+    'title' => t('title'),
+    'body' => t('body'), 
+  );
+
+  if (module_exists('content')) {
+    $fields = content_fields();
+    foreach ($fields as $field) {
+      if ($field['type_name'] == $node_type) {
+        $field_mappers[$field['field_name']] = $field['field_name'];
+      }
+    }
+  }
+  return $field_mappers;
+}
+
+function sms_receive_parse() {
+  $gateway = variable_get('sms_default_gateway', 0);
+  $function = 'sms_'. $gateway .'_receive_parse';
+  if (function_exists($function)) {
+    $sms_message = $function();
+  }
+  return $sms_message;
+}
+
+function sms_receive_sms_fields() {
+  // Maybe 'from' and 'text' should be built-in fields and 
+  // this is used to collect extra fields, in our case 'type'
+  $gateway = variable_get('sms_default_gateway', 0);
+  $function = 'sms_'. $gateway .'_receive_fields';
+  if (function_exists($function)) {
+    $fields = $function();
+  }
+  return $fields;
+}

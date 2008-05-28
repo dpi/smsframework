@@ -1,0 +1,6 @@
+name = "Receive"
+description = "Allows the SMS Framework to receive messages."
+package = SMS Framework
+dependencies = sms
+
+version = "5.x"
