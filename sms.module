@@ -115,21 +115,17 @@ function theme_sms_admin_default_form($form) {
 }
 
 function sms_admin_mapping_form() {
-  $gateways = sms_gateways();
-  
-  // Add default option
-  $gateway_options[0] = 'Default';
-  $gateway_options = array_merge($gateway_options, sms_gateways('names'));
-  
-  foreach (module_list(FALSE, FALSE, TRUE) as $module) {
+  $gateway_options = array_merge(array('Default'), sms_gateways('names'));
+  $modules = module_implements('behavior_info');
+  sort($modules);
+
+  $form['modules'] = array('#tree' => TRUE);
+
+  foreach ($modules as $module) {
     if ($behaviors = module_invoke($module, 'behavior_info')) {
-      $form['modules'][$module] = array(
-        '#value' => $module,
-        '#tree' => TRUE,
-      );
       asort($behaviors);
       foreach ($behaviors as $behavior_id => $behavior) {
-        $form['modules'][$module][$behavior_id] = array('#value' => t($behavior['name']));
+        $form['modules'][$module][$behavior_id] = array('#value' => $behavior['name']);
         
         $form['modules'][$module][$behavior_id]['gateway'] = array(
           '#type' => 'radios',
@@ -141,7 +137,7 @@ function sms_admin_mapping_form() {
   }
   
   foreach ($gateway_options as $key => $option) {
-    $form['gateway_options'][$key] = array('#value' => $option, '#tree' => TRUE);
+    $form['gateway_options'][$key] = array('#value' => $option);
   }
     
   $form['submit'] = array(
@@ -158,15 +154,15 @@ function theme_sms_admin_mapping_form($form) {
     $row[] = array('data' => t('@module module', array('@module' => $module)), 'class' => 'module', 'id' => 'module-'. $module, 'colspan' => count($form['gateway_options']) + 1);
     $rows[] = $row;
     
-    foreach (element_children($form['modules'][$module]) as $key => $behavior) {
+    foreach (element_children($form['modules'][$module]) as $behavior) {
       $row = array();
       if (is_array($form['modules'][$module][$behavior])) {
-        $row[] = array('data' => $behavior, 'class' => 'behavior');
+        $row[] = array('data' => $form['modules'][$module][$behavior]['#value'], 'class' => 'behavior');
         foreach (element_children($form['modules'][$module][$behavior]['gateway']) as $radio) {
           $title = $form['modules'][$module][$behavior]['gateway'][$radio]['#title'];
-          unset($form['modules'][$module][$behavior]['gateway'][$radio]['#title']);
           $row[] = array('data' => drupal_render($form['modules'][$module][$behavior]['gateway'][$radio]), 'title' => $title);
         }
+        $form['modules'][$module][$behavior]['#printed'] = TRUE;
         
         $rows[] = $row;        
       }
@@ -186,7 +182,7 @@ function theme_sms_admin_mapping_form($form) {
 }
 
 function sms_admin_mapping_form_submit($form_id, $form_values) {
-  foreach ($form_values as $module_name => $module) {
+  foreach ($form_values['modules'] as $module_name => $module) {
     if (is_array($module) && module_exists($module_name)) {
       foreach ($module as $behavior_name => $behavior) {
         $is_existing = FALSE;
