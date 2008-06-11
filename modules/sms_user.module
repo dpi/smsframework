@@ -150,39 +150,3 @@ function sms_user_admin() {
   
   return system_settings_form($form);
 }
-
-/*
- * Implementation of hook_sms_receive()
- * Match an incoming message to a user
- */
-function sms_user_sms_receive($node, $sms_message) {
-  // is $sms_message['from'] a general case?
-  $number = $sms_message['from'];
-  // how is this be handled with international numbers? do we need to remove +44 for UK?
-  // should be able to test when we get Chinese SIM card
-  if (substr($number, 0, 1) == '1') {// remove leading '1', sms_user doesn't store it...
-    $number = substr($number, 1);
-  }
-  // NOTE: this needs refactoring to NOT store in profile data -- can't loop through like this...
- /* $result = db_query('SELECT uid, name, data FROM {users} WHERE status != 0 AND access != 0 ORDER BY created DESC');
-  while ($account = db_fetch_object($result)) {
-    $user_data = unserialize($account->data);
-    if($user_data['sms_user']['number'] == $number) {
-      $node->uid = $account->uid;
-      $node->name = $account->name;
-      //$form_state['uid'] = $account->uid;
-      //$form_state['name'] = $account->name;
-      break;
-    }
-  }*/
- 
-  // This is much cleaner, but might still be nice to use a table with phone numbers
-  // ie. could query: SELECT uid FROM {sms_user} WHERE 'number' = 7785555555
-  $result = db_query("SELECT uid, name FROM {users} WHERE data LIKE '%". $number ."%'");
-  while ($account = db_fetch_object($result)) {
-      $node->uid = $account->uid;
-      $node->name = $account->name;
-      break;
-  }
-  return $node;
-}

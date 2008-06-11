@@ -1,6 +1,5 @@
+; $Id$
 name = "Muse"
 description = "Allows the SMS Framework to Muse as a gateway."
 package = SMS Framework
 dependencies = sms
-
-version = "5.x"

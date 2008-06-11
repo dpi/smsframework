@@ -1,4 +1,6 @@
 <?
+// $Id$
+
 function sms_muse_gateway_info() {
   $options['sms_muse_user'] = array(
     '#type' => 'textfield',
@@ -56,7 +58,7 @@ function sms_muse_gateway_info() {
 }
 
 function sms_muse_send_form() {
- /* $form['country'] = array(
+  /* $form['country'] = array(
     '#type' => 'select',
     '#title' => t('Country'),
     '#multiple' => FALSE,
@@ -71,7 +73,7 @@ function sms_muse_send_form() {
 function sms_muse_send($destinations, $message) {
   $number = array();
   foreach($destinations as $destination) {
-  	$number[] = $destination->number;
+    $number[] = $destination->number;
   }
   $result = sms_muse_command('sendmsg', array('number' => $number, 'message' => $message));
   return $result;
@@ -82,11 +84,11 @@ function sms_muse_balance() {
 }
 
 function sms_set_callback($url) {
-	return sms_muse_command('setcallback', array('url' => $url));
+  return sms_muse_command('setcallback', array('url' => $url));
 }
 
 function sms_get_callback() {
-	return sms_muse_command('getcallback');
+  return sms_muse_command('getcallback');
 }
 
 /*
@@ -99,34 +101,31 @@ function sms_muse_command($command = 'auth', $data = array(), $config = NULL) {
     $config = $gateway['configuration'];
   }
 
-  $usesoap = $config['sms_muse_soap']; // not working on muse3.bryght.com
-  $usesoap = "http://developers.mobilemuse.ca/webservices/quickmobile.wsdl";
-  //$smsservicename = "Dialog SMS";
+  $usesoap = $config['sms_muse_soap'];
   $smsservicename = $config['sms_muse_service'];
   
   try {
     $client = new SoapClient($usesoap);
   } catch (Exception $e) {
-  	drupal_set_message('Error caught for '. $usesoap .': ' . $e->getMessage());
+    drupal_set_message('Error caught for '. $usesoap .': ' . $e->getMessage());
+    return;
   }
-  
-
   
   //$transervicename = "QMTranscode";
   //$mmsservicename = "Some MMS Service Point";
   
   switch ($command) {
-        case 'auth':
-  	  $userid = $config['sms_muse_user']; // raincity
-          $pwd = $config['sms_muse_password']; // Raincity2008
+    case 'auth':
+      $userid = $config['sms_muse_user']; // raincity
+      $pwd = $config['sms_muse_password']; // Raincity2008
       try {
-		$result = $client->userAuthenticate($userid, $pwd);
-		//  Remember the token returned in order to send the message
-		$user = $result->AuthenticateToken;
-		drupal_set_message("Muse authentication was successful.");
-		variable_set('sms_muse_session_id', $user);
-		variable_set('sms_clickatell_session_id_timestamp', time());
-		$result = true;
+	$result = $client->userAuthenticate($userid, $pwd);
+	//  Remember the token returned in order to send the message
+	$user = $result->AuthenticateToken;
+	drupal_set_message("Muse authentication was successful.");
+	variable_set('sms_muse_session_id', $user);
+	variable_set('sms_clickatell_session_id_timestamp', time());
+	$result = true;
       } catch (Exception $e) {
         drupal_set_message("Authentication failed: " . $e->getMessage());
         $result = $e;
@@ -134,15 +133,15 @@ function sms_muse_command($command = 'auth', $data = array(), $config = NULL) {
     break;
     case 'sendmsg':
       $phonenums = $data['number'];
-  	  $message = $data['message'];
-  	  if (variable_get('sms_clickatell_session_id_timestamp', 0) < strtotime('-50 mins')) {
-  	  	sms_muse_command();
-  	  }
-  	  $user = variable_get('sms_muse_session_id', '');
- 	  try {
-                $phonenums = $client->CleanPhoneList($user, $phonenums, $smsservicename);
- 	  } catch (Exception $e){
- 	  	drupal_set_message('Clean phone list failed: ' . $e->getMessage());
+      $message = $data['message'];
+      if (variable_get('sms_clickatell_session_id_timestamp', 0) < strtotime('-50 mins')) {
+  	sms_muse_command();
+      }
+      $user = variable_get('sms_muse_session_id', '');
+      try {
+        $phonenums = $client->CleanPhoneList($user, $phonenums, $smsservicename);
+      } catch (Exception $e){
+ 	drupal_set_message('Clean phone list failed: ' . $e->getMessage());
  	  	/*if($e->faultcode == 3) { // Expired authentication
  	  	  sms_muse_command();
  	  	  $user = variable_get('sms_muse_session_id', '');
@@ -152,10 +151,9 @@ function sms_muse_command($command = 'auth', $data = array(), $config = NULL) {
  	  		drupal_set_message('Clean phone list failed: ' . $e->getMessage());
  	  	  }
  	  	}*/
- 	  }
-  	  
-  	  try {
-		$result = $client->sendSMS($user, null, $smsservicename, $phonenums, $message, "TEST");
+      } 	  
+      try {
+	$result = $client->sendSMS($user, null, $smsservicename, $phonenums, $message, "TEST");
         drupal_set_message("Send message was successful.");
         $result = true;
       } catch (Exception $e){
@@ -173,11 +171,11 @@ function sms_muse_command($command = 'auth', $data = array(), $config = NULL) {
       }
     break;
     case 'getcallback':
-  	  if (variable_get('sms_clickatell_session_id_timestamp', 0) < strtotime('-50 mins')) {
-  	  	sms_muse_command();
-  	  }
-	  $user = variable_get('sms_muse_session_id', '');
-	  $result = $client->getCallBackURL($user, $smsservicename);
+      if (variable_get('sms_clickatell_session_id_timestamp', 0) < strtotime('-50 mins')) {
+  	sms_muse_command();
+      }
+      $user = variable_get('sms_muse_session_id', '');
+      $result = $client->getCallBackURL($user, $smsservicename);
     break;
   }
   return $result;
@@ -212,22 +210,22 @@ function sms_muse_error_codes() {
 
 function sms_muse_menu() {
   $items[] = array(
-	'path' => 'admin/smsframework/muse',
-	'title' => t('Muse Testing'),
-	'description' => t('Test functions for Muse.'),
-	'callback' => 'sms_muse_test',
-	'access' => user_access('administer smsframework'),
+    'path' => 'admin/smsframework/muse',
+    'title' => t('Muse Testing'),
+    'description' => t('Test functions for Muse.'),
+    'callback' => 'sms_muse_test',
+    'access' => user_access('administer smsframework'),
   );
   $items[] = array(
-  	'path' => 'sms/in/auth',
-  	'type' => MENU_CALLBACK,
-  	'access' => TRUE,
-  	'callback' => sms_muse_auth,
+    'path' => 'sms/in/auth',
+    'type' => MENU_CALLBACK,
+    'access' => TRUE,
+    'callback' => sms_muse_authenticate,
   );
   return $items;
 }
 
-function sms_muse_auth() {
+function sms_muse_authenticate() {
   $gateway = sms_gateways('gateway', 'muse');
   $smsservicename = $_GET['service'];
   $usesoap = $_GET['soap'];
@@ -252,7 +250,7 @@ function sms_muse_auth() {
     }
   }
   else {
-  	$error .= 'SOAP is not installed on your server';
+    $error .= 'SOAP is not installed on your server';
   }
   
   print drupal_to_js(array(
@@ -279,11 +277,11 @@ function sms_muse_test_send() {
     '#maxlength' => 255,
   );
   $form['sms_muse_test_send_message'] = array(
-  	'#type' => 'textarea',
-  	'#title' => t('Message'),
-  	'#description' => t('The message you want to send'),
-  	'#size' => 40,
-  	'#maxlength' => 140,
+    '#type' => 'textarea',
+    '#title' => t('Message'),
+    '#description' => t('The message you want to send'),
+    '#size' => 40,
+    '#maxlength' => 140,
   );
   $form['submit'] = array(
     '#type' => 'submit', 
@@ -295,9 +293,9 @@ function sms_muse_test_send_submit($form_id, $form_values) {
   $destinations = explode(",", $form_values['sms_muse_test_send_number']);
   $numbers = array();
   foreach($destinations as $destination => $key) {
-  	$number = new stdClass();
-  	$number->number = $key;
-  	$numbers[] = $number;
+    $number = new stdClass();
+    $number->number = $key;
+    $numbers[] = $number;
   }
   $message = $form_values['sms_muse_test_send_message'];
   sms_send($numbers, $message);
@@ -321,8 +319,8 @@ function sms_muse_test_get_callback_submit($form_id, $form_values) {
 
 function sms_muse_test_set_callback() {
   $form['sms_muse_test_set_callback'] = array(
-	'#type' => 'textfield',
-	'#title' => t('Set callback url'),
+    '#type' => 'textfield',
+    '#title' => t('Set callback url'),
   );
   $form['submit'] = array(
     '#type' => 'submit', 
@@ -338,16 +336,16 @@ function sms_muse_test_set_callback_submit($form_id, $form_values) {
 }
 
 function sms_muse_test_auth() {
-	$form['submit'] = array(
-		'#type' => 'submit', 
-		'#value' => t('Authenticate'),
-	);
-	return $form;
+  $form['submit'] = array(
+    '#type' => 'submit', 
+    '#value' => t('Authenticate'),
+  );
+  return $form;
 }
 
 function sms_muse_test_auth_submit($form_id, $form_values) {
-	$result = sms_muse_command();
-	drupal_set_message($result);
+  $result = sms_muse_command();
+  drupal_set_message($result);
 }
 
 function sms_muse_receive_parse() { // hook for for sms_receive.module
@@ -360,5 +358,5 @@ function sms_muse_receive_parse() { // hook for for sms_receive.module
 }
 
 function sms_muse_receive_fields() {
-	return array('type', 'from', 'text');
+  return array('type', 'from', 'text');
 }
