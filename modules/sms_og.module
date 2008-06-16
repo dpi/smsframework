@@ -16,6 +16,9 @@ function sms_og_menu() {
   return $items;
 }
 
+/**
+ * Menu callback.
+ */
 function sms_og_admin_form() {
   $types = node_get_types();
   $group_types = array();

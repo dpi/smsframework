@@ -1,5 +1,6 @@
 <?php
 // $Id$
+
 function sms_receive_menu() {
   $items[] = array(
     'path' => 'admin/smsframework/receive',
@@ -61,6 +62,9 @@ function sms_receive_admin_form() {
 
 function sms_receive_admin_form_submit($form_id, $form_values) {
   if ($form_values['sms_receive_path']) {
+    // TODO: validation to check if path was actually set using sms_receive_set_callback
+    global $base_url;
+    sms_receive_set_callback($base_url .'/'. $form_values['sms_receive_path']);
     variable_set('sms_receive_path', $form_values['sms_receive_path']);
   }
   if ($form_values['sms_receive_content_type']) {
@@ -69,6 +73,38 @@ function sms_receive_admin_form_submit($form_id, $form_values) {
   $sms_fields = sms_receive_sms_fields();
   foreach ($sms_fields as $sms_field) {
     variable_set('sms_receive_field_'. $sms_field , $form_values['sms_receive_field_'. $sms_field]);
+  }
+}
+
+function sms_receive_get_callback($extra = array()) {
+  $gateway_id = sms_behavior_gateway($extra['module'], $extra['behavior']);
+  
+  if (!$gateway_id) {
+    $gateway_id = variable_get('sms_default_gateway', 0);
+  }
+  
+  $gateway = sms_gateways('gateway', $gateway_id);
+  if (function_exists($gateway['get_callback'])) {
+    return $gateway['get_callback']();
+  }
+  else {
+    drupal_set_message('Invalid gateway callback.');
+  }
+}
+
+function sms_receive_set_callback($url, $extra = array()) {
+  $gateway_id = sms_behavior_gateway($extra['module'], $extra['behavior']);
+  
+  if (!$gateway_id) {
+    $gateway_id = variable_get('sms_default_gateway', 0);
+  }
+  
+  $gateway = sms_gateways('gateway', $gateway_id);
+  if (function_exists($gateway['set_callback'])) {
+    return $gateway['set_callback']($url);
+  }
+  else {
+    drupal_set_message('Invalid gateway callback.');
   }
 }
 
