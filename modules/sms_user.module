@@ -5,6 +5,14 @@
  * @file
  * Provides integration between the SMS Framework and Drupal users.
  */
+ 
+/**
+ * Returns the uid of the owner of a number.
+ */
+function sms_user_get_uid($number) {
+  $data = db_fetch_array(db_query("SELECT uid FROM {sms_user} WHERE number = %d", $number));
+  return $data['uid'];
+}
 
 /**
  * Implementation of hook_menu().
@@ -18,135 +26,321 @@ function sms_user_menu($may_cache) {
       'title' => t('SMS User'),
       'description' => t('Edit options for SMS and user integration.'),
       'callback' => 'drupal_get_form',
-      'callback arguments' => array('sms_user_admin'),
+      'callback arguments' => array('sms_user_admin_settings'),
       'access' => user_access('administer sms_user'),
       'type' => MENU_NORMAL_ITEM,
     );
-    
   }
   else {
-    
+    if (arg(0) == 'user' && is_numeric(arg(1))) {
+      $items[] = array(
+        'path' => 'user/'. arg(1) .'/mobile',
+        'title' => t('Mobile settings'),
+        'callback' => 'sms_user_settings',
+        'callback arguments' => array('sms_user_form'),
+        'type' => MENU_LOCAL_TASK,
+      );
+    } 
   }
   return $items;
 }
 
+/**
+ * Implementation of hook_perm()
+ */
+function sms_user_perm() { 
+  return array('administer sms_user');
+}
+
+/**
+ * Menu callback; provides the forms for adding and confirming a user's mobile number.
+ */ 
+function sms_user_settings($register = FALSE) {
+  $account = user_load(array('uid' => arg(1)));
+  $edit = $_POST['op'] ? $_POST : (array)$account;
+  switch ($account->sms_user[0]['status']) {
+    case 0:
+      return drupal_get_form('sms_user_settings_add_form', $account, $edit);
+    case 1:
+      return drupal_get_form('sms_user_settings_confirm_form', $account, $edit);
+    case 2:
+      return drupal_get_form('sms_user_settings_reset_form', $account, $edit);
+  }
+}
+
+function sms_user_settings_add_form($account, $edit) {
+  $form = sms_send_form();
+  $form['submit'] = array(
+    '#type' => 'submit', 
+    '#value' => t('Confirm number'),
+  );
+
+  return $form;
+}
+
+function sms_user_settings_add_form_validate($form_id, $form_values) {
+  if (!$form_values['number'] = sms_formatter($form_values['number'])) {
+    form_set_error('number', t('Please enter a valid ten digit phone number.'));
+  }
+  elseif (sms_user_get_uid($form_values['number'])) {
+    form_set_error('number', t('The phone number you entered is already in use.'));
+  }
+}
+
+function sms_user_settings_add_form_submit($form_id, $form_values) {
+  $account = user_load(array('uid' => arg(1)));
+  $code = rand(1000, 9999);
+  
+  $form_values['number'] = sms_formatter($form_values['number']);
+  
+  $data[0] = array(
+    'number'  => sms_formatter($form_values['number']),
+    'status'  => 1,
+    'code'    => $code,
+    'gateway' => $form_values['gateway'],
+  );
+  
+  user_save($account, array('sms_user' => $data), 'mobile');
+  $destination->number = $form_values['number'];
+  if ($form_values['gateway']) {
+    foreach ($form_values['gateway'] as $key => $field) {
+      $destination->$key = $field;
+    }
+  }
+  sms_send(array($destination), _sms_user_confirm_message($code));
+}
+
+function sms_user_settings_confirm_form($account, $edit) {
+  $form['number'] = array(
+    '#type' => 'item',
+    '#title' => t('Number'),
+    '#value' => $account->sms_user[0]['number'],
+  );
+  $form['confirm_code'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Confirmation code'),
+    '#description' => t('Enter the confirmation code that was sent to your phone.'),
+    '#size' => 4,
+    '#maxlength' => 4,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit', 
+    '#value' => t('Confirm number'),
+  );
+  $form['reset'] = array(
+    '#type' => 'submit', 
+    '#value' => t('Delete & start over'),
+  );
+  return $form;
+}
+
+function sms_user_settings_confirm_form_validate($form_id, $form_values) {
+  if ($form_values['op'] == t('Confirm number')) {
+    $account = user_load(array('uid' => arg(1)));
+    if ($form_values['confirm_code'] != $account->sms_user[0]['code']) {
+      form_set_error('confirm_code', t('The confirmation code is invalid.'));
+    }
+  }
+}
+
+function sms_user_settings_confirm_form_submit($form_id, $form_values) {
+  $account = user_load(array('uid' => arg(1)));
+  if ($form_values['op'] == t('Delete & start over')) {
+    sms_user_delete($account->uid, 0);
+  }
+  else {
+    $data[0] = array(
+      'number'  => $account->sms_user[0]['number'],
+      'status'  => 2,
+      'gateway' => $account->sms_user[0]['gateway'],
+    );
+    
+    user_save($account, array('sms_user' => $data), 'mobile');
+  }
+}
+
+function sms_user_settings_reset_form($account, $edit) {
+  $form['sms_user']['number'] = array(
+    '#type' => 'item',
+    '#title' => t('Your number'),
+    '#value' => $account->sms_user[0]['number'],
+    '#description' => t('Your number has been confirmed.')
+  );
+  
+  $form['reset'] = array(
+    '#type' => 'submit', 
+    '#value' => t('Delete & start over'),
+  );
+  
+  return $form;
+}
+
+function sms_user_settings_reset_form_submit($form_id, $form_values) {
+  $account = user_load(array('uid' => arg(1)));
+  sms_user_delete($account->uid, 0);
+  drupal_set_message(t('Your mobile information has been removed'), 'status');
+}
+
+/**
+ * Deletes a user's mobile information from the database
+ * 
+ * @param $uid
+ *   The uid of the user who's data is to be removed.
+ * 
+ * @param $delta
+ *   The delta value of the number. Defaults to 'all' which will delete all numbers.
+ */
+function sms_user_delete($uid, $delta = 'all') {
+  $db_args = array($uid);
+  if (is_numeric($delta)) {
+    $delta_where = 'AND delta = %d';
+    $db_args[] = $delta;
+  }
+  db_query("DELETE FROM {sms_user} WHERE uid = %d $delta_where", $db_args);
+}
+
 function sms_user_user($op, &$edit, &$account, $category = NULL) {
-  $gateway = sms_gateways('gateway', variable_get('sms_default_gateway', 0));
   switch ($op) {
-    case 'register':
-      return sms_user_form($edit, $account, $category, TRUE);
+    case 'load':
+      return sms_user_load($edit, $account, $category);
     case 'update':
     case 'insert':
       return sms_user_save($edit, $account, $category);
-    case 'form':
-      return sms_user_form($edit, $account, $category);
-    case 'validate':
-      return sms_user_validate($edit, $account);
   }
 }
 
-function sms_user_form($edit, $account, $category, $register = FALSE) {
-  if ($category == 'account') {
-    $form['sms_user'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Mobile information'),
-      '#collapsible' => TRUE,
-      '#collapsed' => FALSE,
-      '#tree' => TRUE,
-    );
-        
-    $destination->number = $edit['sms_user']['number'];
-    if (is_array($edit['sms_user']['gateway'])) {
-      foreach ($edit['sms_user']['gateway'] as $key => $field) {
-        $destination->$key = $field;
-      }
-    }
-    $form['sms_user'] += sms_send_form(NULL, $destination, FALSE);
-    
-    if ($account->sms_user['status'] == 1 && $account->sms_user['code']) { 
-      $form['sms_user']['confirm_code'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Confirmation code'),
-        '#description' => t('Enter the confirmation code that was sent to your phone.'),
-        '#size' => 4,
-        '#maxlength' => 4,
+function sms_user_load(&$edit, &$account, $category) {
+  $result = db_query("SELECT number, delta, status, code, gateway FROM {sms_user} WHERE uid = %d", $account->uid);
+  
+  while ($data = db_fetch_array($result)) {
+    if ($data) {
+      $account->sms_user[$data['delta']] = array(
+        'number' => $data['number'],
+        'status' => $data['status'],
+        'code' => $data['code'],
+        'gateway' => unserialize($data['gateway']),
       );
-    }
-    elseif ($account->sms_user['status'] == 2) {
-      $form['sms_user']['status_message'] = array('#value' => t('Your mobile number has been confirmed.'));
-    }
-    
-    return $form;
-  }
-}
-
-function sms_user_validate($edit, $category) {
-  if ($edit['sms_user']['number']) {
-    if (!sms_formatter($edit['sms_user']['number'])) {
-      form_set_error('number', t('You must enter a valid ten digit phone number.'));
-      $edit['sms_user']['status'] = 0;
-    }
-    else {
-      $errors = FALSE;
-      foreach ($edit['sms_user']['gateway'] as $key => $field) {
-        if (!$field) {
-          $errors = TRUE;
-          form_set_error('sms_user', t('Please check your input.'));
-        }
-        if ($edit['sms_user']['confirm_code'] && $edit['sms_user']['confirm_code'] != $edit['_account']->sms_user['code']) {
-          form_set_error('sms_user][confirm_code', t('The confirmation code is invalid.'));
-        }
-      }
     }
   }
 }
 
 function sms_user_save(&$edit, &$account, $category) {
-  if ($edit['sms_user']['number']) {
-    $edit['sms_user']['number'] = sms_formatter($edit['sms_user']['number']);
+  if ($category == 'mobile') {
+    foreach ($edit['sms_user'] as $delta => $number) {
+      $db_values = array($number['number'], $number['status'], $number['code'], serialize($number['gateway']));
+      if ($account->sms_user[$delta]) {
+        db_query("UPDATE {sms_user} SET number = '%s', status = %d, code = '%s', gateway = '%s'
+          WHERE uid = %d AND delta = %d", array_merge($db_values, array($account->uid, $delta)));
+      }
+      else {
+          db_query("INSERT INTO {sms_user} (number, status, code, gateway, uid, delta)
+            VALUES ('%s', %d, '%s', '%s', %d, %d)", array_merge($db_values, array($account->uid, $delta)));
+      }
+    }
+    $edit['sms_user'] = NULL;
+  }
+}
 
-    if ($edit['sms_user']['number'] != $account->sms_user['number']) {
-      $code = rand(1000, 9999);
-      $edit['sms_user']['code'] = $code;
-      $edit['sms_user']['status'] = 1;
-      
-      $destination->number = $edit['sms_user']['number'];
-      foreach ($edit['sms_user']['gateway'] as $key => $field) {
-        $destination->$key = $field;
-      }
-      sms_send(array($destination), sms_user_confirm_message($code));
-      drupal_set_message(t('A message containing a confirmation code has been sent to your mobile phone. Please enter the code on your !edit_account page.', array('!edit_account' => l(t('edit account'), 'user/'. $account->uid .'/edit'))), 'status');
-    }
-    else {
-      $edit['sms_user']['code'] = $account->sms_user['code'];
-      $edit['sms_user']['status'] = $account->sms_user['status'];
-      
-      if ($edit['sms_user']['confirm_code'] && $edit['sms_user']['confirm_code'] != $edit['_account']->sms_user['code']) {
-        $edit['sms_user']['status'] = 2;
-        drupal_set_message(t('Your mobile number has been confirmed.'), 'status');
-      }
-    }
+function _sms_user_confirm_message($code) {
+  if (module_exists('token')) {
+    $text_format = variable_get('sms_user_confirmation_message', '[site-name] confirmation code: [confirm-code]');
+    $text = token_replace_multiple($text_format, array('sms_user' => array('confirm-code' => $code), 'global'));
+    return $text;
   }
   else {
-    $edit['sms_user']['status'] = 0;
-    $edit['sms_user']['code'] = 0;
-    
-    foreach ($edit['sms_user']['gateway'] as $key => $field) {
-      unset($edit['sms_user']['gateway'][$key]);
-    }
+    return t('!site confirmation code: !code', array('!site' => variable_get('site_name', t('Drupal')), '!code' => $code));
   }
 }
 
-function sms_user_confirm_message($code) {
-  return t('Use the code !code to confirm your mobile number.', array('!code' => $code));
-}
-
-function sms_user_admin() {
+function sms_user_admin_settings() {
   $form['sms_user_registration_form'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show on user registration form.'),
     '#default_value' => variable_get('sms_user_registration_form', 0),
   );
+    
+  if (module_exists('token')) {
+    $form['sms_user_confirmation_message'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Confirmation message format'),
+      '#default_value' => variable_get('sms_user_confirmation_message', '[site-name] confirmation code: [confirm-code]'),
+      '#description' => t('Specify the format for confirmation messages. Keep this as short as possible.'),
+      '#size' => 40,
+      '#maxlength' => 255,
+    );
+    
+    $tokens = token_get_list('sms_user');
+    $rows = array();
+    foreach ($tokens as $category) {
+      foreach ($category as $token => $token_description) {
+          $row = array();
+          $row[] = '['. $token .']';
+          $row[] = $token_description;
+          $rows[] = $row;
+      }
+    }
+    
+    $headers = array(t('Token'), t('Replacement value'));
+    $form['tokens'] = array(
+      '#title' => t('Available tokens'),
+      '#type' => 'fieldset',
+      '#description' => t('These special strings will be replaced by their real value at run time.'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
+    $form['tokens']['list'] = array(
+      '#value' => theme('table', $headers, $rows, array('class' => 'description'))
+    );
+  }
   
   return system_settings_form($form);
+}
+
+/**
+ * Implementation of hook_token_values()
+ */
+function sms_user_token_values($type, $object = NULL, $options = array()) {
+  global $user;
+  $values = array();
+
+  switch ($type) {
+    case 'sms_user':
+      $values['confirm-code'] = $object['confirm-code'];
+      $values['mobile-url']   = url('user/'. $user->uid .'/mobile', NULL, NULL, TRUE);
+      break;
+  }
+  return $values;
+}
+
+/**
+ * Implementation of hook_token_list()
+ */
+function sms_user_token_list($type = 'all') {
+  if ($type = 'sms_user') {
+    $tokens['sms_user']['confirm-code']    = t('The mobile confirmation code for the user.');
+    $tokens['sms_user']['mobile-url']      = t('The URL for the user\'s mobile settings page.');
+  }
+  
+  return $tokens;
+}
+
+/*
+ * Implementation of hook_sms_receive()
+ * Match an incoming message to a user
+ */
+function sms_user_sms_receive($node, $sms_message) {
+  // is $sms_message['from'] a general case?
+  $number = $sms_message['from'];
+  // how is this be handled with international numbers? do we need to remove +44 for UK?
+  // should be able to test when we get Chinese SIM card
+  if (substr($number, 0, 1) == '1') {// remove leading '1', sms_user doesn't store it...
+    $number = substr($number, 1);
+  }
+
+  $uid = sms_user_get_uid($number);
+  $user = user_load(array('uid' => $uid));
+  $node->uid = $account->uid;
+  $node->name = $account->name;
+
+  return $node;
 }
