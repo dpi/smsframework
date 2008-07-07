@@ -87,8 +87,10 @@ function sms_user_settings_add_form_validate($form_id, $form_values) {
   }
 }
 
-function sms_user_settings_add_form_submit($form_id, $form_values) {
-  $account = user_load(array('uid' => arg(1)));
+function sms_user_settings_add_form_submit($form_id, $form_values, $account = NULL) {
+  if (!$account) {
+    $account = user_load(array('uid' => arg(1)));
+  }
   $code = rand(1000, 9999);
   
   $form_values['number'] = sms_formatter($form_values['number']);
@@ -206,6 +208,21 @@ function sms_user_user($op, &$edit, &$account, $category = NULL) {
     case 'update':
     case 'insert':
       return sms_user_save($edit, $account, $category);
+    case 'register':
+      return sms_user_register();
+    case 'delete':
+      return sms_user_delete($account->uid);
+    case 'validate':
+      if ($edit['sms_user'][0]) {
+        return sms_user_settings_add_form_validate('', $edit['sms_user'][0]);
+      }
+    case 'login':
+      // Check if first it's the user's first time logging in.
+      if (!$account->access && $account->sms_user[0]['number']) {
+        sms_user_settings_add_form_submit('', $account->sms_user[0], $account);
+        drupal_set_message(t('A confirmation message has been sent to your mobile phone. Please !link.', array('!link' => l(t('confirm your number'), 'user/'. $account->uid .'/mobile'))), 'status');
+      }
+      break;
   }
 }
 
@@ -225,7 +242,7 @@ function sms_user_load(&$edit, &$account, $category) {
 }
 
 function sms_user_save(&$edit, &$account, $category) {
-  if ($category == 'mobile') {
+  if (($category == 'mobile' || $category == 'account') && $edit['sms_user']) {
     foreach ($edit['sms_user'] as $delta => $number) {
       $db_values = array($number['number'], $number['status'], $number['code'], serialize($number['gateway']));
       if ($account->sms_user[$delta]) {
@@ -233,8 +250,9 @@ function sms_user_save(&$edit, &$account, $category) {
           WHERE uid = %d AND delta = %d", array_merge($db_values, array($account->uid, $delta)));
       }
       else {
-          db_query("INSERT INTO {sms_user} (number, status, code, gateway, uid, delta)
-            VALUES ('%s', %d, '%s', '%s', %d, %d)", array_merge($db_values, array($account->uid, $delta)));
+        // dprint_r($edit);
+        db_query("INSERT INTO {sms_user} (number, status, code, gateway, uid, delta)
+          VALUES ('%s', %d, '%s', '%s', %d, %d)", array_merge($db_values, array($account->uid, $delta)));
       }
     }
     $edit['sms_user'] = NULL;
@@ -252,10 +270,32 @@ function _sms_user_confirm_message($code) {
   }
 }
 
-function sms_user_admin_settings() {
+function sms_user_register() {
+  if (variable_get('sms_user_registration_form', 0)) {
+    $form['sms_user'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Mobile settings'),
+      '#description' => t('You will receive a message to confirm your mobile information upon login.'),
+      '#collapsible' => TRUE,
+      '#tree' => TRUE,
+    );
+
+    $required = FALSE;
+    if (variable_get('sms_user_registration_form', 0) == 2) {
+      $required = TRUE;
+    }
+    $form['sms_user'][0] = sms_send_form(NULL, NULL, $required);
+  
+    return $form;
+  }
+}
+
+function sms_user_admin_settings() {  
   $form['sms_user_registration_form'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Show on user registration form.'),
+    '#type' => 'radios',
+    '#title' => t('Show mobile fields during user registration'),
+    '#description' => t('Specify if the site should collect mobile information during registration.'),
+    '#options' => array(t('Disabled'), t('Optional'), t('Required')),
     '#default_value' => variable_get('sms_user_registration_form', 0),
   );
     
