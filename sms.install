@@ -15,13 +15,6 @@ function sms_install() {
          gateway varchar(64) NOT NULL,
          PRIMARY KEY (mid)) /*!40100 DEFAULT CHARACTER SET utf8 */;
         ');
-        
-      db_query('         
-         CREATE TABLE {sms_mapping} (
-           module varchar(64) NOT NULL,
-           behavior varchar(64) NOT NULL,
-           gateway varchar(64) NOT NULL);
-      ');
       
       db_query('UPDATE {system} SET weight = -5 WHERE name = "sms_sendtophone"');
       break;
@@ -40,7 +33,16 @@ function sms_install() {
  */
 function sms_uninstall() {
   db_query('DROP TABLE {sms_messages}');
-  db_query('DROP TABLE {sms_mapping}');
-  
   drupal_set_message(t('SMS Framework uninstalled successfully.'));
+}
+
+/**
+ * Update: Removes gateway behavior mapping
+ */
+function sms_update_1() {
+  $ret = array();
+  // Remove table
+  $ret[] = update_sql("DROP TABLE {sms_mapping}");
+  
+  return $ret;
 }

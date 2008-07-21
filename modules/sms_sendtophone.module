@@ -70,29 +70,6 @@ function sms_sendtophone_admin_overview() {
 }
 
 /**
- * Implementation of hook_behavior_info().
- */
-function sms_sendtophone_behavior_info() {
-  return array(
-    'inline' => array(
-      'name' => t('Inline filter'),
-      'identifier' => 'inline',
-      'form' => 'sms_sendtophone_inline_form',
-    ),
-    'node' => array(
-      'name' => t('Node link'),
-      'identifier' => 'node',
-      'form' => 'sms_sendtophone_node_form',
-    ),
-    'cck' => array(
-      'name' => t('CCK field'),
-      'indentifier' => 'cck',
-      'form' => 'sms_sendtophone_cck_form',
-    )
-  );
-}
-
-/**
  * Menu callback.
  */
 function sms_sendtophone_page($type = NULL) {

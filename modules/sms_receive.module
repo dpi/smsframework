@@ -77,13 +77,7 @@ function sms_receive_admin_form_submit($form_id, $form_values) {
 }
 
 function sms_receive_get_callback($extra = array()) {
-  $gateway_id = sms_behavior_gateway($extra['module'], $extra['behavior']);
-  
-  if (!$gateway_id) {
-    $gateway_id = variable_get('sms_default_gateway', 0);
-  }
-  
-  $gateway = sms_gateways('gateway', $gateway_id);
+  $gateway = sms_gateways('gateway', variable_get('sms_default_gateway', 0));
   if (function_exists($gateway['get_callback'])) {
     return $gateway['get_callback']();
   }
@@ -93,13 +87,7 @@ function sms_receive_get_callback($extra = array()) {
 }
 
 function sms_receive_set_callback($url, $extra = array()) {
-  $gateway_id = sms_behavior_gateway($extra['module'], $extra['behavior']);
-  
-  if (!$gateway_id) {
-    $gateway_id = variable_get('sms_default_gateway', 0);
-  }
-  
-  $gateway = sms_gateways('gateway', $gateway_id);
+  $gateway = sms_gateways('gateway', variable_get('sms_default_gateway', 0));
   if (function_exists($gateway['set_callback'])) {
     return $gateway['set_callback']($url);
   }
