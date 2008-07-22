@@ -1,4 +1,4 @@
-<?
+<?php
 // $Id$
 
 function sms_muse_gateway_info() {
@@ -72,11 +72,8 @@ function sms_muse_send_form() {
   return $form;
 }
 
-function sms_muse_send($destinations, $message) {
-  $number = array();
-  foreach($destinations as $destination) {
-    $number[] = $destination->number;
-  }
+function sms_muse_send($number, $message) {
+  $number = array($number);
   return sms_muse_command('sendmsg', array('number' => $number, 'message' => $message));
 }
 
@@ -133,14 +130,12 @@ function sms_muse_command($command = 'auth', $data = array(), $config = NULL) {
       }
     break;
     case 'sendmsg':
-      $phonenums = $data['number'];
-      $message = $data['message'];
       if (variable_get('sms_clickatell_session_id_timestamp', 0) < strtotime('-50 mins')) {
   	sms_muse_command();
       }
       $user = variable_get('sms_muse_session_id', '');
       try {
-        $phonenums = $client->CleanPhoneList($user, $phonenums, $smsservicename);
+        $phonenums = $client->CleanPhoneList($user, $data['number'], $smsservicename);
       } catch (Exception $error){
  	return array(
           'faultcode' => $error->faultcode,
@@ -148,7 +143,7 @@ function sms_muse_command($command = 'auth', $data = array(), $config = NULL) {
         );
       }  
       try {
-	$result = $client->sendSMS($user, null, $smsservicename, $phonenums, $message, "TEST");
+	$result = $client->sendSMS($user, null, $smsservicename, $data['number'], $data['message'], "TEST");
         drupal_set_message("Send message was successful.");
         return true;
       } catch (Exception $error){

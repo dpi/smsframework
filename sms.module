@@ -192,20 +192,25 @@ function _gateways_build() {
 /**
  * Sends a message using the active gateway.
  * 
- * @param $destination
- *   An array of $destination objects. Each object must at least contain $destination->number. Additional properties may be defined by gateways.
+ * @param $number
+ *   The destination number.
+ * 
  * @param $message
  *   The text of the messsage to send.
- * @param $extra
+ * 
+ * @param $options
+ *   An array of dditional properties as defined by gateway modules.
  */
-function sms_send($destinations, $message, $extra = array()) {
-  if (!is_array($destinations)) {
-    return 0;
-  }
+function sms_send($number, $message, $options = array()) {
   $gateway = sms_gateways('gateway', variable_get('sms_default_gateway', 0));
+  
+  foreach (module_implements('sms_send') as $module) {
+    $function = $module .'_sms_send';
+    $function($number, $message, $options, $gateway);
+  }
 
   if (function_exists($gateway['send'])) {
-    $gateway['send']($destinations, $message);
+    $gateway['send']($number, $message, $options);
   }
 }
 
@@ -292,11 +297,7 @@ function sms_send_form($form = NULL, $destination = NULL, $required = TRUE) {
  */
 function sms_send_form_submit($form_id, $form_values) {
   $form_values['number'] = sms_formatter($form_values['number']);
-  foreach ($form_values['gateway'] as $key => $gateway_fields) {
-    $destination->$key = $gateway_fields;
-  }
-  $destination->number = $form_values['number'];
-  sms_send(array($destination), $form_values['message'], $form_values);
+  sms_send($form_values['number'], $form_values['message'], $form_values['gateway']);
 }
 
 function sms_send_form_validate($form_id, &$form_values) {

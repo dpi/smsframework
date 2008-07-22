@@ -109,7 +109,7 @@ function sms_user_settings_add_form_submit($form_id, $form_values, $account = NU
       $destination->$key = $field;
     }
   }
-  sms_send(array($destination), _sms_user_confirm_message($code));
+  sms_send($form_values['number'], _sms_user_confirm_message($code), $form_values['gateway']);
 }
 
 function sms_user_settings_confirm_form($account, $edit) {
