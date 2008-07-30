@@ -76,15 +76,9 @@ function sms_clickatell_send_form() {
 /**
  * Callback for sending messages.
  */
-function sms_clickatell_send($destinations, $message) {
-  $numbers = $extra['country'] . $numbers;
-  
-  foreach ($destinations as $destination) {
-    $processed_numbers[] = $destination->country . $destination->number;
-  }
-  
-  $number_string = implode(',', $processed_numbers);
-  $result = sms_clickatell_command('sendmsg', array('number' => $number_string, 'message' => $message));
+function sms_clickatell_send($number, $message, $options) {
+  $number = $options['country'] . $number;
+  $result = sms_clickatell_command('sendmsg', array('number' => $number, 'message' => $message));
 }
 
 function sms_clickatell_balance() {

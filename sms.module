@@ -57,7 +57,6 @@ function sms_perm() {
 
 function sms_admin_overview() {
   $output = drupal_get_form('sms_admin_default_form');
-  $output .= drupal_get_form('sms_admin_mapping_form');
   
   return $output;
 }
@@ -112,92 +111,6 @@ function theme_sms_admin_default_form($form) {
   $output .= drupal_render($form);
 
   return $output;
-}
-
-function sms_admin_mapping_form() {
-  $gateway_options = array_merge(array('Default'), sms_gateways('names'));
-  $modules = module_implements('behavior_info');
-  sort($modules);
-
-  $form['modules'] = array('#tree' => TRUE);
-
-  foreach ($modules as $module) {
-    if ($behaviors = module_invoke($module, 'behavior_info')) {
-      asort($behaviors);
-      foreach ($behaviors as $behavior_id => $behavior) {
-        $form['modules'][$module][$behavior_id] = array('#value' => $behavior['name']);
-        
-        $form['modules'][$module][$behavior_id]['gateway'] = array(
-          '#type' => 'radios',
-          '#options' => $gateway_options,
-          '#default_value' => sms_behavior_gateway($module, $behavior_id),
-        );
-      }
-    }
-  }
-  
-  foreach ($gateway_options as $key => $option) {
-    $form['gateway_options'][$key] = array('#value' => $option);
-  }
-    
-  $form['submit'] = array(
-    '#type' => 'submit', 
-    '#value' => t('Save mappings'),
-  );
-    
-  return $form;
-}
-
-function theme_sms_admin_mapping_form($form) {
-  foreach (element_children($form['modules']) as $module) {
-    $row = array();
-    $row[] = array('data' => t('@module module', array('@module' => $module)), 'class' => 'module', 'id' => 'module-'. $module, 'colspan' => count($form['gateway_options']) + 1);
-    $rows[] = $row;
-    
-    foreach (element_children($form['modules'][$module]) as $behavior) {
-      $row = array();
-      if (is_array($form['modules'][$module][$behavior])) {
-        $row[] = array('data' => $form['modules'][$module][$behavior]['#value'], 'class' => 'behavior');
-        foreach (element_children($form['modules'][$module][$behavior]['gateway']) as $radio) {
-          $title = $form['modules'][$module][$behavior]['gateway'][$radio]['#title'];
-          $row[] = array('data' => drupal_render($form['modules'][$module][$behavior]['gateway'][$radio]), 'title' => $title);
-        }
-        $form['modules'][$module][$behavior]['#printed'] = TRUE;
-        
-        $rows[] = $row;        
-      }
-    }
-  }
-
-  $header[] = (t('Behavior'));
-  foreach (element_children($form['gateway_options']) as $gateway) {
-    if (is_array($form['gateway_options'][$gateway])) {
-      $header[] = drupal_render($form['gateway_options'][$gateway]);
-    }
-  }
-  $output = '<h3>Gateway Mappings</h3>';
-  $output .= theme('table', $header, $rows, array('id' => 'mappings'));
-  $output .= drupal_render($form);
-  return $output;
-}
-
-function sms_admin_mapping_form_submit($form_id, $form_values) {
-  foreach ($form_values['modules'] as $module_name => $module) {
-    if (is_array($module) && module_exists($module_name)) {
-      foreach ($module as $behavior_name => $behavior) {
-        $is_existing = FALSE;
-        $is_existing = db_num_rows(db_query("SELECT * FROM {sms_mapping} WHERE module = '%s' AND behavior = '%s'", $module_name, $behavior_name));
-        
-        if ($is_existing) {
-          db_query("UPDATE {sms_mapping} SET gateway = '%s' WHERE module = '%s' AND behavior = '%s'", $behavior['gateway'], $module_name, $behavior_name);
-        }
-        else {
-          db_query('INSERT INTO {sms_mapping} (module, behavior, gateway) VALUES("%s", "%s", "%s")', $module_name, $behavior_name, $behavior['gateway']);
-        }
-      }
-    }
-  }
-  drupal_set_message(t('Gateway mappings saved.'));
 }
 
 function sms_admin_gateway_form($gateway = NULL, $gateway_id = '') {
@@ -277,89 +190,27 @@ function _gateways_build() {
 }
 
 /**
- * Get a list of all module supplied behaviors
- */
-function sms_behaviors($op = 'behaviors', $behavior = NULL) {
-  list($_behaviors, $_names) = _behaviors_build();
-  
-  switch ($op) {
-    case 'behaviors':
-      return $_behaviors;
-    case 'behavior':
-      return $_behaviors[$behavior];
-    case 'names':
-      return $_names;
-    case 'name':
-      return $_names[$behavior];
-  }
-}
-
-function _behaviors_build() {
-  $_behaviors = array();
-  $_names = array();
-  
-  $behavior_array = module_invoke_all('behavior_info');
-  foreach ($behavior_array as $identifier => $info) {
-    if (is_array($info['options'])) {
-      foreach ($info['options'] as $key => $option) {
-        $info['configuration'][$key] = variable_get($key, '');
-      }
-    }
-    $_behaviors[$identifier] = $info;
-    $_names[$identifier] = $info['name'];
-  }
-  
-  asort($_names);
-  
-  return array($_behaviors, $_names);
-}
-
-function sms_behavior_gateway($module, $behavior) {
-  $mappings = _sms_mappings();
-  if ($mappings[$module][$behavior]) {
-    return $mappings[$module][$behavior];
-  }
-  
-  return 0;
-}
-
-function _sms_mappings($reset = FALSE) {
-  static $mappings;
-  
-  if ($reset || !isset($mappings)) {
-    $mappings = array();
-    $gateway_result = db_query('SELECT module, behavior, gateway FROM {sms_mapping}');
-    while ($row = db_fetch_array($gateway_result)) {
-      $mappings[$row['module']][$row['behavior']] = $row['gateway'];
-    }
-  }
-
-  return $mappings;
-}
-
-/**
  * Sends a message using the active gateway.
  * 
- * @param $destination
- *   An array of $destination objects. Each object must at least contain $destination->number. Additional properties may be defined by gateways.
+ * @param $number
+ *   The destination number.
+ * 
  * @param $message
  *   The text of the messsage to send.
- * @param $extra
+ * 
+ * @param $options
+ *   An array of dditional properties as defined by gateway modules.
  */
-function sms_send($destinations, $message, $extra = array()) {
-  if (!is_array($destinations)) {
-    return 0;
+function sms_send($number, $message, $options = array()) {
+  $gateway = sms_gateways('gateway', variable_get('sms_default_gateway', 0));
+  
+  foreach (module_implements('sms_send') as $module) {
+    $function = $module .'_sms_send';
+    $function($number, $message, $options, $gateway);
   }
-  $gateway_id = sms_behavior_gateway($extra['module'], $extra['behavior']);
-  
-  if (!$gateway_id) {
-    $gateway_id = variable_get('sms_default_gateway', 0);
-  }
-  
-  $gateway = sms_gateways('gateway', $gateway_id);
-  
+
   if (function_exists($gateway['send'])) {
-    $gateway['send']($destinations, $message);
+    $gateway['send']($number, $message, $options);
   }
 }
 
@@ -385,7 +236,7 @@ function sms_formatter($number, $format = 1) {
   // Remove non-number characters
   $number = preg_replace("/[^0-9]/", '', $number);
   
-  if (strlen($number) > 10) {
+  if (strlen($number) > 16) {
     if ($number[0] == 1) {
       $number = ltrim($number, 1);
     }
@@ -408,14 +259,7 @@ function sms_formatter($number, $format = 1) {
  * - Show a 'remeber this info' field and store as a cookie depending on admin settings
  */
 function sms_send_form($form = NULL, $destination = NULL, $required = TRUE) {
-  $gateway_id = sms_behavior_gateway($form['module']['#value'], $form['behavior']['#value']);
-  if ($gateway_id) {
-    $gateway = sms_gateways('gateway', $gateway_id);
-  }
-  else {
-    $gateway = sms_gateways('gateway', variable_get('sms_default_gateway', 0));
-  }
-  
+  $gateway = sms_gateways('gateway', variable_get('sms_default_gateway', 0));
   $sms_form['number'] = array(
     '#type' => 'textfield',
     '#title' => t('Phone number'),
@@ -453,11 +297,7 @@ function sms_send_form($form = NULL, $destination = NULL, $required = TRUE) {
  */
 function sms_send_form_submit($form_id, $form_values) {
   $form_values['number'] = sms_formatter($form_values['number']);
-  foreach ($form_values['gateway'] as $key => $gateway_fields) {
-    $destination->$key = $gateway_fields;
-  }
-  $destination->number = $form_values['number'];
-  sms_send(array($destination), $form_values['message'], $form_values);
+  sms_send($form_values['number'], $form_values['message'], $form_values['gateway']);
 }
 
 function sms_send_form_validate($form_id, &$form_values) {

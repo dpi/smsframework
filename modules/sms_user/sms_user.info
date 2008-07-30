@@ -1,5 +1,5 @@
 ; $Id$
 name = SMS User
 description = Provides integration between the SMS Framework and Drupal users.
-dependencies = sms
+dependencies = sms token
 package = SMS Framework

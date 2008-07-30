@@ -44,6 +44,13 @@ function sms_sendtophone_menu($may_cache) {
 }
 
 /**
+ * Implementation of hook_perm()
+ */
+function sms_sendtophone_perm() {
+  return array('send to any number');
+}
+
+/**
  * Administration page for the Send To Phone module.
  */ 
 function sms_sendtophone_admin_overview() {
@@ -63,52 +70,45 @@ function sms_sendtophone_admin_overview() {
 }
 
 /**
- * Implementation of hook_behavior_info().
- */
-function sms_sendtophone_behavior_info() {
-  return array(
-    'inline' => array(
-      'name' => t('Inline filter'),
-      'identifier' => 'inline',
-      'form' => 'sms_sendtophone_inline_form',
-    ),
-    'node' => array(
-      'name' => t('Node link'),
-      'identifier' => 'node',
-      'form' => 'sms_sendtophone_node_form',
-    ),
-    'cck' => array(
-      'name' => t('CCK field'),
-      'indentifier' => 'cck',
-      'form' => 'sms_sendtophone_cck_form',
-    )
-  );
-}
-
-/**
  * Menu callback.
  */
 function sms_sendtophone_page($type = NULL) {
-  switch ($type) {
-    case 'inline':
-      $form = drupal_get_form('sms_sendtophone_inline_form');
-      break;
-    case 'node':
-      $form = drupal_get_form('sms_sendtophone_node_form');
-      break;
-    case 'field':
-      $form = drupal_get_form('sms_sendtophone_cck_form');
-      break;
-    default:
-      $form = t('An error occured.');
-      break;
+  global $user;
+  $user = user_load(array('uid' => $user-> uid));
+  if (user_access('send to any number') || !empty($user->sms_user['0']['number'])) {
+    switch ($type) {
+      case 'inline':
+        $form = drupal_get_form('sms_sendtophone_inline_form');
+        break;
+      case 'node':
+        $form = drupal_get_form('sms_sendtophone_node_form');
+        break;
+      case 'field':
+        $form = drupal_get_form('sms_sendtophone_cck_form');
+        break;
+      default:
+        $form = t('An error occured.');
+        break;
+    }
+  }
+  else {
+    if(empty($user->sms_user['0']['number']) && user_access('send to any number')) {
+      $register = array(
+        '#value' => t('You need need to <a href="@setup">setup</a> your mobile phone to send messages.', array('@setup' => url('user/'. $user->uid .'/mobile')))
+      );
+    }
+    else {
+      $register = array(
+        '#value' => t('You do not have permission to send messages. You may need to <a href="@signin">sign in</a> or <a href="@register">register</a> for an account to send messages to a mobile phone.', array('@signin' => url('user', 'destination='. $_GET['destination']), '@register' => url('user/register', 'destination='. $_GET['destination']))),
+      );
+    }
+    $form = drupal_render($register);
   }
 
   if ($_GET['thickbox']) {
     print $form;
     exit;
   }
-  
   return $form;
 }
 
@@ -378,9 +378,10 @@ function sms_sendtophone_inline_form() {
         '#title' => t('Message preview'),
       );
     }
-  }  
-  
-  return sms_send_form($form);
+  }
+  global $user;
+  $destination->number = $user->sms_user['0']['number'];
+  return sms_send_form($form, $destination);
 }
 
 function sms_sendtophone_cck_form() {
@@ -406,8 +407,9 @@ function sms_sendtophone_cck_form() {
       );
     }
   }  
-  
-  return sms_send_form($form);
+  global $user;
+  $destination->number = $user->sms_user['0']['number'];
+  return sms_send_form($form, $destination);
 }
 
 function sms_sendtophone_node_form() {
@@ -423,8 +425,9 @@ function sms_sendtophone_node_form() {
       '#default_value' => url('node/'. $node->nid, NULL, NULL, TRUE),
       '#attributes' => array('disabled' => 'true'),
     );
-            
-    return sms_send_form($form, 'sms_sendtophone', 'node');
+  global $user;
+  $destination->number = $user->sms_user['0']['number'];
+  return sms_send_form($form, $destination);
   }
 }
 
@@ -445,4 +448,14 @@ function sms_sendtophone_link($type, $node = NULL, $teaser = FALSE) {
   }
   
   return $links;
+}
+
+function sms_sendtophone_form_alter($form_id, &$form) {
+  if($form_id == sms_sendtophone_inline_form || $form_id == sms_sendtophone_node_form || $form_id == sms_sendtophone_cck_form) {
+    if(!user_access('send to any number')) {
+      // Makes number field plain text
+      $form['sms']['number']['#type'] = 'item';
+      $form['sms']['number']['#value'] = $form['sms']['number']['#default_value'];
+    }
+  }
 }

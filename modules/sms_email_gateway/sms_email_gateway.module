@@ -22,7 +22,9 @@ function sms_email_gateway_send_form($destination = NULL, $required = TRUE) {
     $options[0] = '<'. t('none') .'>';
   }
   
-   $options += _sms_email_gateway_providers();
+  $providers = module_invoke_all('sms_email_gateway_providers');
+  asort($providers);
+  $options += $providers;
     
   $form['carrier'] = array(
     '#type' => 'select',
@@ -40,22 +42,23 @@ function sms_email_gateway_send_form($destination = NULL, $required = TRUE) {
 /**
  * Callback for sending messages.
  */
-function sms_email_gateway_send($destinations, $message) {
+function sms_email_gateway_send($number, $message, $options) {
   $from = variable_get('site_mail', ini_get('sendmail_from'));
-  
-  foreach ($destinations as $destination) {
-    $to = $destination->number .'@'. $destination->carrier;
-    drupal_mail('sms_email_gateway', $to, '', $message, $from);
-  }
+  $to = $number .'@'. $options['carrier'];
+  drupal_mail('sms_email_gateway', $to, '', $message, $from);
 }
 
-function _sms_email_gateway_providers() {
+/**
+ * Implementation of hook_sms_email_gateway_providers()
+ */
+function sms_email_gateway_sms_email_gateway_providers() {
   return array(
     'msg.acsalaska.com' => t('Alaska Communications Systems'),
     'message.alltel.com' => t('Alltel Wireless'),
     'txt.att.net' => t('AT&T/Cingular'),
     'mobile.celloneusa.com' => t('CellularOne'),
     'cwemail.com' => t('Centennial Wireless'),
+    'sms.mycricket.com' => t('Cricket'),
     'messaging.sprintpcs.com' => t('Helio'),
     'page.nextel.com' => t('Nextel'),
     'qwestmp.com' => t('Qwest'),

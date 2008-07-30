@@ -57,16 +57,8 @@ function sms_blast_form_submit($form_id, $form_values) {
   
   foreach ($users as $user) {
     $this_user = user_load(array('uid' => $user['uid']));
-    if ($this_user->sms_user['status'] == 2) {
-      $destination->number = $this_user->sms_user['number'];
-      
-      foreach ($this_user->sms_user['gateway'] as $key => $field) {
-        $destination->$key = $field;
-      }
-      
-      $destinations[] = $destination;
+    if ($this_user->sms_user[0]['status'] == 2) {
+      sms_send($this_user->sms_user[0]['number'], $form_values['message'], $this_user->sms_user[0]['gateway']);
     }
   }
-  
-  sms_send($destinations, $form_values['message']);
 }
