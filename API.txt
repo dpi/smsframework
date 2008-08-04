@@ -26,7 +26,6 @@ properties and callbacks about each gateway. Here is an example:
     return array(
       'my_gateway' => array(
         'name' => 'My Gateway',
-        'identifier' => 'my_gateway',
         'send' => 'my_gateway_send',
         'receive' => TRUE,
         'configure form' => 'my_gateway_admin_form',
@@ -36,8 +35,6 @@ properties and callbacks about each gateway. Here is an example:
   }
     
 * name - Human readable name for the gateway.
-* identifier - Machine readable name for the gateway. This name must match the
-  gateway's array key
 * send - Callback function that the SMS Framework will call to send a message
 * receive (optional) - Set to true if the gateway has support for handling
   incoming messages
