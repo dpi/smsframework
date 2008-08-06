@@ -97,7 +97,7 @@ function sms_clickatell_command($command = 'auth', $data = array(), $config = NU
     $config = $gateway['configuration'];
   }
   
-  if ($config['ssl']) {
+  if ($config['sms_clickatell_ssl']) {
     $scheme = 'https';
   }
   else {
