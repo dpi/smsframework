@@ -35,12 +35,14 @@ properties and callbacks about each gateway. Here is an example:
   }
     
 * name - Human readable name for the gateway.
-* send - Callback function that the SMS Framework will call to send a message
+* send - Callback function that the SMS Framework will call to send a message.
 * receive (optional) - Set to true if the gateway has support for handling
-  incoming messages
-* configure form (optional) - Form function for gateway configuration options
+  incoming messages.
+* configure form (optional) - Form function for gateway configuration options.
+  You may add a function in the form of my_gateway_admin_form_validate for
+  validation but the framework always handles final submission.
 * send form (optional) - Form function for adding gateway-specific fields to
-  the sending form
+  the sending form.
 
 Next you need to write the callback function for sending SMS messages using
 your gateway. Using the example from above, our function would look something
