@@ -195,7 +195,7 @@ function sms_muse_get_session_id() {
       if ($result['status'] == 'OK') {
         variable_set('sms_muse_session_id', $result['data']);
         variable_set('sms_muse_session_id_timestamp', time());
-        watchdog('sms', t('Muse session ID refreshed: ' . $result['data']));
+        watchdog('sms', 'Muse session ID refreshed: %data', array('%data' => $result['data']));
       }
     }
   }
@@ -224,11 +224,11 @@ function sms_muse_error_codes() {
  * Create menu callback for JS
  */
 function sms_muse_menu() {
-  $items[] = array(
-    'path' => 'sms/in/auth',
+  $items = array();
+  $items['sms/in/auth'] = array(
+    'page callback' => 'sms_muse_authenticate',
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
-    'access' => TRUE,
-    'callback' => sms_muse_authenticate,
   );
   return $items;
 }

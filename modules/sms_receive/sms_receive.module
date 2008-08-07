@@ -157,7 +157,7 @@ function sms_receive_receive() {
   $message = sms_receive_parse();
   
   // Insert message into database, mostly for logging and debug right now
-  $mid = db_next_id('{sms_messages}');
+  $mid = db_last_insert_id('sms_messages', 'mid');
   db_query("INSERT INTO {sms_receive} (mid, number, message, time) VALUES(%d, '%s', '%s', '%s')", $mid, $message['from'], $message['text'], time());
   
   $node = sms_receive_process_message($message);
@@ -169,6 +169,7 @@ function sms_receive_receive() {
   // we need to change the current user
   // this has to be done here to allow modules
   // to create users
+  sms_receive_switch_user();
   sms_receive_switch_user($node->uid);
 
   // modules may override node elements before submitting. they do so by returning the node.

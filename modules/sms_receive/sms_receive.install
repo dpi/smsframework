@@ -10,7 +10,7 @@ function sms_receive_install() {
 function sms_receive_schema() {
   $schema['sms_receive'] = array(
     'fields' => array(
-      'mid'         => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'mid'         => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
       'number'      => array('type' => 'varchar', 'not null' => TRUE, 'length' => 255),
       'message'     => array('type' => 'varchar', 'not null' => TRUE, 'length' => 255),
       'time'        => array('type' => 'varchar', 'not null' => TRUE, 'length' => 255),
