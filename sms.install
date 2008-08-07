@@ -1,39 +1,37 @@
 <?php
 // $Id$
+/**
+ * Implementation of hook_install().
+ */
 function sms_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      $success = TRUE;
-      db_query('
-         CREATE TABLE {sms_messages} (
-         mid int(10) NOT NULL,
-         sent int(11) NOT NULL,
-         status int(11) NOT NULL,
-         destination varchar(64) NOT NULL,
-         message text default NULL,
-         gateway varchar(64) NOT NULL,
-         PRIMARY KEY (mid)) /*!40100 DEFAULT CHARACTER SET utf8 */;
-        ');
-      
-      db_query('UPDATE {system} SET weight = -5 WHERE name = "sms_sendtophone"');
-      break;
-  }
+  $result = drupal_install_schema('sms');
+  db_query('UPDATE {system} SET weight = -5 WHERE name = "sms_sendtophone"');
+}
 
-  if ($success) {
-    drupal_set_message(t('SMS Framework installed succesfully.'));
-  } 
-  else {
-    drupal_set_message(t('SMS Framework installation failed. Database tables must be created manually.', 'error'));
-  }
+/**
+ * Implementation of hook_schema().
+ */
+function sms_schema() {
+  $schema['sms_messages'] = array(
+    'fields'        => array(
+      'mid'         => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'sent'        => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'status'      => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'destination' => array('type' => 'varchar', 'not null' => TRUE, 'length' => 64),
+      'message'     => array('type' => 'text'),
+      'gateway'     => array('type' => 'varchar', 'not null' => TRUE, 'length' => 64),
+    ),
+    'primary key' => array('mid'),
+  );
+
+  return $schema;
 }
 
 /**
  * Implementation of hook_uninstall().
  */
 function sms_uninstall() {
-  db_query('DROP TABLE {sms_messages}');
-  drupal_set_message(t('SMS Framework uninstalled successfully.'));
+  drupal_uninstall_schema('sms');
 }
 
 /**
@@ -42,7 +40,7 @@ function sms_uninstall() {
 function sms_update_1() {
   $ret = array();
   // Remove table
-  $ret[] = update_sql("DROP TABLE {sms_mapping}");
+  db_drop_table($ret, 'sms_mapping');
   
   return $ret;
 }

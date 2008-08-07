@@ -1,5 +1,6 @@
 ; $Id$
-name = E-mail Gateway
+name = "E-mail Gateway"
 description = "Allows the SMS Framework to use E-mail gateways."
-dependencies = sms
+dependencies[] = sms
 package = SMS Framework
+core = 6.x

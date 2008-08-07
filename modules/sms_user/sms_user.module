@@ -5,7 +5,21 @@
  * @file
  * Provides integration between the SMS Framework and Drupal users.
  */
- 
+
+/**
+ * Send a message to a user.
+ */
+function sms_user_send($uid, $message) {
+  $account = user_load($uid);
+  
+  if ($account->sms_user[0]['status'] == 2) {
+    return sms_send($account->sms_user[0]['number'], $message, $account->sms_user[0]['gateway']);
+  }
+  else {
+    return FALSE;
+  }
+}
+
 /**
  * Returns the uid of the owner of a number.
  */
@@ -17,31 +31,25 @@ function sms_user_get_uid($number) {
 /**
  * Implementation of hook_menu().
  */
-function sms_user_menu($may_cache) {
+function sms_user_menu() {
   $items = array();
 
-  if ($may_cache) {
-    $items[] = array(
-      'path' => 'admin/smsframework/sms_user',
-      'title' => t('SMS User'),
-      'description' => t('Edit options for SMS and user integration.'),
-      'callback' => 'drupal_get_form',
-      'callback arguments' => array('sms_user_admin_settings'),
-      'access' => user_access('administer sms_user'),
-      'type' => MENU_NORMAL_ITEM,
-    );
-  }
-  else {
-    if (arg(0) == 'user' && is_numeric(arg(1))) {
-      $items[] = array(
-        'path' => 'user/'. arg(1) .'/mobile',
-        'title' => t('Mobile settings'),
-        'callback' => 'sms_user_settings',
-        'callback arguments' => array('sms_user_form'),
-        'type' => MENU_LOCAL_TASK,
-      );
-    } 
-  }
+  $items['admin/smsframework/sms_user'] = array(
+    'title' => 'SMS User',
+    'description' => 'Edit options for SMS and user integration.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sms_user_admin_settings'),
+    'access arguments' => array('administer sms_user'),
+  );
+
+  $items['user/%user/mobile'] = array(
+    'title' => 'Mobile settings',
+    'page callback' => 'sms_user_settings',
+    'page arguments' => array('sms_user_form'),
+    'type' => MENU_LOCAL_TASK,
+    'access callback' => 'user_edit_access',
+    'access arguments' => array(1),
+  );
   return $items;
 }
 
@@ -102,7 +110,7 @@ function sms_user_settings($register = FALSE) {
   return $output;
 }
 
-function sms_user_settings_add_form($account, $edit) {
+function sms_user_settings_add_form(&$form_state, $account, $edit) {
   $form = sms_send_form();
   $form['submit'] = array(
     '#type' => 'submit', 
@@ -112,41 +120,39 @@ function sms_user_settings_add_form($account, $edit) {
   return $form;
 }
 
-function sms_user_settings_add_form_validate($form_id, $form_values) {
-  if (!$form_values['number'] = sms_formatter($form_values['number'])) {
-    form_set_error('number', t('Please enter a valid ten digit phone number.'));
+function sms_user_settings_add_form_validate($form, &$form_state) {
+  if (!$form_state['values']['number'] = sms_formatter($form_state['values']['number'])) {
+    form_set_error('number', t('Please enter a valid phone number.'));
   }
-  elseif (sms_user_get_uid($form_values['number'])) {
+  elseif (sms_user_get_uid($form_state['values']['number'])) {
     form_set_error('number', t('The phone number you entered is already in use.'));
   }
 }
 
-function sms_user_settings_add_form_submit($form_id, $form_values, $account = NULL) {
+function sms_user_settings_add_form_submit($form, &$form_state, $account = NULL) {
   if (!$account) {
     $account = user_load(array('uid' => arg(1)));
   }
   $code = rand(1000, 9999);
   
-  $form_values['number'] = sms_formatter($form_values['number']);
-  
   $data[0] = array(
-    'number'  => sms_formatter($form_values['number']),
+    'number'  => sms_formatter($form_state['values']['number']),
     'status'  => 1,
     'code'    => $code,
-    'gateway' => $form_values['gateway'],
+    'gateway' => $form_state['values']['gateway'],
   );
   
   user_save($account, array('sms_user' => $data), 'mobile');
-  $destination->number = $form_values['number'];
-  if ($form_values['gateway']) {
-    foreach ($form_values['gateway'] as $key => $field) {
+  $destination->number = $form_state['values']['number'];
+  if ($form_state['values']['gateway']) {
+    foreach ($form_state['values']['gateway'] as $key => $field) {
       $destination->$key = $field;
     }
   }
-  sms_send($form_values['number'], _sms_user_confirm_message($code), $form_values['gateway']);
+  sms_send($form_state['values']['number'], _sms_user_confirm_message($code), $form_state['values']['gateway']);
 }
 
-function sms_user_settings_confirm_form($account, $edit) {
+function sms_user_settings_confirm_form(&$form_state, $account, $edit) {
   $form['number'] = array(
     '#type' => 'item',
     '#title' => t('Number'),
@@ -170,18 +176,18 @@ function sms_user_settings_confirm_form($account, $edit) {
   return $form;
 }
 
-function sms_user_settings_confirm_form_validate($form_id, $form_values) {
-  if ($form_values['op'] == t('Confirm number')) {
+function sms_user_settings_confirm_form_validate($form, &$form_state) {
+  if ($form_state['clicked_button']['#value'] == t('Confirm number')) {
     $account = user_load(array('uid' => arg(1)));
-    if ($form_values['confirm_code'] != $account->sms_user[0]['code']) {
+    if ($form_state['values']['confirm_code'] != $account->sms_user[0]['code']) {
       form_set_error('confirm_code', t('The confirmation code is invalid.'));
     }
   }
 }
 
-function sms_user_settings_confirm_form_submit($form_id, $form_values) {
+function sms_user_settings_confirm_form_submit($form, &$form_state) {
   $account = user_load(array('uid' => arg(1)));
-  if ($form_values['op'] == t('Delete & start over')) {
+  if ($form_state['clicked_button']['#value'] == t('Delete & start over')) {
     sms_user_delete($account->uid, 0);
   }
   else {
@@ -195,7 +201,7 @@ function sms_user_settings_confirm_form_submit($form_id, $form_values) {
   }
 }
 
-function sms_user_settings_reset_form($account, $edit) {
+function sms_user_settings_reset_form(&$form_state, $account, $edit) {
   $form['sms_user']['number'] = array(
     '#type' => 'item',
     '#title' => t('Your number'),
@@ -211,13 +217,13 @@ function sms_user_settings_reset_form($account, $edit) {
   return $form;
 }
 
-function sms_user_settings_reset_form_submit($form_id, $form_values) {
+function sms_user_settings_reset_form_submit($form, &$form_state) {
   $account = user_load(array('uid' => arg(1)));
   sms_user_delete($account->uid, 0);
   drupal_set_message(t('Your mobile information has been removed'), 'status');
 }
 
-function sms_user_settings_sleep_form($account, $edit) {
+function sms_user_settings_sleep_form(&$form_state, $account, $edit) {
   $form['sleep'] = array(
     '#type' => 'fieldset',
     '#title' => t('Sleep Time'),
@@ -268,12 +274,12 @@ function sms_user_settings_sleep_form($account, $edit) {
   return $form;
 }
 
-function sms_user_settings_sleep_form_submit($form_id, $form_values) {
+function sms_user_settings_sleep_form_submit($form, &$form_state) {
   $account = user_load(array('uid' => arg(1)));
   $data = $account->sms_user;
-  $data['sleep_enabled'] = $form_values['sleep_enabled'];
-  $data['sleep_start_time'] = $form_values['sleep_start_time'];
-  $data['sleep_end_time'] = $form_values['sleep_end_time'];
+  $data['sleep_enabled'] = $form_state['values']['sleep_enabled'];
+  $data['sleep_start_time'] = $form_state['values']['sleep_start_time'];
+  $data['sleep_end_time'] = $form_state['values']['sleep_end_time'];
   user_save($account, array('sms_user' => $data), 'mobile');
   drupal_set_message(t('The changes have been saved.'), 'status');
 }
@@ -442,7 +448,7 @@ function sms_user_token_values($type, $object = NULL, $options = array()) {
   switch ($type) {
     case 'sms_user':
       $values['confirm-code'] = $object['confirm-code'];
-      $values['mobile-url']   = url('user/'. $user->uid .'/mobile', NULL, NULL, TRUE);
+      $values['mobile-url']   = url("user/$user->uid/mobile", array('absolute' => TRUE));
       break;
   }
   return $values;

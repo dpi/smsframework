@@ -1,5 +1,7 @@
 ; $Id$
-name = SMS User
-description = Provides integration between the SMS Framework and Drupal users.
-dependencies = sms token
+name = "SMS User"
+description = "Provides integration between the SMS Framework and Drupal users."
+dependencies[] = sms
+dependencies[] = token
 package = SMS Framework
+core = 6.x

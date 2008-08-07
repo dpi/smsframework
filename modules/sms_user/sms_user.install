@@ -1,31 +1,37 @@
 <?php
 // $Id$
+/**
+ * Implementation of hook_install().
+ */
 function sms_user_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      db_query("CREATE TABLE {sms_user} (
-        uid int(10) NOT NULL,
-        delta varchar(32),
-        number varchar(32) NOT NULL,
-        status tinyint(4) NOT NULL,
-        code varchar(4) NOT NULL,
-        gateway longtext,
-        PRIMARY KEY (uid, delta),
-        UNIQUE KEY number (number)
-      ) /*!40100 DEFAULT CHARACTER SET utf8 */ ");
-      break;
-  }
+  drupal_install_schema('sms_user');
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function sms_user_schema() {
+  $schema['sms_user'] = array(
+    'fields' => array(
+      'uid'       => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'delta'     => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'number'    => array('type' => 'varchar', 'not null' => TRUE, 'length' => 32),
+      'status'    => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'code'      => array('type' => 'varchar', 'not null' => TRUE, 'length' => 16),
+      'gateway'   => array('type' => 'text'),
+    ),
+    'primary key' => array('uid', 'delta'),
+    'unique key'  => array('number'),
+  );
+  
+  return $schema;
 }
 
 /**
  * Implementation of hook_uninstall().
  */
 function sms_user_uninstall() {
-  if (db_table_exists('sms_user')) {
-    db_query('DROP TABLE {sms_user}');
-  }
-  drupal_set_message(t('SMS User uninstalled successfully.'));
+  drupal_uninstall_schema('sms_user');
 }
 
 /**

@@ -4,37 +4,32 @@
 /**
  * Implementation of hook_menu().
  */
-function sms_sendtophone_menu($may_cache) {
+function sms_sendtophone_menu() {
   $items = array();
 
-  if ($may_cache) {
-    $items[] = array(
-      'path' => 'sms/sendtophone',
-      'title' => t('Send to phone'),
-      'callback' => 'sms_sendtophone_page',
-      'access' => user_access('access content'),
-      'type' => MENU_CALLBACK,
-    );
+  $items['sms/sendtophone/%/%'] = array(
+    'title' => 'Send to phone',
+    'page callback' => 'sms_sendtophone_page',
+    'page arguments' => array(2,3),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
     
-    $items[] = array(
-      'path' => 'sms/sendtophone/thickbox',
-      'title' => t('Send to phone'),
-      'callback' => 'sms_sendtophone_thickbox',
-      'access' => user_access('access content'),
-      'type' => MENU_CALLBACK,
-    );
+  $items['sms/sendtophone/thickbox'] = array(
+    'title' => 'Send to phone',
+    'page callback' => 'sms_sendtophone_thickbox',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
     
-    $items[] = array(
-      'path' => 'admin/smsframework/sendtophone',
-      'title' => t('Send to phone'),
-      'description' => t('Configure send to phone functinality.'),
-      'callback' => 'drupal_get_form',
-      'callback arguments' => array('sms_sendtophone_admin_overview'),
-      'access' => user_access('administer smsframework'),
-    );
+  $items['admin/smsframework/sendtophone'] = array(
+    'title' => 'Send to phone',
+    'description' => 'Configure send to phone functinality.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sms_sendtophone_admin_overview'),
+    'access arguments' => array('administer smsframework'),
+  );
     
-  }
-  
   drupal_add_css(drupal_get_path('module', 'sms_sendtophone') .'/sms_sendtophone.css');
   if (module_exists('thickbox')) {
     drupal_add_js(drupal_get_path('module', 'sms_sendtophone') .'/sms_sendtophone.js');
@@ -72,7 +67,7 @@ function sms_sendtophone_admin_overview() {
 /**
  * Menu callback.
  */
-function sms_sendtophone_page($type = NULL) {
+function sms_sendtophone_page($type, $reference) {
   global $user;
   $user = user_load(array('uid' => $user-> uid));
   if (user_access('send to any number') || !empty($user->sms_user['0']['number'])) {
@@ -81,7 +76,7 @@ function sms_sendtophone_page($type = NULL) {
         $form = drupal_get_form('sms_sendtophone_inline_form');
         break;
       case 'node':
-        $form = drupal_get_form('sms_sendtophone_node_form');
+        $form = drupal_get_form('sms_sendtophone_node_form', $reference);
         break;
       case 'field':
         $form = drupal_get_form('sms_sendtophone_cck_form');
@@ -99,7 +94,7 @@ function sms_sendtophone_page($type = NULL) {
     }
     else {
       $register = array(
-        '#value' => t('You do not have permission to send messages. You may need to <a href="@signin">sign in</a> or <a href="@register">register</a> for an account to send messages to a mobile phone.', array('@signin' => url('user', 'destination='. $_GET['destination']), '@register' => url('user/register', 'destination='. $_GET['destination']))),
+        '#value' => t('You do not have permission to send messages. You may need to <a href="@signin">sign in</a> or <a href="@register">register</a> for an account to send messages to a mobile phone.', array('@signin' => url('user', array('query' => array('destination' => $_GET['destination']))), '@register' => url('user/register', array('query' => array('destination' => $_GET['destination']))))),
       );
     }
     $form = drupal_render($register);
@@ -239,7 +234,7 @@ function _sms_sendtophone_filter_inline_settings($format) {
     '#size' => 40,
     '#maxlength' => 255,
     '#default_value' => variable_get("sms_sendtophone_filter_inline_custom_icon_path_$format", ''),
-    '#field_prefix' => url(NULL, NULL, NULL, TRUE),
+    '#field_prefix' => url(NULL, array('absolute' => TRUE)),
   );
 
   return $form;
@@ -412,9 +407,9 @@ function sms_sendtophone_cck_form() {
   return sms_send_form($form, $destination);
 }
 
-function sms_sendtophone_node_form() {
-  if (is_numeric(arg(3))) {
-    $node = node_load(arg(3));
+function sms_sendtophone_node_form($form_state, $nid) {
+  if (is_numeric($nid)) {
+    $node = node_load($nid);
         
     $form['message'] = array(
       '#type' => 'textarea',
@@ -422,7 +417,7 @@ function sms_sendtophone_node_form() {
       '#description' => t('This URL will be sent to the phone.'),
       '#cols' => 35,
       '#rows' => 2,
-      '#default_value' => url('node/'. $node->nid, NULL, NULL, TRUE),
+      '#default_value' => url('node/'. $node->nid, array('absolute' => TRUE)),
       '#attributes' => array('disabled' => 'true'),
     );
   global $user;
@@ -450,7 +445,7 @@ function sms_sendtophone_link($type, $node = NULL, $teaser = FALSE) {
   return $links;
 }
 
-function sms_sendtophone_form_alter($form_id, &$form) {
+function sms_sendtophone_form_alter(&$form, $form_state, $form_id) {
   if($form_id == sms_sendtophone_inline_form || $form_id == sms_sendtophone_node_form || $form_id == sms_sendtophone_cck_form) {
     if(!user_access('send to any number')) {
       // Makes number field plain text

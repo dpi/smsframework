@@ -2,19 +2,17 @@
 // $Id$
 
 function sms_receive_menu() {
-  $items[] = array(
-    'path' => 'admin/smsframework/receive',
-    'title' => t('Receive'),
-    'description' => t('Setting for the SMS receive module.'),
-    'access' => user_access('administer smsframework'),
-    'callback' => 'drupal_get_form',
-    'callback arguments' => array('sms_receive_admin_form'),
+  $items['admin/smsframework/receive'] = array(
+    'title' => 'Receive',
+    'description' => 'Setting for the SMS receive module.',
+    'access arguments' => array('administer smsframework'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sms_receive_admin_form'),
   );
-  $items[] = array(
-    'path' => variable_get('sms_receive_path', 'sms/in'),
-    'title' => t('SMS Receive'),
-    'access' => user_access('receive sms message'),
-    'callback' => 'sms_receive_receive',
+  $items[variable_get('sms_receive_path', 'sms/in')] = array(
+    'title' => 'SMS Receive',
+    'access arguments' => array('receive sms message'),
+    'page callback' => 'sms_receive_receive',
     'type' => MENU_CALLBACK);
   return $items;
 }
@@ -60,19 +58,19 @@ function sms_receive_admin_form() {
   return $form;
 }
 
-function sms_receive_admin_form_submit($form_id, $form_values) {
-  if ($form_values['sms_receive_path']) {
+function sms_receive_admin_form_submit($form, &$form_state) {
+  if ($form_state['values']['sms_receive_path']) {
     // TODO: validation to check if path was actually set using sms_receive_set_callback
     global $base_url;
-    sms_receive_set_callback($base_url .'/'. $form_values['sms_receive_path']);
-    variable_set('sms_receive_path', $form_values['sms_receive_path']);
+    sms_receive_set_callback($base_url .'/'. $form_state['values']['sms_receive_path']);
+    variable_set('sms_receive_path', $form_state['values']['sms_receive_path']);
   }
-  if ($form_values['sms_receive_content_type']) {
-    variable_set('sms_receive_content_type', $form_values['sms_receive_content_type']);
+  if ($form_state['values']['sms_receive_content_type']) {
+    variable_set('sms_receive_content_type', $form_state['values']['sms_receive_content_type']);
   }
   $sms_fields = sms_receive_sms_fields();
   foreach ($sms_fields as $sms_field) {
-    variable_set('sms_receive_field_'. $sms_field , $form_values['sms_receive_field_'. $sms_field]);
+    variable_set('sms_receive_field_'. $sms_field , $form_state['values']['sms_receive_field_'. $sms_field]);
   }
 }
 
@@ -135,6 +133,7 @@ function sms_receive_parse() {
 function sms_receive_sms_fields() {
   // Maybe 'from' and 'text' should be built-in fields and 
   // this is used to collect extra fields, in our case 'type'
+  $fields = array();
   $gateway = variable_get('sms_default_gateway', 0);
   $function = 'sms_'. $gateway .'_receive_fields';
   if (function_exists($function)) {

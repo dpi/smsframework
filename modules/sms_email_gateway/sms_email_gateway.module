@@ -43,9 +43,17 @@ function sms_email_gateway_send_form($destination = NULL, $required = TRUE) {
  * Callback for sending messages.
  */
 function sms_email_gateway_send($number, $message, $options) {
-  $from = variable_get('site_mail', ini_get('sendmail_from'));
   $to = $number .'@'. $options['carrier'];
-  drupal_mail('sms_email_gateway', $to, '', $message, $from);
+  $params['message'] = $message; 
+  drupal_mail('sms_email_gateway', 'sms', $to, language_default(), $params);
+}
+
+/**
+ * Implementation of hook_mail().
+ */
+function sms_email_gateway_mail($key, &$message, &$params) {
+  $message['body'] = $params['message'];
+  unset($message['params']['message']);
 }
 
 /**
