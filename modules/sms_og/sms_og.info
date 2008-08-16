@@ -1,5 +1,0 @@
-; $Id$
-name = SMS Organic Groups
-description = "Allows for integration with Organic Groups"
-package = SMS Framework
-dependencies = sms_receive
