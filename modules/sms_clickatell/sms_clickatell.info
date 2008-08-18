@@ -4,4 +4,3 @@ description = "Allows the SMS Framework to use Clickatell as a gateway."
 package = SMS Framework
 dependencies[] = sms
 core = 6.x
-

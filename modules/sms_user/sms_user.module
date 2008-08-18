@@ -69,7 +69,7 @@ function sms_user_sms_send(&$number, &$message, &$options, &$gateway) {
     
     if ($account->sms_user['sleep_enabled'] && _sms_user_sleep_active($account)) {
       unset($gateway['send']);
-      watchdog('sms', t('Message was not sent to @user due to sleep settings.', array('@user' => $account->name)));
+      watchdog('sms', 'Message was not sent to @user due to sleep settings.', array('@user' => $account->name));
     }
   }
 }
@@ -479,7 +479,7 @@ function sms_user_auth($number) {
   $uid = sms_user_get_uid($number);
   if ($account = user_load(array('uid' => $uid, 'status' => 1))) {
     $user = $account;
-    watchdog('sms', t('%name was authenticated using SMS.', array('%name' => $user->name)));
+    watchdog('sms', '%name was authenticated using SMS.', array('%name' => $user->name));
     return $user;
   }
 }

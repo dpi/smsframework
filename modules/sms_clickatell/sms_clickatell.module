@@ -112,7 +112,14 @@ function sms_clickatell_command($command = 'auth', $data = array(), $config = NU
       $query = 'api_id='. $config['sms_clickatell_api_id'] .'&user='. $config['sms_clickatell_user'] .'&password='. $config['sms_clickatell_password'];
       break;
     case 'sendmsg':
-      $query = 'session_id='. sms_clickatell_get_session_id() .'&to='. $data['number'] .'&text='. drupal_urlencode($data['message']);
+      // Check if the message requires unicode handling
+      if ($unicode_message = sms_clickatell_unicode($data['message'])) {
+        $message = $unicode_message;
+      }
+      else {
+        $message = drupal_urlencode($data['message']);
+      }
+      $query = 'session_id='. sms_clickatell_get_session_id() .'&to='. $data['number'] .'&text='. $message;
       break;
     case 'getbalance':
       $query = 'session_id='. sms_clickatell_get_session_id();
@@ -187,4 +194,18 @@ function sms_clickatell_country_codes() {
   return array(
     1 => 'United States',
   );
+}
+
+/**
+ * Converts a string to USC-2 encoding if neccessary.
+ */
+function sms_clickatell_unicode($message) {
+  if (function_exists('iconv')) {
+    $latin = @iconv('UTF-8', 'ISO-8859-1', $message);
+    if (strcmp($latin, $message)) {
+      $arr = unpack('H*hex', @iconv('UTF-8', 'UCS-2BE', $message));
+      return strtoupper($arr['hex']) .'&unicode=1';
+    }
+  }
+  return FALSE;
 }
