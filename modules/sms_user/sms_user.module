@@ -467,6 +467,20 @@ function sms_user_token_list($type = 'all') {
 }
 
 /**
+ * Implementation of hook_sms_incoming().
+ */
+function sms_user_sms_incoming($op, $number, $message) {
+  switch ($op) {
+    case 'pre process':
+      sms_user_auth($number);
+      break;
+    case 'post process':
+      sms_user_logout();
+      break;
+  }
+}
+
+/**
  * Authenticate a user based on mobile number.
  * 
  * @param $number

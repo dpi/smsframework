@@ -1,0 +1,7 @@
+; $Id$
+name = "SMS Actions"
+description = "Provides an action for sending outgoing messages and the ability to define custom triggers for incoming messages."
+package = SMS Framework
+dependencies[] = sms
+dependencies[] = trigger
+core = 6.x

@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * Adds support for sending SMS messages using the Clickatell gateway.
+ */
+
+/**
  * Implementation of hook_gateway_info().
  */
 function sms_clickatell_gateway_info() {
@@ -55,9 +60,8 @@ function sms_clickatell_admin_form($configuration) {
  */ 
 function sms_clickatell_admin_form_validate($form, &$form_state) {
   $result = sms_clickatell_command('auth', array(), $form_state['values']);
-  $codes = sms_clickatell_error_codes();
-  if ($result['status'] == 'ERR') {
-    form_set_error('', t('A Clickatell gateway error occured: '. $codes[floor($result['code'])]));
+  if (!$result['status']) {
+    form_set_error('', t('A Clickatell gateway error occured: @error.', array('@error' => $result['message'])));
   }
   variable_set('sms_clickatell_session_id_timestamp', 0);
 }
@@ -82,7 +86,7 @@ function sms_clickatell_send_form() {
  */
 function sms_clickatell_send($number, $message, $options) {
   $number = $options['country'] . $number;
-  $result = sms_clickatell_command('sendmsg', array('number' => $number, 'message' => $message));
+  return sms_clickatell_command('sendmsg', array('number' => $number, 'message' => $message));
 }
 
 function sms_clickatell_balance() {
@@ -127,40 +131,41 @@ function sms_clickatell_command($command = 'auth', $data = array(), $config = NU
   }
 
   // Run the command
-  $result = drupal_http_request($scheme .'://api.clickatell.com/http/'. $command .'?'. $query);
+  $http_result = drupal_http_request($scheme .'://api.clickatell.com/http/'. $command .'?'. $query);
 
   // Check for HTTP errors
-  if ($result->error) {
-    drupal_set_message(t('An error occured during the HTTP request: '. $result->error), 'error');
-    return 0;
+  if ($http_result->error) {
+    return array('status' => FALSE, 'message' => 'An error occured during the HTTP request: @error', 'variables' => array('@error' => $http_result->error));
   }
   
-  if ($result->data) {
+  if ($http_result->data) {
+    // Check for Clickatell errors
+    if (strpos($http_result->data, 'ERR') !== FALSE) {
+      $result = array('status' => FALSE, 'message' => $http_result->data);
+    }
+    else {
+      $result = array('status' => TRUE, 'sid' => $sid);
+    }
     switch ($command) {
       case 'auth':
-        list($response['status'], $response['data']) = explode(': ', $result->data);
-        $response['code'] = drupal_substr($response['data'], 0, 3);
-        $response['message'] = drupal_substr($response['data'], 5, drupal_strlen($response['data']) - 1);
-        break;
-      case 'sendmsg':
-        $response = explode(': ', $result->data);
-        break;
-      case 'getbalance':
-        list($response['status'], $response['data']) = explode(': ', $result->data);
+        if ($result['status']) {
+          // Add Clickatell session ID to result array.
+          list($status, $sid) = explode(': ', $http_result->data);
+          $result['sid'] = $sid;
+        }
         break;
     }
-    
-    return $response;
   }
+  return $result;
 }
 
 function sms_clickatell_get_session_id() {
   if (variable_get('sms_clickatell_session_id_timestamp', 0) < strtotime('-10 mins')) {
     if ($result = sms_clickatell_command()) {
-      if ($result['status'] == 'OK') {
-        variable_set('sms_clickatell_session_id', $result['data']);
+      if ($result['status'] == TRUE) {
+        variable_set('sms_clickatell_session_id', $result['sid']);
         variable_set('sms_clickatell_session_id_timestamp', time());
-        watchdog('sms', 'Clickatell session ID refreshed: %data', array('%data' => $result['data']));
+        watchdog('sms', 'Clickatell session ID refreshed: %data', array('%data' => $result['sid']));
       }
     }
   }

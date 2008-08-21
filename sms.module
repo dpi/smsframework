@@ -8,6 +8,49 @@
  */
 
 /**
+ * Sends a message using the active gateway.
+ * 
+ * @param $number
+ *   The destination number.
+ * 
+ * @param $message
+ *   The text of the messsage to send.
+ * 
+ * @param $options
+ *   An array of dditional properties as defined by gateway modules.
+ */
+function sms_send($number, $message, $options = array()) {
+  $gateway = sms_default_gateway();
+  
+  foreach (module_implements('sms_send') as $module) {
+    $function = $module .'_sms_send';
+    $function($number, $message, $options, $gateway);
+  }
+
+  if (function_exists($gateway['send'])) {
+    $response = $gateway['send']($number, $message, $options);
+  }
+  return sms_handle_result($response, $number, $message);
+}
+
+/**
+ * Callback for incoming messages. Allows gateways modules to pass messages in
+ * a standard format for processing.
+ * 
+ * @param $number
+ *   The sender's mobile number.
+ * 
+ * @param $message
+ *   The content of the text message.
+ */
+function sms_incoming($number, $message) {
+  // Execute three phases
+  module_invoke_all('sms_incoming', 'pre process', $number, $message);
+  module_invoke_all('sms_incoming', 'process', $number, $message);
+  module_invoke_all('sms_incoming', 'post process', $number, $message);
+}
+
+/**
  * Returns the current default gateway.
  */
 function sms_default_gateway() {
@@ -28,6 +71,7 @@ function sms_gateway_info() {
 
 function sms_send_log($number, $message, $options) {
   watchdog('sms', 'SMS message sent to %number with the text: @message', array('%number' => $number, '@message' => $message), WATCHDOG_INFO);
+  return array('status' => TRUE);
 }
 
 /**
@@ -230,28 +274,21 @@ function _gateways_build() {
   return array($_gateways, $_names);
 }
 
-/**
- * Sends a message using the active gateway.
- * 
- * @param $number
- *   The destination number.
- * 
- * @param $message
- *   The text of the messsage to send.
- * 
- * @param $options
- *   An array of dditional properties as defined by gateway modules.
- */
-function sms_send($number, $message, $options = array()) {
-  $gateway = sms_default_gateway();
-  
-  foreach (module_implements('sms_send') as $module) {
-    $function = $module .'_sms_send';
-    $function($number, $message, $options, $gateway);
+function sms_handle_result($result, $number, $message) {
+  if ($result['status']) {
+    return TRUE;
   }
-
-  if (function_exists($gateway['send'])) {
-    $gateway['send']($number, $message, $options);
+  else {
+    $error_message = 'Sending SMS to %number failed.';
+    $variables['%number'] = $number;
+    if ($result['message']) {
+      $error_message .= ' The gateway said '. $result['message'];
+      if (!empty($result['variables'])) {
+        $variables = array_merge($variables, $result['variables']);
+      }
+    }
+    watchdog('sms', $error_message, $variables, WATCHDOG_ERROR);
+    return FALSE;
   }
 }
 
@@ -295,7 +332,7 @@ function sms_formatter($number, $format = 1) {
  * 
  * @return $form
  */
-function sms_send_form($required = TRUE) {
+function sms_send_form($required = FALSE) {
   $gateway = sms_default_gateway();
   $form['number'] = array(
     '#type' => 'textfield',
@@ -308,7 +345,7 @@ function sms_send_form($required = TRUE) {
   // Add gateway defined fields
   if (function_exists($gateway['send form'])) {
     $form['gateway']['#tree'] = TRUE;
-    $form['gateway'] = array_merge($gateway['send form']($destination, $required), $form['gateway']);
+    $form['gateway'] = array_merge($gateway['send form']($required), $form['gateway']);
   }
 
   return $form;
