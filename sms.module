@@ -357,6 +357,18 @@ function sms_send_form_validate($form, &$form_state) {
   }
 }
 
+function sms_validate_number(&$number) {
+  if (!strlen($number) || !$number = sms_formatter($number)) {
+    return t('The phone number is invalid.');
+  }
+
+  // Allow the active gateway to provide number validation
+  $gateway = sms_default_gateway();
+  if (function_exists($gateway['validate number']) && $error = $gateway['validate number']($number)) {
+    return $error;
+  }
+}
+
 /**
  * Performs a simple send on submit. 
  */
