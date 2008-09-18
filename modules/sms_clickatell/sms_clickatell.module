@@ -1,6 +1,14 @@
 <?php
 // $Id$
 
+/**
+ * @file
+ * Adds support for sending SMS messages using the Clickatell gateway.
+ */
+
+/**
+ * Implementation of hook_gateway_info().
+ */
 function sms_clickatell_gateway_info() {
   return array(
     'clickatell' => array(
@@ -52,9 +60,8 @@ function sms_clickatell_admin_form($configuration) {
  */ 
 function sms_clickatell_admin_form_validate($form_id, $form_values) {
   $result = sms_clickatell_command('auth', array(), $form_values);
-  $codes = sms_clickatell_error_codes();
-  if ($result['status'] == 'ERR') {
-    form_set_error('', t('A Clickatell gateway error occured: '. $codes[floor($result['code'])]));
+  if (!$result['status']) {
+    form_set_error('', t('A Clickatell gateway error occured: @error.', array('@error' => $result['message'])));
   }
   variable_set('sms_clickatell_session_id_timestamp', 0);
 }
@@ -79,7 +86,7 @@ function sms_clickatell_send_form() {
  */
 function sms_clickatell_send($number, $message, $options) {
   $number = $options['country'] . $number;
-  $result = sms_clickatell_command('sendmsg', array('number' => $number, 'message' => $message));
+  return sms_clickatell_command('sendmsg', array('number' => $number, 'message' => $message));
 }
 
 function sms_clickatell_balance() {
@@ -109,7 +116,14 @@ function sms_clickatell_command($command = 'auth', $data = array(), $config = NU
       $query = 'api_id='. $config['sms_clickatell_api_id'] .'&user='. $config['sms_clickatell_user'] .'&password='. $config['sms_clickatell_password'];
       break;
     case 'sendmsg':
-      $query = 'session_id='. sms_clickatell_get_session_id() .'&to='. $data['number'] .'&text='. drupal_urlencode($data['message']);
+      // Check if the message requires unicode handling
+      if ($unicode_message = sms_clickatell_unicode($data['message'])) {
+        $message = $unicode_message;
+      }
+      else {
+        $message = drupal_urlencode($data['message']);
+      }
+      $query = 'session_id='. sms_clickatell_get_session_id() .'&to='. $data['number'] .'&text='. $message;
       break;
     case 'getbalance':
       $query = 'session_id='. sms_clickatell_get_session_id();
@@ -117,40 +131,37 @@ function sms_clickatell_command($command = 'auth', $data = array(), $config = NU
   }
 
   // Run the command
-  $result = drupal_http_request($scheme .'://api.clickatell.com/http/'. $command .'?'. $query);
+  $http_result = drupal_http_request($scheme .'://api.clickatell.com/http/'. $command .'?'. $query);
 
   // Check for HTTP errors
-  if ($result->error) {
-    drupal_set_message(t('An error occured during the HTTP request: '. $result->error), 'error');
-    return 0;
+  if ($http_result->error) {
+    return array('status' => FALSE, 'message' => t('An error occured during the HTTP request: @error', array('@error' => $http_result->error)));
   }
   
-  if ($result->data) {
-    switch ($command) {
-      case 'auth':
-        list($response['status'], $response['data']) = explode(': ', $result->data);
-        $response['code'] = drupal_substr($response['data'], 0, 3);
-        $response['message'] = drupal_substr($response['data'], 5, drupal_strlen($response['data']) - 1);
-        break;
-      case 'sendmsg':
-        $response = explode(': ', $result->data);
-        break;
-      case 'getbalance':
-        list($response['status'], $response['data']) = explode(': ', $result->data);
-        break;
+  if ($http_result->data) {
+    // Check for Clickatell errors
+    if (strpos($http_result->data, 'ERR') !== FALSE) {
+      $result = array('status' => FALSE, 'message' => $http_result->data);
     }
-    
-    return $response;
+    elseif ($command == 'auth') {
+      // Add Clickatell session ID to result array.
+      list($status, $sid) = explode(': ', $http_result->data);
+      $result = array('status' => TRUE, 'sid' => $sid);
+    }
+    else {
+      $result = array('status' => TRUE);
+    }
   }
+  return $result;
 }
 
 function sms_clickatell_get_session_id() {
   if (variable_get('sms_clickatell_session_id_timestamp', 0) < strtotime('-10 mins')) {
     if ($result = sms_clickatell_command()) {
-      if ($result['status'] == 'OK') {
-        variable_set('sms_clickatell_session_id', $result['data']);
+      if ($result['status']) {
+        variable_set('sms_clickatell_session_id', $result['sid']);
         variable_set('sms_clickatell_session_id_timestamp', time());
-        watchdog('sms', t('Clickatell session ID refreshed: '. $result['data']));
+        watchdog('sms', t('Clickatell session ID refreshed: %sid', array('%sid' => $result['sid'])));
       }
     }
   }
@@ -184,4 +195,18 @@ function sms_clickatell_country_codes() {
   return array(
     1 => 'United States',
   );
+}
+
+/**
+ * Converts a string to USC-2 encoding if neccessary.
+ */
+function sms_clickatell_unicode($message) {
+  if (function_exists('iconv')) {
+    $latin = @iconv('UTF-8', 'ISO-8859-1', $message);
+    if (strcmp($latin, $message)) {
+      $arr = unpack('H*hex', @iconv('UTF-8', 'UCS-2BE', $message));
+      return strtoupper($arr['hex']) .'&unicode=1';
+    }
+  }
+  return FALSE;
 }
