@@ -1,5 +1,6 @@
 ; $Id$
 name = SMS Blast
 description = Allows bulk text messages to be sent to registered users.
-dependencies = sms_user
 package = SMS Framework
+dependencies[] = sms_user
+core = 6.x
