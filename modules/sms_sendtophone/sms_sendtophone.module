@@ -92,7 +92,7 @@ function sms_sendtophone_page($type = NULL) {
     $form = drupal_render($register);
   }
 
-  if ($_GET['thickbox']) {
+  if (isset($_GET['thickbox'])) {
     print $form;
     exit;
   }
@@ -384,6 +384,16 @@ function sms_sendtophone_form($type) {
   );
   
   return $form;
+}
+
+function sms_sendtophone_form_validate($form_id, $form_values) {
+  if ($error = sms_validate_number($form_values['number'])) {
+    form_set_error('number', $error);
+  }
+}
+
+function sms_sendtophone_form_submit($form_id, $form_values) {
+  sms_send($form_values['number'], $form_values['message'], $form_values['gateway']);
 }
 
 function sms_sendtophone_link($type, $node = NULL, $teaser = FALSE) {

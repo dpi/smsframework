@@ -16,10 +16,6 @@ function sms_email_gateway_gateway_info() {
  */
 function sms_email_gateway_send_form() {  
   $options = array();
-  if (!$required) {
-    $options[0] = '<'. t('none') .'>';
-  }
-  
   $providers = module_invoke_all('sms_email_gateway_providers');
   asort($providers);
   $options += $providers;
@@ -40,9 +36,10 @@ function sms_email_gateway_send_form() {
  * Callback for sending messages.
  */
 function sms_email_gateway_send($number, $message, $options) {
-  $from = variable_get('site_mail', ini_get('sendmail_from'));
+  $from = !empty($options['from']) ? $options['from'] : NULL;
   $to = $number .'@'. $options['carrier'];
   drupal_mail('sms_email_gateway', $to, '', $message, $from);
+  return array('status' => TRUE);
 }
 
 /**
