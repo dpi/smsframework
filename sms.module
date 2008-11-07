@@ -292,11 +292,23 @@ function sms_handle_result($result, $number, $message) {
   }
 }
 
-function sms_number_format($number) {
+function sms_validate_number(&$number, $options = array()) {
+  if (!strlen($number)) {
+    return t('The phone number is invalid.');
+  }
+
+  // Allow the active gateway to provide number validation
+  $gateway = sms_default_gateway();
+  if (function_exists($gateway['validate number']) && $error = $gateway['validate number']($number)) {
+    return $error;
+  }
+}
+
+function sms_format_number($number) {
   $gateway = sms_default_gateway();
   
-  if ($gateway['number_formatter'] && function_exists($gateway['number_formatter'])) {
-    return $gateway['number_formatter']($number_formatter);
+  if ($gateway['format number'] && function_exists($gateway['format number'])) {
+    return $gateway['format number']($number_formatter);
   }
   else {
     return $number;
@@ -354,18 +366,6 @@ function sms_send_form($required = FALSE) {
 function sms_send_form_validate($form, &$form_state) {
   if (!sms_formatter($form_state['values']['number'])) {
     form_set_error('number', t('You must enter a valid phone number.'));
-  }
-}
-
-function sms_validate_number(&$number) {
-  if (!strlen($number) || !$number = sms_formatter($number)) {
-    return t('The phone number is invalid.');
-  }
-
-  // Allow the active gateway to provide number validation
-  $gateway = sms_default_gateway();
-  if (function_exists($gateway['validate number']) && $error = $gateway['validate number']($number)) {
-    return $error;
   }
 }
 
