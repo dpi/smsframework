@@ -285,24 +285,6 @@ function sms_user_validate_number(&$number) {
   }
 }
 
-/**
- * Deletes a user's mobile information from the database
- * 
- * @param $uid
- *   The uid of the user who's data is to be removed.
- * 
- * @param $delta
- *   The delta value of the number. Defaults to 'all' which will delete all numbers.
- */
-function sms_user_delete($uid, $delta = 'all') {
-  $db_args = array($uid);
-  if (is_numeric($delta)) {
-    $delta_where = 'AND delta = %d';
-    $db_args[] = $delta;
-  }
-  db_query("DELETE FROM {sms_user} WHERE uid = %d $delta_where", $db_args);
-}
-
 function sms_user_user($op, &$edit, &$account, $category = NULL) {
   switch ($op) {
     case 'load':
@@ -361,8 +343,26 @@ function sms_user_save(&$edit, &$account, $category) {
         }
       }
     }
-    $edit['sms_user'][0] = NULL;
+    $edit['sms_user'] = NULL;
   }
+}
+
+/**
+ * Deletes a user's mobile information from the database
+ * 
+ * @param $uid
+ *   The uid of the user who's data is to be removed.
+ * 
+ * @param $delta
+ *   The delta value of the number. Defaults to 'all' which will delete all numbers.
+ */
+function sms_user_delete($uid, $delta = 'all') {
+  $db_args = array($uid);
+  if (is_numeric($delta)) {
+    $delta_where = 'AND delta = %d';
+    $db_args[] = $delta;
+  }
+  db_query("DELETE FROM {sms_user} WHERE uid = %d $delta_where", $db_args);
 }
 
 function _sms_user_confirm_message($code) {
@@ -508,23 +508,4 @@ function sms_user_logout() {
   session_destroy();
   
   $user = drupal_anonymous_user();
-}
-
-/*
- * Implementation of hook_sms_receive()
- * Match an incoming message to a user
- */
-function sms_user_sms_receive(&$node, $sms_message) {
-  // is $sms_message['from'] a general case?
-  $number = $sms_message['from'];
-  // how is this be handled with international numbers? do we need to remove +44 for UK?
-  // should be able to test when we get Chinese SIM card
-  if (substr($number, 0, 1) == '1') {// remove leading '1', sms_user doesn't store it...
-    $number = substr($number, 1);
-  }
-
-  $uid = sms_user_get_uid($number);
-  $account = user_load(array('uid' => $uid));
-  $node->uid = $account->uid;
-  $node->name = $account->name;
 }
