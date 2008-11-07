@@ -105,12 +105,12 @@ function sms_muse_command($command = 'auth', $data = array(), $config = NULL) {
       $userid = $config['sms_muse_user'];
       $pwd = $config['sms_muse_password'];
       try {
-	$result = $client->userAuthenticate($userid, $pwd);
+        $result = $client->userAuthenticate($userid, $pwd);
         
-	//  Remember the token returned in order to send the message
-	variable_set('sms_muse_session_id', $result->AuthenticateToken);
-	variable_set('sms_clickatell_session_id_timestamp', time());
-	return true;
+        //  Remember the token returned in order to send the message
+        variable_set('sms_muse_session_id', $result->AuthenticateToken);
+        variable_set('sms_clickatell_session_id_timestamp', time());
+        return true;
       } catch (Exception $error) {
         return array(
           'faultcode' => $error->faultcode,
@@ -120,56 +120,56 @@ function sms_muse_command($command = 'auth', $data = array(), $config = NULL) {
     break;
     case 'sendmsg':
       if (variable_get('sms_clickatell_session_id_timestamp', 0) < strtotime('-50 mins')) {
-  	sms_muse_command();
+        sms_muse_command();
       }
       $user = variable_get('sms_muse_session_id', '');
       try {
         $phonenums = $client->CleanPhoneList($user, $data['number'], $smsservicename);
-      } catch (Exception $error){
- 	return array(
+      } catch (Exception $error) {
+        return array(
           'faultcode' => $error->faultcode,
           'faultstring' => $error->faultstring,
-        );
+          );
       }  
       try {
-	$result = $client->sendSMS($user, null, $smsservicename, $data['number'], $data['message'], "TEST");
+        $result = $client->sendSMS($user, null, $smsservicename, $data['number'], $data['message'], "TEST");
         drupal_set_message("Send message was successful.");
         return true;
-      } catch (Exception $error){
- 	return array(
+      } catch (Exception $error) {
+        return array(
           'faultcode' => $error->faultcode,
           'faultstring' => $error->faultstring,
-        );
+          );
       }
     break;
     case 'setcallback':
       if (variable_get('sms_clickatell_session_id_timestamp', 0) < strtotime('-50 mins')) {
-  	sms_muse_command();
+        sms_muse_command();
       }
       $user = variable_get('sms_muse_session_id', '');
       $url = $data['url'];
       try {
         return $client->setCallBackURL($user, null, $smsservicename, $url);
-      } catch (Exception $error){
+      } catch (Exception $error) {
         drupal_set_message($error->faultstring);
- 	return array(
+        return array(
           'faultcode' => $error->faultcode,
           'faultstring' => $error->faultstring,
-        );
+          );
       }
     break;
     case 'getcallback':
       if (variable_get('sms_clickatell_session_id_timestamp', 0) < strtotime('-50 mins')) {
-  	sms_muse_command();
+        sms_muse_command();
       }
       $user = variable_get('sms_muse_session_id', '');
       try {
         return $client->getCallBackURL($user, $smsservicename);
-      } catch (Exception $error){
- 	return $result = array(
+      } catch (Exception $error) {
+        return $result = array(
           'faultcode' => $error->faultcode,
           'faultstring' => $error->faultstring,
-        );
+          );
       }
     break;
   }
@@ -234,12 +234,12 @@ function sms_muse_authenticate() {
   );
   
   $auth = sms_muse_command('auth', array(), $config); 
-  if($auth == '1') {
-        $result = 1;
+  if ($auth == '1') {
+    $result = 1;
   }
   else {
-        $result = 0;
-        $error = $auth['faultstring'];
+    $result = 0;
+    $error = $auth['faultstring'];
   }
   
   print drupal_to_js(array(

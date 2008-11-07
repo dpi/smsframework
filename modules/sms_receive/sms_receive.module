@@ -257,7 +257,7 @@ function sms_receive_authenticate($node, $sms_message) {
       break;
   }
   // Set to anonymous if no match
-  if(empty($node->uid) && empty($node->name)) {
+  if (empty($node->uid) && empty($node->name)) {
     $node->uid = 0;
     $node->name = '';
   }
