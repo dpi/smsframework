@@ -292,11 +292,14 @@ function sms_handle_result($result, $number, $message) {
   }
 }
 
-function sms_number_format($number) {
+/**
+ * Formats a number for display.
+ */
+function sms_format_number(&$number, $options = array()) {
   $gateway = sms_default_gateway();
   
-  if ($gateway['number_formatter'] && function_exists($gateway['number_formatter'])) {
-    return $gateway['number_formatter']($number_formatter);
+  if ($gateway['format number'] && function_exists($gateway['format number'])) {
+    return $gateway['format number']($number, $options);
   }
   else {
     return $number;
