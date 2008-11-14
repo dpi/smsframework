@@ -32,6 +32,8 @@ function sms_user_get_uid($number) {
  * Implementation of hook_menu().
  */
 function sms_user_menu($may_cache) {
+  global $user;
+  
   $items = array();
 
   if ($may_cache) {
@@ -52,6 +54,7 @@ function sms_user_menu($may_cache) {
         'title' => t('Mobile settings'),
         'callback' => 'sms_user_settings',
         'callback arguments' => array('sms_user_form'),
+        'access' => user_access('administer users') || $user->uid == arg(1),
         'type' => MENU_LOCAL_TASK,
       );
     } 
