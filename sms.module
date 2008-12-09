@@ -212,7 +212,7 @@ function sms_admin_gateway_form_validate($form, &$form_state) {
   // Pass validation to gateway
   $function = $form_state['values']['gateway']['configure form'] .'_validate';
   if (function_exists($function)) {
-    $function($form, &$form_state);
+    $function($form, $form_state);
   }
 }
 
