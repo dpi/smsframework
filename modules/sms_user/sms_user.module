@@ -489,10 +489,8 @@ function sms_user_auth($number) {
 
 function sms_user_logout() {
   global $user;
-  
-  if (!$user->uid) {
-    // Destroy the current session:
-    session_destroy();  
-    $user = drupal_anonymous_user();
-  }
+
+  // Destroy the current session:
+  session_destroy();  
+  $user = drupal_anonymous_user();
 }
