@@ -285,6 +285,9 @@ function sms_user_validate_number(&$number) {
   }
 }
 
+/**
+ * Implmentation of hook_user().
+ */
 function sms_user_user($op, &$edit, &$account, $category = NULL) {
   switch ($op) {
     case 'load':
@@ -297,7 +300,7 @@ function sms_user_user($op, &$edit, &$account, $category = NULL) {
     case 'delete':
       return sms_user_delete($account->uid);
     case 'validate':
-      if (variable_get('sms_user_registration_form', 0) == 2 || strlen($edit['sms_user'][0]['number'])) {
+      if (!empty($edit['sms_user']) && (variable_get('sms_user_registration_form', 0) == 2 || strlen($edit['sms_user'][0]['number']))) {
         if ($error = sms_user_validate_number($edit['sms_user'][0]['number'])) {
           form_set_error('sms_user][0][number', $error);
         }
