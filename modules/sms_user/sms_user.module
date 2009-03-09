@@ -464,7 +464,7 @@ function sms_user_token_list($type = 'all') {
 function sms_user_sms_incoming($op, $number, $message) {
   switch ($op) {
     case 'pre process':
-      sms_user_auth($number);
+      sms_user_authenticate($number);
       break;
     case 'post process':
       sms_user_logout();
@@ -479,7 +479,7 @@ function sms_user_sms_incoming($op, $number, $message) {
  *   The number to authenticate against. For security, this should only be
  *   provided by incoming messages, not through user input.
  */
-function sms_user_auth($number) {
+function sms_user_authenticate($number) {
   global $user;
   
   $uid = sms_user_get_uid($number);
