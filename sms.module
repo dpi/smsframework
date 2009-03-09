@@ -44,6 +44,10 @@ function sms_send($number, $message, $options = array()) {
  *   The content of the text message.
  */
 function sms_incoming($number, $message) {
+  if (module_exists('rules')) {
+    rules_invoke_event('sms_incoming', $number, $message);
+  }
+  
   // Execute three phases
   module_invoke_all('sms_incoming', 'pre process', $number, $message);
   module_invoke_all('sms_incoming', 'process', $number, $message);
