@@ -24,6 +24,13 @@ INSTALLATION
 3. Set and configure your default gateway at admin/smsframework/gateways
 4. Check out the settings pages at admin/smsframework
 
+Documentation
+=============
+Documentation for site builders and developers is available in the handbook
+pages on Drupal.org at the following URL:
+
+http://drupal.org/node/362258
+
 CREDITS
 =======
 Will White of Development Seed (http://drupal.org/user/32237)
