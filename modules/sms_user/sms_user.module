@@ -418,28 +418,14 @@ function sms_user_admin_settings() {
     '#maxlength' => 255,
   );
 
-  $tokens = token_get_list('sms_user');
-  $rows = array();
-  foreach ($tokens as $category) {
-    foreach ($category as $token => $token_description) {
-        $row = array();
-        $row[] = '['. $token .']';
-        $row[] = $token_description;
-        $rows[] = $row;
-    }
-  }
-
-  $headers = array(t('Token'), t('Replacement value'));
   $form['tokens'] = array(
-    '#title' => t('Available tokens'),
     '#type' => 'fieldset',
-    '#description' => t('These special strings will be replaced by their real value at run time.'),
+    '#title' => t('Available replacement patterns'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-  $form['tokens']['list'] = array(
-    '#value' => theme('table', $headers, $rows, array('class' => 'description'))
-  );
+  
+  $form['tokens']['content']['#value'] = theme('token_help', 'sms_user');
   
   $form['sms_user_sleep'] = array(
     '#type' => 'checkbox',
