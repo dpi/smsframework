@@ -1,0 +1,7 @@
+; $Id$
+name = "E-mail Gateway Testing"
+description = "Simple test module for incoming messages via the e-meil gateway."
+dependencies[] = sms
+dependencies[] = sms_email_gateway
+package = SMS Framework
+core = 6.x

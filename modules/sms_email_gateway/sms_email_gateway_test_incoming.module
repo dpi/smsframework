@@ -1,0 +1,165 @@
+<?php
+// $Id$
+
+/**
+ * This is a small test module that accomplishes two goals:
+ *
+ *   1. Provides simple loopback function that can be used to test the
+ *      receiving of messages without a configured e-mail server.
+ *
+ *   2. Provides examples of hooks and callback functions used by the
+ *      sms_email_gateway module.
+ *
+ * Check the code notes in this module for details.
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function sms_email_gateway_test_incoming_menu() {
+  $items = array();
+
+  // Menu callback for testing incoming messages.
+  $items['admin/sms-email-gateway-test-incoming'] = array(
+    'title' => 'SMS e-mail gateway test incoming',
+    'page callback' => 'sms_email_gateway_test_incoming',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer site configuration'),
+  );
+
+  return $items;
+}
+
+/**
+ * Testing function for messages arriving via the email gateway.
+ *
+ * This function provides a simple local callback to allow for testing incoming
+ * email gateway messages without a configured gateway script.
+ *
+ * USAGE:
+ *
+ * Replace the values in brackets with the values you wish to pass to the
+ * sms_email_gateway_receive_message() function.
+ *
+ * www.yoursite.com/admin/sms-email-gateway-incoming-test/[code]/[identifier]/[from]/[subject]/[message]
+ *
+ */
+function sms_email_gateway_test_incoming($code, $identifier, $from, $subject, $message) {
+  sms_email_gateway_receive_message($code, $identifier, $from, $subject, $message, '');
+}
+
+/**
+ * Example of a hook_sms_email_gateway_function_map().
+ *
+ * Invoking hook_sms_email_gateway_function_map() allows passing of data from
+ * an email received via the e-mail gateway to a callback function.
+ *
+ * Data returned from this hook maps address codes to callback functions.
+ *
+ * Address codes and identifiers are extracted from the To: address in the email
+ * header.  The gateway script on the mail server handles this parsing, using
+ * the following logic:
+ *
+ *   1. If no email address extension (+) is present, the address code is the
+ *      user portion of the email address, and there is no identifier.
+ *
+ *   2. If an email address extension (+) is present:
+ *
+ *        a. If the address extension contains an underscore, the address code
+ *           is the portion of the extension to the left of the underscore, and
+ *           the identifier is the portion to the right of the underscore.
+ *
+ *        b. If the address extension does not contain an underscore, the
+ *           address code is portion to the left of the + sign in the username,
+ *           and the identifier is the portion to the right of the + sign in the
+ *           username.
+ *
+ * Examples:
+ *
+ *   1. foo@example.com -- address code is foo, no identifier.
+ *
+ *   2. foo+bar@example.com -- address code is foo, identifier is bar.
+ *
+ *   3. foo+bar_baz@example.com -- address code is bar, identifier is baz.
+ *
+ * By convention, address codes are normally two characters long, but can be
+ * longer.
+ *
+ * USE CASE:
+ *
+ * As an example of how this can be used, let's suppose you have your
+ * mail server configured to send all mail addressed to
+ * sms+[anything]@example.com to the gateway processing script.
+ *
+ * An email is sent to sms+ex_12345@example.com, and the gateway script parses
+ * it and sends the email data, plus an address code of 'ex' and an identifier
+ * of '12345' to the sms_email_gateway module.
+ *
+ * Using the hook invocation below, the 'ex' address code would be mapped to
+ * the example_function_for_hook_sms_email_gateway_function_map() function,
+ * which would be called passing in the identifier of '12345' along with the
+ * message data.
+ *
+ * CAVEATS:
+ *
+ * 1. It is the job of the called function to perform any data cleaning or
+ *    validation!
+ *
+ * 2. Function mappings take precedence over the automatic mapping features for
+ *    node ID's, user ID's, and usernames -- so using these together could cause
+ *    some collisions.
+ *
+ * 3. Any message processed via a function callback does _not_ involve a call
+ *    to sms_incoming() by default.  If you want to expose the incoming
+ *    message to the incoming sms hook, you must invoke it manually.
+ *
+ * @return An associative array, the keys are the two letter address codes,
+ *         values are the callback functions to map to the codes.
+ */
+function sms_email_gateway_test_incoming_sms_email_gateway_function_map() {
+  return array('ex' => 'sms_email_gateway_test_incoming_callback');
+}
+
+/**
+ * Example function for a hook_sms_email_gateway_function_map() immplementation.
+ *
+ * This is the function called in the use case listed in
+ * hook_sms_email_gateway_function_map().
+ *
+ * @param
+ *   $number The phone number associated with the message.
+ * @param
+ *   $message The body of the email message.
+ * @param
+ *   $options An associative array of metadata from the email gateway related
+ *   to the message, with the following key/value pairs:
+ *
+ *     'sms_email_gateway_identifier' => The identifier passed from the gateway
+ *                                       script.
+ *     'sms_email_gateway_from'       => Email From: address.
+ *     'sms_email_gateway_subject'    => Email subject.
+ *     'sms_email_gateway_headers'    => Full headers from the email.
+ */
+function sms_email_gateway_test_incoming_callback($number, $message, $options) {
+  // Let's suppose this callback function is supposed to look for a node
+  // matching the identifier.  No validation is done on any of this data prior
+  // to the function call, so make sure everything is clean!
+  if ($node = node_load((int) $options['sms_email_gateway_identifier'])) {
+    // Let's just replace the node body with the message body.  For extra
+    // security paranoia, pre-filter the message data.
+    $node->body = check_markup($message, FILTER_FORMAT_DEFAULT, FALSE);
+    node_save($node);
+
+    // Since a node was found, let's invoke sms_incoming() so other modules
+    // have a chance to work with the message.
+    sms_incoming($number, $message, $options);
+
+    // Node updated, toss the user to the node with an update message.
+    drupal_set_message(t('%title has been updated via SMS', array('%title' => $node->title)));
+    drupal_goto("node/$node->nid");
+  }
+
+  // No node found, throw an error and hit the front page.
+  drupal_set_message(t('No node ID %nid found', array('%nid' => $options['sms_email_gateway_identifier'])), 'error');
+  drupal_goto('<front>');
+}
