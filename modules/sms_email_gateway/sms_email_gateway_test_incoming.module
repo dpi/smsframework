@@ -25,6 +25,7 @@ function sms_email_gateway_test_incoming_menu() {
     'page callback' => 'sms_email_gateway_test_incoming',
     'access callback' => 'user_access',
     'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
   );
 
   return $items;
