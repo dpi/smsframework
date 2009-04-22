@@ -24,7 +24,7 @@ function sms_user_schema() {
     'primary key' => array('uid', 'delta'),
     'unique key'  => array('number'),
   );
-  
+
   return $schema;
 }
 

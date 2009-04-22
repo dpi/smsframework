@@ -11,7 +11,7 @@
  */
 function sms_user_send($uid, $message) {
   $account = user_load($uid);
-  
+
   if ($account->sms_user[0]['status'] == 2) {
     return sms_send($account->sms_user[0]['number'], $message, $account->sms_user[0]['gateway']);
   }
@@ -56,7 +56,7 @@ function sms_user_menu() {
 /**
  * Implementation of hook_perm()
  */
-function sms_user_perm() { 
+function sms_user_perm() {
   return array('administer sms_user');
 }
 
@@ -66,7 +66,7 @@ function sms_user_perm() {
 function sms_user_sms_send(&$number, &$message, &$options, &$gateway) {
   if (variable_get('sms_user_sleep', 1) && $uid = sms_user_get_uid($number)) {
     $account = user_load(array('uid' => $uid, 'status' => 1));
-    
+
     if (!empty($account->sms_user['sleep_enabled']) && _sms_user_sleep_active($account)) {
       unset($gateway['send']);
       watchdog('sms', 'Message was not sent to @user due to sleep settings.', array('@user' => $account->name));
@@ -81,13 +81,13 @@ function _sms_user_sleep_active($account) {
   if ($account->sms_user['sleep_start_time'] <= $current_hour && $account->sms_user['sleep_end_time'] >= $current_hour) {
     return TRUE;
   }
-  
+
   return FALSE;
 }
 
 /**
  * Menu callback; provides the forms for adding and confirming a user's mobile number.
- */ 
+ */
 function sms_user_settings($register = FALSE) {
   $account = user_load(array('uid' => arg(1)));
   switch (isset($account->sms_user) ? $account->sms_user[0]['status'] : 0) {
@@ -101,18 +101,18 @@ function sms_user_settings($register = FALSE) {
       $output = drupal_get_form('sms_user_settings_reset_form', $account);
       break;
   }
-  
+
   if (variable_get('sms_user_sleep', 1)) {
     $output .= drupal_get_form('sms_user_settings_sleep_form', $account);
   }
-  
+
   return $output;
 }
 
 function sms_user_settings_add_form(&$form_state, $account) {
   $form = sms_send_form();
   $form['submit'] = array(
-    '#type' => 'submit', 
+    '#type' => 'submit',
     '#value' => t('Confirm number'),
   );
 
@@ -146,11 +146,11 @@ function sms_user_settings_confirm_form(&$form_state, $account) {
     '#maxlength' => 4,
   );
   $form['submit'] = array(
-    '#type' => 'submit', 
+    '#type' => 'submit',
     '#value' => t('Confirm number'),
   );
   $form['reset'] = array(
-    '#type' => 'submit', 
+    '#type' => 'submit',
     '#value' => t('Delete & start over'),
   );
   return $form;
@@ -176,7 +176,7 @@ function sms_user_settings_confirm_form_submit($form, &$form_state) {
       'status'  => 2,
       'gateway' => $account->sms_user[0]['gateway'],
     );
-    
+
     user_save($account, array('sms_user' => $data), 'mobile');
   }
 }
@@ -188,12 +188,12 @@ function sms_user_settings_reset_form(&$form_state, $account) {
     '#value' => $account->sms_user[0]['number'],
     '#description' => t('Your number has been confirmed.')
   );
-  
+
   $form['reset'] = array(
-    '#type' => 'submit', 
+    '#type' => 'submit',
     '#value' => t('Delete & start over'),
   );
-  
+
   return $form;
 }
 
@@ -209,14 +209,14 @@ function sms_user_settings_sleep_form(&$form_state, $account) {
     '#title' => t('Sleep Time'),
     '#collapsible' => TRUE,
   );
-  
+
   $form['sleep']['sleep_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Disable messages between these hours'),
     '#description' => t('If enabled, you will not receive messages between the specified hours.'),
     '#default_value' => isset($account->sms_user['sleep_enabled']) ? $account->sms_user['sleep_enabled'] : NULL,
   );
-  
+
   // Determine whether to use the 24-hour or 12-hour clock based on site settings
   if (strpos(variable_get('date_format_short', 'm/d/Y - H:i'), 'g')) {
     $format = 'g A';
@@ -230,23 +230,23 @@ function sms_user_settings_sleep_form(&$form_state, $account) {
     $options[$hour] = date($format, mktime($hour));
     $hour++;
   }
-  
+
   $form['sleep']['sleep_start_time'] = array(
     '#type' => 'select',
     '#multiple' => FALSE,
     '#options' => $options,
     '#default_value' => isset($account->sms_user['sleep_start_time']) ? $account->sms_user['sleep_start_time'] : NULL,
   );
-  
+
   $form['sleep']['sleep_end_time'] = array(
     '#type' => 'select',
     '#multiple' => FALSE,
     '#options' => $options,
     '#default_value' => isset($account->sms_user['sleep_end_time']) ? $account->sms_user['sleep_end_time'] : NULL,
   );
-  
+
   $form['sleep']['save'] = array(
-    '#type' => 'submit', 
+    '#type' => 'submit',
     '#value' => t('Save'),
   );
 
@@ -271,7 +271,7 @@ function sms_user_send_confirmation($account, $number, $options) {
     'code'    => $code,
     'gateway' => $options,
   );
-  
+
   user_save($account, array('sms_user' => $data), 'mobile');
   sms_send($number, _sms_user_confirm_message($code), $options);
 }
@@ -318,7 +318,7 @@ function sms_user_user($op, &$edit, &$account, $category = NULL) {
 
 function sms_user_load(&$edit, &$account, $category) {
   $result = db_query("SELECT number, delta, status, code, gateway FROM {sms_user} WHERE uid = %d", $account->uid);
-  
+
   while ($data = db_fetch_array($result)) {
     if ($data) {
       $account->sms_user[$data['delta']] = array(
@@ -352,10 +352,10 @@ function sms_user_save(&$edit, &$account, $category) {
 
 /**
  * Deletes a user's mobile information from the database
- * 
+ *
  * @param $uid
  *   The uid of the user who's data is to be removed.
- * 
+ *
  * @param $delta
  *   The delta value of the number. Defaults to 'all' which will delete all numbers.
  */
@@ -393,7 +393,7 @@ function sms_user_register() {
   }
 }
 
-function sms_user_admin_settings() {  
+function sms_user_admin_settings() {
   $form['sms_user_registration_form'] = array(
     '#type' => 'radios',
     '#title' => t('Show mobile fields during user registration'),
@@ -401,7 +401,7 @@ function sms_user_admin_settings() {
     '#options' => array(t('Disabled'), t('Optional'), t('Required')),
     '#default_value' => variable_get('sms_user_registration_form', 0),
   );
-    
+
   $form['sms_user_confirmation_message'] = array(
     '#type' => 'textfield',
     '#title' => t('Confirmation message format'),
@@ -410,16 +410,16 @@ function sms_user_admin_settings() {
     '#size' => 40,
     '#maxlength' => 255,
   );
-  
+
   $form['tokens'] = array(
     '#type' => 'fieldset',
     '#title' => t('Available replacement patterns'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-  
+
   $form['tokens']['content']['#value'] = theme('token_help', 'sms_user');
-  
+
   $form['sms_user_sleep'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable sleep hours'),
@@ -454,7 +454,7 @@ function sms_user_token_list($type = 'all') {
     $tokens['sms_user']['confirm-code']    = t('The mobile confirmation code for the user.');
     $tokens['sms_user']['mobile-url']      = t('The URL for the user\'s mobile settings page.');
   }
-  
+
   return $tokens;
 }
 
@@ -474,14 +474,14 @@ function sms_user_sms_incoming($op, $number, $message) {
 
 /**
  * Authenticate a user based on mobile number.
- * 
+ *
  * @param $number
  *   The number to authenticate against. For security, this should only be
  *   provided by incoming messages, not through user input.
  */
 function sms_user_authenticate($number) {
   global $user;
-  
+
   $uid = sms_user_get_uid($number);
   if ($account = user_load(array('uid' => $uid, 'status' => 1))) {
     $user = $account;
@@ -494,6 +494,6 @@ function sms_user_logout() {
   global $user;
 
   // Destroy the current session:
-  session_destroy();  
+  session_destroy();
   $user = drupal_anonymous_user();
 }
