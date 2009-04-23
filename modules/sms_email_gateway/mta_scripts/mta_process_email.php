@@ -63,9 +63,19 @@
  * BEGIN CONFIGURATION.
  */
 
-// The URL of the Drupal site.  Should be a full URL without a trailing slash,
-// ex. http://www.example.com
-define('SITE_URL', 'http://www.example.com');
+// The URL of the Drupal site, no trailing slash -- ex. www.example.com
+// If you set this parameter to an empty string, then the domain that the email
+// is sent to will be used.
+define('SITE_URL', '');
+
+// For sites that use SSL, set this to TRUE.
+define('USE_SSL', FALSE);
+
+// Set this if you need to send to a custom server port (defaults to port 80).
+define('SERVER_PORT', '');
+
+// Set this if you need to send custom query string (useful for debugging).
+define('SERVER_QUERY_STRING', '');
 
 // Set to TRUE to turn on script debugging.
 define('DEBUG', FALSE);
@@ -89,82 +99,44 @@ while (!feof($fd)) {
 }
 fclose($fd);
 
-// Break up the lines.
-$lines = explode("\n", $email);
+if (SITE_URL) {
+  $domain = SITE_URL;
+}
+// No site URL defined, so look for one in the headers.
+else {
+  // Break up the lines.
+  $lines = explode("\n", $email);
 
-$from = '';
-$subject = '';
-$headers = '';
-$message = '';
-$splittingheaders = TRUE;
-
-// Loop through one line at a time.
-for ($i = 0; $i < count($lines); $i++) {
-  // This is a header.
-  if ($splittingheaders) {
-    $headers .= $lines[$i] ."\n";
-
-    // Grab Subject:, From:, To: separately.
-    if (preg_match('/^Subject:(.*)/', $lines[$i], $matches)) {
-      $subject = trim($matches[1]);
-    }
-    elseif (preg_match('/^From:(.*)/', $lines[$i], $matches)) {
-      // For combo name/email addresses, parse out the email addy.
-      $from = parse_email(trim($matches[1]));
-
-    }
-    elseif (preg_match('/^To:(.*)/', $lines[$i], $matches)) {
-      // For combo name/email addresses, parse out the email addy.
-      $full_split = parse_email(trim($matches[1]));
-
-      // Break up the To: address
-      $split = explode('@', $full_split);
-      // User section.
-      $user1 = $split[0];
-      // Domain section.
-      $domain = $split[1];
-      // Check for extension.
-      if (strstr($user1, '+')) {
-        // Split extension.
-        $user2 = explode('+', $user1);
-        // User section.
-        $user = $user2[0];
-        // Extension section.
-        $extension1 = $user2[1];
-        // Check for bridge code/identifier.
-        if (strstr($extension1, '_')) {
-          // Split extension into bridge code and identifier.
-          $extension = explode('_', $extension1);
-          $bridge_code = $extension[0];
-          $identifier = $extension[1];
-        }
-        // No bridge code -- make user bridge code.
-        else {
-          $bridge_code = $user;
-          $identifier = $extension1;
-        }
+  // Loop through the email one line at a time.  As soon as we find the To: line,
+  // or the headers end, then stop looking.
+  for ($i = 0; $i < count($lines); $i++) {
+    if (preg_match('/^To:(.*)/', $lines[$i], $matches)) {
+      // For combo name/email addresses, parse out the email address.
+      $to = parse_email(trim($matches[1]));
+      $to = explode('@', $to);
+      if (!empty($to[1])) {
+        $domain = $to[1];
       }
-      // No extension, no identifier -- make user bridge code.
-      else {
-        $bridge_code = $user1;
-        $identifier = '';
-      }
+      break;
     }
-  // Message chunk.
-  } else {
-    $message .= $lines[$i] ."\n";
-  }
-
-  // Empty line, header section has ended.
-  if (trim($lines[$i]) == '') {
-    $splittingheaders = FALSE;
+    // Empty line, header section has ended.
+    elseif (trim($lines[$i]) == '') {
+      break;
+    }
   }
 }
 
-// Compose URL.
-$url = SITE_URL ? SITE_URL : "http://$domain";
+if (!empty($domain)) {
+  // Compose URL.
+  $transport = USE_SSL ? 'https://' : 'http://';
+  $port = SERVER_PORT ? ':' . SERVER_PORT : '';
+  $query = SERVER_QUERY_STRING ? '?' . SERVER_QUERY_STRING : '';
+  $url = $transport . $domain . $port . "/xmlrpc.php" . $query;
 
-$result = xmlrpc("$url/xmlrpc.php", 'emailBridge.send', $bridge_code, $identifier, $from, $subject, $message, $headers);
+  $result = xmlrpc($url, 'emailGateway.send', $email);
+}
+
+
 
 // Debugging section.
 if (DEBUG) {
@@ -177,11 +149,6 @@ if (DEBUG) {
     $debug .= "XML-RPC Error -- return value follows:\n[start return value]$xml_return_output\n[end return value]\n";
   }
   $debug .= "URL: $url\n";
-  $debug .= "Bridge code: $bridge_code\n";
-  $debug .= "Identifier: $identifier\n";
-  $debug .= "From: $from\n";
-  $debug .= "Subject: $subject\n";
-  $debug .= "Message: $message\n";
   $debug .= "Full message:\n$email\n\n\n";
   $fh = fopen(DEBUG_FILE, 'a');
   fwrite($fh, $debug);

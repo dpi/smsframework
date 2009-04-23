@@ -95,39 +95,76 @@ function sms_email_gateway_xmlrpc() {
     array(
       'emailGateway.send',
       'sms_email_gateway_receive_message',
-      array('int', 'string', 'string', 'string', 'string', 'string', 'string'),
+      array('int', 'string'),
       t('sends a received e-mail to the configured Drupal site')
     ),
   );
 }
 
+function sms_email_gateway_receive_message($email) {
+  // Break up the lines.
+  $lines = explode("\n", $email);
+
+  $from = '';
+  $to = '';
+  $subject = '';
+  $headers = '';
+  $message = '';
+  $splittingheaders = TRUE;
+
+  // Loop through one line at a time.
+  for ($i = 0; $i < count($lines); $i++) {
+    // This is a header.
+    if ($splittingheaders) {
+      $headers .= $lines[$i] ."\n";
+
+      // Grab Subject:, From:, To: separately.
+      if (preg_match('/^Subject:(.*)/', $lines[$i], $matches)) {
+        $subject = trim($matches[1]);
+      }
+      elseif (preg_match('/^From:(.*)/', $lines[$i], $matches)) {
+        // For combo name/email addresses, parse out the email addy.
+        $from = sms_email_gateway_parse_email(trim($matches[1]));
+
+      }
+      elseif (preg_match('/^To:(.*)/', $lines[$i], $matches)) {
+        // For combo name/email addresses, parse out the email addy.
+        $to = sms_email_gateway_parse_email(trim($matches[1]));
+      }
+    // Message chunk.
+    } else {
+      $message .= $lines[$i] ."\n";
+    }
+
+    // Empty line, header section has ended.
+    if (trim($lines[$i]) == '') {
+      $splittingheaders = FALSE;
+    }
+  }
+
+  sms_email_gateway_process_incoming_message($from, $to, $subject, $message, $headers);
+
+  return 0;
+}
+
 /**
  * Passes the data from a received e-mail to a callback function.
  *
- * @param
- *   $code A two letter identifier which is declared in
- *   hook_sms_email_gateway_function_map().
- * @param
- *   $identifier Custom identifier to pass to the callback function. ex. A nid.
- * @param
- *   $from The address the email was sent from.
- * @param
- *   $subject The e-mail subject.
- * @param
- *   $message The body of the email message.
- * @param
- *   $headers A string of the full headers from email.
+ * @param $from
+ *    The address the email was sent from.
+ * @param $to
+ *    The address the email was sent to.
+ * @param $subject
+ *    The e-mail subject.
+ * @param $message
+ *    The body of the email message.
+ * @param $headers
+ *    A string of the full headers from email.
  *
  * @return
  *   Successful exit code.
  */
-function sms_email_gateway_receive_message($code, $identifier, $from, $subject, $message, $headers) {
-  // Force lowercase for the bridge code and identifier.
-  $code = drupal_strtolower($code);
-  $identifier = drupal_strtolower($identifier);
-
-  // Grab the callback mapping.
-  $function_map = module_invoke_all('sms_email_gateway_function_map');
+function sms_email_gateway_process_incoming_message($from, $to, $subject, $message, $headers) {
 
   // The normal convention for mobile email addresses is phonenumber@provider,
   // but some allow custom names and such for the email username.  There's not
@@ -138,41 +175,13 @@ function sms_email_gateway_receive_message($code, $identifier, $from, $subject, 
 
   // Build email-specific metadata.
   $options = array(
-    'sms_email_gateway_identifier' => $identifier,
     'sms_email_gateway_from' => $from,
+    'sms_email_gateway_to' => $to,
     'sms_email_gateway_subject' => $subject,
     'sms_email_gateway_headers' => $headers,
   );
 
-  // If a valid callback exists, execute it.
-  if (isset($function_map[$code]) && function_exists($function_map[$code])) {
-    $function = $function_map[$code];
-    $function($number, $message, $options);
-  }
-  // Numeric bridge codes can be either a user or node ID, so check.
-  elseif (is_numeric($code)) {
-    if (variable_get('sms_email_gateway_enable_node_id', 0)) {
-      if ($node = node_load($code)) {
-        $options['#node'] = $node;
-        sms_incoming($number, $message, $options);
-      }
-    }
-    if (variable_get('sms_email_gateway_enable_user_id', 0)) {
-      if ($account = user_load(array('uid' => $code))) {
-        $options['#account'] = $account;
-        sms_incoming($number, $message, $options);
-      }
-    }
-  }
-  // Nothing else matched, so see if a username match exists.
-  elseif (variable_get('sms_email_gateway_enable_username', 0)) {
-    if ($account = user_load(array('name' => $code))) {
-      $options['#account'] = $account;
-      sms_incoming($number, $message, $options);
-    }
-  }
-
-  return 0;
+  sms_incoming($number, $message, $options);
 }
 
 /**
@@ -214,5 +223,119 @@ function sms_email_gateway_sms_email_gateway_providers() {
     'tmomail.net' => t('T-Mobile'),
     'vmobl.com' => t('Virgin Mobile'),
     'vtext.com' => t('Verizon'),
+  );
+}
+
+/**
+ * Parses out email address from addresses with human-readable names.
+ *
+ * @param $full_address
+ *   The full email address.
+ *
+ * @return
+ *   The email address.
+ */
+function sms_email_gateway_parse_email($full_address) {
+  if ($left = strpos($full_address, '<')) {
+    $right = strpos($full_address, '>');
+    $address = substr($full_address, $left + 1, $right - $left - 1);
+  }
+  else {
+    $address = $full_address;
+  }
+
+  return $address;
+}
+
+/**
+ * Parses an email address matching a standardized structure into metadata.
+ *
+ * Address codes and identifiers are extracted from the email address using the
+ * following logic:
+ *
+ *   1. If no email address extension (+) is present, the address code is the
+ *      user portion of the email address, and there is no identifier.
+ *
+ *   2. If an email address extension (+) is present:
+ *
+ *        a. If the address extension contains an underscore, the address code
+ *           is the portion of the extension to the left of the underscore, and
+ *           the identifier is the portion to the right of the underscore.
+ *
+ *        b. If the address extension does not contain an underscore, the
+ *           address code is portion to the left of the + sign in the username,
+ *           and the identifier is the portion to the right of the + sign in the
+ *           username.
+ *
+ * Examples:
+ *
+ *   1. foo@example.com -- address code is foo, no identifier.
+ *
+ *   2. foo+bar@example.com -- address code is foo, identifier is bar.
+ *
+ *   3. foo+bar_baz@example.com -- address code is bar, identifier is baz.
+ *
+ * By convention, address codes are normally two characters long, but can be
+ * longer.
+ *
+ * USE CASE:
+ *
+ * See sms_email_gateway_test_incoming_sms_incoming() in
+ * sms_email_gateway_test_incoming.module for an example of how to use this
+ * functionality.
+ *
+ * CAVEATS:
+ *
+ * 1. It is the job of any calling code to validate the metadata -- this is
+ *    only a parsing function!!
+ *
+ * @param $address
+ *   The email address to parse.
+ *
+ * @return
+ *   An associative array with the following key/value pairs:
+ *     'user'         => The user portion of the email address.
+ *     'address_code' => The parsed address code.
+ *     'identifier'   => The parsed identifier, if any.
+ */
+function sms_email_gateway_address_metadata($address) {
+  // Break up the To: address
+  $split = explode('@', $address);
+  // User section.
+  $user1 = $split[0];
+  // Domain section.
+  $domain = $split[1];
+  // Check for extension.
+  if (strstr($user1, '+')) {
+    // Split extension.
+    $user2 = explode('+', $user1);
+    // User section.
+    $user = $user2[0];
+    // Extension section.
+    $extension1 = $user2[1];
+    // Check for address code/identifier.
+    if (strstr($extension1, '_')) {
+      // Split extension into address code and identifier.
+      $extension = explode('_', $extension1);
+      $address_code = $extension[0];
+      $identifier = $extension[1];
+    }
+    // No address code -- make user address code.
+    else {
+      $address_code = $user;
+      $identifier = $extension1;
+    }
+  }
+  // No extension, no identifier -- make user equal address code.
+  else {
+    $user = $user1;
+    $address_code = $user1;
+    $identifier = '';
+  }
+
+  return array(
+    'user' => $user,
+    'address_code' => $address_code,
+    'identifier' => $identifier,
   );
 }
