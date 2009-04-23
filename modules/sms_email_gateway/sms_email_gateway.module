@@ -129,17 +129,12 @@ function sms_email_gateway_receive_message($code, $identifier, $from, $subject, 
   // Grab the callback mapping.
   $function_map = module_invoke_all('sms_email_gateway_function_map');
 
-  // Try to figure out the number this message came from.  This is a bit hairy
-  // with email, so we're just trying to determine if the address username is
-  // all numbers -- if it is, use it as the number, otherwise don't pass a
-  // number.
+  // The normal convention for mobile email addresses is phonenumber@provider,
+  // but some allow custom names and such for the email username.  There's not
+  // much we can do about that, so just treat whatever is the email username as
+  // the SMS number...
   $split = explode('@', $from);
-  if (preg_match('/[^\d]/', $split[0])) {
-    $number = NULL;
-  }
-  else {
-    $number = $split[0];
-  }
+  $number = $split[0];
 
   // Build email-specific metadata.
   $options = array(
