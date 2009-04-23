@@ -425,6 +425,42 @@ function sms_user_admin_settings() {
     '#default_value' => variable_get('sms_user_sleep', 1),
   );
 
+  // Registration settings.
+  $form['registration'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Registration settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['registration']['sms_user_registration_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable registration'),
+    '#default_value' => variable_get('sms_user_registration_enabled', 0),
+    '#description' => t('If selected, users can create user accounts via SMS.'),
+  );
+  $form['registration']['sms_user_allow_password'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow password creation'),
+    '#default_value' => variable_get('sms_user_allow_password', 0),
+    '#description' => t('If selected, the user will be allowed to include a password in their registration request -- the password will be the first word in the first line of the request.'),
+  );
+  $form['registration']['sms_user_new_account_message'] = array(
+    '#type' => 'textarea',
+    '#title' => t('New user message'),
+    '#default_value' => variable_get('sms_user_new_account_message', ''),
+    '#description' => t('The message that will be sent to newly registered users.  Leave empty for no message.'),
+  );
+  $form['registration']['tokens'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Available replacement patterns'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $form['registration']['tokens']['content']['#value'] = theme('token_help', 'sms_user');
+
+
+
   return system_settings_form($form);
 }
 
@@ -459,15 +495,90 @@ function sms_user_token_list($type = 'all') {
 /**
  * Implementation of hook_sms_incoming().
  */
-function sms_user_sms_incoming($op, $number, $message) {
+function sms_user_sms_incoming($op, $number, $message, $options) {
   switch ($op) {
     case 'pre process':
-      sms_user_authenticate($number);
+      if ($account = sms_user_authenticate($number)) {
+        // Other modules can use this flag to detect if the user has logged in
+        // via the SMS Framework without performing extra checks on every login.
+        $account->sms_user['login'] = TRUE;
+        $account->sms_user['message'] = $message;
+        $account->sms_user['options'] = $options;
+        $edit = array();
+        user_module_invoke('login', $edit, $account);
+      }
+      elseif (variable_get('sms_user_registration_enabled', 0) && $number) {
+        if ($account = sms_user_register_new_user($number, $message, $options)) {
+          // Send the new user the registration message if one exists.
+          if ($message = variable_get('sms_user_new_account_message', '')) {
+            sms_user_send($account->uid, $message);
+          }
+        }
+      }
       break;
     case 'post process':
       sms_user_logout();
       break;
   }
+}
+
+/**
+ * Registers a new user via SMS
+ *
+ * @param $number
+ *   The user's mobile number.
+ * @param $message
+ *   Body of the SMS message.
+ * @param $options
+ *   An associative array of metadata passed from the incoming gateway.
+ * @return
+ *   The user object of the created user.
+ */
+function sms_user_register_new_user($number, $message, $options) {
+
+  $edit = array();
+
+  // Add password if enabled.
+  if (variable_get('sms_user_allow_password', 0)) {
+    $lines = explode("\n", $message);
+    $words = explode(" ", $lines[0]);
+    foreach ($words as $word) {
+      if (trim($word)) {
+        $edit['pass'] = preg_replace('/\s+/', '-', $word);
+        break;
+      }
+    }
+  }
+  // Auto-generated password.
+  if (!$edit['pass']) {
+    $edit['pass'] = user_password();
+  }
+
+  // Pick a pseudo-random name for the user -- using the email
+  // address would be a privacy violation.
+  $edit['name'] = substr(md5($number), 0, 10);
+
+  // Save the user.
+  $edit['status'] = variable_get('user_register', 1) == 1;
+  // If we have a from address from the e-mail gateway, use it, otherwise
+  // leave the e-mail fields blank.
+  $mail = isset($options['sms_email_gateway_from']) ? $options['sms_email_gateway_from'] : '';
+  $edit['mail'] = $edit['init'] = $mail;
+
+
+  $edit['sms_user'] = array(
+    // Other modules can use this flag to detect if the user has
+    // registered via the SMS Framework without performing extra checks on
+    // every registration.
+    'register' => TRUE,
+    'number' => $number,
+    'message' => $message,
+    'options' => $options,
+  );
+
+  $account = user_save('', $edit);
+
+  return $account;
 }
 
 /**

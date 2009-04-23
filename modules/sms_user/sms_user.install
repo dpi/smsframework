@@ -46,4 +46,15 @@ function sms_user_update_1() {
  */
 function sms_user_uninstall() {
   drupal_uninstall_schema('sms_user');
+
+  $variables = array(
+    'sms_user_registration_enabled',
+    'sms_user_allow_password',
+    'sms_user_new_account_message',
+  );
+
+  foreach ($variables as $variable) {
+    variable_del($variable);
+  }
+
 }
