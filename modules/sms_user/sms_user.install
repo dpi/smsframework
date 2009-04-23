@@ -15,17 +15,30 @@ function sms_user_schema() {
   $schema['sms_user'] = array(
     'fields' => array(
       'uid'       => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
-      'delta'     => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
       'number'    => array('type' => 'varchar', 'not null' => TRUE, 'length' => 32),
       'status'    => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
       'code'      => array('type' => 'varchar', 'not null' => TRUE, 'length' => 16),
       'gateway'   => array('type' => 'text'),
     ),
-    'primary key' => array('uid', 'delta'),
-    'unique key'  => array('number'),
+    'primary key' => array('number'),
+    'indexes' => array('uid' => array('uid')),
   );
 
   return $schema;
+}
+
+/**
+ * Implementation of hook_update().
+ *
+ * Drop the now dead delta field, and change primary key to number.
+ */
+function sms_user_update_1() {
+  $ret = array();
+  db_drop_primary_key($ret, 'sms_user');
+  db_add_primary_key($ret, 'sms_user', array('number'));
+  db_add_index($ret, 'sms_user', 'uid', array('uid'));
+  db_drop_field($ret, 'sms_user', 'delta');
+  return $ret;
 }
 
 /**
