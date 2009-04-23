@@ -43,44 +43,18 @@ function sms_email_gateway_admin_form(&$form_state) {
   $form = array();
 
 /*
-  TODO: we may not need these, but leaving here just in case.
+  TODO: we may not need this, but leaving here just in case.
   $form['sms_email_gateway_sendmail_path'] = array(
     '#type' => 'textfield',
     '#title' => t('Path to sendmail'),
     '#default_value' => variable_get('sms_email_gateway_sendmail_path', '/usr/sbin/sendmail'),
     '#description' => t('Enter the full system path to the sendmail program. This is system-dependent. If you have shell access to the system, you can try <em>which sendmail</em> to get the path.'),
-  );
-  $form['sms_email_gateway_mail_user'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Mail user'),
-    '#default_value' => variable_get('sms_email_gateway_mail_user', 'eb'),
-    '#description' => t('Enter the name of the E-mail bridge user that was created on the mail server. Due to size limits for SMS addresses, the name is limited to three characters.'),
-    '#size' => 3,
-    '#maxlength' => 3,
-  );
+  );*/
   $form['sms_email_gateway_mail_domain'] = array(
     '#type' => 'textfield',
-    '#title' => t('Mail domain'),
+    '#title' => t('Default mail domain'),
     '#default_value' => variable_get('sms_email_gateway_mail_domain', 'example.com'),
-    '#description' => t('Enter domain where the email bridge messages are received.'),
-  );*/
-  $form['sms_email_gateway_enable_node_id'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable node ID mapping.'),
-    '#default_value' => variable_get('sms_email_gateway_enable_node_id', 0),
-    '#description' => t('Enabling this allows numeric address codes (ex. 12345@example.com) to be mapped to Drupal node IDs.'),
-  );
-  $form['sms_email_gateway_enable_user_id'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable user ID mapping.'),
-    '#default_value' => variable_get('sms_email_gateway_enable_user_id', 0),
-    '#description' => t('Enabling this allows numeric address codes (ex. 12345@example.com) to be mapped to Drupal user IDs.'),
-  );
-  $form['sms_email_gateway_enable_username'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable Drupal username mapping.'),
-    '#default_value' => variable_get('sms_email_gateway_enable_username', 0),
-    '#description' => t('Enabling this allows address codes (ex. bob@example.com) to be mapped to Drupal usernames.'),
+    '#description' => t('Enter the default domain where the email gateway messages are received.'),
   );
 
   return system_settings_form($form);
@@ -338,4 +312,61 @@ function sms_email_gateway_address_metadata($address) {
     'address_code' => $address_code,
     'identifier' => $identifier,
   );
+}
+
+/**
+ * Formats metadata-embedded email addresses.
+ *
+ * This function is a helper function to build addresses that are in the format
+ * parsed by sms_email_gateway_address_metadata().  See that function for
+ * details on the format.
+ *
+ * @param $config
+ *   An associative array of information needed to build the from address.
+ *   Possible keys are:
+ *      'user'           =>  Required. The user the email is sent from.
+ *      'user_title'     =>  Optional. Adds a human-readable username to the
+ *                           From: address, ex. Bob <bob@example.com>.  Default
+ *                           is no human-readable username.
+ *      'domain'         =>  Optional. The domain the email is sent from.
+ *                           Defaults to the mail domain setting for the email
+ *                           gateway.
+ *      'address_code'   =>  Optional. A code that can be used for routing
+ *                           incoming messages, ex. map different codes to
+ *                           different callbacks.
+ *      'identifier      =>  Optional. A custom identifier, ex. A nid.
+ *
+ * @return
+ *   The metadata-formatted email address.
+ */
+function sms_email_gateway_build_metadata_address($config) {
+
+  // Build extension components, if any.
+  $extension_components = array();
+  if (isset($config['address_code'])) {
+    $extension_components[] = $config['address_code'];
+  }
+  if (isset($config['identifier'])) {
+    $extension_components[] = $config['identifier'];
+  }
+  if (empty($extension_components)) {
+    $extension = '';
+  }
+  else {
+    $extension = '+' . implode('_', $extension_components);
+  }
+
+  // Use custom domain, fallback to default.
+  $domain = isset($config['domain']) ? $config['domain'] : variable_get('sms_email_gateway_mail_domain', 'example.com');
+
+  // Build final from address.
+  $from = $config['user']. $extension .'@'. $domain;
+  if (isset($config['user_title'])) {
+    $full_from = $config['user_title'] . ' <'. $from .'>';
+  }
+  else {
+    $full_from = $from;
+  }
+
+  return $full_from;
 }

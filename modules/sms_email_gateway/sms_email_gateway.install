@@ -3,11 +3,7 @@
 // $Id$
 
 function sms_email_gateway_uninstall() {
-  // TODO: leaving these here for now, in case we need it.
+  // TODO: leaving this here for now, in case we need it.
   // variable_del('sms_email_gateway_sendmail_path');
-  // variable_del('sms_email_gateway_mail_user');
-  // variable_del('sms_email_gateway_mail_domain');
-  variable_del('sms_email_gateway_enable_node_id');
-  variable_del('sms_email_gateway_enable_user_id');
-  variable_del('sms_email_gateway_enable_username');
+  variable_del('sms_email_gateway_mail_domain');
 }
