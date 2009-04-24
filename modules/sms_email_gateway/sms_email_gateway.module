@@ -269,6 +269,7 @@ function sms_email_gateway_parse_email($full_address) {
  * @return
  *   An associative array with the following key/value pairs:
  *     'user'         => The user portion of the email address.
+ *     'domain'       => The domain portion of the email address.
  *     'address_code' => The parsed address code.
  *     'identifier'   => The parsed identifier, if any.
  */
@@ -309,6 +310,7 @@ function sms_email_gateway_address_metadata($address) {
 
   return array(
     'user' => $user,
+    'domain' => $domain,
     'address_code' => $address_code,
     'identifier' => $identifier,
   );
