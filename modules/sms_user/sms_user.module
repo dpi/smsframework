@@ -499,11 +499,13 @@ function sms_user_sms_incoming($op, $number, $message, $options) {
   switch ($op) {
     case 'pre process':
       if ($account = sms_user_authenticate($number)) {
-        // Other modules can use this flag to detect if the user has logged in
-        // via the SMS Framework without performing extra checks on every login.
-        $account->sms_user['login'] = TRUE;
-        $account->sms_user['message'] = $message;
-        $account->sms_user['options'] = $options;
+        $metadata = array(
+          'login' => TRUE,
+          'number' => $number,
+          'message' => $message,
+          'options' => $options,
+        );
+        sms_user_login_metadata($account->uid, $metadata);
         $edit = array();
         user_module_invoke('login', $edit, $account);
       }
@@ -523,6 +525,66 @@ function sms_user_sms_incoming($op, $number, $message, $options) {
 }
 
 /**
+ * Store metadata related to SMS users registering/logging in.
+ *
+ * Drupal core doesn't really provide a way to pass user metadata around that's
+ * related to a user registering (meaning during the registration cycle), so we
+ * provide a storage mechanism here.
+ *
+ * Since it seems sloppy to handle registration cycles with one method and
+ * logins with another, this function handles all SMS-related metadata related
+ * to logging in and registering.
+ *
+ * The data is placed in this storage mechansim for the duration of the page
+ * load, and is placed here before the user hooks are invoked by sms_user,
+ * therefore it should be available to all modules that need it.
+ *
+ * @param $uid
+ *   The uid of the user to store/fetch.  If NULL, return all cached accounts.
+ * @param $metadata
+ *   The metadata to store, or the metadata to fetch if NULL.
+ *   The metadata is stored/retrieved as an associative array with the following
+ *   key/value pairs:
+ *
+ *     'register' => A boolean indicating if the user is just registering.
+ *     'login'    => A boolean indicating if the user is logging in.
+ *     'number'   => The SMS number the message was sent from.
+ *     'message'  => The SMS message sent with the registration/login.
+ *     'options'  => The SMS message metadata passed from the gateway.
+ *
+ * @param $reset
+ *   If TRUE, reset the accounts cache.
+ *
+ * @return
+ *   No uid set: An array, key = uid, value = An associative array of account
+ *               metadata.
+ *   uid set, no metadata set: An associative array of account metadata.
+ *   uid set, metadata set: Cache the metadata for the user, return TRUE.
+ */
+function sms_user_login_metadata($uid = NULL, $metadata = NULL, $reset = FALSE) {
+  static $accounts = array();
+
+  if ($reset) {
+    $accounts = array();
+  }
+
+  if (!isset($uid)) {
+    return $accounts;
+  }
+
+  if (isset($metadata)) {
+    $accounts[$uid] = $metadata;
+    return TRUE;
+  }
+  elseif (isset($accounts[$uid])) {
+    return $accounts[$uid];
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
  * Registers a new user via SMS
  *
  * @param $number
@@ -535,6 +597,7 @@ function sms_user_sms_incoming($op, $number, $message, $options) {
  *   The user object of the created user.
  */
 function sms_user_register_new_user($number, $message, $options) {
+  global $user;
 
   $edit = array();
 
@@ -565,20 +628,36 @@ function sms_user_register_new_user($number, $message, $options) {
   $mail = isset($options['sms_email_gateway_from']) ? $options['sms_email_gateway_from'] : '';
   $edit['mail'] = $edit['init'] = $mail;
 
-
+  // Pass in sms_user specific data for saving.
   $edit['sms_user'] = array(
-    // Other modules can use this flag to detect if the user has
-    // registered via the SMS Framework without performing extra checks on
-    // every registration.
-    'register' => TRUE,
     'number' => $number,
-    'message' => $message,
-    'options' => $options,
+    'status' => 0,
+    'code' => '',
+    'gateway' => '',
   );
 
   $account = user_save('', $edit);
 
-  return $account;
+  // Verify that the account was created.
+  if (is_object($account)) {
+    $user = $account;
+
+    $metadata = array(
+      'register' => TRUE,
+      'number' => $number,
+      'message' => $message,
+      'options' => $options,
+    );
+    sms_user_login_metadata($account->uid, $metadata);
+
+    $edit = array();
+    user_module_invoke('login', $edit, $account);
+
+    return $account;
+  }
+
+  return FALSE;
+
 }
 
 /**
