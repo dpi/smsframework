@@ -76,9 +76,8 @@ function sms_user_sms_send(&$number, &$message, &$options, &$gateway) {
 
 function _sms_user_sleep_active($account) {
   $current_hour = date('G');
-  $current_hour = 22;
 
-  if ($account->sms_user['sleep_start_time'] <= $current_hour && $account->sms_user['sleep_end_time'] >= $current_hour) {
+  if ($account->sms_user['sleep_start_time'] <= $current_hour && $account->sms_user['sleep_end_time'] > $current_hour) {
     return TRUE;
   }
 
