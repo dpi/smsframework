@@ -23,8 +23,14 @@ function sms_user_send($uid, $message) {
 /**
  * Returns the uid of the owner of a number.
  */
-function sms_user_get_uid($number) {
-  $data = db_fetch_array(db_query("SELECT uid FROM {sms_user} WHERE number = '%s'", $number));
+function sms_user_get_uid($number, $status = NULL) {
+  $sql = "SELECT uid FROM {sms_user} WHERE number = '%s'";
+  $arguments = array($number);
+  if (isset($status)) {
+    $sql .= " AND status = %d";
+    $arguments[] = $status;
+  }
+  $data = db_fetch_array(db_query($sql, $arguments));
   return $data['uid'];
 }
 
@@ -279,7 +285,7 @@ function sms_user_validate_number(&$number) {
   if ($error = sms_validate_number($number)) {
     return $error;
   }
-  elseif (sms_user_get_uid($number)) {
+    elseif (sms_user_get_uid($number, 2)) {
     return t('This phone number is already registered to another user.');
   }
 }
