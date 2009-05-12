@@ -6,6 +6,9 @@
  * Provides integration between the SMS Framework and Drupal users.
  */
 
+define('SMS_USER_PENDING', 1);
+define('SMS_USER_CONFIRMED', 2);
+
 /**
  * Send a message to a user.
  */
@@ -23,8 +26,14 @@ function sms_user_send($uid, $message) {
 /**
  * Returns the uid of the owner of a number.
  */
-function sms_user_get_uid($number) {
-  $data = db_fetch_array(db_query("SELECT uid FROM {sms_user} WHERE number = '%s'", $number));
+function sms_user_get_uid($number, $status = NULL) {
+  $sql = "SELECT uid FROM {sms_user} WHERE number = '%s'";
+  $arguments = array($number);
+  if (isset($status)) {
+    $sql .= " AND status = %d";
+    $arguments[] = $status;
+  }
+  $data = db_fetch_array(db_query($sql, $arguments));
   return $data['uid'];
 }
 
@@ -102,10 +111,10 @@ function sms_user_settings($register = FALSE) {
     case 0:
       $output = drupal_get_form('sms_user_settings_add_form', $account);
       break;
-    case 1:
+    case SMS_USER_PENDING:
       $output = drupal_get_form('sms_user_settings_confirm_form', $account);
       break;
-    case 2:
+    case SMS_USER_CONFIRMED:
       $output = drupal_get_form('sms_user_settings_reset_form', $account);
       break;
   }
@@ -181,7 +190,7 @@ function sms_user_settings_confirm_form_submit($form_id, $form_values) {
   else {
     $data[0] = array(
       'number'  => $account->sms_user[0]['number'],
-      'status'  => 2,
+      'status'  => SMS_USER_CONFIRMED,
       'gateway' => $account->sms_user[0]['gateway'],
     );
     
@@ -276,7 +285,7 @@ function sms_user_send_confirmation($account, $number, $options) {
   $number = sms_formatter($number);
   $data[0] = array(
     'number'  => $number,
-    'status'  => 1,
+    'status'  => SMS_USER_PENDING,
     'code'    => $code,
     'gateway' => $options,
   );
@@ -289,7 +298,7 @@ function sms_user_validate_number(&$number) {
   if ($error = sms_validate_number($number)) {
     return $error;
   }
-  elseif (sms_user_get_uid($number)) {
+    elseif (sms_user_get_uid($number, SMS_USER_CONFIRMED)) {
     return t('This phone number is already registered to another user.');
   }
 }
