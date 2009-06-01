@@ -56,6 +56,12 @@ function sms_email_gateway_admin_form(&$form_state) {
     '#default_value' => variable_get('sms_email_gateway_mail_domain', 'example.com'),
     '#description' => t('Enter the default domain where the email gateway messages are received.'),
   );
+  $form['sms_email_gateway_debug'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable debugging'),
+    '#default_value' => variable_get('sms_email_gateway_debug', 0),
+    '#description' => t('If enabled, records details of all incoming messages in the log files.'),
+  );
 
   return system_settings_form($form);
 }
@@ -156,6 +162,17 @@ function sms_email_gateway_process_incoming_message($from, $to, $subject, $messa
   );
 
   sms_incoming($number, $message, $options);
+
+  if (variable_get('sms_email_gateway_debug', 0)) {
+    $data = '';
+    $data .= "Number: $number \n";
+    $data .= "To: $to \n";
+    $data .= "Subject: $subject \n\n";
+    $data .= "Message: \n $message \n";
+    $data .= "Headers: \n $headers \n";
+    $data .= "Options: \n" . var_export($options, TRUE);
+    watchdog('email_gateway', "Email received from $from, details: <br /><br /><pre>". htmlentities($data)). "</pre>";
+  }
 }
 
 /**
