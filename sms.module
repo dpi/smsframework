@@ -6,6 +6,10 @@
  * The core of the SMS Framework. Provides gateway managment and API for
  * sending and receiving SMS messages.
  */
+ 
+define('SMS_CARRIER_DEFAULT', 0);
+define('SMS_CARRIER_OVERRIDDEN', 1);
+define('SMS_CARRIER_NORMAL', 3);
 
 /**
  * Sends a message using the active gateway.
@@ -110,6 +114,52 @@ function sms_menu() {
     'access arguments' => array('administer smsframework'),
     'type' => MENU_CALLBACK,
   );
+  
+  $items['admin/smsframework/carriers'] = array(
+    'title' => 'Carrier configuration',
+    'description' => 'Configure supported carriers.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sms_carriers_admin_form'),
+    'access arguments' => array('administer smsframework'),
+    'file' => 'sms.admin.inc',
+  );
+  
+  $items['admin/smsframework/carriers/manage'] = array(
+    'title' => 'Manage',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  
+  $items['admin/smsframework/carriers/add'] = array(
+    'title' => 'Add',
+    'description' => 'Configure supported carriers.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sms_carriers_edit_form'),
+    'access arguments' => array('administer smsframework'),
+    'file' => 'sms.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  
+  $items['admin/smsframework/carriers/%carrier'] = array(
+    'title' => 'Edit carrier',
+    'description' => 'Configure supported carriers.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sms_carriers_edit_form', 3),
+    'access arguments' => array('administer smsframework'),
+    'type' => MENU_CALLBACK,
+    'file' => 'sms.admin.inc',
+  );
+  
+  $items['admin/smsframework/carriers/delete/%carrier'] = array(
+    'title' => 'Edit carrier',
+    'description' => 'Configure supported carriers.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sms_carriers_delete_form', 4),
+    'access arguments' => array('administer smsframework'),
+    'type' => MENU_CALLBACK,
+    'file' => 'sms.admin.inc',
+  );
+  
   return $items;
 }
 
@@ -124,11 +174,11 @@ function sms_perm() {
  * Implementation of hook_theme().
  */
 function sms_theme() {
-  return array(
-    'sms_admin_default_form' => array(
-      'arguments' => array('form' => NULL),  
-    )
-  );
+  
+  $items['sms_admin_default_form'] =
+  $items['sms_carriers_admin_form'] = array('arguments' => array('form' => NULL));
+
+  return $items;
 }
 
 /**
@@ -244,7 +294,7 @@ function sms_admin_gateway_form_submit($form, &$form_state) {
  *
  * @return
  *   Either an array of all gateways or a single gateway, in a variable format.
- **/
+ */
 function sms_gateways($op = 'gateways', $gateway = NULL) {
   list($_gateways, $_names) = _gateways_build();
   
@@ -276,6 +326,98 @@ function _gateways_build() {
   asort($_names);
   
   return array($_gateways, $_names);
+}
+
+/**
+ * Get a list of all carriers
+ */
+function sms_carriers($domain = NULL) {
+  $default_carriers = module_invoke_all('sms_carriers');
+  $enabled_carriers = variable_get('sms_enabled_carriers', array());
+
+  // Load default carriers from code
+  foreach ($default_carriers as $id => $carrier) {
+    $carriers[$id] = array('name' => $carrier, 'type' => SMS_CARRIER_DEFAULT);
+  }
+
+  // Load overrideen carriers from database
+  $result = db_query("SELECT name, domain FROM {sms_carriers}");
+  
+  while ($carrier = db_fetch_array($result)) {
+    if (in_array($carrier['domain'], array_keys($carriers))) {
+      $type = SMS_CARRIER_OVERRIDDEN;
+    }
+    else {
+      $type = SMS_CARRIER_NORMAL;
+    }
+
+    $carriers[$carrier['domain']] = array(
+      'name' => $carrier['name'],
+      'type' => $type,
+    );
+  }
+  
+  foreach($enabled_carriers as $carrier) {
+    if (is_array($carriers[$carrier])) {
+      $carriers[$carrier]['status'] = 1;
+    }
+  }
+
+  if ($domain) {
+    $carriers[$domain]['domain'] = $domain;
+    return $carriers[$domain];
+  }
+
+  return $carriers;
+}
+
+/**
+ * Load a single carrier
+ */
+function carrier_load($domain) {
+  return sms_carriers($domain);
+}
+
+/**
+ * Save a carrier.
+ */
+function carrier_save($domain, $edit) {
+  if (!empty($domain)) {
+    $carrier = carrier_load($domain);
+    if ($carrier['type'] == SMS_CARRIER_DEFAULT) {
+      $edit['status'] = 1;
+      drupal_write_record('sms_carriers', $edit);
+    }
+    else if(!empty($edit['domain'])) {
+      drupal_write_record('sms_carriers', $edit, 'domain');
+      // TODO: we need more logic to figure out when someone is changing the domain name
+    }
+  }
+  else {
+    $edit['status'] = 1;
+    drupal_write_record('sms_carriers', $edit);
+  }
+}
+
+/**
+ * Implementation of hook_sms_carriers()
+ */
+function sms_sms_carriers() {
+  return array(
+    'msg.acsalaska.com' => t('Alaska Communications Systems'),
+    'message.alltel.com' => t('Alltel Wireless'),
+    'txt.att.net' => t('AT&T/Cingular'),
+    'mobile.celloneusa.com' => t('CellularOne'),
+    'cwemail.com' => t('Centennial Wireless'),
+    'sms.mycricket.com' => t('Cricket'),
+    'messaging.sprintpcs.com' => t('Helio'),
+    'page.nextel.com' => t('Nextel'),
+    'qwestmp.com' => t('Qwest'),
+    'messaging.sprintpcs.com' => t('Sprint'),
+    'tmomail.net' => t('T-Mobile'),
+    'vmobl.com' => t('Virgin Mobile'),
+    'vtext.com' => t('Verizon'),
+  );
 }
 
 function sms_handle_result($result, $number, $message) {
