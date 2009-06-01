@@ -609,32 +609,9 @@ function sms_user_register_new_user($number, $message, $options) {
 
   $edit = array();
 
-  // Add password if enabled.
-  if (variable_get('sms_user_allow_password', 0)) {
-    $lines = explode("\n", $message);
-    $words = explode(" ", $lines[0]);
-    foreach ($words as $word) {
-      if (trim($word)) {
-        $edit['pass'] = preg_replace('/\s+/', '-', $word);
-        break;
-      }
-    }
-  }
-  // Auto-generated password.
-  if (!$edit['pass']) {
-    $edit['pass'] = user_password();
-  }
-
-  // Pick a pseudo-random name for the user -- using the email
-  // address would be a privacy violation.
-  $edit['name'] = substr(md5($number . strval(time())), 0, 10);
-
-  // Save the user.
-  $edit['status'] = variable_get('user_register', 1) == 1;
   // If we have a from address from the e-mail gateway, use it, otherwise
   // leave the e-mail fields blank.
   $mail = isset($options['sms_email_gateway_from']) ? $options['sms_email_gateway_from'] : '';
-  $edit['mail'] = $edit['init'] = $mail;
 
   // Pass in sms_user specific data for saving.
   $edit['sms_user'] = array(
@@ -646,10 +623,34 @@ function sms_user_register_new_user($number, $message, $options) {
 
   // If by chance there's already a user with the same email address, then use
   // it instead of creating a new user.
-  if ($edit['mail'] && ($account = user_load(array('mail' => $edit['mail'])))) {
+  if ($mail && ($account = user_load(array('mail' => $mail)))) {
     $account = user_save($account, $edit);
   }
   else {
+    $edit['mail'] = $edit['init'] = $mail;
+
+    // Add password if enabled.
+    if (variable_get('sms_user_allow_password', 0)) {
+      $lines = explode("\n", $message);
+      $words = explode(" ", $lines[0]);
+      foreach ($words as $word) {
+        if (trim($word)) {
+          $edit['pass'] = preg_replace('/\s+/', '-', $word);
+          break;
+        }
+      }
+    }
+    // Auto-generated password.
+    if (!$edit['pass']) {
+      $edit['pass'] = user_password();
+    }
+
+    // Pick a pseudo-random name for the user -- using the email
+    // address would be a privacy violation.
+    $edit['name'] = substr(md5($number . strval(time())), 0, 10);
+
+    // Save the user.
+    $edit['status'] = variable_get('user_register', 1) == 1;
     $account = user_save('', $edit);
   }
 
