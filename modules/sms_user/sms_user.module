@@ -341,11 +341,10 @@ function sms_user_save(&$edit, &$account, $category) {
   if (($category == 'mobile' || $category == 'account') && $edit['sms_user']) {
     $number = $edit['sms_user'];
     $db_values = array($number['number'], $number['status'], isset($number['code']) ? $number['code'] : NULL, serialize($number['gateway']));
-    if (isset($account->sms_user)) {
-      db_query("UPDATE {sms_user} SET number = '%s', status = %d, code = '%s', gateway = '%s'
+
+    db_query("UPDATE {sms_user} SET number = '%s', status = %d, code = '%s', gateway = '%s'
         WHERE uid = %d AND number = '%s'", array_merge($db_values, array($account->uid, $number['number'])));
-    }
-    else {
+    if ($number['number'] && !db_affected_rows()) {
       db_query("INSERT INTO {sms_user} (number, status, code, gateway, uid)
         VALUES ('%s', %d, '%s', '%s', %d)", array_merge($db_values, array($account->uid)));
     }
@@ -628,7 +627,7 @@ function sms_user_register_new_user($number, $message, $options) {
 
   // Pick a pseudo-random name for the user -- using the email
   // address would be a privacy violation.
-  $edit['name'] = substr(md5($number), 0, 10);
+  $edit['name'] = substr(md5($number . strval(time())), 0, 10);
 
   // Save the user.
   $edit['status'] = variable_get('user_register', 1) == 1;
@@ -645,7 +644,15 @@ function sms_user_register_new_user($number, $message, $options) {
     'gateway' => '',
   );
 
-  $account = user_save('', $edit);
+  // If by chance there's already a user with the same email address, then use
+  // it instead of creating a new user.
+  if ($edit['mail'] && ($account = user_load(array('mail' => $edit['mail'])))) {
+    $account = user_save($account, $edit);
+  }
+  else {
+    $account = user_save('', $edit);
+  }
+
 
   // Verify that the account was created.
   if (is_object($account)) {
