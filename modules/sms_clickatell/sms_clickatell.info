@@ -2,5 +2,6 @@
 name = "Clickatell"
 description = "Allows the SMS Framework to use Clickatell as a gateway."
 package = SMS Framework
-dependencies[] = sms
+version = 6.x-1.x-dev
 core = 6.x
+dependencies[] = sms

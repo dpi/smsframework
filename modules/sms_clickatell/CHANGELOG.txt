@@ -1,0 +1,11 @@
+$Id$
+
+This file will be replaced when a stable release is cut.
+
+Changes (so far) to Clickatell gateway module (sms_clickatell) 6.x-1.x-dev
+
+- Removed country code function, in favour of core framework functions for country codes
+- More to list...
+
+TODO
+- Remember to test with SMS Framework 1.0

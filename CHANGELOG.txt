@@ -1,0 +1,27 @@
+$Id$
+
+This file will be replaced when a stable release is cut.
+
+Changes to SMS Framework core module (sms) 6.x-1.x-dev
+
+- Added constants for Message direction codes, Message status codes, Gateway response codes.
+- Added sms_receipt() function.
+- Modified sms_send()
+    - Now passes $gateway and $options to the sms_handle_result().
+- Modified sms_handle_result()
+    - Added $gateway and $options to @params, with default values.
+    - Logging failed messages is now optional, as per admin setting, enabled by default.
+    - Will now return a full response array if admin setting is enabled, or the usual TRUE/FALSE - disabled by default. Response array includes message info, gateway array, status values from the gateway and the associated SMS Framework gateway status code.
+    - @todo Change ^^ to be an $options key instead of admin setting.
+- Moved admin settings functions to include file: sms.admin.inc
+- Added include file: sms.countrycode.inc
+- Made sms_send_form use the country code list function from sms.countrycode.inc
+- Added hook_sms_send_process(). Hook name chosen to preserve backward-compatibility, since hook_sms_send() does not implement the standard $op values ('pre process', 'process', 'post process').
+
+TODO
+- Admin setting for sms_log_failed_messages
+- What is sms_format_number() for?
+- What is sms_validate_number() for?
+- sms_formatter() shouldnt be used as a validator function.
+- In sms_send(), remove loop in favour of module_invoke_all()
+- What if the gateway always returns a message id code? We should be able to capture this.
