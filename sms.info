@@ -1,6 +1,7 @@
 ; $Id$
 name = "SMS Framework"
 description = "Provides a extensible API that facilitates communication between Drupal and various SMS gateways."
-package = SMS Framework
-version = 6.x-1.x-dev
 core = 6.x
+
+version = 6.x-1.x-dev
+package = SMS Framework

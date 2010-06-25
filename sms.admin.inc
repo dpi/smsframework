@@ -1,23 +1,12 @@
 <?php
 // $Id$
 /**
+ * @file
  * SMS Framework core module: Admin settings form functions
  *
  * @package sms
  */ 
 
-/**
- * Implementation of hook_theme().
- */
-/*
-function sms_theme() {
-  return array(
-    'sms_admin_default_form' => array(
-      'arguments' => array('form' => NULL),  
-    )
-  );
-}
-*/
 
 function sms_admin_default_form() {
   $gateways = sms_gateways();
@@ -70,6 +59,7 @@ function theme_sms_admin_default_form($form) {
   return $output;
 }
 
+
 function sms_admin_gateway_form(&$form_state, $gateway_id) {
   $gateway = sms_gateways('gateway', $gateway_id);
   if ($gateway && function_exists($gateway['configure form'])) {
@@ -100,6 +90,7 @@ function sms_admin_gateway_form_validate($form, &$form_state) {
   }
 }
 
+
 function sms_admin_gateway_form_submit($form, &$form_state) {
   $gateway = $form_state['values']['gateway'];
   
@@ -111,3 +102,47 @@ function sms_admin_gateway_form_submit($form, &$form_state) {
 }
 
 
+function sms_admin_settings_form(&$form_state) {
+  $form['log_failed_messages'] = array(
+    '#type'  => 'checkbox',
+    '#title' => 'Log messages that fail to send',
+    '#default_value' => variable_get('sms_log_failed_messages', TRUE),
+  );
+  $form['send_form'] = array(
+    '#type'  => 'fieldset',
+    '#title' => 'Send form',
+    '#collapsible' => TRUE,
+    '#collapsed'   => FALSE,
+  );
+  $validation_enabled = (function_exists('sms_valid_get_rulesets_for_form'));
+  $form['send_form']['send_form_include_ruleset_selector'] = array(
+    '#type'  => 'checkbox',
+    '#title' => 'Display ruleset selector on send form',
+    '#default_value' => variable_get('sms_send_form_include_ruleset_selector', TRUE),
+    '#disabled' => (! $validation_enabled),
+    '#description' => (! $validation_enabled) ? 'You must enable the SMS Framework Validation module to access this feature.' : NULL,
+  );
+  $form['send_form']['send_form_ruleset_selector_title'] = array(
+    '#type'  => 'textfield',
+    '#title' => 'Ruleset selector title',
+    '#maxlength'     => 100,
+    '#default_value' => variable_get('sms_send_form_ruleset_selector_title', 'Country'),
+    '#disabled' => (! $validation_enabled),
+    '#description' => (! $validation_enabled) ? 'You must enable the SMS Framework Validation module to access this feature.' : NULL,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit', 
+    '#value' => t('Save'),
+  );
+  return $form;
+}
+
+function sms_admin_settings_form_submit($form, &$form_state) {
+  variable_set('sms_log_failed_messages',
+               $form_state['values']['log_failed_messages']);
+  variable_set('sms_send_form_include_ruleset_selector',
+               $form_state['values']['send_form_include_ruleset_selector']);
+  variable_set('sms_send_form_ruleset_selector_title',
+               $form_state['values']['send_form_ruleset_selector_title']);
+  drupal_set_message(t('The settings have been saved.'));
+}

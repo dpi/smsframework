@@ -2,10 +2,32 @@ $Id$
 
 This file will be replaced when a stable release is cut.
 
-Changes (so far) to Clickatell gateway module (sms_clickatell) 6.x-1.x-dev
+Changes to Clickatell gateway module (sms_clickatell)
 
-- Removed country code function, in favour of core framework functions for country codes
-- More to list...
+-----------------------------------------------------------
+CHANGES SINCE 6.x-1.0
+-----------------------------------------------------------
+
+- Added menu (URL) paths for the receiver and receipt features
+- Modified sms_clickatell_command()
+    - A successful send will now return a response array, with Clickatell status codes mapped to SMS Framework status codes (see sms constants).
+    - Added support for long messages by setting the concat parameter to an appropriate value based on the message character length.
+    - Added SSL support (dependent on PHP support)
+    - Added support for sender IDs
+    - Added support for message reference tags
+    - Added support to delay message sending
+    - Added support to expire a message if not sent within a timeframe
+    - Added support for priority tag
+    - Added support for expectreply tag
+    - Added better quality error handling with mapping to core gateway status codes.
+- Added menu (URL) paths for the receiver and receipt features
+- Added function: sms_clickatell_receive_message() to handle incoming messages
+- Added function: sms_clickatell_receive_receipt() to handle incoming receipts
+- Added function: sms_clickatell_map_message_status_code() to map Clickatell message status codes to SMS Framework core status codes (see sms constants).
+- Added function: sms_clickatell_map_response_code() to map Clickatell gateway response codes to SMS Framework core gateway status codes (see sms constants).
+- Removed function: sms_clickatell_error_codes(), retired in favour of response code mappings.
+- Removed function: sms_clickatell_country_codes(), retired in favour of core framework functions for country codes (sms_valid rulesets).
+- Added more to the gateway configuration settings form.
 
 TODO
-- Remember to test with SMS Framework 1.0
+- Test with SMS Framework 1.0

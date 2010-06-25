@@ -1,6 +1,6 @@
 ; $Id$
 name = "Clickatell"
-description = "Allows the SMS Framework to use Clickatell as a gateway."
+description = "Gateway: Clickatell"
 package = SMS Framework
 version = 6.x-1.x-dev
 core = 6.x

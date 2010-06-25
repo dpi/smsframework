@@ -1,27 +1,40 @@
-$Id$
+; $Id$
 
 This file will be replaced when a stable release is cut.
 
-Changes to SMS Framework core module (sms) 6.x-1.x-dev
+Changes to SMS Framework core module (sms) and complimentary module set
 
-- Added constants for Message direction codes, Message status codes, Gateway response codes.
-- Added sms_receipt() function.
+See the CHANGELOG.txt in each complimentary module for module-specific changes.
+
+-----------------------------------------------------------
+CHANGES SINCE 6.x-1.0
+-----------------------------------------------------------
+- Added constants for message direction codes, message status codes, gateway response codes.
+- Added function: sms_dir() to help render the sms direction constants.
 - Modified sms_send()
-    - Now passes $gateway and $options to the sms_handle_result().
+    - Now passes $gateway and $options to sms_handle_result()
+    - Added post-process hook: hook_sms_send_process(). Hook name chosen to preserve backward-compatibility, since hook_sms_send() does not implement the standard $op values ('pre process', 'process', 'post process').
 - Modified sms_handle_result()
     - Added $gateway and $options to @params, with default values.
     - Logging failed messages is now optional, as per admin setting, enabled by default.
-    - Will now return a full response array if admin setting is enabled, or the usual TRUE/FALSE - disabled by default. Response array includes message info, gateway array, status values from the gateway and the associated SMS Framework gateway status code.
-    - @todo Change ^^ to be an $options key instead of admin setting.
-- Moved admin settings functions to include file: sms.admin.inc
-- Added include file: sms.countrycode.inc
-- Made sms_send_form use the country code list function from sms.countrycode.inc
-- Added hook_sms_send_process(). Hook name chosen to preserve backward-compatibility, since hook_sms_send() does not implement the standard $op values ('pre process', 'process', 'post process').
+    - Return either a full response array if an option is given in $options, or the usual TRUE/FALSE. Response array includes message info, gateway array, status values from the gateway and the associated SMS Framework gateway status code.
+- Modified sms_validate_number()
+    - Added additional formatting to catch error cases more easily.
+    - Added hook_sms_validate() with pre-process, process and post-process operations.
+- Added function: sms_receipt() that provides hook_sms_receipt()
+- Removed function: sms_formatter(). This function is redundant, since validation functions will format the number.
+- sms_send_form() will only include the ruleset (country) selector if it needs to (if there are rulesets and/or admin setting enabled). Default is 'auto-select'.
+- sms_send_form_validate(): Made it call the main validation function sms_validate_number() and carry any number manipulation made by the validation methods.
+- Added include file: sms.admin.inc
+- Moved admin settings form functions to sms.admin.inc file
+- Added a core admin settings form
+- Added admin setting for sms_send_form with ruleset (country) selector on/off and configurable field title.
+
+- Added module: sms_actions
+- Added module: sms_devel
+- Added module: sms_txtlocal
+- Added module: sms_valid
 
 TODO
-- Admin setting for sms_log_failed_messages
-- What is sms_format_number() for?
-- What is sms_validate_number() for?
-- sms_formatter() shouldnt be used as a validator function.
-- In sms_send(), remove loop in favour of module_invoke_all()
 - What if the gateway always returns a message id code? We should be able to capture this.
+- sms_send_form() to show ruleset selector only the form previously validated false. Requires some Drupal form tricks.

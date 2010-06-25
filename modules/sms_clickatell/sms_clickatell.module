@@ -1,6 +1,7 @@
 <?php
 // $Id$
 /**
+ * @file
  * Clickatell gateway module for Drupal SMS Framework. Outbound+Inbound+Receipts
  *
  * Thanks to diggersf for his great work on the original module.
@@ -18,7 +19,7 @@
  *  - http(s)://yourhost.example.com/sms/clickatell/receipt
  *
  * The send function in this module supports several options, including message
- * sender. Please see {@link sms_clickatell_command()}
+ * sender. Please see sms_clickatell_command()
  *
  * Relevant Clickatell documentation:
  *  - https://www.clickatell.com/developers/api_http.php
@@ -31,10 +32,14 @@
  * @subpackage sms_clickatell
  */
 
+
 /**
- * Implementation of hook_gateway_info().
+ * Implement hook_gateway_info()
  *
- * @return array SMS Framework gateway info
+ * @return
+ *   SMS Framework gateway info array
+ *
+ * @ingroup hooks
  */
 function sms_clickatell_gateway_info() {
   return array(
@@ -48,11 +53,14 @@ function sms_clickatell_gateway_info() {
   );
 }
 
+
 /**
- * Implementation of hook_menu
- * Provides Drupal with path and menu item configuration for this module.
+ * Implement hook_menu()
  *
- * @return array Drupal menu items
+ * @return
+ *   Drupal menu items array
+ *
+ * @ingroup hooks
  */
 function sms_clickatell_menu() {
   $items = array();
@@ -71,11 +79,14 @@ function sms_clickatell_menu() {
   return $items;
 }
 
+
 /**
  * Configuration form for gateway module
  *
- * @param array $configuration
- * @return array Drupal form structure
+ * @param $configuration
+ *
+ * @return
+ *   Drupal form array
  */
 function sms_clickatell_admin_form($configuration) {
   $form['sms_clickatell_balance'] = array(
@@ -139,12 +150,6 @@ function sms_clickatell_admin_form($configuration) {
   return $form;
 }
 
-/**
- * Validates the submission of the configuration form.
- *
- * @param array $form
- * @param array $form_state
- */
 function sms_clickatell_admin_form_validate($form, &$form_state) {
   // Check default sender
   if (!empty($form_state['values']['sms_clickatell_from'])) {
@@ -163,15 +168,21 @@ function sms_clickatell_admin_form_validate($form, &$form_state) {
   variable_set('sms_clickatell_session_id_timestamp', 0);
 }
 
+
 /**
  * Callback for sending messages.
  *
- * Options for this send function: see {@link sms_txtlocal_command()}
+ * Options for this send function: see sms_txtlocal_command()
  *
- * @param int $number MSISDN of message recipient. Expected to include the country code prefix.
- * @param str $message Message body text.
- * @param array $options Options from SMS Framework.
- * @return bool Whether the send was successful or not.
+ * @param $number
+ *   MSISDN of message recipient. Expected to include the country code prefix.
+ * @param $message
+ *   Message body text.
+ * @param $options
+ *   Options from SMS Framework.
+ *
+ * @return
+ *   Response from sms_clickatell_command()
  */
 function sms_clickatell_send($number, $message, $options) {
   // Attach the country code to the number, if required
@@ -182,10 +193,12 @@ function sms_clickatell_send($number, $message, $options) {
   return sms_clickatell_command('sendmsg', array('number' => $number, 'message' => $message, 'options' => $options));
 }
 
+
 /**
  * Get account balance
  *
- * @return str Balance text
+ * @return
+ *   Balance text
  */
 function sms_clickatell_balance() {
   $result = sms_clickatell_command('getbalance');
@@ -209,10 +222,15 @@ function sms_clickatell_balance() {
  *   priority    - Optional: Queue priority to apply to the message. Can be 1, 2 or 3, where 1 is high priority. Clickatell param: 'queue'
  *   expectreply - Optional: Route the message properly so that the user can reply. Clickatell param: 'mo'
  *
- * @param str   $command One of 'auth', 'sendmsg' or 'getbalance'.
- * @param array $data    All data required to perform the command.
- * @param array $config  Gateway configuration parameters.
- * @return bool Whether the command succeeded or not.
+ * @param $command
+ *   One of 'auth', 'sendmsg' or 'getbalance'.
+ * @param $data
+ *   All data required to perform the command.
+ * @param $config
+ *   Gateway configuration parameters.
+ *
+ * @return
+ *   Response from command.
  */
 function sms_clickatell_command($command = 'auth', $data = array(), $config = NULL) {
   $gateway = sms_gateways('gateway', 'clickatell');
@@ -302,7 +320,11 @@ function sms_clickatell_command($command = 'auth', $data = array(), $config = NU
 
   // Check for HTTP errors
   if ($http_result->error) {
-    return array('status' => FALSE, 'message' => t('An error occured during the HTTP request: @error', array('@error' => $http_result->error)));
+    return array(
+      'status'  => FALSE,
+      'message' => t('An error occured during the HTTP request: @error',
+                     array('@error' => $http_result->error)),
+    );
   }
   
   if ($http_result->data) {
@@ -341,7 +363,8 @@ function sms_clickatell_command($command = 'auth', $data = array(), $config = NU
 /**
  * Get a new or existing Clickatell session ID
  *
- * @return str Clickatell session ID
+ * @return
+ *   Clickatell session ID
  */
 function sms_clickatell_get_session_id() {
   if (variable_get('sms_clickatell_session_id_timestamp', 0) < strtotime('-10 mins')) {
@@ -440,7 +463,7 @@ function sms_clickatell_receive_receipt() {
   // Get framework message status code and Clickatell status text
   $status  = sms_clickatell_map_message_status_code($gw_msg_status_code);
   $gw_msg_status_codes = sms_clickatell_message_status_codes();
-  $gw_msg_status_text  = $msg_status_codes[$gw_msg_status_code];
+  $gw_msg_status_text  = $gw_msg_status_codes[$gw_msg_status_code];
 
   // Define gateway-specific status (code) and text (success/error message)
   $options['gateway_message_status']      = $gw_msg_status_code;
@@ -454,37 +477,31 @@ function sms_clickatell_receive_receipt() {
 /**
  * Map a Clickatell message status code to an SMS Framework message status code
  *
- * @return int SMS Framework message status code.
+ * @return
+ *   SMS Framework message status code. See sms constants.
  */
 function sms_clickatell_map_message_status_code($code) {
   switch ($code) {
     case '003':
     case '004':
       return SMS_MSG_STATUS_DELIVERED;
-      break;
     case '002':
     case '011':
       return SMS_MSG_STATUS_QUEUED;
-      break;
     case '008':
       return SMS_MSG_STATUS_OK;
-      break;
     case '001':
     case '005':
     case '006':
     case '007':
     case '009':
       return SMS_MSG_STATUS_ERROR;
-      break;
     case '010':
       return SMS_MSG_STATUS_EXPIRED;
-      break;
     case '012':
       return SMS_MSG_STATUS_NOCREDIT;
-      break;
     default:
       return SMS_MSG_STATUS_UNKNOWN;
-      break;
   }
 }
 
@@ -492,7 +509,8 @@ function sms_clickatell_map_message_status_code($code) {
 /**
  * Map a Clickatell gateway response status code to an SMS Framework gateway status code
  *
- * @return int SMS Framework gateway status code.
+ * @return
+ *   SMS Framework gateway status code. See sms constants.
  */
 function sms_clickatell_map_response_code($code) {
   switch ($code) {
@@ -548,7 +566,8 @@ function sms_clickatell_map_response_code($code) {
  * Clickatell always uses leading zeros, so its important to enclose the code
  * keys in quotes.
  *
- * @return array Associative array of message status codes and text strings.
+ * @return
+ *   Associative array of message status codes and text strings.
  */
 function sms_clickatell_message_status_codes() {
   return array(
@@ -570,7 +589,8 @@ function sms_clickatell_message_status_codes() {
 /**
  * Returns an array of response codes and messages that are generated by the Clickatell gateway
  *
- * @return array Associative array of response codes and text.
+ * @return
+ *   Associative array of response codes and text.
  */
 function sms_clickatell_response_codes() {
   return array(
@@ -610,6 +630,12 @@ function sms_clickatell_response_codes() {
 
 /**
  * Converts a string to USC-2 encoding if neccessary.
+ *
+ * @param $message
+ *   Message string.
+ *
+ * @return
+ *   Converted message string or FALSE.
  */
 function sms_clickatell_unicode($message) {
   if (function_exists('iconv')) {
