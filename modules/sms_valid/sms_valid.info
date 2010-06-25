@@ -1,0 +1,8 @@
+; $Id$
+name = Validation
+description = Provides number validation features to the SMS Framework.
+core = 6.x
+
+version = 6.x-1.x-dev
+package = SMS Framework
+dependencies[] = sms

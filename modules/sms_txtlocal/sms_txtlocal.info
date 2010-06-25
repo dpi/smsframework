@@ -1,0 +1,15 @@
+; $Id$
+;
+; SMS Framework gateway module for Txtlocal (www.txtlocal.com)
+;
+; To make inbound work you must configure txtlocal to send the messages to a
+; URL: http(s)://yourhost.example.com/sms/txtlocal/receiver
+;
+; Please also read the comment header in sms_txtlocal.module.
+;
+name = "Txtlocal"
+description = "Gateway: Txtlocal"
+package = SMS Framework
+version = 6.x-1.x-dev
+core = 6.x
+dependencies[] = sms
