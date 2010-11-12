@@ -38,3 +38,16 @@ CHANGES SINCE 6.x-1.0
 TODO
 - What if the gateway always returns a message id code? We should be able to capture this.
 - sms_send_form() to show ruleset selector only the form previously validated false. Requires some Drupal form tricks.
+- Change sender/receiver options keys to be 'gw_number' - this requires a change in all feature modules and all gateway modules that support incoming messages.
+- Allow gateway send function to modify the $options variable, to carry on for post-processing.
+- DONE Change virtual gateway to use gw_number = 99999
+- DONE Virtual gateway should have a lower-case G
+- DONE Virtual gateway: remove default reference set and ensure that other calls to $options['reference'] are handled correctly in the module.
+- DONE Virtual gateway seems to be overwriting the reference tags.
+- DONE Virtual gateway 'gateway_number' to 'gw_number'.
+- DONE sms_track must accept simple gateway response (true/false)
+- SMS Tracking receipts are not UPDATEing for some weird reason.
+- sms_devel Send Form must request full gateway response
+- Virtual gateway to set a default gw_number
+- DONE SMS Tracking purge hook_cron
+

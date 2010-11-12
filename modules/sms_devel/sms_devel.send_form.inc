@@ -29,10 +29,11 @@ function sms_devel_send_form(&$form_state) {
 
   // Message text field for my form
   $form['message'] = array(
-    '#type'  => 'textfield',
+    '#type'  => 'textarea',
     '#title' => t('Message'),
-    '#size'      => 80,
-    '#maxlength' => 160,  // This can be longer if you allow long messages
+    '#rows'  => 4,
+    '#cols'  => 40,
+    '#resizable' => FALSE,
   );
 
   // Submit button for my form
