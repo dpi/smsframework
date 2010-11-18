@@ -1,0 +1,40 @@
+<?php
+// $Id$
+/**
+ * @file
+ * Development and testing tools for Drupal SMS Framework.
+ *
+ * @package sms
+ * @subpackage sms_devel
+ */
+include 'sms_devel.send_form.inc';
+
+
+/**
+ * Implement hook_menu()
+ *
+ * @return
+ *   Drupal menu item array.
+ *
+ * @ingroup hooks
+ */
+function sms_devel_menu() {
+  $items = array();
+
+  $items['admin/smsframework/devel'] = array(
+    'title'  => 'Devel',
+    'description' => 'Development and testing tools.',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('sms_devel_send_form', NULL),
+    'access arguments' => array('administer smsframework'),
+  );
+
+  $items['admin/smsframework/devel/send_form'] = array(
+    'title'  => 'Test send form',
+    'type'   => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  return $items;
+}
+

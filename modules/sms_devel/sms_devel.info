@@ -1,0 +1,6 @@
+; $Id$
+name = Devel
+description = Development and testing tools to assist module/site development.
+core = 6.x
+package = SMS Framework
+dependencies[] = sms
