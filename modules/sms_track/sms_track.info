@@ -1,0 +1,7 @@
+; $Id$
+name = Tracking
+description = Message archiving and delivery tracking for the SMS Framework.
+core = 6.x
+package = SMS Framework
+dependencies[] = sms
+dependencies[] = views

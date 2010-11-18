@@ -1,6 +1,6 @@
 ; $Id$
 name = Devel
-description = Development and testing tools to assist module/site development.
+description = Dev and test tools to assist module/site development with the SMS Framework.
 core = 6.x
 package = SMS Framework
 dependencies[] = sms
