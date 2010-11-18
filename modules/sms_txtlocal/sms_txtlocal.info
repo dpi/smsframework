@@ -10,6 +10,5 @@
 name = "Txtlocal"
 description = "Gateway: Txtlocal"
 package = SMS Framework
-version = 6.x-1.x-dev
 core = 6.x
 dependencies[] = sms
