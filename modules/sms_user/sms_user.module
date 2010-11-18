@@ -155,13 +155,13 @@ function sms_user_settings_confirm_form(&$form_state, $account) {
   );
   $form['number'] = array(
     '#type' => 'item',
-    '#title' => t('Number'),
+    '#title' => t('Mobile phone number'),
     '#value' => $account->sms_user['number'],
   );
   $form['confirm_code'] = array(
     '#type' => 'textfield',
     '#title' => t('Confirmation code'),
-    '#description' => t('Enter the confirmation code that was sent to your phone.'),
+    '#description' => t('Enter the confirmation code sent by SMS to your mobile phone.'),
     '#size' => 4,
     '#maxlength' => 4,
   );
