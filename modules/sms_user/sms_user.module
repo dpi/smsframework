@@ -309,7 +309,7 @@ function sms_user_validate_number(&$number) {
   if ($error = sms_validate_number($number)) {
     return $error;
   }
-    elseif (sms_user_get_uid($number, SMS_USER_CONFIRMED)) {
+  elseif (sms_user_get_uid($number)) {
     return t('This phone number is already registered to another user.');
   }
 }
