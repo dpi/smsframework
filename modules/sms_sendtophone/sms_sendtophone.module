@@ -76,7 +76,7 @@ function sms_sendtophone_page($type = NULL) {
   else {
     if (empty($user->sms_user['0']['number']) && user_access('send to any number')) {
       $register = array(
-        '#value' => t('You need need to <a href="@setup">setup</a> your mobile phone to send messages.', array('@setup' => url('user/'. $user->uid .'/mobile')))
+        '#value' => t('You need to <a href="@setup">setup</a> your mobile phone to send messages.', array('@setup' => url('user/'. $user->uid .'/mobile')))
       );
     }
     else {
