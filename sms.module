@@ -177,7 +177,10 @@ function sms_perm() {
  */
 function sms_theme() {
   $items['sms_admin_default_form'] =
-  $items['sms_carriers_admin_form'] = array('arguments' => array('form' => NULL));
+  $items['sms_carriers_admin_form'] = array(
+    'arguments' => array('form' => NULL),
+    'file' => 'sms.admin.inc',
+  );
 
   return $items;
 }
@@ -439,6 +442,22 @@ function sms_send_form_submit($form, &$form_state) {
   $form_state['values']['number'] = sms_formatter($form_state['values']['number']);
   sms_send($form_state['values']['number'], $form_state['values']['message'], $form_state['values']['gateway']);
 }
+
+/**
+ * Render a direction code
+ *
+ * @param $out bool Outgoing allowed or not
+ * @param $in  bool Incoming allowed or not
+ * @return const The constant that defines this direction combination. Usually an integer value.
+ */
+function sms_dir($out, $in) {
+  if ( $out &&  $in) { return SMS_DIR_ALL;  }
+  if ( $out && !$in) { return SMS_DIR_OUT;  }
+  if (!$out &&  $in) { return SMS_DIR_IN;   }
+  if (!$out && !$in) { return SMS_DIR_NONE; }
+}
+
+
 
 /**
  * Returns an array of E.164 international country calling codes
