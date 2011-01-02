@@ -44,13 +44,22 @@ function sms_devel_menu() {
     'access arguments' => array('administer smsframework'),
     'type'   => MENU_LOCAL_TASK,
     'weight' => -9,
+    'file' => 'sms_devel.virtualgw.admin.inc',
   );
 
   $items['admin/smsframework/devel/virtualgw/send'] = array(
     'page callback'    => 'sms_devel_virtualgw_ahah_send',
-    //'page arguments'   => array(NULL),
     'access arguments' => array('administer smsframework'),
     'type'   => MENU_CALLBACK,
+    'file' => 'sms_devel.virtualgw.inc',
+  );
+
+  $items['sms/virtualgw/receiver'] = array(
+    'page callback'    => 'sms_devel_virtualgw_receiver',
+    'page arguments' => array(),
+    'access callback' => TRUE,
+    'type'   => MENU_CALLBACK,
+    'file' => 'sms_devel.virtualgw.inc',
   );
 
   $items['admin/smsframework/devel/virtualgw/getactivity'] = array(

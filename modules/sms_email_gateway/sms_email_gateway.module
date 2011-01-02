@@ -1,6 +1,14 @@
 <?php
 // $Id$
 
+/**
+ * @file
+ * 
+ */
+
+/**
+ * Implements hook_gateway_info().
+ */
 function sms_email_gateway_gateway_info() {
   return array(
     'email' => array(

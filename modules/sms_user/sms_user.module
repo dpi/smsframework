@@ -140,6 +140,10 @@ function sms_user_settings_add_form_validate($form, &$form_state) {
   if ($error = sms_user_validate_number($form_state['values']['number'])) {
     form_set_error('number', $error);
   }
+
+  if (empty($form_state['values']['gateway'])) {
+   $form_state['values']['gateway'] = array();
+  }
 }
 
 function sms_user_settings_add_form_submit($form, &$form_state, $account = NULL) {
@@ -494,6 +498,8 @@ function sms_user_token_list($type = 'all') {
  * Implementation of hook_sms_incoming().
  */
 function sms_user_sms_incoming($op, $number, $message, $options) {
+  global $user;
+
   switch ($op) {
     case 'pre process':
       if ($account = sms_user_authenticate($number)) {

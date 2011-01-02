@@ -65,7 +65,7 @@ function sms_devel_virtualgw_send($number, $message, $options) {
 
 function sms_devel_virtualgw_receiver($number = NULL, $message = NULL, $options = array()) {
   // Handle HTTP requests rather than direct function calls
-  if ($number == NULL) {
+  if ($number === NULL) {
     $number  = $_REQUEST['number'];
     $message = (array_key_exists('message', $_REQUEST)) ? $_REQUEST['message'] : 'NO_MESSAGE';
     $options['gw_number'] = (array_key_exists('gw_number', $_REQUEST)) ? $_REQUEST['gw_number'] : 'NO_GW_NUMBER';
@@ -184,15 +184,16 @@ function sms_devel_virtualgw_js_getactivity() {
 
 
 function sms_devel_virtualgw_ahah_send() {
-  $from    = $_POST['sms_devel_virtualgw_from'];
-  $to      = $_POST['sms_devel_virtualgw_to'];
-  $message = $_POST['sms_devel_virtualgw_message'];
-
-  $number  = $from;
-  $options['gw_number'] = $to;
-
-  // Call the receiver
-  sms_devel_virtualgw_receiver($number, $message, $options);
+  $result = drupal_http_request(
+    url('sms/virtualgw/receiver', array('absolute' => TRUE)),
+    array('Content-Type' => 'application/x-www-form-urlencoded'),
+    'POST',
+    http_build_query(array(
+      'number' => $_POST['sms_devel_virtualgw_from'],
+      'message' => $_POST['sms_devel_virtualgw_message'],
+      'gw_number' => $_POST['sms_devel_virtualgw_to'],
+    ), '', '&')
+  );
 
   // Return a good status
   drupal_json(array('status' => TRUE));
