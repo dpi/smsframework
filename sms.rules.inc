@@ -1,35 +1,36 @@
 <?php
 
 /**
- * Implementation of hook_rules_event_info().
+ * @file
+ * Rules module support of the smsframework.
+ */
+
+/**
+ * Implements hook_rules_event_info().
  */
 function sms_rules_event_info() {
   return array(
     'sms_incoming' => array(
       'label' => t('When a SMS message is received.'),
       'module' => 'SMS Framework',
-      'arguments' => sms_rules_arguments(),
+      'arguments' => array(
+        'number' => array(
+          'label' => t('Number'),
+          'type' => 'sms_number',
+        ),
+        'message' => array(
+          'label' => t('Message'),
+          'type' => 'sms_message',
+        ),
+      ),
     ),
   );
-}
-
-function sms_rules_arguments() {
-  $args = array(
-    'number' => array(
-      'label' => t('Number'),
-      'type' => 'sms_number',
-    ),
-    'message' => array(
-      'label' => t('Message'),
-      'type' => 'sms_message',
-    ),
-  );
-    
-  return $args;
 }
 
 /**
- * Implementation of hook_rules_action_info().
+ * Implements hook_rules_action_info().
+ *
+ * @todo - this should be in the sms_user module.
  */
 function sms_rules_action_info() {
   return array(
@@ -58,15 +59,28 @@ function sms_rules_action_info() {
   );
 }
 
+/**
+ * Rules action callback to send sms message to user.
+ *
+ * @todo - this should be in the sms_user module.
+ */
 function sms_action_user_send($user, $message) {
   sms_user_send($user->uid, $message);
 }
 
+/**
+ * Rules action callback to match number to user.
+ *
+ * @todo - this should be in the sms_user module.
+ */
 function sms_action_match_user($number) {
   $uid = sms_user_get_uid($number);
   return array('user_loaded' => user_load(array('uid' => $uid)));
 }
 
+/**
+ * Implements hook_token_values().
+ */
 function sms_token_values($type, $object = NULL, $options = array()) {
   if ($type == 'sms_message') {
     $values['message'] = $object;
@@ -84,6 +98,9 @@ function sms_token_values($type, $object = NULL, $options = array()) {
   return $values;
 }
 
+/**
+ * Implements hook_token_list().
+ */
 function sms_token_list($type = 'all') {
   switch ($type) {
     case 'sms_message':

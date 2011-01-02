@@ -1,9 +1,17 @@
 <?php
 // $Id$
 
+/**
+ * @file
+ * The admin sms functions.
+ */
+
+/**
+ * Select default sms gateway form.
+ */
 function sms_admin_default_form() {
   $gateways = sms_gateways();
-  
+
   foreach ($gateways as $identifier => $gateway) {
     $active = ($identifier == variable_get('sms_default_gateway', 'log'));
     $options[$identifier] = '';
@@ -16,15 +24,20 @@ function sms_admin_default_form() {
     }
   }
   $form['default'] = array('#type' => 'radios', '#options' => $options, '#default_value' => variable_get('sms_default_gateway', 'log'));
-  
+
   $form['submit'] = array(
-    '#type' => 'submit', 
+    '#type' => 'submit',
     '#value' => t('Set default gateway'),
   );
-  
+
   return $form;
 }
 
+/**
+ * Form submission handler for sms_admin_default_form().
+ *
+ * @see sms_admin_default_form()
+ */
 function sms_admin_default_form_submit($form, &$form_state) {
   // Process form submission to set the default gateway
   if ($form_state['values']['default']) {
@@ -33,6 +46,14 @@ function sms_admin_default_form_submit($form, &$form_state) {
   }
 }
 
+/**
+ * Returns HTML for the admin default gateway form.
+ *
+ * @param $form
+ *  An form array.
+ *
+ * @ingroup themeable
+ */
 function theme_sms_admin_default_form($form) {
   $rows = array();
   foreach ($form as $name => $element) {
@@ -52,6 +73,15 @@ function theme_sms_admin_default_form($form) {
   return $output;
 }
 
+/**
+ * Form builder for the sms gateway configuration form.
+ *
+ * @param @gateway_id
+ *  The ID of the sms gateway.
+ *
+ * @see sms_admin_gateway_form_validate()
+ * @see sms_admin_gateway_form_submit()
+ */
 function sms_admin_gateway_form(&$form_state, $gateway_id) {
   $gateway = sms_gateways('gateway', $gateway_id);
   if ($gateway && function_exists($gateway['configure form'])) {
@@ -59,7 +89,7 @@ function sms_admin_gateway_form(&$form_state, $gateway_id) {
     $form = $gateway['configure form']($gateway['configuration']);
 
     $form['submit'] = array(
-      '#type' => 'submit', 
+      '#type' => 'submit',
       '#value' => t('Save'),
     );
     $form['gateway'] = array('#type' => 'value', '#value' => $gateway);
@@ -71,8 +101,10 @@ function sms_admin_gateway_form(&$form_state, $gateway_id) {
 }
 
 /**
- * Validation for gateway configuration. If the gateway defines a validation
- * function it uses that.
+ * Form validation handler for sms_admin_gateway_form().
+ *
+ * @see sms_admin_gateway_form()
+ * @see sms_admin_gateway_form_submit()
  */
 function sms_admin_gateway_form_validate($form, &$form_state) {
   // Pass validation to gateway
@@ -82,9 +114,15 @@ function sms_admin_gateway_form_validate($form, &$form_state) {
   }
 }
 
+/**
+ * Form submission handler for sms_admin_gateway_form().
+ *
+ * @see sms_admin_gateway_form()
+ * @see sms_admin_gateway_form_validate()
+ */
 function sms_admin_gateway_form_submit($form, &$form_state) {
   $gateway = $form_state['values']['gateway'];
-  
+
   // Remove uneccesary values
   unset($form_state['values']['op'], $form_state['values']['submit'], $form_state['values']['gateway'], $form_state['values']['form_token'], $form_state['values']['form_id']);
   variable_set('sms_'. $gateway['identifier'] .'_settings', $form_state['values']);
@@ -93,7 +131,9 @@ function sms_admin_gateway_form_submit($form, &$form_state) {
 }
 
 /**
- * Page callback for admin/smsframework/carriers
+ * Form builder for the list of sms carriers.
+ *
+ * @see sms_carriers_admin_form_submit().
  */
 function sms_carriers_admin_form() {
   $carriers = sms_carriers();
@@ -121,37 +161,39 @@ function sms_carriers_admin_form() {
       '#description' => $storage,
       '#default_value' => $carrier['status'],
     );
-    
+
     $form['domain'][$css_safe_id] = array(
       '#type' => 'markup',
       '#value' => $id,
     );
-    
+
     $actions[] = l(t('Edit'), "admin/smsframework/carriers/{$id}");
-    
+
     if ($carrier['type'] == SMS_CARRIER_OVERRIDDEN) {
       $actions[] = l(t('Revert'), "admin/smsframework/carriers/delete/{$id}");
     }
     else if ($carrier['type'] == SMS_CARRIER_NORMAL) {
       $actions[] = l(t('Delete'), "admin/smsframework/carriers/delete/{$id}");
     }
-    
+
     $form['actions'][$css_safe_id] = array(
       '#type' => 'markup',
       '#value' => implode(' | ', $actions),
     );
   }
-  
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save settings'),
   );
-  
+
   return $form;
 }
 
 /**
- * Submit handler form carrier settings form.
+ * Form submission handler for sms_carriers_admin_form().
+ *
+ * @see sms_carriers_admin_form().
  */
 function sms_carriers_admin_form_submit(&$form, &$form_state) {
   $enabled_carriers = array();
@@ -165,38 +207,45 @@ function sms_carriers_admin_form_submit(&$form, &$form_state) {
 }
 
 /**
- * Carrier edit form.
+ * Form builder for the carrier edit form.
+ *
+ * @param $carrier
+ *   An associative array defining the sms carrier.
+ *
+ * @see sms_carriers_edit_form_submit().
  */
 function sms_carriers_edit_form($form_state, $carrier = array()) {
   $form['carrier'] = array(
     '#type' => 'value',
     '#value' => $carrier['domain'],
   );
-  
+
   $form['name'] = array(
     '#type' => 'textfield',
     '#title' => t('Name'),
     '#default_value' => $carrier['name'],
     '#required' => TRUE,
   );
-  
+
   $form['domain'] = array(
     '#type' => 'textfield',
     '#title' => t('Domain'),
-    '#default_value' => $carrier['domain'],  
+    '#default_value' => $carrier['domain'],
     '#required' => TRUE,
   );
-  
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
   );
-  
+
   return $form;
 }
 
 /**
- * Submit handler for carrier edit form.
+ * Form submission handler for sms_carriers_edit_form().
+ *
+ * @see sms_carriers_edit_form().
  */
 function sms_carriers_edit_form_submit(&$form, &$form_state) {
   $carrier = array();
@@ -210,7 +259,12 @@ function sms_carriers_edit_form_submit(&$form, &$form_state) {
 }
 
 /**
- * Carrier deletion confirmation.
+ * Form builder for the carrier deletion confirmation form.
+ *
+ * @param $carrier
+ *   An associative array defining the sms carrier.
+ *
+ * @see sms_carriers_delete_form_submit()
  */
 function sms_carriers_delete_form(&$form_state, $carrier) {
   $form['domain'] = array('#type' => 'value', '#value' => $carrier['domain']);
@@ -224,7 +278,9 @@ function sms_carriers_delete_form(&$form_state, $carrier) {
 }
 
 /**
- * Submit handler for carrier deletion.
+ * Form submission handler for sms_carriers_delete_form().
+ *
+ * @see sms_carriers_delete_form()
  */
 function sms_carriers_delete_form_submit($form, &$form_state) {
   db_query('DELETE FROM {sms_carriers} WHERE domain = "%s"', $form_state['values']['domain']);
@@ -234,10 +290,18 @@ function sms_carriers_delete_form_submit($form, &$form_state) {
   if ($carrier['type'] == SMS_CARRIER_NORMAL) {
     drupal_set_message(t('The carrier has been deleted.'));
   }
-  
+
   $form_state['redirect'] = 'admin/smsframework/carriers';
 }
 
+/**
+ * Returns HTML for the sms carriers admin form.
+ *
+ * @param $form
+ *  A form array.
+ *
+ * @ingroup themeable
+ */
 function theme_sms_carriers_admin_form($form) {
   $output = '';
 
@@ -251,7 +315,7 @@ function theme_sms_carriers_admin_form($form) {
     $name .= "</div>";
     unset($form['status'][$element]['#title']);
     unset($form['status'][$element]['#description']);
-    
+
     $row = array(
       'status' => drupal_render($form['status'][$element]),
       'name' => $name,
@@ -260,10 +324,10 @@ function theme_sms_carriers_admin_form($form) {
     );
     $rows[] = $row;
   }
-  
+
   $output .= theme('table', $header, $rows, array('id' => 'sms-form-table', 'class' => 'sms'));
   $output .= drupal_render($form['submit']);
   $output .= drupal_render($form);
-  
+
   return $output;
 }
