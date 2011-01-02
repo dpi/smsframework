@@ -482,14 +482,6 @@ function sms_validate_number(&$number, $options = array()) {
 }
 
 /**
- * Performs a simple send on submit.
- */
-function sms_send_form_submit($form, &$form_state) {
-  $form_state['values']['number'] = sms_formatter($form_state['values']['number']);
-  sms_send($form_state['values']['number'], $form_state['values']['message'], $form_state['values']['gateway']);
-}
-
-/**
  * Render a direction code
  *
  * @param $out bool Outgoing allowed or not
