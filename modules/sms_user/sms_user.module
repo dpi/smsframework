@@ -89,8 +89,26 @@ function sms_user_sms_send(&$number, &$message, &$options, &$gateway) {
   }
 }
 
+/**
+ * Is the user sleeping?
+ *
+ * @param $account
+ *   User account object.
+ *
+ * @return
+ *   TRUE if its currently in the user user sleep time.
+ */
 function _sms_user_sleep_active($account) {
-  $current_hour = date('G');
+  //if the user has a timezone set in his account get the time there
+  if (isset($account->timezone_name)) {
+    $timezone = new DateTimeZone($account->timezone_name);
+    $date = new DateTime();
+    $date->setTimezone( $timezone );
+    $current_hour = $date->format('G');
+  }
+  else {
+    $current_hour = date('G');
+  }
 
   if ($account->sms_user['sleep_start_time'] <= $current_hour && $account->sms_user['sleep_end_time'] > $current_hour) {
     return TRUE;
