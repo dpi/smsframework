@@ -393,6 +393,7 @@ function sms_user_user($op, &$edit, &$account, $category = NULL) {
 function sms_user_load(&$edit, &$account, $category) {
   $result = db_query("SELECT number, status, code, gateway FROM {sms_user} WHERE uid = %d", $account->uid);
 
+  $account->sms_user = array();
   while ($data = db_fetch_array($result)) {
     $user_data = unserialize($account->data);
     $account->sms_user = $user_data['sms_user'];
