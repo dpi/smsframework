@@ -12,33 +12,13 @@ define('SMS_USER_CONFIRMED', 2);
 define('SMS_USER_MAX_CHARS', 140);
 
 require_once 'sms_user.actions.inc';
+require_once 'sms_user.rules.inc';
 
 /**
- * Send a message to a user.
+ * Implementation of hook_perm()
  */
-function sms_user_send($uid, $message) {
-  $account = user_load($uid);
-
-  if ($account->sms_user['status'] == 2) {
-    return sms_send($account->sms_user['number'], $message, $account->sms_user['gateway']);
-  }
-  else {
-    return FALSE;
-  }
-}
-
-/**
- * Returns the uid of the owner of a number.
- */
-function sms_user_get_uid($number, $status = NULL) {
-  $sql = "SELECT uid FROM {sms_user} WHERE number = '%s'";
-  $arguments = array($number);
-  if (isset($status)) {
-    $sql .= " AND status = %d";
-    $arguments[] = $status;
-  }
-  $data = db_fetch_array(db_query($sql, $arguments));
-  return $data['uid'];
+function sms_user_perm() {
+  return array('administer sms_user', 'delete mobile phone number');
 }
 
 /**
@@ -69,10 +49,31 @@ function sms_user_menu() {
 }
 
 /**
- * Implementation of hook_perm()
+ * Send a message to a user.
  */
-function sms_user_perm() {
-  return array('administer sms_user');
+function sms_user_send($uid, $message) {
+  $account = user_load($uid);
+
+  if ($account->sms_user['status'] == 2) {
+    return sms_send($account->sms_user['number'], $message, $account->sms_user['gateway']);
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Returns the uid of the owner of a number.
+ */
+function sms_user_get_uid($number, $status = NULL) {
+  $sql = "SELECT uid FROM {sms_user} WHERE number = '%s'";
+  $arguments = array($number);
+  if (isset($status)) {
+    $sql .= " AND status = %d";
+    $arguments[] = $status;
+  }
+  $data = db_fetch_array(db_query($sql, $arguments));
+  return $data['uid'];
 }
 
 /**
@@ -195,6 +196,7 @@ function sms_user_settings_confirm_form(&$form_state, $account) {
   $form['reset'] = array(
     '#type' => 'submit',
     '#value' => t('Delete & start over'),
+    '#access' => user_access('delete mobile phone number'),
   );
   return $form;
 }
@@ -221,6 +223,10 @@ function sms_user_settings_confirm_form_submit($form, &$form_state) {
     );
 
     user_save($account, array('sms_user' => $data), 'mobile');
+    // If the rule module is installed, fire rules
+    if (module_exists('rules')) {
+      rules_invoke_event('sms_user_validated', $account);
+    }
   }
 }
 
@@ -231,14 +237,15 @@ function sms_user_settings_reset_form(&$form_state, $account) {
   );
   $form['sms_user']['number'] = array(
     '#type' => 'item',
-    '#title' => t('Your number'),
+    '#title' => t('Your mobile phone number'),
     '#value' => $account->sms_user['number'],
-    '#description' => t('Your number has been confirmed.')
+    '#description' => t('Your mobile phone number has been confirmed.')
   );
 
   $form['reset'] = array(
     '#type' => 'submit',
     '#value' => t('Delete & start over'),
+    '#access' => user_access('delete mobile phone number'),
   );
 
   return $form;
@@ -247,6 +254,9 @@ function sms_user_settings_reset_form(&$form_state, $account) {
 function sms_user_settings_reset_form_submit($form, &$form_state) {
   $account = user_load(array('uid' => $form_state['values']['uid']));
   sms_user_delete($account->uid);
+  if (module_exists('rules')) {
+    rules_invoke_event('sms_user_removed', $account);
+  }
   drupal_set_message(t('Your mobile information has been removed'), 'status');
 }
 
@@ -372,7 +382,6 @@ function sms_user_user($op, &$edit, &$account, $category = NULL) {
         'weight' => 10,
       );
       return $categories;
-      break;
   }
 }
 
@@ -461,7 +470,7 @@ function _sms_user_confirm_message($code) {
 }
 
 /**
- * Form elements to show on user registration page. 
+ * Form elements to show on user registration page.
  *
  * @see sms_user_user()
  */
