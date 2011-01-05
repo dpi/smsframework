@@ -225,6 +225,35 @@ function sms_incoming($number, $message, $options = array()) {
 }
 
 /**
+ * Callback for incoming message receipts. Allows gateways modules to pass
+ * message receipts in a standard format for processing, and provides a basic
+ * set of status codes for common code handling.
+ *
+ * Allowed message status codes are defined as constants at the top of this module.
+ *
+ * The gateway code and string will often be provided in the $options array as
+ * 'gateway_message_status' and 'gateway_message_status_text'.
+ *
+ * @param string $number
+ * The sender's mobile number.
+ *
+ * @param string $reference
+ * Unique message reference code, as provided when message is sent.
+ *
+ * @param string $message_status
+ * An SMS Framework message status code, as per the defined constants.
+ *
+ * @param array $options
+ * Extended options passed by the receipt receiver.
+ */
+function sms_receipt($number, $reference, $message_status = SMS_GW_UNKNOWN_STATUS, $options = array()) {
+  // Execute three phases
+  module_invoke_all('sms_receipt', 'pre process', $number, $reference, $message_status, $options);
+  module_invoke_all('sms_receipt', 'process', $number, $reference, $message_status, $options);
+  module_invoke_all('sms_receipt', 'post process', $number, $reference, $message_status, $options);
+}
+
+/**
  * Returns the current default gateway.
  */
 function sms_default_gateway() {
