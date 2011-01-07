@@ -466,7 +466,7 @@ function sms_clickatell_receive_receipt() {
   }
 
   // Invoke the SMS Framework receipt handler
-  //sms_receipt($number, $status, $options);
+  sms_receipt($number, $status, $options);
 }
 
 /**
