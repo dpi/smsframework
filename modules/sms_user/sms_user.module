@@ -18,7 +18,10 @@ require_once 'sms_user.rules.inc';
  * Implementation of hook_perm()
  */
 function sms_user_perm() {
-  return array('administer sms_user', 'delete mobile phone number');
+  return array(
+   'receive sms',
+   'edit own sms number'
+  );
 }
 
 /**
@@ -32,7 +35,7 @@ function sms_user_menu() {
     'description' => 'Edit options for SMS and user integration.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sms_user_admin_settings'),
-    'access arguments' => array('administer sms_user'),
+    'access arguments' => array('administer sms'),
     'file' => 'sms_user.admin.inc',
   );
 
@@ -41,11 +44,18 @@ function sms_user_menu() {
     'page callback' => 'sms_user_settings',
     'page arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
-    'access callback' => 'user_edit_access',
+    'access callback' => 'sms_user_edit_access',
     'access arguments' => array(1),
     'tab_parent' => 'user/%/edit',
   );
   return $items;
+}
+
+/**
+ * Access control on edit users sms number.
+ */
+function sms_user_edit_access($account) {
+  return (user_edit_access($account) && user_access('receive sms', $account));
 }
 
 /**
@@ -54,11 +64,16 @@ function sms_user_menu() {
 function sms_user_send($uid, $message) {
   $account = user_load($uid);
 
-  if ($account->sms_user['status'] == 2) {
-    return sms_send($account->sms_user['number'], $message, $account->sms_user['gateway']);
+  if (user_access('receive sms', $account)) { //Check if the user is enabled to receive SMS
+    if ($account->sms_user[0]['status'] == 2) {
+      return sms_send($account->sms_user[0]['number'], $message, $account->sms_user[0]['gateway']);
+    }
+    else {
+      return FALSE;
+    }
   }
   else {
-    return FALSE;
+    drupal_set_message(t("User %user is not enabled to receive SMS, see 'receive sms' permission", array('%user' => $account->name)), 'status', TRUE);
   }
 }
 
@@ -196,7 +211,7 @@ function sms_user_settings_confirm_form(&$form_state, $account) {
   $form['reset'] = array(
     '#type' => 'submit',
     '#value' => t('Delete & start over'),
-    '#access' => user_access('delete mobile phone number'),
+    '#access' => user_access('edit own sms number'),
   );
   return $form;
 }
@@ -245,7 +260,7 @@ function sms_user_settings_reset_form(&$form_state, $account) {
   $form['reset'] = array(
     '#type' => 'submit',
     '#value' => t('Delete & start over'),
-    '#access' => user_access('delete mobile phone number'),
+    '#access' => user_access('edit own sms number'),
   );
 
   return $form;
@@ -358,10 +373,20 @@ function sms_user_user($op, &$edit, &$account, $category = NULL) {
     case 'insert':
       return sms_user_save($edit, $account, $category);
     case 'view':
-      if ($account->sms_user['status'] == SMS_USER_PENDING) {
-        drupal_set_message(t('You need to confirm your mobile number, <a href="@mobile_url">enter the confirmation code here</a>.', array('@mobile_url' => url('user/'. $account->uid .'/edit/mobile'))));
+      if (user_access('receive sms', $account)) {
+        if ($account->sms_user['status'] == SMS_USER_PENDING) {
+          drupal_set_message(t('You need to confirm your mobile number, <a href="@mobile_url">enter the confirmation code sent to your mobile</a>.', array('@mobile_url' => url('user/'. $account->uid .'/edit/mobile'))));
+        }
+        $account->content['sms'] = array(
+          '#type' => 'user_profile_category',
+          '#title' => t('Mobile'),
+        );
+        $account->content['sms']['number'] = array(
+          '#type' => 'user_profile_item',
+          '#title' => t(''),
+          '#value' => $account->sms_user['number'], // @todo - theme function to format number.
+        );
       }
-      print_r($account);
       break;
     case 'register':
       return sms_user_register();
