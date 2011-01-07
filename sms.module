@@ -576,6 +576,12 @@ function sms_formatter($number, $format = 1) {
   // Remove non-number characters
   $number = preg_replace("/[^0-9]/", '', $number);
 
+  /*
+  @todo - the only length specification in the international numbering plan is that
+  numbers should be a maximum of 15 digits.
+
+  http://en.wikipedia.org/wiki/E.164
+
   if (strlen($number) > 16) {
     if ($number[0] == 1) {
       $number = ltrim($number, 1);
@@ -587,6 +593,7 @@ function sms_formatter($number, $format = 1) {
   elseif (strlen($number) < 10) {
     return FALSE;
   }
+  */
 
   return $number;
 }
