@@ -108,7 +108,7 @@ function sms_track_menu() {
 function sms_track_sms_send($number, $message, &$options = array(), $gateway) {
   // Tracking
   // Place a tracking reference on a sent message if we need to
-  if (! array_key_exists('reference', $options)) {
+  if (!empty($options) && !array_key_exists('reference', $options)) {
     $options['reference'] = md5($number . $message);
   }
 }
