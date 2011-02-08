@@ -22,6 +22,7 @@
  *   HTML page content string
  */
 function sms_track_help($path, $arg) {
+  $output = '';
   switch ($path) {
     case "admin/help#sms_track":
       $output = '<p>'.  t("<i>TO BE RE-WRITTEN</i> This module simply records all incoming and outgoing SMS messages from the SMS Framework. This can be used to enable an audit trail for your system, so that you can investigate any issues and keen an eye on what is flowing in and out.<br /><br /><strong>Outgoing: </strong>It is important to be aware of your outgoing SMS traffic because user spamming can be expensive for you, and may also expose you to legal issues. A small code error can cause this kind of problem.<br /><br /><strong>Incoming: </strong>The proper handling of inbound messages depends heavily on the quality of your software code. You may find that someone is sending malformed messages to your gateway receiver, which could expose a vulnerability and potentially release sensitive data.<br /><br />This module uses a database table to store messages, and implements Views for reporting.") .'</p>';
