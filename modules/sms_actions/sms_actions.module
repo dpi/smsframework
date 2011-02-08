@@ -18,7 +18,7 @@ function sms_actions_sms_incoming($op, $number, $message) {
         $active_command = $command;
       }
     }
-  
+
     if ($active_command) {
       sms_actions_do($active_command, $number, $message);
     }
@@ -33,16 +33,19 @@ function sms_actions_sms_incoming($op, $number, $message) {
   }
 }
 
+/**
+ *
+ */
 function sms_actions_do($command, $number, $message) {
   // Keep objects for reuse so that changes actions make to objects can persist.
   static $objects;
-  
+
   $aids = _trigger_get_hook_aids('sms_actions', $command->op);
-  
+
   if (!$aids) {
     return;
   }
-  
+
   $context = array(
     'hook' => 'sms_actions',
     'op' => $command->op,
@@ -98,7 +101,7 @@ function sms_actions_menu() {
     'page arguments' => array('sms_actions_edit_command_form', 4),
     'type' => MENU_CALLBACK,
   );
-  
+
   return $items;
 }
 
@@ -120,6 +123,9 @@ function sms_actions_action_info() {
   );
 }
 
+/**
+ *
+ */
 function sms_actions_send_action_form($context) {
   // Set default values for form.
   if (!isset($context['number'])) {
@@ -131,10 +137,10 @@ function sms_actions_send_action_form($context) {
   if (!isset($context['message'])) {
     $context['message'] = '';
   }
-  
+
   $form = sms_send_form(NULL, NULL, FALSE);
   $form['number']['#default_value'] = $context['number'];
-  
+
   $form['author'] = array(
     '#type' => 'checkbox',
     '#title' => t('Send to author of original post'),
@@ -207,12 +213,12 @@ function sms_actions_send_action($object, $context) {
   }
 
   $number = $context['number'];
-  
+
   $variables = array(
     '%site_name' => variable_get('site_name', 'Drupal'),
     '%username' => $account->name,
   );
-  
+
   if (isset($node)) {
     if (!isset($account)) {
       $account = user_load(array('uid' => $node->uid));
@@ -236,11 +242,14 @@ function sms_actions_send_action($object, $context) {
   if (isset($node) && $context['author']) {
     sms_user_send($account->uid, $message);
   }
-  else{  
+  else{
     sms_send($number, $message);
   }
 }
 
+/**
+ *
+ */
 function sms_actions_action_info_alter(&$actions) {
   // Actions to alter
   $hooks = array(
@@ -255,13 +264,13 @@ function sms_actions_action_info_alter(&$actions) {
     'node_unpublish_by_keyword_action',
     'system_send_email_action',
   );
-  
+
   $commands = sms_actions_get_commands();
   $command_triggers[] = 'sms_actions';
   foreach ($commands as $command) {
     $command_triggers[] = 'sms_actions_'. $command->discriminator;
   }
-  
+
   foreach ($actions as $hook => $action) {
     if (in_array($hook, $hooks)) {
       $actions[$hook]['hooks']['sms_actions'] = $command_triggers;
@@ -277,16 +286,16 @@ function sms_actions_hook_info() {
 
   $hooks['sms_actions']['sms_actions']['sms_actions'] = array(
     'runs when' => t('When an SMS message with any discriminator is received.'),
-  );  
-  
+  );
+
   $commands = sms_actions_get_commands();
-  
+
   foreach ($commands as $command) {
     $hooks['sms_actions']['sms_actions'][$command->op] = array(
       'runs when' => t('When an SMS message with the %discriminator discriminator is received.', array('%discriminator' => $command->discriminator)),
     );
   }
-  
+
   return $hooks;
 }
 
@@ -295,11 +304,11 @@ function sms_actions_hook_info() {
  */
 function sms_actions_get_commands() {
   $commands =  variable_get('sms_actions_commands', array());
-  
+
   foreach ($commands as $key => $command) {
     $commands[$key]->op = 'sms_actions_'. $command->discriminator;
   }
-  
+
   return $commands;
 }
 
@@ -343,7 +352,7 @@ function sms_actions_command_delete($discriminator) {
 function sms_actions_command_list() {
   $header = array(t('Discriminator'), t('Operations'));
   $commands = sms_actions_get_commands();
-  
+
   if (!empty($commands)) {
     foreach ($commands as $command) {
       $row = array($command->discriminator, l(t('edit'), 'admin/smsframework/actions/edit/'. $command->discriminator));
@@ -356,16 +365,19 @@ function sms_actions_command_list() {
   return theme('table', $header, $rows);
 }
 
+/**
+ *
+ */
 function sms_actions_edit_command_form(&$form_state, $discriminator = NULL) {
   if (isset($discriminator)) {
     $command = sms_actions_command_load($discriminator);
   }
-  
+
   // Check for confirmation forms.
   if (isset($form_state['confirm_delete'])) {
     return sms_actions_command_confirm_delete($form_state, $discriminator);
   }
-  
+
   $form['discriminator'] = array(
     '#type' => 'textfield',
     '#title' => t('Discriminator'),
@@ -375,9 +387,9 @@ function sms_actions_edit_command_form(&$form_state, $discriminator = NULL) {
     '#required' => TRUE,
     '#default_value' => $command->discriminator,
   );
-  
+
   $form['submit'] = array(
-    '#type' => 'submit', 
+    '#type' => 'submit',
     '#value' => t('Save command'),
   );
 
@@ -392,22 +404,28 @@ function sms_actions_edit_command_form(&$form_state, $discriminator = NULL) {
       '#weight' => 45,
     );
   }
-  
+
   return $form;
 }
 
+/**
+ *
+ */
 function sms_actions_edit_command_form_validate($form, &$form_state) {
   if (!preg_match('!^[a-z0-9\-]+$!', $form_state['values']['discriminator'])) {
     form_set_error('discriminator', t('The discriminator may only consist of lowercase letters, dashes, and numbers.'));
   }
 }
 
+/**
+ *
+ */
 function sms_actions_edit_command_form_submit($form, &$form_state) {
   // $commands = sms_actions_get_commands();
   $command = new stdClass();
   $command->discriminator = $form_state['values']['discriminator'];
   $command->old_discriminator = $form_state['values']['old_discriminator'];
-  
+
   if ($form_state['clicked_button']['#value'] == t('Delete')) {
     if ($form_state['values']['delete'] === TRUE) {
       return sms_actions_command_confirm_delete_submit($form, $form_state);
@@ -422,9 +440,12 @@ function sms_actions_edit_command_form_submit($form, &$form_state) {
   $form_state['redirect'] = 'admin/smsframework/actions';
 }
 
+/**
+ *
+ */
 function sms_actions_command_confirm_delete($form_state, $discriminator) {
   $command = sms_actions_command_load($discriminator);
-  
+
   $form['discriminator'] = array('#type' => 'value', '#value' => $command->discriminator);
   $form['delete'] = array('#type' => 'value', '#value' => TRUE);
   return confirm_form($form,
@@ -436,9 +457,12 @@ function sms_actions_command_confirm_delete($form_state, $discriminator) {
                   t('Cancel'));
 }
 
+/**
+ *
+ */
 function sms_actions_command_confirm_delete_submit($form, &$form_state) {
   sms_actions_command_delete($form_state['values']['discriminator']);
   drupal_set_message(t('The command %command has been deleted.', array('%command' => $form_state['values']['discriminator'])));
-  
+
   $form_state['redirect'] = 'admin/smsframework/actions';
 }
