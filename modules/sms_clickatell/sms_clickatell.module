@@ -137,7 +137,7 @@ function sms_clickatell_admin_form($configuration) {
     ),
     '#default_value' => $configuration['sms_clickatell_callback'],
   );
-  
+
   return $form;
 }
 
@@ -178,7 +178,7 @@ function sms_clickatell_send_form() {
     '#options' => sms_country_codes(),
     '#default_value' => -1,
   );
-  
+
   return $form;
 }
 
@@ -233,18 +233,18 @@ function sms_clickatell_balance() {
  */
 function sms_clickatell_command($command = 'auth', $data = array(), $config = NULL) {
   $gateway = sms_gateways('gateway', 'clickatell');
-    
+
   if ($config == NULL) {
     $config = $gateway['configuration'];
   }
-  
+
   if ($config['sms_clickatell_ssl']) {
     $scheme = 'https';
   }
   else {
     $scheme = 'http';
   }
-  
+
   switch ($command) {
     case 'auth':
       $query = 'api_id='. $config['sms_clickatell_api_id'] .'&user='. $config['sms_clickatell_user'] .'&password='. $config['sms_clickatell_password'];
@@ -320,7 +320,7 @@ function sms_clickatell_command($command = 'auth', $data = array(), $config = NU
   if ($http_result->error) {
     return array('status' => FALSE, 'message' => t('An error occured during the HTTP request: @error', array('@error' => $http_result->error)));
   }
-  
+
   if ($http_result->data) {
     // Check for Clickatell errors
     if (strpos($http_result->data, 'ERR') !== FALSE) {
@@ -353,7 +353,7 @@ function sms_clickatell_get_session_id() {
       }
     }
   }
-  
+
   return variable_get('sms_clickatell_session_id', 0);
 }
 
