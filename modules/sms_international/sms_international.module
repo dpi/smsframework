@@ -1,11 +1,20 @@
 <?php
+// $Id$
 
+/**
+ * @file
+ *
+ */
+
+/**
+ * Take a number including country code and make sure it is valid.
+ */
 function sms_international_validate_number($number, $options = array()) {
   // Replace all non-digit charecters with spaces
   $number = preg_replace("/[^0-9]/", '', $number);
   $number = trim($number);
   $number = ltrim($number, '0'); // Remove leading zeros
-  
+
 
   for ($i = 0; $i < 4; $i++) {
     $candidates[] = substr($number, 0, $i + 1);
@@ -17,17 +26,20 @@ function sms_international_validate_number($number, $options = array()) {
     $countries[] = $country;
     $codes[$country['country_code']] = $country['iso'];
   }
-  
+
   foreach ($countries as $country) {
     $trimmed_number = ltrim($number, $country['country_code']);
     if (strlen($trimmed_number) >= $country['min_length'] && strlen($trimmed_number) <= $country['max_length']) {
       return FALSE;
     }
   }
-  
+
   return 'false';
 }
 
+/**
+ *
+ */
 function sms_international_countries() {
   return array(
     'ES' => array('name' => t('Spain'), 'code' => '34', 'length' => 9),

@@ -31,7 +31,7 @@ function sms_rules_event_info() {
  * Implements hook_token_values().
  */
 function sms_token_values($type, $object = NULL, $options = array()) {
-  $tokens = '';
+  $values = array();
   if ($type == 'sms_message') {
     $values['message'] = $object;
     

@@ -545,6 +545,7 @@ function sms_user_token_values($type, $object = NULL, $options = array()) {
  * Implementation of hook_token_list()
  */
 function sms_user_token_list($type = 'all') {
+  $tokens = array();
   if ($type == 'sms_user') {
     $tokens['sms_user']['confirm-code']    = t('The mobile confirmation code for the user.');
     $tokens['sms_user']['mobile-url']      = t('The URL for the user\'s mobile settings page.');
