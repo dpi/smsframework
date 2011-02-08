@@ -18,13 +18,13 @@ function sms_track_views_handlers() {
       'path' => drupal_get_path('module', 'sms_track') . '/views',
     ),
     'handlers' => array(
-      'views_handler_field_sms_track_direction' => array(
+      'sms_track_handler_field_direction' => array(
         'parent' => 'views_handler_field',
       ),
-      'views_handler_field_sms_track_local_number' => array(
+      'sms_track_handler_field_local_number' => array(
         'parent' => 'views_handler_field',
       ),
-      'views_handler_field_sms_track_gateway' => array(
+      'sms_track_handler_field_gateway' => array(
         'parent' => 'views_handler_field',
       ),
     ),
@@ -69,7 +69,7 @@ function sms_track_views_data() {
         'title' => t('Direction'),
         'help' => t('Incoming or Outgoing.'),
         'field' => array(
-          'handler' => 'views_handler_field_sms_track_direction',
+          'handler' => 'sms_track_handler_field_direction',
           'click sortable' => TRUE,
         ),
         'argument' => array(
@@ -121,7 +121,7 @@ function sms_track_views_data() {
         'title' => t('Local number'),
         'help' => t('Phone number or ID of remote recipient/sender.'),
         'field' => array(
-          'handler' => 'views_handler_field_sms_track_local_number',
+          'handler' => 'sms_track_handler_field_local_number',
           'click sortable' => TRUE,
         ),
         'argument' => array(
@@ -139,7 +139,7 @@ function sms_track_views_data() {
         'title' => t('Gateway'),
         'help' => t('SMS gateway module name.'),
         'field' => array(
-          'handler' => 'views_handler_field_sms_track_gateway',
+          'handler' => 'sms_track_handler_field_gateway',
           'click sortable' => TRUE,
         ),
         'argument' => array(
