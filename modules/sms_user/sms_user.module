@@ -116,7 +116,7 @@ function sms_user_sms_send(&$number, &$message, &$options, &$gateway) {
  */
 function _sms_user_sleep_active($account) {
   //if the user has a timezone set in his account get the time there
-  if (isset($account->timezone_name)) {
+  if (!empty($account->timezone_name)) {
     $timezone = new DateTimeZone($account->timezone_name);
     $date = new DateTime();
     $date->setTimezone( $timezone );
