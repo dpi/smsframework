@@ -374,7 +374,8 @@ function sms_user_user($op, &$edit, &$account, $category = NULL) {
       return sms_user_save($edit, $account, $category);
     case 'view':
       if (user_access('receive sms', $account)) {
-        if ($account->sms_user['status'] == SMS_USER_PENDING) {
+        if (isset($account->sms_user['status']) &&
+	    $account->sms_user['status'] == SMS_USER_PENDING) {
           drupal_set_message(t('You need to confirm your mobile number, <a href="@mobile_url">enter the confirmation code sent to your mobile</a>.', array('@mobile_url' => url('user/'. $account->uid .'/edit/mobile'))));
         }
         $account->content['sms'] = array(
@@ -384,7 +385,8 @@ function sms_user_user($op, &$edit, &$account, $category = NULL) {
         $account->content['sms']['number'] = array(
           '#type' => 'user_profile_item',
           '#title' => t(''),
-          '#value' => $account->sms_user['number'], // @todo - theme function to format number.
+	  // @todo - theme function to format number.
+          '#value' => isset($account->sms_user['number']) ? $account->sms_user['number'] : '',
         );
       }
       break;
