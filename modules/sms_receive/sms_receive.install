@@ -1,5 +1,4 @@
 <?php
-// $Id$
 function sms_receive_install() {
   switch ($GLOBALS['db_type']) {
     case 'mysql':

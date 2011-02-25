@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 function sms_receive_menu() {
   $items[] = array(

@@ -1,4 +1,3 @@
-; $Id$
 name = "SMS Receive"
 description = "Allows the SMS Framework to receive messages."
 package = SMS Framework

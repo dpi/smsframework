@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 function sms_muse_gateway_info() {
   $options['sms_muse_user'] = array(

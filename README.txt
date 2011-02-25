@@ -1,4 +1,3 @@
-$Id$
 DESCRIPTION
 ===========
 Provides a pluggable API for Drupal to interact with SMS messages. 

@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 function sms_email_gateway_gateway_info() {
   return array(
