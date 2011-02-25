@@ -1,5 +1,4 @@
 <?php
-// $Id$
 /**
  * @file
  * Message tracking module: Admin settings form functions

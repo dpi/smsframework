@@ -1,4 +1,3 @@
-$Id$
 
 This file will be replaced when a stable release is cut.
 

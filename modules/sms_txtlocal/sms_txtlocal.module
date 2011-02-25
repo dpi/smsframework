@@ -1,5 +1,4 @@
 <?php
-// $Id$
 /**
  * @file
  * Txtlocal gateway module for Drupal SMS Framework. Outbound+Inbound

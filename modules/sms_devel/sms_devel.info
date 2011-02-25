@@ -1,4 +1,3 @@
-; $Id$
 name = Devel
 description = Dev and test tools to assist module/site development with the SMS Framework.
 core = 6.x

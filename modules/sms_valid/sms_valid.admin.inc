@@ -1,5 +1,4 @@
 <?php
-// $Id$
 /**
  * @file
  * SMS Framework core module: Admin settings form functions
