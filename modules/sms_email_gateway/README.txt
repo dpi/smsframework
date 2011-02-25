@@ -1,4 +1,3 @@
-$Id$
 
 This module provides a simple interface to SMS messaging via e-mail gateways.
 

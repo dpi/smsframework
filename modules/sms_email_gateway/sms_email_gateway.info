@@ -1,4 +1,3 @@
-; $Id$
 name = "E-mail Gateway"
 description = "Allows the SMS Framework to use E-mail gateways."
 dependencies[] = sms

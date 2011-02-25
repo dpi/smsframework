@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * A handler to provide displays for users' mobile phone

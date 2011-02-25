@@ -1,4 +1,3 @@
-; $Id$
 
 -----------------------------------------------------------
 SMS Framework Message Tracking feature module

@@ -1,4 +1,3 @@
-; $Id$
 name = SMS Blast
 description = Allows bulk text messages to be sent to registered users.
 package = SMS Framework

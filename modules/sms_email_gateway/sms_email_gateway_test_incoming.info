@@ -1,4 +1,3 @@
-; $Id$
 name = "E-mail Gateway Testing"
 description = "Simple test module for incoming messages via the e-meil gateway."
 dependencies[] = sms

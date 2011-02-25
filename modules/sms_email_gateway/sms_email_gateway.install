@@ -1,6 +1,5 @@
 <?php
 
-// $Id$
 
 function sms_email_gateway_uninstall() {
   // TODO: leaving this here for now, in case we need it.

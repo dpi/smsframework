@@ -1,5 +1,4 @@
 <?php
-// $Id$
 /**
  * @file
  * SMS Framework Message Tracking feature module: views

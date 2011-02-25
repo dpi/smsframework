@@ -1,5 +1,4 @@
 <?php
-// $Id$
 /**
  * @file
  * Virtual Gateway for the sms_devel module: Admin forms include

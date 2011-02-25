@@ -1,5 +1,4 @@
 <?php
-// $Id$
 /**
  * @file
  * Test send form include for the sms_devel module of the SMS Framework.

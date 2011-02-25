@@ -1,4 +1,3 @@
-; $Id$
 name = Validation
 description = Provides number validation features to the SMS Framework.
 core = 6.x

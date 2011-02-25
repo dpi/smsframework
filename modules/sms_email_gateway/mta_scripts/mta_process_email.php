@@ -1,7 +1,6 @@
 #!/usr/bin/php
 <?php
 
-// $Id$
 
 /**
  * E-mail processing script for the SMS email gateway module.

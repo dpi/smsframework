@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * These are the additional functions needed to run XML-RPC client processes
