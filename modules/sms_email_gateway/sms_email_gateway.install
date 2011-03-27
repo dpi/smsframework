@@ -1,8 +1,0 @@
-<?php
-
-
-function sms_email_gateway_uninstall() {
-  // TODO: leaving this here for now, in case we need it.
-  // variable_del('sms_email_gateway_sendmail_path');
-  variable_del('sms_email_gateway_mail_domain');
-}
