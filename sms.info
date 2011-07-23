@@ -1,4 +1,14 @@
 name = "SMS Framework"
 description = "Provides a extensible API that facilitates communication between Drupal and various SMS gateways."
 package = SMS Framework
-core = 6.x
+core = 7.x
+
+version = "7.x-2.x-dev"
+core = 7.x
+project = "smsframework"
+
+files[] = sms.admin.inc
+files[] = sms.install
+files[] = sms.module
+files[] = sms.tokens.inc
+files[] = sms.rules.inc

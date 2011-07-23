@@ -1,5 +1,7 @@
 <?php
 
+// $Id$
+
 /**
  * @file
  * Install, update and uninstall functions for the smsframework module.
@@ -9,7 +11,6 @@
  * Implements hook_install().
  */
 function sms_install() {
-  drupal_install_schema('sms');
 }
 
 /**
@@ -18,8 +19,16 @@ function sms_install() {
 function sms_schema() {
   $schema['sms_carriers'] = array(
     'fields' => array(
-      'name'    => array('type' => 'varchar', 'not null' => TRUE, 'length' => 64),
-      'domain'  => array('type' => 'varchar', 'not null' => TRUE, 'length' => 128),
+      'name' => array(
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'length' => 64,
+      ),
+      'domain' => array(
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'length' => 128,
+      ),
     ),
     'primary key' => array('domain'),
   );
@@ -34,21 +43,20 @@ function sms_schema() {
  */
 function sms_update_1() {
   $ret = array();
-  db_drop_primary_key($ret, 'sms_user');
-  db_add_primary_key($ret, 'sms_user', array('number'));
-  db_add_index($ret, 'sms_user', 'uid', array('uid'));
-  db_drop_field($ret, 'sms_user', 'delta');
-  return $ret;
+  db_drop_primary_key('sms_user');
+  db_add_primary_key('sms_user', array('number'));
+  db_add_index('sms_user', 'uid', array('uid'));
+  db_drop_field('sms_user', 'delta');
+  return t('SMS database update 1 successful.');
 }
 
 /**
  * Implements hook_uninstall().
  */
 function sms_uninstall() {
-  drupal_uninstall_schema('sms');
 
   $variables = array();
-
+  # XXX D7 porting issue: need to variable_del sms* variables on sms_uninstall()
   foreach ($variables as $variable) {
     variable_del($variable);
   }
