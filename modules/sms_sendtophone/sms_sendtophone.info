@@ -3,5 +3,4 @@ description = Provides various tools for sending bits of information via SMS.
 dependencies[] = sms
 package = SMS Framework
 core = 7.x
-version = "7.x-2.x-dev"
 files[] = sms_sendtophone.module
