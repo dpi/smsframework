@@ -7,7 +7,7 @@
  */
 
 /*
- * Implementation of hook_rules_event_info().
+ * Implements hook_rules_event_info().
  * @ingroup rules
  */
 function sms_user_rules_event_info() {
@@ -16,14 +16,20 @@ function sms_user_rules_event_info() {
       'label' => t('User validated SMS code'),
       'module' => 'SMS',
       'arguments' => array(
-        'user' => array('type' => 'user', 'label' => t('User validated SMS code')),
+        'user' => array(
+          'type' => 'user',
+          'label' => t('User validated SMS code'),
+        ),
       ),
     ),
     'sms_user_removed' => array(
       'label' => t('User removed mobile phone number'),
       'module' => 'SMS',
       'arguments' => array(
-        'user' => array('type' => 'user', 'label' => t('User removed mobile phone number')),
+        'user' => array(
+          'type' => 'user',
+          'label' => t('User removed mobile phone number'),
+        ),
       ),
     ),
   );
@@ -37,15 +43,24 @@ function sms_user_rules_action_info() {
     'sms_action_user_send' => array(
       'label' => t('Send SMS message to user'),
       'arguments' => array(
-        'user' => array('type' => 'user', 'label' => t('User')),
-        'message' => array('type' => 'string', 'label' => t('Message')),
+        'user' => array(
+          'type' => 'user',
+          'label' => t('User'),
+        ),
+        'message' => array(
+          'type' => 'string',
+          'label' => t('Message'),
+        ),
       ),
       'module' => 'SMS Framework',
     ),
     'sms_action_match_user' => array(
       'label' => t('Match mobile number to user'),
       'arguments' => array(
-        'number' => array('type' => 'string', 'label' => t('Mobile number')),
+        'number' => array(
+          'type' => 'string',
+          'label' => t('Mobile number'),
+        ),
       ),
       'new variables' => array(
         'user_loaded' => array(
@@ -71,7 +86,6 @@ function sms_action_user_send($user, $message) {
  */
 function sms_action_match_user($number) {
   $uid = sms_user_get_uid($number);
-  return array('user_loaded' => user_load(array('uid' => $uid)));
+  return array('user_loaded' => user_load($user->uid));
 }
-
 

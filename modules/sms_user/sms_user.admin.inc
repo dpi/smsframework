@@ -1,14 +1,15 @@
 <?php
 
 /**
- * @file sms.admin.inc
- *   SMS admin pages and functions.
+ * @file
+ * sms_user.admin.inc
+ * SMS admin pages and functions.
  */
 
 /**
  * SMS admin settings.
  */
-function sms_user_admin_settings() {
+function sms_user_admin_settings($form, &$form_state) {
   $form['sms_user_registration_form'] = array(
     '#type' => 'radios',
     '#title' => t('Show mobile fields during user registration'),
@@ -33,7 +34,7 @@ function sms_user_admin_settings() {
     '#collapsed' => TRUE,
   );
 
-  $form['tokens']['content']['#value'] = theme('token_help', 'sms_user');
+  $form['tokens']['content']['#value'] = theme('token_tree', array('token_types' => array('sms_user')));
 
   $form['sms_user_sleep'] = array(
     '#type' => 'checkbox',
@@ -74,7 +75,7 @@ function sms_user_admin_settings() {
     '#collapsed' => TRUE,
   );
 
-  $form['registration']['tokens']['content']['#value'] = theme('token_help', 'sms_user');
+  $form['registration']['tokens']['content']['#value'] = theme('token_tree', array('token_types' => array('sms_user')));
 
   $form['sms_user_max_chars'] = array(
     '#type' => 'textfield',

@@ -1,23 +1,48 @@
 <?php
+/**
+ * @file
+ * Install, update and uninstall functions for the sms_user module.
+ *
+ */
+
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  */
 function sms_user_install() {
-  drupal_install_schema('sms_user');
 }
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  */
 function sms_user_schema() {
   $schema['sms_user'] = array(
     'fields' => array(
-      'uid'       => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
-      'number'    => array('type' => 'varchar', 'not null' => TRUE, 'length' => 32),
-      'status'    => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
-      'code'      => array('type' => 'varchar', 'not null' => TRUE, 'length' => 16),
-      'gateway'   => array('type' => 'text'),
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'number' => array(
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'length' => 32,
+      ),
+      'status' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'code' => array(
+        'type' => 'varchar',
+        'not null' => FALSE,
+        'length' => 16,
+        'default' => ''
+      ),
+      'gateway' => array(
+        'type' => 'text',
+        'serialize' => TRUE,
+      ),
     ),
     'primary key' => array('number'),
     'indexes' => array('uid' => array('uid')),
@@ -27,25 +52,26 @@ function sms_user_schema() {
 }
 
 /**
- * Implementation of hook_update().
+ * Implements hook_update().
  *
  * Drop the now dead delta field, and change primary key to number.
  */
 function sms_user_update_1() {
   $ret = array();
-  db_drop_primary_key($ret, 'sms_user');
-  db_add_primary_key($ret, 'sms_user', array('number'));
-  db_add_index($ret, 'sms_user', 'uid', array('uid'));
-  db_drop_field($ret, 'sms_user', 'delta');
-  return $ret;
+  db_drop_primary_key('sms_user');
+  db_add_primary_key('sms_user', array('number'));
+  db_add_index('sms_user', 'uid', array('uid'));
+  db_drop_field('sms_user', 'delta');
+  // hook_update_N() no longer returns a $ret array. Instead, return
+  // nothing or a translated string indicating the update ran successfully.
+  // See http://drupal.org/node/224333#update_sql.
+  return t('TODO Add a descriptive string here to show in the UI.') /* $ret */;
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function sms_user_uninstall() {
-  drupal_uninstall_schema('sms_user');
-
   $variables = array(
     'sms_user_registration_enabled',
     'sms_user_allow_password',
@@ -56,4 +82,8 @@ function sms_user_uninstall() {
     variable_del($variable);
   }
 
+}
+
+function sms_user_update_7000() {
+  // update code field to NOT NULL
 }

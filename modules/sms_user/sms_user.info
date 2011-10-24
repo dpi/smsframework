@@ -3,4 +3,8 @@ description = "Provides integration between the SMS Framework and Drupal users."
 dependencies[] = sms
 dependencies[] = token
 package = SMS Framework
-core = 6.x
+core = 7.x
+
+files[] = includes/sms_user_handler_field_number.inc
+files[] = includes/sms_user_handler_field_status.inc
+files[] = includes/sms_user_handler_filter_status.inc

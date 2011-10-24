@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @file
  * A handler to provide displays for users' mobile phone
  *
  */

@@ -6,7 +6,7 @@
  */
 
 /**
- * Implementation of hook_views_default_views().
+ * Implements hook_views_default_views().
  */
 function sms_user_views_default_views() {
   $views = array();
@@ -228,4 +228,3 @@ function sms_user_views_default_views() {
 
   return $views;
 }
-

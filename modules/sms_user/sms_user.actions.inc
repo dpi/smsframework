@@ -6,17 +6,21 @@
  */
 
 /**
- * Implementation of hook_action_info().
+ * Implements hook_action_info().
  */
 function sms_user_action_info() {
   $info['sms_user_send_sms_action'] = array(
-      'type' => 'user',
-      'description' => t('Send SMS to Users'),
-      'configurable' => TRUE,
+    'type' => 'user',
+    'label' => t('Send SMS to Users'),
+    'configurable' => TRUE,
   );
   return $info;
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function sms_user_send_sms_action(&$user, $context) {
   $message = $context['sms_text'];
   sms_user_send($user->uid, $message);
@@ -30,23 +34,27 @@ function sms_user_send_sms_action(&$user, $context) {
  */
 function sms_user_send_sms_action_form($context) {
   $limit = variable_get('sms_user_max_chars', SMS_USER_MAX_CHARS);
-  drupal_add_js(drupal_get_path('module', 'sms_user') .'/sms_user.js');
+  drupal_add_js(drupal_get_path('module', 'sms_user') . '/sms_user.js');
 
   $form['sms_text'] = array(
-    '#type'  => 'textarea',
+    '#type' => 'textarea',
     '#title' => 'SMS Text',
     '#required' => TRUE,
   );
   $form['sms_limit'] = array(
-    '#type'   => 'markup',
-    '#prefix' => '<div id="keystrokes" class="description" limit="'. $limit .'"><span></span>',
-    '#value'  => t('@max chars max', array('@max' => $limit)),
+    '#type' => 'markup',
+    '#prefix' => '<div id="keystrokes" class="description" limit="' . $limit . '"><span></span>',
+    '#value' => t('@max chars max', array('@max' => $limit)),
     '#suffix' => '</div>',
   );
 
   return $form;
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function sms_user_send_sms_action_validate($form, $form_state) {
   $sms_text = $form_state['values']['sms_text'];
   if (empty($sms_text)) {

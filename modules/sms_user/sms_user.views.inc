@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * The basic views for sms_user.
+ */
+
+/**
  * basic views
  */
 function sms_user_views_data() {
@@ -16,14 +21,14 @@ function sms_user_views_data() {
     'help' => t('Display the users Mobile number.'),
     'field' => array(
       'handler' => 'sms_user_handler_field_number',
-      'click sortable' => FALSE,
+      'click sortable' => TRUE,
     ),
     'filter' => array(
       'handler' => 'views_handler_filter_string',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
-    )
+    ),
   );
   $data['sms_user']['status'] = array(
     'title' => t('Mobile Status'),
@@ -37,7 +42,7 @@ function sms_user_views_data() {
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
-    )
+    ),
   );
   return $data;
 }
@@ -48,7 +53,8 @@ function sms_user_views_data() {
 function sms_user_views_handlers() {
   return array(
     'info' => array(
-        'path' => drupal_get_path('module', 'sms_user') . '/includes'),
+      'path' => drupal_get_path('module', 'sms_user') . '/includes',
+    ),
     'handlers' => array(
       'sms_user_handler_field_number' => array(
         'parent' => 'views_handler_field',
