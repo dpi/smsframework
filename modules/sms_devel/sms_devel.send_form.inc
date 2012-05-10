@@ -16,7 +16,7 @@
  *
  * @ingroup forms
  */
-function sms_devel_send_form(&$form_state) {
+function sms_devel_send_form($form, &$form_state) {
   // Begin my form
   $form['about'] = array(
     '#type'  => 'item',
