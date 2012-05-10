@@ -367,7 +367,7 @@ function sms_actions_command_list() {
 /**
  *
  */
-function sms_actions_edit_command_form(&$form_state, $discriminator = NULL) {
+function sms_actions_edit_command_form($form, &$form_state, $discriminator = NULL) {
   if (isset($discriminator)) {
     $command = sms_actions_command_load($discriminator);
   }
