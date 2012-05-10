@@ -1,4 +1,4 @@
-name = Devel
+name = SMS Devel
 description = Dev and test tools to assist module/site development with the SMS Framework.
 core = 6.x
 package = SMS Framework
