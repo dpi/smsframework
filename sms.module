@@ -374,7 +374,7 @@ function sms_send_form($required = FALSE) {
   );
 
   // Add gateway defined fields
-  if (function_exists($gateway['send form'])) {
+  if (!empty($gateway['send form']) && function_exists($gateway['send form'])) {
     $form['gateway']['#tree'] = TRUE;
     $form['gateway'] = array_merge($gateway['send form']($required), $form['gateway']);
   }
@@ -468,7 +468,7 @@ function sms_validate_number(&$number, $options = array()) {
 
   // Allow the active gateway to provide number validation
   $gateway = sms_default_gateway();
-  if (function_exists($gateway['validate number']) && $error = $gateway['validate number']($number, $options)) {
+  if ((!empty($gateway['validate number']) && function_exists($gateway['validate number'])) && $error = $gateway['validate number']($number, $options)) {
     return $error;
   }
 }
