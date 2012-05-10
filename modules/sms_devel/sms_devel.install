@@ -9,26 +9,6 @@
 
 
 /**
- * Implement hook_install()
- *
- * @ingroup hooks
- */
-function sms_devel_install() {
-  drupal_install_schema('sms_devel');
-}
-
-
-/**
- * Implement hook_uninstall()
- *
- * @ingroup hooks
- */
-function sms_devel_uninstall() {
-  drupal_uninstall_schema('sms_devel');
-}
-
-
-/**
  * Implement hook_schema()
  *
  * @return
@@ -38,35 +18,35 @@ function sms_devel_uninstall() {
  */
 function sms_devel_schema() {
   $schema['sms_devel_virtualgw'] = array(
-    'description' => t('SMS virtual gateway trace log.'),
+    'description' => 'SMS virtual gateway trace log.',
     'fields' => array(
       'id' => array(
-        'description' => t('The primary identifier.'),
+        'description' => 'The primary identifier.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE),
       'created' => array(
-        'description' => t('The creation timestamp.'),
+        'description' => 'The creation timestamp.',
         'type' => 'int',        'unsigned' => TRUE,
         'not null' => TRUE),
       'type' => array(
-        'description' => t('0=out 1=in, 2=receipt'),
+        'description' => '0=out 1=in, 2=receipt',
         'type' => 'int',
         'size' => 'tiny',
         'unsigned' => TRUE,
         'not null' => TRUE),
       'number' => array(
-        'description' => t('If type=0/2 this is recipient. If type=1 this is sender.'),
+        'description' => 'If type=0/2 this is recipient. If type=1 this is sender.',
         'type' => 'varchar',
         'length' => 20,
         'not null' => TRUE),
       'message' => array(
-        'description' => t('Message text.'),
+        'description' => 'Message text.',
         'type' => 'text',
         'size' => 'normal',
         'not null' => FALSE),
       'options' => array(
-        'description' => t('Extended message options.'),
+        'description' => 'Extended message options.',
         'type' => 'text',
         'size' => 'normal',
         'not null' => FALSE),
