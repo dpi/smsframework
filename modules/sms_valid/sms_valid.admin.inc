@@ -502,15 +502,15 @@ function sms_valid_admin_test_form_submit(&$form, $form_state) {
     case 1:  // Test main validation function
       $error = sms_validate_number($number);
       if ($error) {
-        drupal_set_message('Error message from validation function:<br />'.$error);
+        drupal_set_message(t('Error message from validation function:<br />!error', array('!error' => filter_xss($error))));
       }
       $pass = (! $error);
       break;
   }
 
   if ($pass) {
-    drupal_set_message('Validation succeeded and returned number '. $number);
+    drupal_set_message(t('Validation succeeded and returned number %number.', array('%number' => $number)));
   } else {
-    form_set_error('number', 'Validation FAILED');
+    form_set_error('number', 'Validation failed.');
   }
 }

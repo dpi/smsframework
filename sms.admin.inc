@@ -182,7 +182,7 @@ function sms_carriers_admin_form($form, &$form_state) {
 
     $form['domain'][$css_safe_id] = array(
       '#type' => 'markup',
-      '#value' => $id,
+      '#value' => check_plain($id),
     );
 
     $actions[] = l(t('Edit'), "admin/smsframework/carriers/{$id}");
