@@ -211,7 +211,7 @@ function sms_track_archive_write($dir, $number, $message, $options = array()) {
       // Or render a status code from a simple true/false result
       if (! $status) {
         if ($options['result']) {
-          $status = SWS_GW_OK;
+          $status = SMS_GW_OK;
         }
         else {
           $status = SMS_GW_ERR_OTHER;
