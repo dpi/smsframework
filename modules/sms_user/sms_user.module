@@ -703,7 +703,7 @@ function sms_user_sms_incoming($op, $number, $message, $options) {
       }
       break;
     case 'post process':
-      sms_user_logout();
+      sms_user_sms_logout();
       break;
   }
 }
@@ -874,7 +874,7 @@ function sms_user_authenticate($number) {
 /**
  * Log the current user out.
  */
-function sms_user_logout() {
+function sms_user_sms_logout() {
   global $user;
 
   // Destroy the current session:
