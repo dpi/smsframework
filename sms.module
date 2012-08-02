@@ -404,6 +404,111 @@ function sms_send_form_submit($form, &$form_state) {
 }
 
 /******************************************************************************
+ * SMS Carrier Functions
+ *
+ * @todo - consider moving this to email gateway, unless there is a reason to
+ * have these functions without the email gateway?
+ *****************************************************************************/
+
+/**
+ * Get a list of all carriers
+ */
+function sms_carriers($domain = NULL) {
+  $default_carriers = module_invoke_all('sms_carriers');
+  $enabled_carriers = variable_get('sms_enabled_carriers', array());
+  $carriers = array();
+
+  // Load default carriers from code
+  foreach ($default_carriers as $id => $carrier) {
+    $carriers[$id] = array('name' => $carrier, 'type' => SMS_CARRIER_DEFAULT);
+  }
+
+  // Load overrideen carriers from database
+  $result = db_query("SELECT name, domain FROM {sms_carriers}");
+
+  foreach ($result as $carrier) {
+    if (in_array($carrier->domain, array_keys($carriers))) {
+      $type = SMS_CARRIER_OVERRIDDEN;
+    }
+    else {
+      $type = SMS_CARRIER_NORMAL;
+    }
+
+    $carriers[$carrier->domain] = array(
+      'name' => $carrier->name,
+      'type' => $type,
+    );
+  }
+
+  foreach ($enabled_carriers as $carrier) {
+    if (is_array($carriers[$carrier])) {
+      $carriers[$carrier]['status'] = 1;
+    }
+  }
+
+  if ($domain) {
+    $carriers[$domain]['domain'] = $domain;
+    return $carriers[$domain];
+  }
+
+  return $carriers;
+}
+
+/**
+ * Load a single carrier
+ */
+function carrier_load($domain) {
+  return sms_carriers($domain);
+}
+
+/**
+ * Save a carrier.
+ */
+function carrier_save($domain, $edit) {
+  if (!empty($domain)) {
+    $carrier = carrier_load($domain);
+
+    if ($carrier['type'] == SMS_CARRIER_DEFAULT) {
+      $edit['status'] = 1;
+      drupal_write_record('sms_carriers', $edit);
+    }
+    elseif (!empty($edit['domain'])) {
+      //Case for when the domain name hasn't changed
+      if ($edit['domain'] == $domain) {
+        drupal_write_record('sms_carriers', $edit, 'domain');
+      }
+      //Case for when the domain has changed
+      else {
+        carrier_delete($domain);
+        drupal_write_record('sms_carriers', $edit);
+      }
+      
+      // TODO: we need more logic to figure out when someone is changing the domain name
+    }
+  }
+  else {
+    $edit['status'] = 1;
+    drupal_write_record('sms_carriers', $edit);
+  }
+}
+
+function carrier_delete($domain) {
+  db_delete('sms_carriers')
+    ->condition('domain', $domain)
+    ->execute();
+    
+  //removes carrier from variable
+  $enabled_carriers = variable_get('sms_enabled_carriers', array());
+  foreach ($enabled_carriers as $i => $carrier) {
+    if ($carrier == $domain) {
+      unset($enabled_carriers[$i]);
+      break;
+    }
+  }
+  variable_set('sms_enabled_carriers', $enabled_carriers);
+}
+
+/******************************************************************************
  * HELPER FUNCTIONS
  */
 
