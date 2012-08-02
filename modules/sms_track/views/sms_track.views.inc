@@ -9,7 +9,7 @@
 
 
 /**
- * Implement hook_views_handlers()
+ * Implement hook_views_handlers().
  */
 function sms_track_views_handlers() {
   return array(
@@ -32,10 +32,10 @@ function sms_track_views_handlers() {
 
 
 /**
- * Implement hook_views_data()
+ * Implement hook_views_data().
  */
 function sms_track_views_data() {
-  //TODO: I have left id and options out of this until I can work out how the handlers work.
+  // TODO: I have left id and options out of this until I can work out how the handlers work.
   return array(
     'sms_track' => array(
       'table' => array(

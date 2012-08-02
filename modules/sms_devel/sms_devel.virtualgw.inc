@@ -8,16 +8,14 @@
  */
 
 /*
- A table is required to store activity, to be queried by the interactor page 
- Note: I have changed the "server-side number" nomenclature from "sender" & 
+ A table is required to store activity, to be queried by the interactor page
+ Note: I have changed the "server-side number" nomenclature from "sender" &
  "in_number" to simply "gw_number".
-*/
+ */
 
-
-define('SMS_DEVEL_VIRTUALGW_TYPE_OUT',     0);
-define('SMS_DEVEL_VIRTUALGW_TYPE_IN',      1);
+define('SMS_DEVEL_VIRTUALGW_TYPE_OUT',      0);
+define('SMS_DEVEL_VIRTUALGW_TYPE_IN',       1);
 define('SMS_DEVEL_VIRTUALGW_TYPE_RECEIPT', 2);
-
 
 /**
  * Callback for sending messages.
@@ -54,7 +52,7 @@ function sms_devel_virtualgw_send($number, $message, $options) {
 
   // Always return success
   return array(
-    'status'      => TRUE,
+    'status' => TRUE,
     'status_code' => SMS_GW_OK,
     'gateway_status_code' => 'OK',
     'gateway_status_text' => 'sms_devel_virtualgw: send: OK',
@@ -62,6 +60,10 @@ function sms_devel_virtualgw_send($number, $message, $options) {
 }
 
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function sms_devel_virtualgw_receiver($number = NULL, $message = NULL, $options = array()) {
   // Handle HTTP requests rather than direct function calls
   if ($number === NULL) {
@@ -79,24 +81,41 @@ function sms_devel_virtualgw_receiver($number = NULL, $message = NULL, $options 
 }
 
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function sms_devel_virtualgw_log_insert($type, $number = '', $message = '', $options = array()) {
   $options_z = serialize($options);
-  $result = db_query("INSERT INTO {sms_devel_virtualgw} (created, type, number,
-    message, options) VALUES (%d, %d, '%s', '%s', '%s')",
-    time(), $type, $number, $message, $options_z);
+  // @TODO Please review the conversion of this statement to the D7 database API syntax.
+  /* db_query("INSERT INTO {sms_devel_virtualgw} (created, type, number,
+   message, options) VALUES (%d, %d, '%s', '%s', '%s')", REQUEST_TIME, $type, $number, $message, $options_z) */
+  $result = $id = db_insert('sms_devel_virtualgw')
+  ->fields(array(
+    'created' => REQUEST_TIME,
+    'type' => $type,
+    'number' => $number,
+    'message' => $message,
+    'options' => $options_z,
+  ))
+  ->execute();
   return $result;
 }
 
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function sms_devel_virtualgw_sendlogic($number, $message, $options) {
   $autoreply_enabled = variable_get('sms_devel_virtualgw_autoreply_enabled', FALSE);
-  $autoreply_format  = variable_get('sms_devel_virtualgw_autoreply_format',  '');
-  $receipts_enabled  = variable_get('sms_devel_virtualgw_receipts_enabled',  FALSE);
+  $autoreply_format  = variable_get('sms_devel_virtualgw_autoreply_format',   '');
+  $receipts_enabled  = variable_get('sms_devel_virtualgw_receipts_enabled',   FALSE);
 
   if ($autoreply_enabled) {
     // TODO Figure out the tokens logic
-    //$echo_message = $autoreply_format . $message;
-    $echo_message = 'echo: '. $message;
+    // $echo_message = $autoreply_format . $message;
+    $echo_message = 'echo: ' . $message;
 
     // Swap the numbers for the echo
     $echo_number  = $options['gw_number'];
@@ -118,6 +137,10 @@ function sms_devel_virtualgw_sendlogic($number, $message, $options) {
 }
 
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function sms_devel_virtualgw_js_getactivity() {
   // We should not need to get a default limit - expect it in the request
   $limit = 50;
@@ -126,7 +149,9 @@ function sms_devel_virtualgw_js_getactivity() {
     $limit = $_REQUEST['rows'];
   }
   // Handle zero or null limit
-  if ( ! $limit ) { $limit = 1; }
+  if ( ! $limit ) {
+    $limit = 1;
+  }
 
   $lines = array();
 
@@ -137,14 +162,11 @@ function sms_devel_virtualgw_js_getactivity() {
       case SMS_DEVEL_VIRTUALGW_TYPE_OUT:
         $from = $options['sender'];
         $to   = $row->number;
-        ;;
       case SMS_DEVEL_VIRTUALGW_TYPE_IN:
         $from = $row->number;
         $to   = $options['sender'];
-        ;;
       case SMS_DEVEL_VIRTUALGW_TYPE_RECEIPT:
         // Receipt
-        ;;
     }
     $dir = $row->type;
     $msg = $row->message;
@@ -154,14 +176,17 @@ function sms_devel_virtualgw_js_getactivity() {
 
   $output = implode("\n", $lines);
 
-  $form_state = array('storage' => NULL, 'submitted' => FALSE);
-  $form_build_id = $_POST['form_build_id'];
+  $form_state = array(
+    'storage' => NULL,
+    'submitted' => FALSE,
+  );
+  $form_build_id = check_plain($_POST['form_build_id']);
   // Get the form from the cache.
   $form = form_get_cache($form_build_id, $form_state);
   $args = $form['#parameters'];
   $form_id = array_shift($args);
   // We will run some of the submit handlers so we need to disable redirecting.
-  $form['#redirect'] = FALSE;
+  $form_state['#redirect'] = FALSE;
   // We need to process the form, prepare for that by setting a few internals
   // variables.
   $form['#post'] = $_POST;
@@ -178,22 +203,22 @@ function sms_devel_virtualgw_js_getactivity() {
   unset($logfield['#prefix'], $logfield['#suffix']); // Prevent duplicate wrappers.
   $output = drupal_render($logfield);
 
-  return drupal_json(array('status' => TRUE, 'data' => $output));
+  return drupal_json_output(array('status' => TRUE, 'data' => $output));
 }
 
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function sms_devel_virtualgw_ahah_send() {
   $result = drupal_http_request(
-    url('sms/virtualgw/receiver', array('absolute' => TRUE)),
-    array('Content-Type' => 'application/x-www-form-urlencoded'),
-    'POST',
-    http_build_query(array(
+    url('sms/virtualgw/receiver', array('absolute' => TRUE)), array('headers' => array('Content-Type' => 'application/x-www-form-urlencoded'), 'method' => 'POST', 'data' => http_build_query(array(
       'number' => $_POST['sms_devel_virtualgw_from'],
       'message' => $_POST['sms_devel_virtualgw_message'],
       'gw_number' => $_POST['sms_devel_virtualgw_to'],
-    ), '', '&')
-  );
+    ), '', '&')));
 
   // Return a good status
-  drupal_json(array('status' => TRUE));
+  drupal_json_output(array('status' => TRUE));
 }

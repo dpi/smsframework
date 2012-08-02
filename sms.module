@@ -1,7 +1,5 @@
 <?php
 
-// $Id$
-
 /**
  * @file
  * The core of the SMS Framework. Provides gateway managment and API for
@@ -9,7 +7,7 @@
  */
 
 // Direction codes
-define('SMS_DIR_NONE', 0);
+define('SMS_DIR_NONE',  0);
 define('SMS_DIR_OUT',   1);
 define('SMS_DIR_IN',    2);
 define('SMS_DIR_ALL',   4);
@@ -18,7 +16,7 @@ define('SMS_DIR_ALL',   4);
 // 0=Unknown, 2xx=Positive, 3xx=Positive/Neutral (context-dependent), 4xx=Negative
 define('SMS_MSG_STATUS_UNKNOWN',      0);
 define('SMS_MSG_STATUS_OK',         200);
-define('SMS_MSG_STATUS_DELIVERED', 202);
+define('SMS_MSG_STATUS_DELIVERED',  202);
 define('SMS_MSG_STATUS_QUEUED',     302);
 define('SMS_MSG_STATUS_ERROR',      400);
 define('SMS_MSG_STATUS_NOCREDIT',   402);
@@ -29,7 +27,7 @@ define('SMS_MSG_STATUS_EXPIRED',    408);
 define('SMS_GW_UNKNOWN_STATUS',      0);
 define('SMS_GW_OK',                200);
 define('SMS_GW_ERR_AUTH',          401);
-define('SMS_GW_ERR_INVALID_CALL', 400);
+define('SMS_GW_ERR_INVALID_CALL',  400);
 define('SMS_GW_ERR_NOT_FOUND',     404);
 define('SMS_GW_ERR_MSG_LIMITS',    413);
 define('SMS_GW_ERR_MSG_ROUTING',   502);
@@ -468,8 +466,17 @@ function sms_validate_number(&$number, $options = array()) {
 
   // Allow the active gateway to provide number validation
   $gateway = sms_default_gateway();
-  if ((!empty($gateway['validate number']) && function_exists($gateway['validate number'])) && $error = $gateway['validate number']($number, $options)) {
-    return $error;
+  // TODO we neeed some sort of validation this isn't working properly.
+  if (isset($gateway['validate_number'])) {
+    if (function_exists($gateway['validate number']) && $error = $gateway['validate number']($number, $options)) {
+      return $error;
+    }
+    elseif ($error = sms_valid_validate($number, $options)) {
+      return $error;
+    }
+  }
+  else {
+    return NULL;
   }
 }
 
@@ -712,6 +719,4 @@ function sms_country_codes() {
     255 => "Zanzibar",
     263 => "Zimbabwe",
   );
-
 }
-

@@ -9,7 +9,7 @@
 
 
 /**
- * Implement hook_views_default_views()
+ * Implement hook_views_default_views().
  */
 function sms_track_views_default_views() {
   $view = new view;

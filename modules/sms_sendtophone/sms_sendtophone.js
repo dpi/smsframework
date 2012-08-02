@@ -1,4 +1,5 @@
-Drupal.behaviors.smssendtophone = function (context) {
+Drupal.behaviors.smssendtophone = {
+(attach: function (context) {
   $("a.sms-sendtophone").addClass('thickbox').each(function(i) {
     if ($(this).attr('href').search(/\?/) < 0) {
       $(this).attr('href', $(this).attr('href').concat('?'));
@@ -8,4 +9,5 @@ Drupal.behaviors.smssendtophone = function (context) {
     }
     $(this).attr('href', $(this).attr('href').concat('height=275&width=300&thickbox=1'));
   })
-}
+})(jQuery);
+};

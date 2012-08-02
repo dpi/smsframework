@@ -5,32 +5,34 @@
  *
  * @package sms
  * @subpackage sms_valid
- */ 
+ */
 
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  *
  * @ingroup hooks
  */
 function sms_valid_install() {
-  drupal_install_schema('sms_valid');
+  // TODO The drupal_(un)install_schema functions are called automatically in D7.
+  // drupal_install_schema('sms_valid')
   sms_valid_create_example_ruleset();
 }
 
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  *
  * @ingroup hooks
  */
-function sms_valid_uninstall() {
-  drupal_uninstall_schema('sms_valid');
-}
+// function sms_valid_uninstall() {
+// TODO The drupal_(un)install_schema functions are called automatically in D7.
+// drupal_uninstall_schema('sms_valid')
+// }
 
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  *
  * @return
  *   Drupal schema.
@@ -42,36 +44,41 @@ function sms_valid_schema() {
   $schema['sms_valid_rules'] = array(
     'fields' => array(
       'prefix' => array(
-              'type'      => 'int',
-              'size'      => 'small',
-              'unsigned'  => TRUE,
-              'not null'  => TRUE,
-              'description' => 'Number prefix/code; 1-65535'),
+        'type' => 'int',
+        'size' => 'small',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Number prefix/code; 1-65535',
+      ),
       'name' => array(
-              'type'      => 'varchar',
-              'length'    => 100,
-              'not null'  => TRUE,
-              'description' => 'Descriptive name for this prefix/ruleset'),
+        'type' => 'varchar',
+        'length' => 100,
+        'not null' => TRUE,
+        'description' => 'Descriptive name for this prefix/ruleset',
+      ),
       'rules' => array(
-              'type'      => 'text',
-              'not null'  => FALSE,
-              'serialize' => TRUE,
-              'description' => 'Serialized ruleset'),
+        'type' => 'text',
+        'not null' => FALSE,
+        'serialize' => TRUE,
+        'description' => 'Serialized ruleset',
+      ),
       'dirs_enabled' => array(
-              'type'      => 'int',
-              'size'      => 'tiny',
-              'not null'  => TRUE,
-              'default'   => 4,
-              'description' => 'Active msg directions. See SMS_DIR_* constants.'),
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 4,
+        'description' => 'Active msg directions. See SMS_DIR_* constants.',
+      ),
       'iso2' => array(
-              'type'      => 'varchar',
-              'length'    => 2,
-              'not null'  => FALSE,
-              'description' => 'ISO 3166-1 alpha-2 country code'),
+        'type' => 'varchar',
+        'length' => 2,
+        'not null' => FALSE,
+        'description' => 'ISO 3166-1 alpha-2 country code',
+      ),
     ),
     'primary key' => array('prefix'),
   );
-  
+
   return $schema;
 }
 
@@ -87,19 +94,56 @@ function sms_valid_create_example_ruleset(&$ret = array()) {
   $name   = 'New Zealand';
   $dirs_enabled = 4;
   $iso2  = 'NZ';
-  $rules = array('21' => array('allow' => TRUE,  'comment' => 'Vodafone'),
-                 '22' => array('allow' => TRUE,  'comment' => 'Two Degrees Mobile'),
-                 '25' => array('allow' => FALSE, 'comment' => 'Telecom AMPS+TDMA (old)'),
-                 '26' => array('allow' => FALSE, 'comment' => 'Telecom pager network'),
-                 '27' => array('allow' => TRUE,  'comment' => 'Telecom CDMA'),
-                 '28' => array('allow' => TRUE,  'comment' => 'Slingshot'),
-                 '29' => array('allow' => TRUE,  'comment' => 'TelstraClear'),
-                );
+  $rules = array(
+    '21' => array(
+      'allow' => TRUE,
+      'comment' => 'Vodafone',
+    ),
+    '22' => array(
+      'allow' => TRUE,
+      'comment' => 'Two Degrees Mobile',
+    ),
+    '25' => array(
+      'allow' => FALSE,
+      'comment' => 'Telecom AMPS+TDMA (old)',
+    ),
+    '26' => array(
+      'allow' => FALSE,
+      'comment' => 'Telecom pager network',
+    ),
+    '27' => array(
+      'allow' => TRUE,
+      'comment' => 'Telecom CDMA',
+    ),
+    '28' => array(
+      'allow' => TRUE,
+      'comment' => 'Slingshot',
+    ),
+    '29' => array(
+      'allow' => TRUE,
+      'comment' => 'TelstraClear',
+    ),
+  );
   $rules_z = serialize($rules);
 
-  $sql = "INSERT INTO {sms_valid_rules} (prefix,name,rules,dirs_enabled,iso2)".
+  $sql = "INSERT INTO {sms_valid_rules} (prefix,name,rules,dirs_enabled,iso2)" .
                                 "VALUES (%d, '%s', '%s', %d, '%s')";
-  $result = db_query($sql, $prefix, $name, $rules_z, $dirs_enabled, $iso2);
-  $ret[]  = array('success' => $result !== FALSE, 'query' => check_plain($sql));
-}
+  // @TODO Please convert this statement to the D7 database API syntax.
+//  $result = db_query($sql, $prefix, $name, $rules_z, $dirs_enabled, $iso2);
 
+  $result = db_insert('sms_valid_rules')
+  ->fields(array(
+    'prefix' => $prefix,
+    'name' => $name,
+    'rules' => $rules_z,
+    'dirs_enabled' => $dirs_enabled,
+    'iso2' => $iso2,
+  ))
+//  $result => $sql;
+  ->execute();
+
+  $ret[] = array(
+    'success' => $result !== FALSE,
+    'query' => check_plain($sql),
+  );
+}

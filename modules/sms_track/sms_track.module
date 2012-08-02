@@ -10,7 +10,7 @@
 
 
 /**
- * Implement hook_help()
+ * Implements hook_help().
  *
  * @param $path
  *   URI string
@@ -24,7 +24,7 @@ function sms_track_help($path, $arg) {
   $output = '';
   switch ($path) {
     case "admin/help#sms_track":
-      $output = '<p>'.  t("<i>TO BE RE-WRITTEN</i> This module simply records all incoming and outgoing SMS messages from the SMS Framework. This can be used to enable an audit trail for your system, so that you can investigate any issues and keen an eye on what is flowing in and out.<br /><br /><strong>Outgoing: </strong>It is important to be aware of your outgoing SMS traffic because user spamming can be expensive for you, and may also expose you to legal issues. A small code error can cause this kind of problem.<br /><br /><strong>Incoming: </strong>The proper handling of inbound messages depends heavily on the quality of your software code. You may find that someone is sending malformed messages to your gateway receiver, which could expose a vulnerability and potentially release sensitive data.<br /><br />This module uses a database table to store messages, and implements Views for reporting.") .'</p>';
+      $output = '<p>' . t("<i>TO BE RE-WRITTEN</i> This module simply records all incoming and outgoing SMS messages from the SMS Framework. This can be used to enable an audit trail for your system, so that you can investigate any issues and keen an eye on what is flowing in and out.<br /><br /><strong>Outgoing: </strong>It is important to be aware of your outgoing SMS traffic because user spamming can be expensive for you, and may also expose you to legal issues. A small code error can cause this kind of problem.<br /><br /><strong>Incoming: </strong>The proper handling of inbound messages depends heavily on the quality of your software code. You may find that someone is sending malformed messages to your gateway receiver, which could expose a vulnerability and potentially release sensitive data.<br /><br />This module uses a database table to store messages, and implements Views for reporting.") . '</p>';
       break;
   }
   return $output;
@@ -32,7 +32,7 @@ function sms_track_help($path, $arg) {
 
 
 /**
- * Implement hook_enable()
+ * Implements hook_enable().
  */
 function sms_track_enable() {
   if (variable_get('sms_track_archive_dir', SMS_DIR_NONE)) {
@@ -42,7 +42,7 @@ function sms_track_enable() {
 
 
 /**
- * Implement hook_disable()
+ * Implements hook_disable().
  */
 function sms_track_disable() {
   if (variable_get('sms_track_archive_dir', SMS_DIR_NONE)) {
@@ -52,22 +52,22 @@ function sms_track_disable() {
 
 
 /**
- * Implement hook_cron()
+ * Implements hook_cron().
  */
 function sms_track_cron() {
   // Ensure that we only run at most once per hour
   $last_run = variable_get('sms_track_archive_cron_last_run', 0);
-  $time_an_hour_ago = time() - 3600;
+  $time_an_hour_ago = REQUEST_TIME - 3600;
   if ($last_run <= $time_an_hour_ago) {
     // Purge the archive
     sms_track_archive_purge();
-    variable_set('sms_track_archive_cron_last_run', time());
+    variable_set('sms_track_archive_cron_last_run', REQUEST_TIME);
   }
 }
 
 
 /**
- * Implement hook_menu()
+ * Implements hook_menu().
  *
  * @return
  *   Drupal menu items array
@@ -76,26 +76,26 @@ function sms_track_menu() {
   $items = array();
 
   $items['admin/smsframework/sms_track'] = array(
-    'title'  => 'Message tracking',
+    'title' => 'Message tracking',
     'description' => 'Options and view for the message archive.',
-    'page callback'    => 'drupal_get_form',
-    'page arguments'   => array('sms_track_settings_form'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sms_track_settings_form'),
     'access arguments' => array('administer smsframework'),
-    'file'   => 'sms_track.admin.inc',
+    'file' => 'sms_track.admin.inc',
   );
   $items['admin/smsframework/sms_track/settings'] = array(
-    'title'  => 'Settings',
-    'type'   => MENU_DEFAULT_LOCAL_TASK,
+    'title' => 'Settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 0,
   );
   $items['admin/smsframework/sms_track/view'] = array(
-    'title'  => 'View the archive',
-    'file'   => 'sms_track.admin.inc',
-    'page callback'    => 'sms_track_admin_view',
+    'title' => 'View the archive',
+    'file' => 'sms_track.admin.inc',
+    'page callback' => 'sms_track_admin_view',
     'access arguments' => array('administer smsframework'),
-    'type'   => MENU_LOCAL_TASK,
+    'type' => MENU_LOCAL_TASK,
     'weight' => 1,
-    'file'   => 'sms_track.admin.inc',
+    'file' => 'sms_track.admin.inc',
   );
 
   return $items;
@@ -103,7 +103,7 @@ function sms_track_menu() {
 
 
 /**
- * Implement hook_sms_send()
+ * Implements hook_sms_send().
  */
 function sms_track_sms_send($number, $message, &$options = array(), $gateway) {
   // Tracking
@@ -114,7 +114,7 @@ function sms_track_sms_send($number, $message, &$options = array(), $gateway) {
 }
 
 /**
- * Implement hook_sms_send_process()
+ * Implements hook_sms_send_process().
  *
  * @param $op
  *   Operation string (pre process, process, post process)
@@ -132,7 +132,7 @@ function sms_track_sms_send($number, $message, &$options = array(), $gateway) {
 function sms_track_sms_send_process($op, $number, $message, $options, $gateway, $result) {
   if ($op == 'post process') {
     // Archiving
-    $dir = 0;  // outgoing
+    $dir = 0; // outgoing
     $options['gateway_id'] = $gateway['identifier'];
     $options['result']  = $result;
     $result = sms_track_archive_write($dir, $number, $message, $options);
@@ -141,7 +141,7 @@ function sms_track_sms_send_process($op, $number, $message, $options, $gateway, 
 
 
 /**
- * Implement hook_sms_incoming()
+ * Implements hook_sms_incoming().
  *
  * @param $op
  *   SMS incoming operation string (pre process, process, post process)
@@ -155,14 +155,14 @@ function sms_track_sms_send_process($op, $number, $message, $options, $gateway, 
 function sms_track_sms_incoming($op, $number, $message, $options) {
   if ($op == 'pre process') {
     // Archiving
-    $dir = 1;  // incoming
+    $dir = 1; // incoming
     sms_track_archive_write($dir, $number, $message, $options);
   }
 }
 
 
 /**
- * Implement hook_sms_receipt()
+ * Implements hook_sms_receipt().
  *
  * @param $op
  *   Operation string
@@ -235,21 +235,32 @@ function sms_track_archive_write($dir, $number, $message, $options = array()) {
   }
 
   $gw_number = (array_key_exists('gw_number', $options)) ? $options['gw_number'] : NULL;
-  $created   = time();
+  $created   = REQUEST_TIME;
   $options_z = serialize($options);
 
-  $result = db_query("INSERT INTO {sms_track} (reference, dir, number,
-    gw_number, message, status, created, options) VALUES
-    ('%s', %d, '%s', '%s', '%s', %d, %d, '%s')", $reference, $dir,
-    $number, $gw_number, $message, $status, $created, $options_z);
+  // @TODO Please review the conversion of this statement to the D7 database API syntax.
+  /* db_query("INSERT INTO {sms_track} (reference, dir, number,
+   gw_number, message, status, created, options) VALUES
+   ('%s', %d, '%s', '%s', '%s', %d, %d, '%s')", $reference, $dir, $number, $gw_number, $message, $status, $created, $options_z) */
+
+  $result = $id = db_insert('sms_track')
+  ->fields(array(
+    'reference' => $reference,
+    'dir' => $dir,
+    'number' => $number,
+    'gw_number' => $gw_number,
+    'message' => $message,
+    'status' => $status,
+    'created' => $created,
+    'options' => $options_z,
+  ))
+  ->execute();
 
   if (! $result) {
     $to_from = ($dir == 0) ? 'To' : 'From';
-    watchdog('sms_track', 'Failed to record message: '.
-      $to_from .' '. $number .': '. $message);
+    watchdog('sms_track', 'Failed to record message: ' . $to_from . ' ' . $number . ': ' . $message);
   }
 }
-
 
 /**
  * Update a message with a new status code
@@ -262,27 +273,35 @@ function sms_track_archive_write($dir, $number, $message, $options = array()) {
  * @todo Log record handling
  */
 function sms_track_update_message($reference, $status) {
-  $updated = time();
+  $updated = REQUEST_TIME;
 
-  watchdog('sms_track', $reference.' '.$status.' '.$updated);
+  watchdog('sms_track', $reference . ' ' . $status . ' ' . $updated);
 
-  $result = db_query('UPDATE {sms_track} SET status = %d, updated = %d WHERE reference = \'%s\'', $status, $updated, $reference);
+  // @TODO Please review the conversion of this statement to the D7 database API syntax.
+  /* db_query('UPDATE {sms_track} SET status = %d, updated = %d WHERE reference = \'%s\'', $status, $updated, $reference) */
+  $result = db_update('sms_track')
+  ->fields(array(
+    'status' => $status,
+    'updated' => $updated,
+  ))
+  ->condition('reference', $reference)
+  ->execute();
 
   if ($result) {
-    watchdog('sms_track', 'Affected rows: '. db_affected_rows($result));
+    watchdog('sms_track', 'Affected rows: ' . db_affected_rows($result));
   }
 }
 
 
 /**
- * Implement hook_views_api()
+ * Implements hook_views_api().
  *
  * @return
  *   Views API required information array
  */
 function sms_track_views_api() {
   return array(
-    'api'  => 2,
+    'api' => 2,
     'path' => drupal_get_path('module', 'sms_track') . '/views',
   );
 }
@@ -302,7 +321,11 @@ function sms_track_archive_purge($max_age_days = NULL) {
   // Purge with no survivors
   if ($max_age_days > 0) {
     $max_age_secs = $max_age_days * 86400;
-    $oldest = time() - $max_age_secs;
-    $result = db_query("DELETE FROM {sms_track} WHERE created < %d", $oldest);
+    $oldest = REQUEST_TIME - $max_age_secs;
+    // @TODO Please review the conversion of this statement to the D7 database API syntax.
+    /* db_query("DELETE FROM {sms_track} WHERE created < %d", $oldest) */
+    $result = db_delete('sms_track')
+    ->condition('created', $oldest, '<')
+    ->execute();
   }
 }

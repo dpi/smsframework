@@ -9,7 +9,7 @@
 
 
 /**
- * Implement hook_handler_field()
+ * Implement hook_handler_field().
  */
 class sms_track_handler_field_direction extends views_handler_field {
   function render($values) {
@@ -20,7 +20,7 @@ class sms_track_handler_field_direction extends views_handler_field {
       case 1:
         return t('In');
     }
-    //else
+    // else
     return $value;
   }
 }

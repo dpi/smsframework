@@ -1,16 +1,18 @@
 <?php
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  */
 function sms_international_install() {
+//  drupal_install_schema('sms_international');
+
   db_query("INSERT INTO {sms_international} (iso, name, country_code, min_length, max_length, status) VALUES ('es', 'Spain', '34', '9', '9', 1)");
   db_query("INSERT INTO {sms_international} (iso, name, country_code, min_length, max_length, status) VALUES ('gb', 'United Kingdom', '44', '9', '10', 1)");
   db_query("INSERT INTO {sms_international} (iso, name, country_code, min_length, max_length, status) VALUES ('us', 'United States', '1', '10', '10', 1)");
 }
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  */
 function sms_international_schema() {
   $schema['sms_international'] = array(
@@ -25,6 +27,13 @@ function sms_international_schema() {
     'primary key' => array('iso'),
     'indexes'  => array('country_code' => array('country_code')),
   );
-  
+
   return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function sms_international_uninstall() {
+//  drupal_uninstall_schema('sms_international');
 }

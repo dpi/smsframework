@@ -2,4 +2,5 @@ name = "SMS International"
 description = "Provides international number validation."
 dependencies[] = sms
 package = SMS Framework
-core = 6.x
+core = "7.x"
+

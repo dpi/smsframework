@@ -21,12 +21,24 @@ function sms_user_admin_settings($form, &$form_state) {
   $form['sms_user_confirmation_message'] = array(
     '#type' => 'textfield',
     '#title' => t('Confirmation message format'),
-    '#default_value' => variable_get('sms_user_confirmation_message', '[site-name] confirmation code: [confirm-code]'),
+    '#default_value' => variable_get('sms_user_confirmation_message', '[site:name] confirmation code: '),
     '#description' => t('Specify the format for confirmation messages. Keep this as short as possible.'),
-    '#size' => 40,
+    '#size' => 140,
     '#maxlength' => 255,
   );
 
+  // Add the token help to a collapsed fieldset at the end of the configuration page.
+  $form['tokens']['token_help'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Available Tokens List'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['tokens']['token_help']['content'] = array(
+    '#theme' => 'token_tree',
+    '#token_types' => array(),
+  );
+  /*
   $form['tokens'] = array(
     '#type' => 'fieldset',
     '#title' => t('Available replacement patterns'),
@@ -35,7 +47,7 @@ function sms_user_admin_settings($form, &$form_state) {
   );
 
   $form['tokens']['content']['#value'] = theme('token_tree', array('token_types' => array('sms_user')));
-
+  */
   $form['sms_user_sleep'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable sleep hours'),
@@ -68,6 +80,19 @@ function sms_user_admin_settings($form, &$form_state) {
     '#default_value' => variable_get('sms_user_new_account_message', ''),
     '#description' => t('The message that will be sent to newly registered users.  Leave empty for no message.'),
   );
+  
+  // Add the token help to a collapsed fieldset at the end of the registration page.
+  $form['registration']['tokens']['token_help'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Available Tokens List'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['registration']['tokens']['token_help']['content'] = array(
+    '#theme' => 'token_tree',
+    '#token_types' => array(),
+  );
+  /*
   $form['registration']['tokens'] = array(
     '#type' => 'fieldset',
     '#title' => t('Available replacement patterns'),
@@ -76,7 +101,7 @@ function sms_user_admin_settings($form, &$form_state) {
   );
 
   $form['registration']['tokens']['content']['#value'] = theme('token_tree', array('token_types' => array('sms_user')));
-
+  */
   $form['sms_user_max_chars'] = array(
     '#type' => 'textfield',
     '#default_value' => variable_get('sms_user_max_chars', SMS_USER_MAX_CHARS),

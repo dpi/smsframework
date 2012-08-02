@@ -3,4 +3,4 @@ description = "Provides an action for sending outgoing messages and the ability 
 package = SMS Framework
 dependencies[] = sms
 dependencies[] = trigger
-core = 6.x
+core = 7.x

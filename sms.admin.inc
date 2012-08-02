@@ -1,7 +1,5 @@
 <?php
 
-// $Id$
-
 /**
  * @file
  * The admin sms functions.
@@ -16,12 +14,12 @@ function sms_admin_default_form($form, &$form_state) {
   foreach ($gateways as $identifier => $gateway) {
     $active = ($identifier == variable_get('sms_default_gateway', 'log'));
     $options[$identifier] = '';
-    $form[$gateway['name']]['id'] = array('#value' => $identifier);
+    $form[$gateway['name']]['id'] = array('#markup' => $identifier);
     if ( isset($gateway['configure form'] ) and ( function_exists($gateway['configure form'] ))) {
-      $form[$gateway['name']]['configure'] = array('#value' => l(t('configure'), 'admin/smsframework/gateways/' . $identifier));
+      $form[$gateway['name']]['configure'] = array('#markup' => l(t('configure'), 'admin/smsframework/gateways/' . $identifier));
     }
     else {
-      $form[$gateway['name']]['configure'] = array('#value' => t('No configuration options'));
+      $form[$gateway['name']]['configure'] = array('#markup' => t('No configuration options'));
     }
   }
 
@@ -65,11 +63,10 @@ function theme_sms_admin_default_form($variables) {
   $rows = array();
   foreach ($form as $name => $element) {
     if (is_array($element) and isset($element['id']) and is_array($element['id'])) {
-        # dsm($element['configure']);
       $rows[] = array(
-        drupal_render($form['default'][$element['id']['#value']]),
+        drupal_render($form['default'][$element['id']['#markup']]),
         check_plain($name),
-        $element['configure']['#value'], // XXX D7 porting issue: why doesn't this work?  drupal_render($element['configure']),
+        $element['configure']['#markup'],
       );
       unset($form[$name]);
     }
@@ -182,7 +179,7 @@ function sms_carriers_admin_form($form, &$form_state) {
 
     $form['domain'][$css_safe_id] = array(
       '#type' => 'markup',
-      '#value' => check_plain($id),
+      '#markup' => check_plain($id),
     );
 
     $actions[] = l(t('Edit'), "admin/smsframework/carriers/{$id}");
@@ -196,7 +193,7 @@ function sms_carriers_admin_form($form, &$form_state) {
 
     $form['actions'][$css_safe_id] = array(
       '#type' => 'markup',
-      '#value' => implode(' | ', $actions),
+      '#markup' => check_plain(implode(' | ', $actions)),
     );
   }
 
@@ -365,4 +362,3 @@ function theme_sms_carriers_admin_form($variables) {
 
   return $output;
 }
-

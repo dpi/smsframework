@@ -14,6 +14,7 @@ function sms_token_info() {
   $info['types']['sms'] = array(
     'name' => t('SMS'),
     'needs-data' => 'sms',
+    'description' => t("SMS"),
   );
   $info['tokens']['sms']['number'] = array(
     'name' => t('Number'),

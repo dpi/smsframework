@@ -9,7 +9,7 @@
 
 
 /**
- * Implement hook_handler_field()
+ * Implement hook_handler_field().
  */
 class sms_track_handler_field_local_number extends views_handler_field {
   function render($values) {

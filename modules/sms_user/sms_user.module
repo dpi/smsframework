@@ -19,11 +19,11 @@ function sms_user_permission() {
   return array(
     'receive sms' => array(
       'title' => t('receive sms'),
-      'description' => t('TODO Add a description for \'receive sms\''),
+      'description' => t('Receive SMS from the site.'),
     ),
     'edit own sms number' => array(
       'title' => t('edit own sms number'),
-      'description' => t('TODO Add a description for \'edit own sms number\''),
+      'description' => t('Edit own SMS number.'),
     ),
   );
 }
@@ -69,7 +69,6 @@ function sms_user_edit_access($account) {
  */
 function sms_user_send($uid, $message) {
   $account = user_load($uid);
-  
   //Check if the user is enabled to receive SMS
   if (user_access('receive sms', $account)) {
     if ($account->sms_user[0]['status'] == 2) {
@@ -145,7 +144,7 @@ function _sms_user_sleep_active($account) {
  * Menu callback; provides the forms for adding and confirming a user's mobile number.
  */
 function sms_user_settings($account) {
-  dsm($account);
+  //dsm($account);
   switch (isset($account->sms_user) ? $account->sms_user['status'] : 0) {
     case 0:
       $output = drupal_get_form('sms_user_settings_add_form', $account);
@@ -166,8 +165,7 @@ function sms_user_settings($account) {
 }
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Displays the user settings form.
  */
 function sms_user_settings_add_form($form, &$form_state, $account) {
   $form = sms_send_form();
@@ -184,8 +182,7 @@ function sms_user_settings_add_form($form, &$form_state, $account) {
 }
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Validate the users number.
  */
 function sms_user_settings_add_form_validate($form, &$form_state) {
   if ($error = sms_user_validate_number($form_state['values']['number'])) {
@@ -220,7 +217,7 @@ function sms_user_settings_confirm_form($form, &$form_state, $account) {
   $form['number'] = array(
     '#type' => 'item',
     '#title' => t('Mobile phone number'),
-    '#value' => $account->sms_user['number'],
+    '#markup' => $account->sms_user['number'],
   );
   $form['confirm_code'] = array(
     '#type' => 'textfield',
@@ -290,7 +287,8 @@ function sms_user_settings_reset_form($form, &$form_state, $account) {
   $form['sms_user']['number'] = array(
     '#type' => 'item',
     '#title' => t('Your mobile phone number'),
-    '#value' => $account->sms_user['number'],
+    '#markup' => $account->sms_user['number'],
+//    '#markup' => $account->sms_user['number'] . '@' . $account->sms_user['gateway']['carrier'],
     '#description' => t('Your mobile phone number has been confirmed.'),
   );
 
@@ -450,8 +448,7 @@ function sms_user_user_view($account, $view_mode) {
     $account->content['sms']['number'] = array(
       '#type' => 'user_profile_item',
       '#title' => t(''),
-      // @todo - theme function to format number.
-      '#value' => isset($account->sms_user['number']) ? $account->sms_user['number'] : '',
+      '#markup' => isset($account->sms_user['number']) ? $account->sms_user['number'] : '',
     );
   }
 }
@@ -518,6 +515,7 @@ function sms_user_user_load($users) {
 
   foreach ($result as $record) {
     if (!empty($record->uid)) {
+      $record->gateway = unserialize($record->gateway);
       $users[$record->uid]->sms_user = (array)$record;
 
       // @todo: the following is to support messaging that expect account details
@@ -534,13 +532,13 @@ function sms_user_user_load($users) {
  */
 function sms_user_save(&$edit, &$account, $category) {
   if (($category == 'mobile' || $category == 'account') && isset($edit['sms_user'])) {
-    dsm($edit);
+    //dsm($edit);
     $number = (object)$edit['sms_user'];
     $number->uid = $account->uid;
-    dsm($number);
+    //dsm($number);
 
     $primary_keys = array();
-    if ($account->sms_user['status'] == SMS_USER_PENDING && $edit['sms_user']['status'] == SMS_USER_CONFIRMED) { // is existing
+    if (isset($account->sms_user) && $account->sms_user['status'] == SMS_USER_PENDING && $edit['sms_user']['status'] == SMS_USER_CONFIRMED) { // is existing
       $primary_keys = array('number');
     }
     drupal_write_record('sms_user', $number, $primary_keys);
@@ -563,17 +561,12 @@ function sms_user_save(&$edit, &$account, $category) {
  * @see sms_user_user()
  */
 function sms_user_delete($uid, $number = FALSE) {
-  $db_args = array($uid);
-
-  if ($number == FALSE) {
-    $number_where = '';
+  $query = db_delete('sms_user')
+    ->condition('uid', $uid);
+  if ($number) {
+    $query->condition('number', $number);
   }
-  else {
-    $number_where = "AND number = '%s'";
-    $db_args[] = $number;
-  }
-  // TODO Please convert this statement to the D7 database API syntax.
-  db_query("DELETE FROM {sms_user} WHERE uid = %d $number_where", $db_args);
+  $num_deleted = $query->execute();
 }
 
 /**
@@ -587,9 +580,8 @@ function sms_user_delete($uid, $number = FALSE) {
  *   Created message, ready to send to user.
  */
 function _sms_user_confirm_message($code) {
-  $text_format = variable_get('sms_user_confirmation_message', '[site-name] confirmation code: [confirm-code]');
-  // @todo: d7 token support
-  //$text = token_replace_multiple($text_format, array('sms_user' => array('confirm-code' => $code)));
+  $text_format = variable_get('sms_user_confirmation_message', '[site:name] confirmation code: ') . $code;
+  $text = token_replace($text_format, array('confirm-code' => $code));
   return $text;
 }
 
@@ -618,9 +610,11 @@ function sms_user_register() {
 }
 
 /**
- * Implements hook_token_values().
- */
-function sms_user_token_values($type, $object = NULL, $options = array()) {
+ * Implements hook_tokens().
+ * TODO put this in upgrade patch.
+ * @see http://drupal.org/documentation/modules/token/update/6/7
+ *
+function sms_user_tokens($type, $object = NULL, $options = array()) {
   global $user;
   $values = array();
 
@@ -631,11 +625,32 @@ function sms_user_token_values($type, $object = NULL, $options = array()) {
       break;
   }
   return $values;
+}*/
+function sms_user_tokens($type, $tokens, array $data = array(), array $options = array()) {
+//function sms_user_tokens($type, $object = NULL, $options = array()) {
+  global $user;
+  $replacements = array();
+
+  if ($type == 'sms_user') {
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'confirm-code':
+            $replacements[$original] = $object['confirm-code'];
+          break;
+        case 'mobile-url':
+            $replacements[$original] = url("user/$user->uid/edit/mobile", array('absolute' => TRUE));
+          break;
+      }
+    }
+  }
+  return $replacements;
 }
 
 /**
- * Implements hook_token_list().
- */
+ * Implements hook_token_info().
+ *
+ * @see http://drupal.org/documentation/modules/token/update/6/7
+ *
 function sms_user_token_list($type = 'all') {
   $tokens = array();
   if ($type == 'sms_user') {
@@ -644,6 +659,19 @@ function sms_user_token_list($type = 'all') {
   }
 
   return $tokens;
+}*/
+function sms_user_token_info() {
+  $info['tokens']['sms_user']['confirm-code'] = array(
+    'name' => t('Confirmation code'),
+    'description' => t('The mobile confirmation code for the user.'),
+    'type' => 'sms_user',
+  );
+  $info['tokens']['sms_user']['mobile-url'] = array(
+    'name' => t('Mobile URL'),
+    'description' => t('The URL for the user\'s mobile settings page.'),
+    'type' => 'sms_user',
+  );
+  return $info;
 }
 
 /**
@@ -844,7 +872,7 @@ function sms_user_authenticate($number) {
 }
 
 /**
- *
+ * Log the current user out.
  */
 function sms_user_logout() {
   global $user;

@@ -68,7 +68,7 @@ function sms_track_settings_form_submit($form, &$form_state) {
     watchdog('sms_track', 'SMS Tracking archive collector enabled');
   }
 
-  drupal_set_message('Settings saved.');
+  drupal_set_message(t('Settings saved.'));
 }
 
 

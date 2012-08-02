@@ -9,7 +9,26 @@
 
 
 /**
- * Implement hook_schema()
+ * Implement hook_install().
+ *
+function sms_track_install() {
+  drupal_install_schema('sms_track');
+}
+ * This should not be needed in D7
+ */
+
+/**
+ * Implement hook_uninstall().
+ *
+function sms_track_uninstall() {
+  drupal_uninstall_schema('sms_track');
+}
+ * This should not be needed in D7
+ */
+
+
+/**
+ * Implement hook_schema().
  *
  * @return
  *   Drupal schema array
