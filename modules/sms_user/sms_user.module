@@ -447,7 +447,7 @@ function sms_user_user_view($account, $view_mode) {
     );
     $account->content['sms']['number'] = array(
       '#type' => 'user_profile_item',
-      '#title' => t(''),
+      '#title' => '',
       '#markup' => isset($account->sms_user['number']) ? $account->sms_user['number'] : '',
     );
   }
