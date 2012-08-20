@@ -84,13 +84,28 @@ function sms_user_send($uid, $message) {
 }
 
 /**
+ * Returns a verified number of a given user
+ */
+function sms_user_get_number($account) {
+  //Check if the user is enabled to receive SMS
+  if (user_access('receive sms', $account)) {
+    if ($account->sms_user[0]['status'] == 2) {
+      return $account->sms_user[0]['number'];
+    }
+    else {
+      return FALSE;
+    }
+  }
+}
+
+/**
  * Returns the uid of the owner of a number.
  */
 function sms_user_get_uid($number, $status = NULL) {
   $query = db_select('sms_user', 'u')
     ->fields('u', array('uid'))
     ->condition('number', $number);
-   
+
   if (isset($status)) {
     $query->condition('status', $status);
   }
@@ -457,7 +472,7 @@ function sms_user_user_view($account, $view_mode) {
  * Implements hook_form_alter().
  */
 function sms_user_form_alter(&$form, &$form_state, $form_id) {
-  if($form_id == "user_register_form") {
+  if ($form_id == "user_register_form") {
     if (variable_get('sms_user_registration_form', 0)) {
       $form['sms_user'] = array(
         '#type' => 'fieldset',
@@ -506,7 +521,7 @@ function sms_user_user_login(&$edit, $account) {
   // Check if first it's the user's first time logging in.
   if (!$account->access && !empty($account->sms_user['number']) && $account->sms_user['status'] != SMS_USER_CONFIRMED) {
     sms_user_send_confirmation($account, $account->sms_user['number'], $account->sms_user['gateway']);
-    drupal_set_message(t('A confirmation message has been sent to your mobile phone. Please !link.', array('!link' => l(t('confirm your number'), 'user/' . $account->uid . '/edit/mobile'))), 'status');
+    drupal_set_message(t('A confirmation message has been sent to your mobile phone. Please @link.', array('@link' => l(t('confirm your number'), 'user/' . $account->uid . '/edit/mobile'))), 'status');
   }
 }
 
@@ -555,7 +570,7 @@ function sms_user_save(&$edit, &$account, $category) {
   if (($category == 'mobile' || $category == 'account') && isset($edit['sms_user']) && $edit['sms_user']['number'] && $account->uid != 0) {
     $number = (object)$edit['sms_user'];
     $number->uid = $account->uid;
-    if(!isset($number->status)) {
+    if (!isset($number->status)) {
       $number->status = NULL;
     }
 
