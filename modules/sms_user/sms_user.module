@@ -454,10 +454,31 @@ function sms_user_user_view($account, $view_mode) {
 }
 
 /**
- * Implements hook_user_XXX().
+ * Implements hook_form_alter().
  */
-function sms_user_user_XXX($edit, $account) {
-  return sms_user_register();
+function sms_user_form_alter(&$form, &$form_state, $form_id) {
+  if($form_id == "user_register_form") {
+    if (variable_get('sms_user_registration_form', 0)) {
+      $form['sms_user'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Mobile settings'),
+        '#description' => t('You will receive a message to confirm your mobile information upon login.'),
+        '#collapsible' => TRUE,
+        '#tree' => TRUE,
+      );
+
+      $required = FALSE;
+      if (variable_get('sms_user_registration_form', 0) == 2) {
+        $required = TRUE;
+      }
+      
+      
+      $form['sms_user'] += sms_send_form($required);
+
+      return $form;
+    }
+  }
+  return $form;
 }
 
 /**
@@ -531,18 +552,19 @@ function sms_user_user_load($users) {
  * @see sms_user_user()
  */
 function sms_user_save(&$edit, &$account, $category) {
-  if (($category == 'mobile' || $category == 'account') && isset($edit['sms_user'])) {
-    //dsm($edit);
+  if (($category == 'mobile' || $category == 'account') && isset($edit['sms_user']) && $edit['sms_user']['number'] && $account->uid != 0) {
     $number = (object)$edit['sms_user'];
     $number->uid = $account->uid;
-    //dsm($number);
+    if(!isset($number->status)) {
+      $number->status = NULL;
+    }
 
     $primary_keys = array();
-    if (isset($account->sms_user) && $account->sms_user['status'] == SMS_USER_PENDING && $edit['sms_user']['status'] == SMS_USER_CONFIRMED) { // is existing
+    if (isset($account->sms_user) && sms_user_get_uid($number->number)) { // is existing
       $primary_keys = array('number');
     }
     drupal_write_record('sms_user', $number, $primary_keys);
-
+    
     $edit['sms_user']['number'] = NULL;
     $edit['sms_user']['status'] = NULL;
     $edit['sms_user']['code'] = NULL;
@@ -583,30 +605,6 @@ function _sms_user_confirm_message($code) {
   $text_format = variable_get('sms_user_confirmation_message', '[site:name] confirmation code: ') . $code;
   $text = token_replace($text_format, array('confirm-code' => $code));
   return $text;
-}
-
-/**
- * Form elements to show on user registration page.
- *
- * @see sms_user_user()
- */
-function sms_user_register() {
-  if (variable_get('sms_user_registration_form', 0)) {
-    $form['sms_user'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Mobile settings'),
-      '#description' => t('You will receive a message to confirm your mobile information upon login.'),
-      '#collapsible' => TRUE,
-      '#tree' => TRUE,
-    );
-
-    $required = FALSE;
-    if (variable_get('sms_user_registration_form', 0) == 2) {
-      $required = TRUE;
-    }
-    $form['sms_user'] += sms_send_form($required);
-    return $form;
-  }
 }
 
 /**
