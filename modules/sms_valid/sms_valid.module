@@ -141,10 +141,10 @@ function sms_valid_get_all_rulesets() {
   $result = db_query("SELECT * FROM {sms_valid_rules}");
 
   $rulesets = array();
-  foreach($result as $row) {
+  foreach ($result as $row) {
     $prefix = $row->prefix;
     $rulesets[$prefix] = $row;
-    $rulesets[$prefix->rules] = unserialize($row->rules);
+    $rulesets[$prefix]->rules = unserialize($row->rules);
   }
   /*while ($row = db_fetch_array($result)) {
     $prefix = $row['prefix'];
@@ -166,10 +166,9 @@ function sms_valid_get_all_rulesets() {
 function sms_valid_get_ruleset($prefix) {
 //  $result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix = :prefix LIMIT 1", array(':prefix' => $prefix));
   // @TODO Lets try this to see if it is a good converstion from D6 to D7
-  $result = db_query_range("SELECT * FROM {sms_valid_rules} WHERE prefix = :prefix", 0, 1, array(':prefix' => $prefix))->fetchAssoc();
+  $ruleset = db_query_range("SELECT * FROM {sms_valid_rules} WHERE prefix = :prefix", 0, 1, array(':prefix' => $prefix))->fetchAssoc();
   //if (db_affected_rows()) {
-  foreach($result as $ruleset) {
-    //$ruleset = db_fetch_array($result);
+  if ($ruleset) {
     $ruleset['rules'] = unserialize($ruleset['rules']);
     return $ruleset;
   }
@@ -230,7 +229,7 @@ function sms_valid_get_ruleset_for_number($number) {
     ->fields('u', array('prefix', 'name', 'rules', 'dirs_enabled', 'iso2'))
     ->condition('prefix', $potential_prefixes, 'IN');
   $result = $query->execute();
-  foreach($result as $row) {
+  foreach ($result as $row) {
 dsm("line 234 sms_valid.module");
     if ($row->prefix > $last_prefix) {
       $best_ruleset = $row;
@@ -255,7 +254,7 @@ function sms_valid_get_prefixes_for_iso2($iso2) {
   $result = db_query("SELECT prefix FROM {sms_valid_rules} WHERE iso2 = :iso2", array(':iso2' => $iso2));
   $prefixes = array();
 //TODO  while ($row = db_fetch_object($result)) {
-  foreach($result as $row) {
+  foreach ($result as $row) {
     $prefixes[] = $row->prefix;
   }
   return $prefixes;
@@ -481,8 +480,8 @@ function sms_valid_get_rulesets_for_form($include_null_option = FALSE) {
   // Other options
   $rulesets = sms_valid_get_all_rulesets();
   foreach ($rulesets as $prefix => $ruleset) {
-    $suffix = (!empty($ruleset['iso2'])) ? ' (' . $ruleset['iso2'] . ')' : '';
-    $options[$prefix] = $prefix . ' : ' . $ruleset['name'] . $suffix;
+    $suffix = (!empty($ruleset->iso2)) ? ' (' . $ruleset->iso2 . ')' : '';
+    $options[$prefix] = $prefix . ' : ' . $ruleset->name . $suffix;
   }
   return $options;
 }
@@ -648,7 +647,7 @@ function sms_valid_validate(&$number, &$options = array()) {
     }
   }
 
-  # No matching rules. Default deny.
+  // No matching rules. Default deny.
   $result['log'][] = "Cannot validate this number. Denied by default.";
   return $result;
 }

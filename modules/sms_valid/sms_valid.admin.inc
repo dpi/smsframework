@@ -166,8 +166,8 @@ function sms_valid_admin_rulesets_form($form, &$form_state) {
   );
 
   foreach ($rulesets as $r) {
-    $prefix = $r['prefix'];
-    $qty_rules = count($r['rules']);
+    $prefix = $r->prefix;
+    $qty_rules = count($r->rules);
     $rule_edit = ' (' . l(t('edit'), "admin/smsframework/validation/ruleset/$prefix") . ')';
 
     $form[$prefix]['prefix'] = array(
@@ -175,11 +175,11 @@ function sms_valid_admin_rulesets_form($form, &$form_state) {
       '#size' => 5,
       '#maxlength' => 5,
       '#disabled' => TRUE,
-      '#value' => $r['prefix'],
+      '#value' => $r->prefix,
     );
-    $form[$prefix]['name'] = array('#value' => $r['name']);
-    $form[$prefix]['iso2'] = array('#value' => $r['iso2']);
-    $form[$prefix]['qty_rules'] = array('#value' => $qty_rules . $rule_edit);
+    $form[$prefix]['name'] = array('#markup' => $r->name);
+    $form[$prefix]['iso2'] = array('#markup' => $r->iso2);
+    $form[$prefix]['qty_rules'] = array('#markup' => $qty_rules . $rule_edit);
     $form[$prefix][$prefix . '_out'] = array(
       '#type' => 'checkbox',
       '#title' => 'Outbound',
@@ -209,12 +209,10 @@ function sms_valid_admin_rulesets_form($form, &$form_state) {
  * @see sms_valid_admin_rulesets_form()
  */
 function theme_sms_valid_admin_rulesets_form($variables) {
-//  dsm($variables);
-  $variables = $variables['form'];
   $form = $variables['form'];
-  $rows = array();
+  $output = '';
   foreach ($form as $prefix => $element) {
-    if (isset($element['prefix']) && is_array($element['prefix'])) {
+    if (is_array($element) && isset($element['prefix']) && is_array($element['prefix'])) {
       $rows[] = array(
         drupal_render($element['prefix']),
         drupal_render($element['name']),
@@ -227,7 +225,6 @@ function theme_sms_valid_admin_rulesets_form($variables) {
       unset($form[$prefix]);
     }
   }
-
   $output .= drupal_render_children($form['note']);
   unset($form['note']);
 
@@ -235,18 +232,18 @@ function theme_sms_valid_admin_rulesets_form($variables) {
     t('Prefix'),
     t('Name'),
     t('Country'),
-    t('Qty Rules'), array(
+    t('Qty Rules'), 
+    array(
       'data' => t('Allow messages'),
       'colspan' => 2,
     ),
     t('Delete'));
   $output .= theme('table', array(
-    'header' => array(
-      'header' => $header,
-      'rows' => $rows,
-    )));
+    'header' => $header,
+    'rows' => $rows,
+    ));
   $output .= drupal_render_children($form);
-
+  
   return $output;
 }
 
@@ -297,8 +294,7 @@ function sms_valid_admin_ruleset_form($form, &$form_state, $prefix = NULL) {
   // Ruleset selection area
   $form['title'] = array(
     '#type' => 'item',
-//    '#value' => t('Select a ruleset from the drop-down box and click Refresh to update the ruleset form below.'),
-    '#markup' => t('Select a ruleset from the drop-down box and click Refresh to update the ruleset form below.'),
+    '#markup' => t('Choose a ruleset from the drop down box and click Refresh to update the ruleset form below.'),
   );
 
   $form['select_prefix'] = array(
@@ -393,8 +389,6 @@ function sms_valid_admin_ruleset_form($form, &$form_state, $prefix = NULL) {
  * @see sms_valid_admin_ruleset_form()
  */
 function theme_sms_valid_admin_ruleset_form($variables) {
-//  dsm($variables['form']);
-  $variables = $variables['form'];
   $form = $variables['form'];
   $header = array();
   $rows   = array();
@@ -404,25 +398,26 @@ function theme_sms_valid_admin_ruleset_form($variables) {
       'colspan' => 3,
     ),
   );
+  
   $rows[] = array(
     drupal_render($form['select_prefix']),
-    drupal_render_children($form['select']),
+    drupal_render($form['select']),
     array(
       'data' => '',
       'width' => '80%',
     ),
   );
-
   unset($form['title']);
   unset($form['select_prefix']);
   unset($form['select']);
-
+  
   $output = theme(
     'table', array(
-      'header' => array(
-        'header' => $header,
-        'rows' => $rows,
-  )));
+      'header' => $header,
+      'rows' => $rows,
+    )
+  );
+  
   $output .= drupal_render_children($form);
 
   return $output;
@@ -434,7 +429,7 @@ function theme_sms_valid_admin_ruleset_form($variables) {
  */
 function sms_valid_admin_ruleset_form_select(&$form, $form_state) {
   $prefix = $form_state['values']['select_prefix'];
-  $form_state['#redirect'] = "admin/smsframework/validation/ruleset/$prefix";
+  drupal_goto("admin/smsframework/validation/ruleset/$prefix");
 }
 
 
@@ -442,11 +437,11 @@ function sms_valid_admin_ruleset_form_select(&$form, $form_state) {
  * @see sms_valid_admin_ruleset_form()
  */
 function sms_valid_admin_ruleset_form_submit(&$form, $form_state) {
-  $ruleset['prefix'] = $form_state['clicked_button']['#post']['prefix'];
+  $ruleset['prefix'] = $form_state['input']['prefix'];
   $ruleset['name']   = $form_state['values']['name'];
   $ruleset['iso2']   = $form_state['values']['iso2'];
 
-  $rules_text        = $form_state['clicked_button']['#post']['rules'];
+  $rules_text        = $form_state['values']['rules'];
   $ruleset['rules']  = sms_valid_text_to_rules($rules_text);
 
   $out = $form_state['values']['out'];
@@ -505,7 +500,7 @@ function sms_valid_admin_test_form($form, &$form_state, $last_test_validation_nu
  */
 function sms_valid_admin_test_form_submit(&$form, $form_state) {
   $number = $form_state['values']['number'];
-  drupal_set_message(check_plain(t('You entered ') . $number));
+  drupal_set_message(check_plain(t('You entered') . $number));
   variable_set('sms_valid_test_last_number', $number);
 
   $test_mode = $form_state['values']['test_mode'];
@@ -526,7 +521,7 @@ function sms_valid_admin_test_form_submit(&$form, $form_state) {
     case 1: // Test main validation function
       $error = sms_validate_number($number);
       if ($error) {
-        drupal_set_message(t('Error message from validation function:<br />!error', array('!error' => filter_xss($error))));
+        drupal_set_message(t('Error message from validation function: %error', array('%error' => filter_xss($error))));
       }
       $pass = (! $error);
       break;
@@ -534,7 +529,8 @@ function sms_valid_admin_test_form_submit(&$form, $form_state) {
 
   if ($pass) {
     drupal_set_message(t('Validation succeeded and returned number %number.', array('%number' => $number)));
-  } else {
+  } 
+  else {
     form_set_error('number', 'Validation failed.');
   }
 }
