@@ -387,8 +387,9 @@ function sms_send_form($required = FALSE) {
  * @see sms_send_form_submit()
  */
 function sms_send_form_validate($form, &$form_state) {
-  if (!sms_validate_number(sms_formatter($form_state['values']['number']), $form_state['values']['gateway'])) {
-    form_set_error('number', t('You must enter a valid phone number.'));
+  $not_valid = sms_validate_number(sms_formatter($form_state['values']['number']), $form_state['values']['gateway']); 
+  if ($not_valid) {
+    form_set_error('number', t($not_valid));
   }
 }
 
