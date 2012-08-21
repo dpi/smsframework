@@ -18,11 +18,11 @@ function sms_token_info() {
   );
   $info['tokens']['sms']['number'] = array(
     'name' => t('Number'),
-    'description' => t("XXX ."),
+    'description' => t("SMS Phone Number."),
   );
   $info['tokens']['sms']['message'] = array(
     'name' => t('Message'),
-    'description' => t("XXX ."),
+    'description' => t("SMS Mesage."),
   );
   return $info;
 }
