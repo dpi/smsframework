@@ -219,7 +219,8 @@ function sms_handle_result($result, $number, $message) {
  */
 function sms_incoming($number, $message, $options = array()) {
   if (module_exists('rules')) {
-    rules_invoke_event('sms_incoming', array('number' => $number, 'message' => $message));
+    $options += array('number' => $number, 'message' => $message);   
+    rules_invoke_event('sms_incoming', $options);
   }
 
   // Execute three phases
