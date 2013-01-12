@@ -678,6 +678,11 @@ function sms_user_token_list($type = 'all') {
   return $tokens;
 }*/
 function sms_user_token_info() {
+  $info['types']['sms_user'] = array(
+    'name' => t('SMS User'),
+    'description' => t('Tokens related to a users\' sms settings.'),
+    'needs-data' => 'user',
+  );
   $info['tokens']['sms_user']['confirm-code'] = array(
     'name' => t('Confirmation code'),
     'description' => t('The mobile confirmation code for the user.'),
