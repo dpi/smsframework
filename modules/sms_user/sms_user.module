@@ -598,6 +598,10 @@ function sms_user_save(&$edit, &$account, $category) {
  * @see sms_user_user()
  */
 function sms_user_delete($uid, $number = FALSE) {
+  if (is_object($uid)) {
+    $uid = $uid->uid;
+  }
+  
   $query = db_delete('sms_user')
     ->condition('uid', $uid);
   if ($number) {
