@@ -1008,3 +1008,71 @@ function _sms_user_feedsprocess_set_value($source, $target_item, $target, $value
       break;
   }
 }
+
+/**
+ * Implements hook_entity_property_info_alter().
+ */
+function sms_user_entity_property_info_alter(&$info) {
+  $properties = &$info['user']['properties'];
+  $properties['sms_user_phone_number'] = array(
+      'label' => t("Phone Number"),
+      'description' => t("The users mobile phone number."),
+      'type' => 'text',
+      'getter callback' => 'entity_property_sms_user_get_properties',
+      'computed' => TRUE,
+      'required' => FALSE,
+  );
+  $properties['sms_user_status'] = array(
+      'label' => t("SMS Status"),
+      'description' => t("The users status of the Mobile Phone number."),
+      'type' => 'text',
+      'getter callback' => 'entity_property_sms_user_get_properties',
+      'computed' => TRUE,
+      'required' => TRUE,
+  );
+  $properties['sms_user_gateway'] = array(
+      'label' => t("SMS Gateway"),
+      'description' => t("The SMS Gateway for this user."),
+      'type' => 'text',
+      'getter callback' => 'entity_property_sms_user_get_properties',
+      'computed' => TRUE,
+      'required' => FALSE,
+  );
+
+}
+
+/**
+ * Helper function that gets properties for the sms_user_entity_property_info_alter() function
+ * @param unknown_type $data
+ * @param array $options
+ * @param unknown_type $name
+ * @param unknown_type $type
+ * @param unknown_type $info
+ */
+function entity_property_sms_user_get_properties($data, array $options, $name, $type, $info) {
+  if (isset($data->uid) && ($data->uid > 0)) {
+    $account = user_load($data->uid);
+    if (isset($account->sms_user)) {
+      switch ($name) {
+        case "sms_user_phone_number" :
+          return $account->sms_user['number'];
+          break;
+        case "sms_user_status" :
+          switch ($account->sms_user['status']) {
+            case 1:
+              return t('Pending');
+              break;
+            case 2:
+              return t('Active');
+              break;
+          }
+        case "sms_user_gateway" :
+          if (is_string($account->sms_user['gateway'])) {
+            return $account->sms_user['gateway'];
+          }
+          break;
+      }
+    }
+  }
+  return NULL;
+}

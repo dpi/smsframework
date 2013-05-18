@@ -1,9 +1,11 @@
 name = "SMS User"
 description = "Provides integration between the SMS Framework and Drupal users."
-dependencies[] = sms
-dependencies[] = token
 package = SMS Framework
 core = 7.x
+
+dependencies[] = sms
+dependencies[] = token
+dependencies[] = entity
 
 files[] = includes/sms_user_handler_field_number.inc
 files[] = includes/sms_user_handler_field_status.inc
