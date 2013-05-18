@@ -201,7 +201,12 @@ function sms_user_settings_add_form($form, &$form_state, $account) {
  */
 function sms_user_settings_add_form_validate($form, &$form_state) {
   if ($error = sms_user_validate_number($form_state['values']['number'])) {
-    form_set_error('number', $error);
+    if (is_array($error)) {
+      form_set_error('number', t("This is not a valid number on this website."));
+    }
+    else {
+      form_set_error('number', $error);
+    }
   }
 
   if (empty($form_state['values']['gateway'])) {
@@ -486,8 +491,8 @@ function sms_user_form_alter(&$form, &$form_state, $form_id) {
       if (variable_get('sms_user_registration_form', 0) == 2) {
         $required = TRUE;
       }
-      
-      
+
+
       $form['sms_user'] += sms_send_form($required);
 
       return $form;
@@ -579,7 +584,7 @@ function sms_user_save(&$edit, &$account, $category) {
       $primary_keys = array('number');
     }
     drupal_write_record('sms_user', $number, $primary_keys);
-    
+
     $edit['sms_user']['number'] = NULL;
     $edit['sms_user']['status'] = NULL;
     $edit['sms_user']['code'] = NULL;
@@ -601,7 +606,7 @@ function sms_user_delete($uid, $number = FALSE) {
   if (is_object($uid)) {
     $uid = $uid->uid;
   }
-  
+
   $query = db_delete('sms_user')
     ->condition('uid', $uid);
   if ($number) {

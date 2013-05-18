@@ -229,12 +229,11 @@ function sms_valid_get_ruleset_for_number($number) {
     ->fields('u', array('prefix', 'name', 'rules', 'dirs_enabled', 'iso2'))
     ->condition('prefix', $potential_prefixes, 'IN');
   $result = $query->execute();
-  foreach ($result as $row) {
-dsm("line 234 sms_valid.module");
-    if ($row->prefix > $last_prefix) {
+  while ($row = $result->fetchAssoc()) {
+    if ($row['prefix'] > $last_prefix) {
       $best_ruleset = $row;
+      $best_ruleset['rules'] = unserialize($best_ruleset['rules']);
     }
-    $best_ruleset['rules'] = unserialize($best_ruleset['rules']);
   }
 
   return $best_ruleset;
@@ -304,8 +303,6 @@ function sms_valid_ruleset_is_enabled($prefix, $dir = SMS_DIR_OUT) {
  *   Bollean. Result of the DB query.
  */
 function sms_valid_ruleset_set_status($prefix, $dir = SMS_DIR_ALL) {
-  // @TODO Please review the conversion of this statement to the D7 database API syntax.
-  /* db_query("UPDATE {sms_valid_rules} SET dirs_enabled = %d WHERE prefix = %d", $dir, $prefix) */
   return db_update('sms_valid_rules')
   ->fields(array('dirs_enabled' => $dir))
   ->condition('prefix', $prefix)
@@ -331,10 +328,6 @@ function sms_valid_save_ruleset($ruleset) {
 
   if (sms_valid_get_ruleset($prefix)) {
     // The ruleset exists so we should update
-    // @TODO Please review the conversion of this statement to the D7 database API syntax.
-    /* db_query("UPDATE {sms_valid_rules} SET
-     name = '%s', rules = '%s', dirs_enabled = %d,
-     iso2 = '%s' WHERE prefix = %d", $name, $rules_z, $dirs_enabled, $iso2, $prefix) */
     return db_update('sms_valid_rules')
     ->fields(array(
         'name' => $name,
@@ -347,11 +340,6 @@ function sms_valid_save_ruleset($ruleset) {
   }
   else {
     // The ruleset does not exist so we should create
-    // @TODO Please review the conversion of this statement to the D7 database API syntax.
-    /* db_query("INSERT INTO {sms_valid_rules}
-     (prefix, name, rules, dirs_enabled, iso2)
-     VALUES
-     (%d, '%s', '%s', %d, '%s')", $prefix, $name, $rules_z, $dirs_enabled, $iso2) */
     return $id = db_insert('sms_valid_rules')
     ->fields(array(
         'prefix' => $prefix,
@@ -375,8 +363,6 @@ function sms_valid_save_ruleset($ruleset) {
  *   Boolean. Result of the DB query.
  */
 function sms_valid_delete_ruleset($prefix) {
-  // @TODO Please review the conversion of this statement to the D7 database API syntax.
-  /* db_query("DELETE FROM {sms_valid_rules} WHERE prefix = %d", $prefix) */
   return db_delete('sms_valid_rules')
     ->condition('prefix', $prefix)
     ->execute();
@@ -418,7 +404,12 @@ function sms_valid_text_to_rules($text) {
 
     // Capture any comments and then strip them
     preg_match('/\#(.*)/', $line, $matches);
-    $comment = trim($matches[1]);
+    if (isset($matches[1])) {
+      $comment = trim($matches[1]);
+    }
+    else {
+      $comment = '';
+    }
     $line = trim(preg_replace('/\#.*/', '', $line));
 
     // Check if we are allowing or denying, deny by default
@@ -586,8 +577,8 @@ function sms_valid_validate(&$number, &$options = array()) {
     $ruleset  = sms_valid_get_ruleset_for_number($number);
 
     if ($ruleset) {
-      $result['log'][] = 'Identified ruleset prefix ' . $prefix;
       $prefix = $ruleset['prefix'];
+      $result['log'][] = 'Identified ruleset prefix ' . $prefix;
     }
     else {
       // Could not identify ruleset prefix

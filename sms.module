@@ -219,7 +219,7 @@ function sms_handle_result($result, $number, $message) {
  */
 function sms_incoming($number, $message, $options = array()) {
   if (module_exists('rules')) {
-    $options += array('number' => $number, 'message' => $message);   
+    $options += array('number' => $number, 'message' => $message);
     rules_invoke_event('sms_incoming', $options);
   }
 
@@ -388,7 +388,7 @@ function sms_send_form($required = FALSE) {
  * @see sms_send_form_submit()
  */
 function sms_send_form_validate($form, &$form_state) {
-  $not_valid = sms_validate_number(sms_formatter($form_state['values']['number']), $form_state['values']['gateway']); 
+  $not_valid = sms_validate_number(sms_formatter($form_state['values']['number']), $form_state['values']['gateway']);
   if ($not_valid) {
     form_set_error('number', t($not_valid));
   }
@@ -484,7 +484,7 @@ function carrier_save($domain, $edit) {
         carrier_delete($domain);
         drupal_write_record('sms_carriers', $edit);
       }
-      
+
       // TODO: we need more logic to figure out when someone is changing the domain name
     }
   }
@@ -498,7 +498,7 @@ function carrier_delete($domain) {
   db_delete('sms_carriers')
     ->condition('domain', $domain)
     ->execute();
-    
+
   //removes carrier from variable
   $enabled_carriers = variable_get('sms_enabled_carriers', array());
   foreach ($enabled_carriers as $i => $carrier) {
@@ -578,13 +578,13 @@ function sms_validate_number(&$number, $options = array()) {
     if (function_exists($gateway['validate number']) && $error = $gateway['validate number']($number, $options)) {
       return $error;
     }
-    elseif ($error = sms_valid_validate($number, $options)) {
+  }
+  if (module_exists('sms_valid')) {
+    if ($error = sms_valid_validate($number, $options)) {
       return $error;
     }
   }
-  else {
-    return NULL;
-  }
+  return NULL;
 }
 
 /**

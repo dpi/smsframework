@@ -232,7 +232,7 @@ function theme_sms_valid_admin_rulesets_form($variables) {
     t('Prefix'),
     t('Name'),
     t('Country'),
-    t('Qty Rules'), 
+    t('Qty Rules'),
     array(
       'data' => t('Allow messages'),
       'colspan' => 2,
@@ -243,7 +243,7 @@ function theme_sms_valid_admin_rulesets_form($variables) {
     'rows' => $rows,
     ));
   $output .= drupal_render_children($form);
-  
+
   return $output;
 }
 
@@ -398,7 +398,7 @@ function theme_sms_valid_admin_ruleset_form($variables) {
       'colspan' => 3,
     ),
   );
-  
+
   $rows[] = array(
     drupal_render($form['select_prefix']),
     drupal_render($form['select']),
@@ -410,14 +410,14 @@ function theme_sms_valid_admin_ruleset_form($variables) {
   unset($form['title']);
   unset($form['select_prefix']);
   unset($form['select']);
-  
+
   $output = theme(
     'table', array(
       'header' => $header,
       'rows' => $rows,
     )
   );
-  
+
   $output .= drupal_render_children($form);
 
   return $output;
@@ -506,7 +506,7 @@ function sms_valid_admin_test_form_submit(&$form, $form_state) {
   $test_mode = $form_state['values']['test_mode'];
   variable_set('sms_valid_test_mode', $test_mode);
 
-  if (! variable_get('sms_valid_use_rulesets', FALSE)) {
+  if (!variable_get('sms_valid_use_rulesets', FALSE)) {
     drupal_set_message(t('Note: Rulesets are disabled.'));
   }
 
@@ -529,7 +529,7 @@ function sms_valid_admin_test_form_submit(&$form, $form_state) {
 
   if ($pass) {
     drupal_set_message(t('Validation succeeded and returned number %number.', array('%number' => $number)));
-  } 
+  }
   else {
     form_set_error('number', 'Validation failed.');
   }
