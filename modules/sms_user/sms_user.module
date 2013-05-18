@@ -957,3 +957,54 @@ function sms_user_sms_logout() {
 function sms_user_views_api() {
   return array('api' => 2);
 }
+
+/**
+ * Allows for setting Phonenumber, Status and Gateway using feeds
+ * Implements hook_feeds_processor_targets_alter()
+ * @param unknown_type $targets
+ * @param unknown_type $entity_type
+ * @param unknown_type $bundle
+ */
+function sms_user_feeds_processor_targets_alter(&$targets, $entity_type, $bundle) {
+  $targets['sms_user_phonenumber'] = array(
+      'name' => t('SMS User Phonenumber'),
+      'description' => t('The Phone number for the user to be used in the SMS Framework.'),
+      'optional_unique' => TRUE,
+      'callback' => '_sms_user_feedsprocess_set_value'
+  );
+  $targets['sms_user_status'] = array(
+      'name' => t('SMS User Status'),
+      'description' => t('The Phone number for the user to be used in the SMS Framework.'),
+      'optional_unique' => TRUE,
+      'callback' => '_sms_user_feedsprocess_set_value'
+  );
+  $targets['sms_user_gateway'] = array(
+      'name' => t('SMS User Gateway'),
+      'description' => t('The Phone number for the user to be used in the SMS Framework.'),
+      'optional_unique' => TRUE,
+      'callback' => '_sms_user_feedsprocess_set_value'
+  );
+}
+
+/**
+ * Callback function for feeds that sets the 3 fields we support for this
+ *
+ * @param unknown_type $source
+ * @param unknown_type $target_item
+ * @param unknown_type $target
+ * @param unknown_type $value
+ * @param unknown_type $mapping
+ */
+function _sms_user_feedsprocess_set_value($source, $target_item, $target, $value, $mapping) {
+  switch($target) {
+    case 'sms_user_phonenumber':
+      $target_item->sms_user['number'] = $value;
+      break;
+    case 'sms_user_status':
+      $target_item->sms_user['status'] = $value;
+      break;
+    case 'sms_user_gateway':
+      $target_item->sms_user['gateway'] = $value;
+      break;
+  }
+}
