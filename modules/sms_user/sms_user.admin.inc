@@ -48,11 +48,51 @@ function sms_user_admin_settings($form, &$form_state) {
 
   $form['tokens']['content']['#value'] = theme('token_tree', array('token_types' => array('sms_user')));
   */
-  $form['sms_user_sleep'] = array(
+  // Registration settings.
+
+  $form['sleep'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Global Sleep Settings'),
+    '#description' => t('Enable Sleep hours. Start and End times are global. Users may override these settings on an individual basis. If Start and End time are both 0:00, only individual overrides will be taken into account.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['sleep']['sms_user_sleep'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable sleep hours'),
     '#description' => t('If checked, users will be able to specifiy hours during which they will not receive messages from the site.'),
     '#default_value' => variable_get('sms_user_sleep', 1),
+  );
+
+  // Determine whether to use the 24-hour or 12-hour clock based on site settings
+  if (strpos(variable_get('date_format_short', 'm/d/Y - H:i'), 'g')) {
+    $format = 'g A';
+  }
+  else {
+    $format = 'H:00';
+  }
+  // Build the list of options based on format
+  $hour = 0;
+  while ($hour < 24) {
+    $options[$hour] = date($format, mktime($hour));
+    $hour++;
+  }
+
+  $form['sleep']['sms_user_sleep_start_time'] = array(
+      '#title' => t('Start time'),
+      '#type' => 'select',
+      '#multiple' => FALSE,
+      '#options' => $options,
+      '#default_value' => variable_get('sms_user_sleep_start_time', 0),
+  );
+
+  $form['sleep']['sms_user_sleep_end_time'] = array(
+      '#title' => t('End time'),
+      '#type' => 'select',
+      '#multiple' => FALSE,
+      '#options' => $options,
+      '#default_value' => variable_get('sms_user_sleep_end_time', 0),
   );
 
   // Registration settings.
@@ -80,7 +120,7 @@ function sms_user_admin_settings($form, &$form_state) {
     '#default_value' => variable_get('sms_user_new_account_message', ''),
     '#description' => t('The message that will be sent to newly registered users.  Leave empty for no message.'),
   );
-  
+
   // Add the token help to a collapsed fieldset at the end of the registration page.
   $form['registration']['tokens']['token_help'] = array(
     '#type' => 'fieldset',

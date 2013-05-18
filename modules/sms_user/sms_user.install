@@ -43,6 +43,27 @@ function sms_user_schema() {
         'type' => 'text',
         'serialize' => TRUE,
       ),
+      'sleep_enabled' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'default' => 0,
+        'not null' => TRUE,
+      ),
+      'sleep_start_time' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'default' => 0,
+        'not null' => FALSE,
+      ),
+      'sleep_end_time' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'default' => 0,
+        'not null' => FALSE,
+      ),
     ),
     'primary key' => array('number'),
     'indexes' => array('uid' => array('uid')),
@@ -86,4 +107,36 @@ function sms_user_uninstall() {
 
 function sms_user_update_7000() {
   // update code field to NOT NULL
+}
+
+/**
+ * Add newcol field to {sms_user} table.
+ */
+function sms_user_update_7003() {
+  $spec = array(
+      'sleep_enabled' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'default' => 0,
+        'not null' => TRUE,
+      ),
+      'sleep_start_time' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'default' => 0,
+        'not null' => FALSE,
+      ),
+      'sleep_end_time' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'default' => 0,
+        'not null' => FALSE,
+      ),
+    );
+  foreach ($spec as $key=>$value) {
+    db_add_field('sms_user', $key, $value);
+  }
 }

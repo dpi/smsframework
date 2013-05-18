@@ -120,7 +120,7 @@ function sms_user_sms_send(&$number, &$message, &$options, &$gateway) {
   if (variable_get('sms_user_sleep', 1) && $uid = sms_user_get_uid($number)) {
     $account = array_shift(user_load_multiple(array($uid), array('status' => 1)));
 
-    if (!empty($account->sms_user['sleep_enabled']) && _sms_user_sleep_active($account)) {
+    if (_sms_user_sleep_active($account)) {
       unset($gateway['send']);
       watchdog('sms', 'Message was not sent to @user due to sleep settings.', array('@user' => $account->name));
     }
@@ -138,18 +138,50 @@ function sms_user_sms_send(&$number, &$message, &$options, &$gateway) {
  */
 function _sms_user_sleep_active($account) {
   //if the user has a timezone set in his account get the time there
-  if (!empty($account->timezone_name)) {
-    $timezone = new DateTimeZone($account->timezone_name);
-    $date = new DateTime();
-    $date->setTimezone( $timezone );
-    $current_hour = $date->format('G');
+  if ((variable_get('configurable_timezones', 1)) && (!empty($account->timezone_name))) {
+    $timezone = new DateTimeZone($account->timezone);
   }
   else {
-    $current_hour = date('G');
+    $default = variable_get('date_default_timezone', '');
+    $timezone = empty($default) ? 'UTC' : $default;
+  }
+  $date = new DateTime();
+  $date->setTimezone( $timezone );
+  $current_hour = $date->format('G');
+  $current_hour = date('G');
+
+  // User has individual settings, which will always override globals
+  if (!empty($account->sms_user['sleep_enabled'])) {
+    $start = $account->sms_user['sleep_start_time'];
+    $end = $account->sms_user['sleep_end_time'];
+    }
+  else {
+    $start = variable_get('sms_user_sleep_start_time', 0);
+    $end = variable_get('sms_user_sleep_end_time', 0);
   }
 
-  if ($account->sms_user['sleep_start_time'] <= $current_hour && $account->sms_user['sleep_end_time'] > $current_hour) {
-    return TRUE;
+  // If values are not set, send the message
+  if (($start == 0) && ($end == 0)) {
+    return FALSE;
+  }
+
+  // Do 2 checks: one is where start < end
+  // two is where end < start (like from 22 to 7)
+
+  if ($start < $end) {
+    if ($start <= $current_hour && $end > $current_hour) {
+      return TRUE;
+    }
+  }
+  if ($end < $start) {
+    // current is between start and midnight
+    if ($start <= $current_hour) {
+      return TRUE;
+    }
+    // current is between midnight and end
+    if ($current_hour < $end) {
+      return TRUE;
+    }
   }
 
   return FALSE;
@@ -173,7 +205,7 @@ function sms_user_settings($account) {
   }
 
   if (variable_get('sms_user_sleep', 1)) {
-    //$output = array_merge($output, drupal_get_form('sms_user_settings_sleep_form', $account));
+    $output = array_merge($output, drupal_get_form('sms_user_settings_sleep_form', $account));
   }
 
   return drupal_render($output);
@@ -470,6 +502,13 @@ function sms_user_user_view($account, $view_mode) {
       '#title' => '',
       '#markup' => isset($account->sms_user['number']) ? $account->sms_user['number'] : '',
     );
+    if ((variable_get('sms_user_sleep', 1)) && ($account->sms_user['sleep_enabled'])) {
+      $account->content['sms']['sleep'] = array(
+        '#type' => 'user_profile_item',
+        '#title' => '',
+        '#markup' => t('You will not receive messages between ' . $account->sms_user['sleep_start_time'] . ':00 and ' .$account->sms_user['sleep_end_time'] . ':00'),
+      );
+    }
   }
 }
 
@@ -550,7 +589,7 @@ function sms_user_user_categories() {
 function sms_user_user_load($users) {
   // ERROR: return statement not found in hook_load
   $result = db_select('sms_user', 'u')
-    ->fields('u', array('uid', 'number', 'status', 'code', 'gateway'))
+    ->fields('u', array('uid', 'number', 'status', 'code', 'gateway', 'sleep_enabled', 'sleep_start_time', 'sleep_end_time'))
     ->condition('uid', array_keys($users), 'IN')
     ->execute();
 
@@ -589,6 +628,9 @@ function sms_user_save(&$edit, &$account, $category) {
     $edit['sms_user']['status'] = NULL;
     $edit['sms_user']['code'] = NULL;
     $edit['sms_user']['gateway'] = NULL;
+    $edit['sms_user']['sleep_enabled'] = NULL;
+    $edit['sms_user']['sleep_start_time'] = NULL;
+    $edit['sms_user']['sleep_end_time'] = NULL;
   }
 }
 
