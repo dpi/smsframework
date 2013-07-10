@@ -5,8 +5,10 @@
  * Provides integration between the SMS Framework and Drupal users.
  */
 
+define('SMS_USER_BLOCKED', 0);
 define('SMS_USER_PENDING', 1);
 define('SMS_USER_CONFIRMED', 2);
+define('SMS_USER_SMS_REGISTERED', 3);
 define('SMS_USER_MAX_CHARS', 140);
 
 require_once 'sms_user.actions.inc';
@@ -71,7 +73,7 @@ function sms_user_send($uid, $message) {
   $account = user_load($uid);
   //Check if the user is enabled to receive SMS
   if (user_access('receive sms', $account)) {
-    if ($account->sms_user[0]['status'] == 2) {
+    if ($account->sms_user[0]['status'] >= SMS_USER_CONFIRMED) {
       return sms_send($account->sms_user[0]['number'], $message, $account->sms_user[0]['gateway']);
     }
     else {
@@ -89,7 +91,7 @@ function sms_user_send($uid, $message) {
 function sms_user_get_number($account) {
   //Check if the user is enabled to receive SMS
   if (user_access('receive sms', $account)) {
-    if ($account->sms_user[0]['status'] == 2) {
+    if ($account->sms_user[0]['status'] >= SMS_USER_CONFIRMED) {
       return $account->sms_user[0]['number'];
     }
     else {
@@ -143,7 +145,8 @@ function _sms_user_sleep_active($account) {
   }
   else {
     $default = variable_get('date_default_timezone', '');
-    $timezone = empty($default) ? 'UTC' : $default;
+    $timezonestring = empty($default) ? 'UTC' : $default;
+    $timezone = new DateTimeZone($timezonestring);
   }
   $date = new DateTime();
   $date->setTimezone( $timezone );
@@ -200,12 +203,16 @@ function sms_user_settings($account) {
       $output = drupal_get_form('sms_user_settings_confirm_form', $account);
       break;
     case SMS_USER_CONFIRMED:
+    case SMS_USER_SMS_REGISTERED:
       $output = drupal_get_form('sms_user_settings_reset_form', $account);
       break;
   }
 
   if (variable_get('sms_user_sleep', 1)) {
-    $output = array_merge($output, drupal_get_form('sms_user_settings_sleep_form', $account));
+    $output2 = Array();
+    $output2['phoneform'] = $output;
+    $output2['sleepform'] = drupal_get_form('sms_user_settings_sleep_form', $account);
+    $output = $output2;
   }
 
   return drupal_render($output);
@@ -215,7 +222,7 @@ function sms_user_settings($account) {
  * Displays the user settings form.
  */
 function sms_user_settings_add_form($form, &$form_state, $account) {
-  $form = sms_send_form();
+  $form = sms_send_form(TRUE);
   $form['uid'] = array(
     '#type' => 'hidden',
     '#value' => $account->uid,
@@ -224,6 +231,8 @@ function sms_user_settings_add_form($form, &$form_state, $account) {
     '#type' => 'submit',
     '#value' => t('Confirm number'),
   );
+  $form['#validate'][] = 'sms_user_settings_add_form_validate';
+  $form['#submit'][] = 'sms_user_settings_add_form_submit';
 
   return $form;
 }
@@ -287,6 +296,12 @@ function sms_user_settings_confirm_form($form, &$form_state, $account) {
     '#value' => t('Delete & start over'),
     '#access' => user_access('edit own sms number'),
   );
+  $form['confirm'] = array(
+    '#type' => 'submit',
+    '#value' => t('Confirm without code'),
+    '#access' => user_access('administer site'),
+  );
+
   return $form;
 }
 
@@ -430,7 +445,12 @@ function sms_user_settings_sleep_form($form, &$form_state, $account) {
  */
 function sms_user_settings_sleep_form_submit($form, &$form_state) {
   $account = user_load($form_state['values']['uid']);
-  $data = $account->sms_user;
+  if (isset($account->sms_user)) {
+    $data = $account->sms_user;
+  }
+  else {
+    $data = Array();
+  }
   $data['sleep_enabled'] = $form_state['values']['sleep_enabled'];
   $data['sleep_start_time'] = $form_state['values']['sleep_start_time'];
   $data['sleep_end_time'] = $form_state['values']['sleep_end_time'];
@@ -473,7 +493,10 @@ function sms_user_validate_number(&$number) {
  * Implements hook_user_presave().
  */
 function sms_user_user_presave(&$edit, $account, $category) {
-  return sms_user_save($edit, $account, $category);
+  // only do this on existing users
+  if ($account->is_new) {
+    return sms_user_save($edit, $account, $category);
+  }
 }
 
 /**
@@ -502,7 +525,7 @@ function sms_user_user_view($account, $view_mode) {
       '#title' => '',
       '#markup' => isset($account->sms_user['number']) ? $account->sms_user['number'] : '',
     );
-    if ((variable_get('sms_user_sleep', 1)) && ($account->sms_user['sleep_enabled'])) {
+    if ((variable_get('sms_user_sleep', 1)) && ((isset($account->sms_user)) && ($account->sms_user['sleep_enabled']))) {
       $account->content['sms']['sleep'] = array(
         '#type' => 'user_profile_item',
         '#title' => '',
@@ -861,9 +884,9 @@ function sms_user_register_new_user($number, $message, $options) {
   // Pass in sms_user specific data for saving.
   $edit['sms_user'] = array(
     'number' => $number,
-    'status' => 0,
+    'status' => SMS_USER_SMS_REGISTERED,
     'code' => '',
-    'gateway' => '',
+    'gateway' => array(),
   );
 
   // If by chance there's already a user with the same email address, then use
@@ -1059,11 +1082,17 @@ function entity_property_sms_user_get_properties($data, array $options, $name, $
           break;
         case "sms_user_status" :
           switch ($account->sms_user['status']) {
-            case 1:
+            case SMS_USER_BLOCKED:
+              return t('Blocked');
+              break;
+            case SMS_USER_PENDING:
               return t('Pending');
               break;
-            case 2:
+            case SMS_USER_CONFIRMED:
               return t('Active');
+              break;
+            case SMS_USER_SMS_REGISTERED:
+              return t('SMS Registered');
               break;
           }
         case "sms_user_gateway" :

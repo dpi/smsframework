@@ -368,7 +368,7 @@ function sms_send_form($required = FALSE) {
     '#type' => 'textfield',
     '#title' => t('Phone number'),
     '#size' => 40,
-    '#maxlength' => 255,
+    '#maxlength' => 16,
     '#required' => $required,
   );
 
