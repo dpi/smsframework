@@ -586,7 +586,7 @@ function sms_user_user_validate(&$edit, $account, $category) {
  */
 function sms_user_user_login(&$edit, $account) {
   // Check if first it's the user's first time logging in.
-  if (!$account->access && !empty($account->sms_user['number']) && $account->sms_user['status'] != SMS_USER_CONFIRMED) {
+  if (!$account->access && !empty($account->sms_user['number']) && $account->sms_user['status'] <= SMS_USER_CONFIRMED) {
     sms_user_send_confirmation($account, $account->sms_user['number'], $account->sms_user['gateway']);
     drupal_set_message(t('A confirmation message has been sent to your mobile phone. Please @link.', array('@link' => l(t('confirm your number'), 'user/' . $account->uid . '/edit/mobile'))), 'status');
   }
@@ -634,7 +634,7 @@ function sms_user_user_load($users) {
  * @see sms_user_user()
  */
 function sms_user_save(&$edit, &$account, $category) {
-  if (($category == 'mobile' || $category == 'account') && isset($edit['sms_user']) && $edit['sms_user']['number'] && $account->uid != 0) {
+  if (($category == 'mobile' || $category == 'account') && isset($edit['sms_user']) && $edit['sms_user']['number'] && (isset($account->uid) && ($account->uid != 0))) {
     $number = (object)$edit['sms_user'];
     $number->uid = $account->uid;
     if (!isset($number->status)) {
@@ -782,6 +782,11 @@ function sms_user_sms_incoming($op, $number, $message, $options) {
           'options' => $options,
         );
         sms_user_login_metadata($account->uid, $metadata);
+        // Regenerate the session ID to prevent against session fixation attacks.
+        // This is called before hook_user in case one of those functions fails
+        // or incorrectly does a redirect which would leave the old session in place.
+        drupal_session_regenerate();
+
         $edit = array();
         user_module_invoke('login', $edit, $account);
       }
@@ -889,9 +894,10 @@ function sms_user_register_new_user($number, $message, $options) {
     'gateway' => array(),
   );
 
+  $edit['timezone'] = '';
   // If by chance there's already a user with the same email address, then use
   // it instead of creating a new user.
-  if ($mail && ($account = array_shift(user_load_multiple(array(), array('mail' => $mail))))) {
+  if ((!(empty($mail))) && ($account = array_shift(user_load_multiple(array(), array('mail' => $mail))))) {
     $account = user_save($account, $edit);
   }
   else {
@@ -909,7 +915,7 @@ function sms_user_register_new_user($number, $message, $options) {
       }
     }
     // Auto-generated password.
-    if (!$edit['pass']) {
+    if (!isset($edit['pass']) || (!$edit['pass'])) {
       $edit['pass'] = user_password();
     }
 
@@ -955,11 +961,15 @@ function sms_user_register_new_user($number, $message, $options) {
 function sms_user_authenticate($number) {
   global $user;
 
-  $uid = sms_user_get_uid($number);
-  if ($account = array_shift(user_load_multiple(array($uid), array('status' => 1)))) {
-    $user = $account;
-    watchdog('sms', '%name was authenticated using SMS.', array('%name' => $user->name));
-    return $user;
+  if ($uid = sms_user_get_uid($number)) {
+    if ($account = array_shift(user_load_multiple(array($uid), array('status' => 1)))) {
+      $user = $account;
+      watchdog('sms', '%name was authenticated using SMS.', array('%name' => $user->name));
+      return $user;
+    }
+  }
+  else {
+    return false;
   }
 }
 
@@ -971,6 +981,10 @@ function sms_user_sms_logout() {
 
   // Destroy the current session:
   session_destroy();
+  // Regenerate the session ID to prevent against session fixation attacks.
+  // This is called before hook_user in case one of those functions fails
+  // or incorrectly does a redirect which would leave the old session in place.
+  drupal_session_regenerate();
   $user = drupal_anonymous_user();
 }
 
