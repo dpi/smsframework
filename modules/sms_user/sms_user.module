@@ -493,10 +493,7 @@ function sms_user_validate_number(&$number) {
  * Implements hook_user_presave().
  */
 function sms_user_user_presave(&$edit, $account, $category) {
-  // only do this on existing users
-  if ($account->is_new) {
-    return sms_user_save($edit, $account, $category);
-  }
+  return sms_user_save($edit, $account, $category);
 }
 
 /**
