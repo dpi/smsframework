@@ -12,6 +12,28 @@
  */
 interface SmsParserInterface {
   /**
+   * Check access to parser for incoming SMS.
+   *
+   * Providers usually do this by checking against an allowed (range of) IP
+   * addresses. It could also be with a request parameter.
+   *
+   * Remember when implementing if you use variables that these may not be
+   * loaded from the database, and would have to be set in the settings.php
+   * file, in the case of a configuration parsing and queuing without
+   * bootstrapping the database.
+   *
+   * @param string $originator
+   *   The originator of the SMS. Usually the IP address.
+   * @param array $requst
+   *   $_REQUEST array, or replacement.
+   *
+   * @return bool|array
+   *   TRUE to allow access.
+   *   Response array if denied, @see this::response() for format.
+   */
+  static function checkAccess($originator, $request);
+
+  /**
    * Start a parser. Load URI information.
    *
    * @param array $request
@@ -58,7 +80,8 @@ interface SmsParserInterface {
    * HTTP response object this just provides simple options.
    *
    * @return array
-   *   Definition @todo.
+   *   Array of header values keyed by header name and body.
+   *   array('headers' => array('name' => 'value), 'body' => 'text');
    */
   public function getResponse();
 
@@ -102,6 +125,13 @@ abstract class SmsParserBase implements SmsParserInterface {
    * @var array
    */
   protected $options;
+
+  /**
+   * {@inheritdoc}
+   */
+  static function checkAccess($originator, $request) {
+    return TRUE;
+  }
 
   /**
    * {@inheritdoc}
