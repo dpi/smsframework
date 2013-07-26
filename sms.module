@@ -123,6 +123,16 @@ function sms_menu() {
     'file' => 'sms.admin.inc',
   );
 
+  $items['admin/smsframework/bootstrap'] = array(
+    'title' => 'Incoming SMS bootstrap',
+    'description' => 'Review settings for incoming SMS bootstrap by-pass',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sms_bootstrap_admin'),
+    'access arguments' => array('administer smsframework'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'sms.admin.inc',
+  );
+
   return $items;
 }
 
@@ -150,6 +160,17 @@ function sms_theme() {
   );
 
   return $items;
+}
+
+/**
+ * Implements hook_cron_queue_info().
+ */
+function sms_cron_queue_info() {
+  return array(
+    'sms_incoming' => array(
+      'worker callback' => 'sms_incoming_queue_worker',
+    ),
+  );
 }
 
 /**
@@ -206,6 +227,13 @@ function sms_handle_result($result, $number, $message) {
     watchdog('sms', $error_message, $variables, WATCHDOG_ERROR);
     return FALSE;
   }
+}
+
+/**
+ * Queue worker callback for queued incomming messages.
+ */
+function sms_incoming_queue_worker($item) {
+  sms_incoming($item['number'], $item['message'], $item['options']);
 }
 
 /**
