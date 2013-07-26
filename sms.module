@@ -134,6 +134,7 @@ function sms_permission() {
     'administer smsframework' => array(
       'title' => t('administer smsframework'),
       'description' => t('Administer SMS Framework'),
+      'restrict access' => TRUE,
     ),
   );
 }
