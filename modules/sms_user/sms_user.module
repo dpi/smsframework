@@ -124,7 +124,7 @@ function sms_user_sms_send(&$number, &$message, &$options, &$gateway) {
 
     if (_sms_user_sleep_active($account)) {
       unset($gateway['send']);
-      watchdog('sms', 'Message was not sent to @user due to sleep settings.', array('@user' => $account->name));
+      watchdog('sms_user', 'Message was not sent to @user due to sleep settings.', array('@user' => $account->name));
     }
   }
 }
@@ -767,8 +767,6 @@ function sms_user_token_info() {
  * Implements hook_sms_incoming().
  */
 function sms_user_sms_incoming($op, $number, $message, $options) {
-  global $user;
-
   switch ($op) {
     case 'pre process':
       if ($account = sms_user_authenticate($number)) {
@@ -779,13 +777,7 @@ function sms_user_sms_incoming($op, $number, $message, $options) {
           'options' => $options,
         );
         sms_user_login_metadata($account->uid, $metadata);
-        // Regenerate the session ID to prevent against session fixation attacks.
-        // This is called before hook_user in case one of those functions fails
-        // or incorrectly does a redirect which would leave the old session in place.
-        drupal_session_regenerate();
-
-        $edit = array();
-        user_module_invoke('login', $edit, $account);
+        _sms_user_switch($account);
       }
       elseif (variable_get('sms_user_registration_enabled', 0) && $number) {
         if ($account = sms_user_register_new_user($number, $message, $options)) {
@@ -797,7 +789,7 @@ function sms_user_sms_incoming($op, $number, $message, $options) {
       }
       break;
     case 'post process':
-      sms_user_sms_logout();
+      _sms_user_switch();
       break;
   }
 }
@@ -863,6 +855,39 @@ function sms_user_login_metadata($uid = NULL, $metadata = NULL, $reset = FALSE) 
 }
 
 /**
+ * Internal function to swap user.
+ *
+ * Safely Impersonating Another User.
+ * https://drupal.org/node/218104
+ * Called once to login, and once to logout. Does not nest.
+ *
+ * @param object $account
+ *  The account object of the user to log in; or none to log out and restore
+ *  the previous user and session.
+ */
+function _sms_user_switch($account = NULL) {
+  global $user;
+  $original_user = &drupal_static(__FUNCTION__ . '_user');
+  $original_state = &drupal_static(__FUNCTION__ . '_state');
+
+  if ($account) {
+    $original_user = $user;
+    $original_state = drupal_save_session();
+    drupal_save_session(FALSE);
+
+    $user = $account;
+    $edit = array();
+    user_module_invoke('login', $edit, $account);
+    watchdog('sms_user', '%name was logged in using SMS.', array('%name' => $user->name));
+  }
+  elseif (! empty($original_user)) {
+    $user = $original_user;
+    drupal_save_session($original_state);
+    watchdog('sms_user', '%name was restored as logged in using SMS.', array('%name' => $user->name));
+  }
+}
+
+/**
  * Registers a new user via SMS
  *
  * @param $number
@@ -875,8 +900,6 @@ function sms_user_login_metadata($uid = NULL, $metadata = NULL, $reset = FALSE) 
  *   The user object of the created user.
  */
 function sms_user_register_new_user($number, $message, $options) {
-  global $user;
-
   $edit = array();
 
   // If we have a from address from the e-mail gateway, use it, otherwise
@@ -923,6 +946,7 @@ function sms_user_register_new_user($number, $message, $options) {
     // Save the user.
     $edit['status'] = variable_get('user_register', 1) == 1;
     $account = user_save('', $edit);
+    watchdog('sms_user', '%name was created using SMS.', array('%name' => $account->name));
   }
 
 
@@ -937,8 +961,10 @@ function sms_user_register_new_user($number, $message, $options) {
       'options' => $options,
     );
     sms_user_login_metadata($account->uid, $metadata);
-
-    $edit = array();
+    if ($account->status) {
+      // User account is directly enabled.
+      _sms_user_switch($account);
+    }
     user_module_invoke('login', $edit, $account);
 
     return $account;
@@ -956,33 +982,17 @@ function sms_user_register_new_user($number, $message, $options) {
  *   provided by incoming messages, not through user input.
  */
 function sms_user_authenticate($number) {
-  global $user;
-
   if ($uid = sms_user_get_uid($number)) {
-    if ($account = array_shift(user_load_multiple(array($uid), array('status' => 1)))) {
-      $user = $account;
-      watchdog('sms', '%name was authenticated using SMS.', array('%name' => $user->name));
-      return $user;
+    $account = user_load_multiple(array($uid), array('status' => 1));
+    $account = reset($account);
+    if (! empty($account)) {
+      watchdog('sms_user', '%name was authenticated using SMS.', array('%name' => $account->name));
+      return $account;
     }
   }
   else {
     return false;
   }
-}
-
-/**
- * Log the current user out.
- */
-function sms_user_sms_logout() {
-  global $user;
-
-  // Destroy the current session:
-  session_destroy();
-  // Regenerate the session ID to prevent against session fixation attacks.
-  // This is called before hook_user in case one of those functions fails
-  // or incorrectly does a redirect which would leave the old session in place.
-  drupal_session_regenerate();
-  $user = drupal_anonymous_user();
 }
 
 /**
