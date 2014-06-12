@@ -44,99 +44,6 @@ define('SMS_CARRIER_OVERRIDDEN', 1);
 define('SMS_CARRIER_NORMAL', 3);
 
 /**
- * Implements hook_menu().
- */
-function sms_menu() {
-  $items = array();
-
-  $items['admin/smsframework'] = array(
-    'title' => 'SMS Framework',
-    'description' => 'Control how your site uses SMS.',
-    'position' => 'right',
-    'page callback' => 'system_admin_menu_block_page',
-    'access arguments' => array('administer smsframework'),
-    'file' => 'system.admin.inc',
-    'file path' => drupal_get_path('module', 'system'),
-  );
-
-  $items['admin/smsframework/gateways'] = array(
-    'title' => 'Gateway configuration',
-    'description' => 'Configure gateways and chose the default gateway.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sms_admin_default_form', NULL),
-    'access arguments' => array('administer smsframework'),
-    'file' => 'sms.admin.inc',
-  );
-
-  $items['admin/smsframework/gateways/%'] = array(
-    'title callback' => 'sms_admin_gateway_title',
-    'title arguments' => array(3),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sms_admin_gateway_form', 3),
-    'access arguments' => array('administer smsframework'),
-    'type' => MENU_CALLBACK,
-    'file' => 'sms.admin.inc',
-  );
-
-  $items['admin/smsframework/carriers'] = array(
-    'title' => 'Carrier configuration',
-    'description' => 'Configure supported carriers.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sms_carriers_admin_form'),
-    'access arguments' => array('administer smsframework'),
-    'file' => 'sms.admin.inc',
-  );
-
-  $items['admin/smsframework/carriers/manage'] = array(
-    'title' => 'Manage',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  );
-
-  $items['admin/smsframework/carriers/add'] = array(
-    'title' => 'Add',
-    'description' => 'Configure supported carriers.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sms_carriers_edit_form'),
-    'access arguments' => array('administer smsframework'),
-    'file' => 'sms.admin.inc',
-    'type' => MENU_LOCAL_TASK,
-  );
-
-  $items['admin/smsframework/carriers/%carrier'] = array(
-    'title' => 'Edit carrier',
-    'description' => 'Configure supported carriers.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sms_carriers_edit_form', 3),
-    'access arguments' => array('administer smsframework'),
-    'type' => MENU_CALLBACK,
-    'file' => 'sms.admin.inc',
-  );
-
-  $items['admin/smsframework/carriers/delete/%carrier'] = array(
-    'title' => 'Edit carrier',
-    'description' => 'Configure supported carriers.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sms_carriers_delete_form', 4),
-    'access arguments' => array('administer smsframework'),
-    'type' => MENU_CALLBACK,
-    'file' => 'sms.admin.inc',
-  );
-
-  $items['admin/smsframework/bootstrap'] = array(
-    'title' => 'Incoming SMS bootstrap',
-    'description' => 'Review settings for incoming SMS bootstrap by-pass',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sms_bootstrap_admin'),
-    'access arguments' => array('administer smsframework'),
-    'type' => MENU_LOCAL_TASK,
-    'file' => 'sms.admin.inc',
-  );
-
-  return $items;
-}
-
-/**
  * Implements hook_permission().
  */
 function sms_permission() {
@@ -156,7 +63,6 @@ function sms_theme() {
   $items['sms_admin_default_form'] =
   $items['sms_carriers_admin_form'] = array(
     'render element' => 'form',
-    'file' => 'sms.admin.inc',
   );
 
   return $items;
@@ -291,7 +197,12 @@ function sms_receipt($number, $reference, $message_status = SMS_GW_UNKNOWN_STATU
  * Returns the current default gateway.
  */
 function sms_default_gateway() {
-  return sms_gateways('gateway', variable_get('sms_default_gateway', 'log'));
+  return sms_gateways('gateway', sms_default_gateway_id());
+}
+
+function sms_default_gateway_id() {
+  $config = \Drupal::config('sms.settings');
+  return $config->get('default_gateway');
 }
 
 /**
@@ -352,7 +263,7 @@ function sms_gateways($op = 'gateways', $gateway = NULL) {
     case 'gateways':
       return $_gateways;
     case 'gateway':
-      $return = $_gateways[$gateway];
+      $return = empty($_gateways[$gateway]) ? array() : $_gateways[$gateway];
       $return['identifier'] = $gateway;
       return $return;
     case 'names':
@@ -363,12 +274,15 @@ function sms_gateways($op = 'gateways', $gateway = NULL) {
 }
 
 function _gateways_build() {
+  // @todo Implement caching here
   $_gateways = array();
   $_names = array();
 
   $gateway_array = module_invoke_all('gateway_info');
+  $config = \Drupal::config('sms.settings');
+  $settings = $config->get('gateway_settings');
   foreach ($gateway_array as $identifier => $info) {
-    $info['configuration'] = variable_get('sms_' . $identifier . '_settings', '');
+    $info['configuration'] = $settings ? $settings[$identifier] : array();
     $_gateways[$identifier] = $info;
     $_names[$identifier] = $info['name'];
   }
@@ -443,10 +357,10 @@ function sms_send_form_submit($form, &$form_state) {
 
 /**
  * Get a list of all carriers
+ * @todo - store carriers in config instead of database
  */
 function sms_carriers($domain = NULL) {
   $default_carriers = module_invoke_all('sms_carriers');
-  $enabled_carriers = variable_get('sms_enabled_carriers', array());
   $carriers = array();
 
   // Load default carriers from code
@@ -454,7 +368,7 @@ function sms_carriers($domain = NULL) {
     $carriers[$id] = array('name' => $carrier, 'type' => SMS_CARRIER_DEFAULT);
   }
 
-  // Load overrideen carriers from database
+  // Load overridden carriers from database
   $result = db_query("SELECT name, domain FROM {sms_carriers}");
 
   foreach ($result as $carrier) {
@@ -471,7 +385,7 @@ function sms_carriers($domain = NULL) {
     );
   }
 
-  foreach ($enabled_carriers as $carrier) {
+  foreach (Drupal::config('sms.settings')->get('enabled_carriers') as $carrier) {
     if (is_array($carriers[$carrier])) {
       $carriers[$carrier]['status'] = 1;
     }
@@ -528,15 +442,16 @@ function carrier_delete($domain) {
     ->condition('domain', $domain)
     ->execute();
 
-  //removes carrier from variable
-  $enabled_carriers = variable_get('sms_enabled_carriers', array());
+  //removes carrier from config also
+  $config = \Drupal::config('sms.settings');
+  $enabled_carriers = $config->get('enabled_carriers');
   foreach ($enabled_carriers as $i => $carrier) {
     if ($carrier == $domain) {
       unset($enabled_carriers[$i]);
       break;
     }
   }
-  variable_set('sms_enabled_carriers', $enabled_carriers);
+  $config->set('enabled_carriers', $enabled_carriers)->save();
 }
 
 /******************************************************************************
@@ -549,7 +464,7 @@ function carrier_delete($domain) {
 function sms_format_number(&$number, $options = array()) {
   $gateway = sms_default_gateway();
 
-  if ($gateway['format number'] && function_exists($gateway['format number'])) {
+  if (!empty($gateway['format number']) && function_exists($gateway['format number'])) {
     return $gateway['format number']($number, $options);
   }
   else {
@@ -609,8 +524,9 @@ function sms_validate_number(&$number, $options = array()) {
     }
   }
   if (module_exists('sms_valid')) {
-    if ($error = sms_valid_validate($number, $options)) {
-      return $error;
+    $validation = sms_valid_validate($number, $options);
+    if (!$validation['pass']) {
+      return implode('<br/>', $validation['log']);
     }
   }
   return NULL;
@@ -644,215 +560,80 @@ function sms_dir($out, $in) {
  * @return array Associative array of country calling codes and country names.
  */
 function sms_country_codes() {
-  return array(
-    93 => "Afghanistan",
-    355 => "Albania",
-    213 => "Algeria",
-    376 => "Andorra",
-    244 => "Angola",
-    1264 => "Anguilla",
-    1268 => "Antigua & Barbuda",
-    54 => "Argentina",
-    374 => "Armenia",
-    297 => "Aruba",
-    61 => "Australia",
-    43 => "Austria",
-    994 => "Azerbaijan",
-    1242 => "Bahamas",
-    973 => "Bahrain",
-    880 => "Bangladesh",
-    1246 => "Barbados",
-    375 => "Belarus",
-    32 => "Belgium",
-    501 => "Belize",
-    229 => "Benin",
-    1441 => "Bermuda",
-    975 => "Bhutan",
-    591 => "Bolivia",
-    387 => "Bosnia-Herzegovina",
-    267 => "Botswana",
-    55 => "Brazil",
-    1284 => "British Virgin Islands",
-    673 => "Brunei",
-    359 => "Bulgaria",
-    226 => "Burkina Faso",
-    257 => "Burundi",
-    855 => "Cambodia",
-    237 => "Cameroon",
-    34 => "Canary Islands",
-    238 => "Cape Verde",
-    1345 => "Cayman Islands",
-    236 => "Central African Republic",
-    235 => "Chad",
-    56 => "Chile",
-    86 => "China",
-    57 => "Colombia",
-    269 => "Comoros",
-    242 => "Congo",
-    243 => "Democratic Republic Congo",
-    682 => "Cook Islands",
-    385 => "Croatia",
-    53 => "Cuba",
-    357 => "Cyprus",
-    420 => "Czech Republic",
-    45 => "Denmark",
-    253 => "Djibouti",
-    1767 => "Dominica",
-    670 => "East Timor",
-    593 => "Ecuador",
-    20 => "Egypt",
-    503 => "El Salvador",
-    240 => "Equatorial Guinea",
-    372 => "Estonia",
-    251 => "Ethiopia",
-    500 => "Falkland Islands",
-    298 => "Faroe Islands",
-    679 => "Fiji",
-    358 => "Finland",
-    33 => "France",
-    594 => "French Guiana",
-    689 => "French Polynesia",
-    241 => "Gabon",
-    220 => "Gambia",
-    995 => "Georgia",
-    49 => "Germany",
-    233 => "Ghana",
-    350 => "Gibraltar",
-    881 => "Global Mobile Satellite",
-    30 => "Greece",
-    299 => "Greenland",
-    1473 => "Grenada",
-    590 => "Guadeloupe",
-    1671 => "Guam",
-    502 => "Guatemala",
-    224 => "Guinea",
-    592 => "Guyana",
-    509 => "Haiti",
-    504 => "Honduras",
-    852 => "HongKong",
-    36 => "Hungary",
-    354 => "Iceland",
-    91 => "India",
-    62 => "Indonesia",
-    98 => "Iran",
-    964 => "Iraq",
-    353 => "Ireland",
-    972 => "Israel",
-    39 => "Italy / Vatican City State",
-    225 => "Ivory Coast",
-    1876 => "Jamaica",
-    81 => "Japan",
-    962 => "Jordan",
-    254 => "Kenya",
-    82 => "Korea (South)",
-    965 => "Kuwait",
-    996 => "Kyrgyzstan",
-    856 => "Lao",
-    371 => "Latvia",
-    961 => "Lebanon",
-    266 => "Lesotho",
-    231 => "Liberia",
-    218 => "Libya",
-    423 => "Liechtenstein",
-    370 => "Lithuania",
-    352 => "Luxembourg",
-    853 => "Macau",
-    389 => "Macedonia",
-    261 => "Madagascar",
-    265 => "Malawi",
-    60 => "Malaysia",
-    960 => "Maldives",
-    223 => "Mali",
-    356 => "Malta",
-    596 => "Martinique",
-    222 => "Mauritania",
-    230 => "Mauritius",
-    269 => "Mayotte Island (Comoros)",
-    52 => "Mexico",
-    373 => "Moldova",
-    377 => "Monaco (Kosovo)",
-    976 => "Mongolia",
-    382 => "Montenegro",
-    1664 => "Montserrat",
-    212 => "Morocco",
-    258 => "Mozambique",
-    95 => "Myanmar",
-    264 => "Namibia",
-    977 => "Nepal",
-    31 => "Netherlands",
-    599 => "Netherlands Antilles",
-    687 => "New Caledonia",
-    64 => "New Zealand",
-    505 => "Nicaragua",
-    227 => "Niger",
-    234 => "Nigeria",
-    47 => "Norway",
-    968 => "Oman",
-    92 => "Pakistan",
-    970 => "Palestine (+970)",
-    9725 => "Palestine (+9725)",
-    507 => "Panama",
-    675 => "Papua New Guinea",
-    595 => "Paraguay",
-    51 => "Peru",
-    63 => "Philippines",
-    48 => "Poland",
-    351 => "Portugal",
-    974 => "Qatar",
-    262 => "Reunion",
-    40 => "Romania",
-    7 => "Russia / Kazakhstan",
-    250 => "Rwanda",
-    1670 => "Saipan",
-    1684 => "Samoa (American)",
-    685 => "Samoa (Western)",
-    378 => "San Marino",
-    882 => "Satellite-Thuraya",
-    966 => "Saudi Arabia",
-    221 => "Senegal",
-    381 => "Serbia",
-    248 => "Seychelles",
-    232 => "Sierra Leone",
-    65 => "Singapore",
-    421 => "Slovakia",
-    386 => "Slovenia",
-    252 => "Somalia",
-    27 => "South Africa",
-    34 => "Spain",
-    94 => "Sri Lanka",
-    1869 => "St. Kitts And Nevis",
-    1758 => "St. Lucia",
-    1784 => "St. Vincent",
-    249 => "Sudan",
-    597 => "Suriname",
-    268 => "Swaziland",
-    46 => "Sweden",
-    41 => "Switzerland",
-    963 => "Syria",
-    886 => "Taiwan",
-    992 => "Tajikistan",
-    255 => "Tanzania",
-    66 => "Thailand",
-    228 => "Togo",
-    676 => "Tonga Islands",
-    1868 => "Trinidad and Tobago",
-    216 => "Tunisia",
-    90 => "Turkey",
-    993 => "Turkmenistan",
-    1649 => "Turks and Caicos Islands",
-    256 => "Uganda",
-    44 => "UK / Isle of Man / Jersey / Guernsey",
-    380 => "Ukraine",
-    971 => "United Arab Emirates",
-    598 => "Uruguay",
-    1 => "USA / Canada / Dominican Rep. / Puerto Rico",
-    998 => "Uzbekistan",
-    678 => "Vanuatu",
-    58 => "Venezuela",
-    84 => "Vietnam",
-    967 => "Yemen",
-    260 => "Zambia",
-    255 => "Zanzibar",
-    263 => "Zimbabwe",
-  );
+  return \Drupal::config('sms.settings')->get('country_codes');
 }
+
+/**
+ * Returns HTML for the admin default gateway form.
+ *
+ * @param $form
+ *  An form array.
+ *
+ * @ingroup themeable
+ *
+ * @todo Update the rendering of this to drupal 8 standard. @see https://drupal.org/node/2195739
+ */
+function theme_sms_admin_default_form($variables) {
+  $form = $variables['form'];
+  $rows = array();
+  foreach ($form as $name => $element) {
+    if (is_array($element) && isset($element['id']) && is_array($element['id'])) {
+      $rows[] = array(
+        drupal_render($form['default'][$element['id']['#markup']]),
+        check_plain($name),
+        $element['configure']['#markup'],
+      );
+      unset($form[$name]);
+    }
+  }
+  $header = array(t('Default'), t('Name'), array(
+      'data' => t('Operations'),
+      'colspan' => 1,
+    ));
+  $output = '';
+  $output .= _theme('table', array('header' => $header, 'rows' => $rows));
+  $output .= drupal_render_children($form);
+
+  return $output;
+}
+
+/**
+ * Returns HTML for the sms carriers admin form.
+ *
+ * @param $form
+ *  A form array.
+ *
+ * @ingroup themeable
+ *
+ * @todo Update the rendering of this to drupal 8 standard. @see https://drupal.org/node/2195739
+ */
+function theme_sms_carriers_admin_form($variables) {
+  $form = $variables['form'];
+
+  $header = array(t('Enabled'), t('Carrier'), t('Domain'), t('Actions'));
+
+  $rows = array();
+  foreach (element_children($form['status']) as $element) {
+    $name = "<div class='carrier'>";
+    $name .= "<strong>{$form['status'][$element]['#title']}</strong>";
+    $name .= "<div class='description'>{$form['status'][$element]['#description']}</div>";
+    $name .= "</div>";
+    unset($form['status'][$element]['#title']);
+    unset($form['status'][$element]['#description']);
+    $row = array(
+        'status' => drupal_render($form['status'][$element]),
+        'name' => $name,
+        'domain' => drupal_render($form['domain'][$element]),
+        'actions' => drupal_render($form['actions'][$element]),
+    );
+    $rows[] = $row;
+  }
+  $output = '';
+  $output .= _theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array( 'class' => array('sms'), 'id' => 'sms-form-table' )));
+  $output .= drupal_render($form['submit']);
+  $output .= drupal_render_children($form);
+
+  return $output;
+}
+
+

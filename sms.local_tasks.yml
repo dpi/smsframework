@@ -1,0 +1,11 @@
+sms.carrier_admin:
+  route_name: sms.carrier_admin
+  base_route: sms.carrier_admin
+  title: 'Manage'
+  weight: -10
+
+sms.bootstrap_admin:
+  title: 'Incoming SMS bootstrap'
+  description: 'Review settings for incoming SMS bootstrap by-pass'
+  route_name: sms.bootstrap_admin
+  base_route: sms.bootstrap_admin

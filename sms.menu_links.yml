@@ -1,0 +1,20 @@
+sms.admin:
+  title: 'SMS Framework'
+  description: 'Configure how your site uses SMS.'
+  route_name: sms.admin
+  parent: system.admin_config
+
+sms.gateway_admin:
+  title: 'Gateway configuration'
+  description: 'Configure gateways and choose the default gateway.'
+  route_name: sms.gateway_admin
+  parent: sms.admin
+  weight: -10
+
+sms.carrier_admin:
+  title: 'Carrier configuration'
+  description: 'Configure supported carriers.'
+  route_name: sms.carrier_admin
+  parent: sms.admin
+  weight: -9
+
