@@ -33,10 +33,10 @@ class GatewayDefaultForm extends ConfigFormBase {
       $options[$identifier] = '';
       $form[$gateway['name']]['id'] = array('#markup' => $identifier);
       if ( isset($gateway['configure form'] ) and ( function_exists($gateway['configure form'] ))) {
-        $form[$gateway['name']]['configure'] = array('#markup' => l(t('configure'), 'admin/smsframework/gateways/' . $identifier));
+        $form[$gateway['name']]['configure'] = array('#markup' => l($this->t('configure'), 'admin/smsframework/gateways/' . $identifier));
       }
       else {
-        $form[$gateway['name']]['configure'] = array('#markup' => t('No configuration options'));
+        $form[$gateway['name']]['configure'] = array('#markup' => $this->t('No configuration options'));
       }
     }
   
@@ -48,7 +48,7 @@ class GatewayDefaultForm extends ConfigFormBase {
   
     $form['submit'] = array(
       '#type' => 'submit',
-      '#value' => t('Set default gateway'),
+      '#value' => $this->t('Set default gateway'),
     );
   
     return $form;
@@ -60,10 +60,10 @@ class GatewayDefaultForm extends ConfigFormBase {
   public function submitForm(array &$form, array &$form_state) {
     // Process form submission to set the default gateway
     if ($form_state['values']['default']) {
-      drupal_set_message(t('Default gateway updated.'));
-      
-      $config = $this->configFactory->get('sms.settings');
-      $config->set('default_gateway', $form_state['values']['default'])
+      drupal_set_message($this->t('Default gateway updated.'));
+
+      $this->config('sms.settings')
+        ->set('default_gateway', $form_state['values']['default'])
         ->save();
     }
   }

@@ -8,6 +8,7 @@
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Component\Utility\String;
 
 /**
  * Provides a configuration form for sms carriers.
@@ -32,13 +33,14 @@ class CarrierAdminForm extends ConfigFormBase {
   
       switch ($carrier['type']) {
         case SMS_CARRIER_DEFAULT:
-          $storage = t('Default');
+          $storage = $this->t('Default');
           break;
         case SMS_CARRIER_OVERRIDDEN:
-          $storage = t('Overridden');
+          $storage = $this->t('Overridden');
           break;
         case SMS_CARRIER_NORMAL:
-          $storage = t('Normal');
+        default:
+          $storage = $this->t('Normal');
           break;
       }
       $form['status']['#tree'] = TRUE;
@@ -47,23 +49,23 @@ class CarrierAdminForm extends ConfigFormBase {
       }
       $form['status'][$css_safe_id] = array(
         '#type' => 'checkbox',
-        '#title' => check_plain($carrier['name']),
-        '#description' => check_plain($storage),
+        '#title' => String::checkPlain($carrier['name']),
+        '#description' => String::checkPlain($storage),
         '#default_value' => $carrier['status'] == 1,
       );
   
       $form['domain'][$css_safe_id] = array(
         '#type' => 'markup',
-        '#markup' => check_plain($id),
+        '#markup' => String::checkPlain($id),
       );
   
-      $actions[] = l(t('Edit'), "admin/config/smsframework/carriers/edit/{$id}");
+      $actions[] = l($this->t('Edit'), "admin/config/smsframework/carriers/edit/{$id}");
   
       if ($carrier['type'] == SMS_CARRIER_OVERRIDDEN) {
-        $actions[] = l(t('Revert'), "admin/config/smsframework/carriers/delete/{$id}");
+        $actions[] = l($this->t('Revert'), "admin/config/smsframework/carriers/delete/{$id}");
       }
       elseif ($carrier['type'] == SMS_CARRIER_NORMAL) {
-        $actions[] = l(t('Delete'), "admin/config/smsframework/carriers/delete/{$id}");
+        $actions[] = l($this->t('Delete'), "admin/config/smsframework/carriers/delete/{$id}");
       }
   
       $form['actions'][$css_safe_id] = array(
@@ -74,7 +76,7 @@ class CarrierAdminForm extends ConfigFormBase {
   
     $form['submit'] = array(
       '#type' => 'submit',
-      '#value' => t('Save settings'),
+      '#value' => $this->t('Save settings'),
     );
   
     return $form;
@@ -90,7 +92,7 @@ class CarrierAdminForm extends ConfigFormBase {
         $enabled_carriers[] = str_replace('-', '.', $carrier);
       }
     }
-    $this->configFactory->get('sms.settings')->set('enabled_carriers', $enabled_carriers)->save();
-    drupal_set_message(t('The configuration options have been saved.'));
+    $this->config('sms.settings')->set('enabled_carriers', $enabled_carriers)->save();
+    drupal_set_message($this->t('The configuration options have been saved.'));
   }
 }

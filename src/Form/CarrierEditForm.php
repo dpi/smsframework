@@ -38,21 +38,21 @@ class CarrierEditForm extends ConfigFormBase {
 
     $form['name'] = array(
       '#type' => 'textfield',
-      '#title' => t('Name'),
+      '#title' => $this->t('Name'),
       '#default_value' => $carrier['name'],
       '#required' => TRUE,
     );
 
     $form['domain'] = array(
       '#type' => 'textfield',
-      '#title' => t('Domain'),
+      '#title' => $this->t('Domain'),
       '#default_value' => $carrier['domain'],
       '#required' => TRUE,
     );
 
     $form['submit'] = array(
       '#type' => 'submit',
-      '#value' => t('Save'),
+      '#value' => $this->t('Save'),
     );
 
     return $form;
@@ -66,7 +66,7 @@ class CarrierEditForm extends ConfigFormBase {
     if ($form_state['values']['domain'] != $form_state['values']['carrier']) {
       foreach ($carriers as $domain => $carrier) {
         if ($domain == $form_state['values']['domain']) {
-          form_set_error('', t('Domain must be unique.'));
+          form_set_error('', $this->t('Domain must be unique.'));
         }
       }
     }
@@ -76,13 +76,12 @@ class CarrierEditForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, array &$form_state) {
-    $carrier = array();
     $carrier = array(
       'name' => $form_state['values']['name'],
       'domain' => $form_state['values']['domain'],
     );
     carrier_save($form_state['values']['carrier'], $carrier);
-    drupal_set_message(t('The carrier has been saved.'));
+    drupal_set_message($this->t('The carrier has been saved.'));
     $form_state['redirect'] = 'admin/config/smsframework/carriers';
   }
 }

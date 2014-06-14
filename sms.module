@@ -94,19 +94,19 @@ function sms_cron_queue_info() {
 function sms_send($number, $message, $options = array()) {
   $gateway = sms_default_gateway();
 
-  foreach (module_implements('sms_send') as $module) {
+  foreach (\Drupal::moduleHandler()->getImplementations('sms_send') as $module) {
     $function = $module . '_sms_send';
     $function($number, $message, $options, $gateway);
   }
 
   $response = NULL;
-  if (function_exists($gateway['send'])) {
+  if (isset($gateway['send']) && function_exists($gateway['send'])) {
     $response = $gateway['send']($number, $message, $options);
   }
   $result = sms_handle_result($response, $number, $message);
 
   // Post process hook
-  foreach (module_implements('sms_send_process') as $module) {
+  foreach (\Drupal::moduleHandler()->getImplementations('sms_send_process') as $module) {
     $function = $module . '_sms_send_process';
     $function('post process', $number, $message, $options, $gateway, $result);
   }
@@ -153,15 +153,15 @@ function sms_incoming_queue_worker($item) {
  *   The content of the text message.
  */
 function sms_incoming($number, $message, $options = array()) {
-  if (module_exists('rules')) {
+  if (\Drupal::moduleHandler()->moduleExists('rules')) {
     $options += array('number' => $number, 'message' => $message);
     rules_invoke_event('sms_incoming', $options);
   }
 
   // Execute three phases
-  module_invoke_all('sms_incoming', 'pre process', $number, $message, $options);
-  module_invoke_all('sms_incoming', 'process', $number, $message, $options);
-  module_invoke_all('sms_incoming', 'post process', $number, $message, $options);
+  \Drupal::moduleHandler()->invokeAll('sms_incoming', 'pre process', $number, $message, $options);
+  \Drupal::moduleHandler()->invokeAll('sms_incoming', 'process', $number, $message, $options);
+  \Drupal::moduleHandler()->invokeAll('sms_incoming', 'post process', $number, $message, $options);
 }
 
 /**
@@ -188,9 +188,9 @@ function sms_incoming($number, $message, $options = array()) {
  */
 function sms_receipt($number, $reference, $message_status = SMS_GW_UNKNOWN_STATUS, $options = array()) {
   // Execute three phases
-  module_invoke_all('sms_receipt', 'pre process', $number, $reference, $message_status, $options);
-  module_invoke_all('sms_receipt', 'process', $number, $reference, $message_status, $options);
-  module_invoke_all('sms_receipt', 'post process', $number, $reference, $message_status, $options);
+  \Drupal::moduleHandler()->invokeAll('sms_receipt', 'pre process', $number, $reference, $message_status, $options);
+  \Drupal::moduleHandler()->invokeAll('sms_receipt', 'process', $number, $reference, $message_status, $options);
+  \Drupal::moduleHandler()->invokeAll('sms_receipt', 'post process', $number, $reference, $message_status, $options);
 }
 
 /**
@@ -201,8 +201,7 @@ function sms_default_gateway() {
 }
 
 function sms_default_gateway_id() {
-  $config = \Drupal::config('sms.settings');
-  return $config->get('default_gateway');
+  return \Drupal::config('sms.settings')->get('default_gateway');
 }
 
 /**
@@ -278,7 +277,7 @@ function _gateways_build() {
   $_gateways = array();
   $_names = array();
 
-  $gateway_array = module_invoke_all('gateway_info');
+  $gateway_array = \Drupal::moduleHandler()->invokeAll('gateway_info');
   $config = \Drupal::config('sms.settings');
   $settings = $config->get('gateway_settings');
   foreach ($gateway_array as $identifier => $info) {
@@ -523,7 +522,7 @@ function sms_validate_number(&$number, $options = array()) {
       return $error;
     }
   }
-  if (module_exists('sms_valid')) {
+  if (\Drupal::moduleHandler()->moduleExists('sms_valid')) {
     $validation = sms_valid_validate($number, $options);
     if (!$validation['pass']) {
       return implode('<br/>', $validation['log']);
@@ -580,7 +579,7 @@ function theme_sms_admin_default_form($variables) {
     if (is_array($element) && isset($element['id']) && is_array($element['id'])) {
       $rows[] = array(
         drupal_render($form['default'][$element['id']['#markup']]),
-        check_plain($name),
+        \Drupal\Component\Utility\String::checkPlain($name),
         $element['configure']['#markup'],
       );
       unset($form[$name]);
@@ -613,20 +612,22 @@ function theme_sms_carriers_admin_form($variables) {
   $header = array(t('Enabled'), t('Carrier'), t('Domain'), t('Actions'));
 
   $rows = array();
-  foreach (element_children($form['status']) as $element) {
-    $name = "<div class='carrier'>";
-    $name .= "<strong>{$form['status'][$element]['#title']}</strong>";
-    $name .= "<div class='description'>{$form['status'][$element]['#description']}</div>";
-    $name .= "</div>";
-    unset($form['status'][$element]['#title']);
-    unset($form['status'][$element]['#description']);
-    $row = array(
-        'status' => drupal_render($form['status'][$element]),
-        'name' => $name,
-        'domain' => drupal_render($form['domain'][$element]),
-        'actions' => drupal_render($form['actions'][$element]),
-    );
-    $rows[] = $row;
+  if ($form['status']) {
+    foreach (\Drupal\Core\Render\Element::children($form['status']) as $element) {
+      $name = "<div class='carrier'>";
+      $name .= "<strong>{$form['status'][$element]['#title']}</strong>";
+      $name .= "<div class='description'>{$form['status'][$element]['#description']}</div>";
+      $name .= "</div>";
+      unset($form['status'][$element]['#title']);
+      unset($form['status'][$element]['#description']);
+      $row = array(
+          'status' => drupal_render($form['status'][$element]),
+          'name' => $name,
+          'domain' => drupal_render($form['domain'][$element]),
+          'actions' => drupal_render($form['actions'][$element]),
+      );
+      $rows[] = $row;
+    }
   }
   $output = '';
   $output .= _theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array( 'class' => array('sms'), 'id' => 'sms-form-table' )));

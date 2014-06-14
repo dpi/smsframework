@@ -67,9 +67,10 @@ class GatewayConfigForm extends ConfigFormBase {
     $gateway = $form_state['values']['gateway'];
     // Remove unnecessary values
     unset($form_state['values']['op'], $form_state['values']['submit'], $form_state['values']['gateway'], $form_state['values']['form_token'], $form_state['values']['form_id']);
-    $config = $this->configFactory->get('sms.settings');
-    $config->set('gateway_settings.' . $gateway['identifier'], $form_state['values']);
-    drupal_set_message(t('The gateway settings have been saved.'));
+    $this->config('sms.settings')
+      ->set('gateway_settings.' . $gateway['identifier'], $form_state['values'])
+      ->save();
+    drupal_set_message($this->t('The gateway settings have been saved.'));
     $form_state['redirect'] = 'admin/config/smsframework/gateways';
   }
 
