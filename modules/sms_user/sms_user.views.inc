@@ -2,11 +2,11 @@
 
 /**
  * @file
- * The basic views for sms_user.
+ * The basic views fields available for sms_user.
  */
 
 /**
- * basic views
+ * Implements hook_views_data()
  */
 function sms_user_views_data() {
   $data['sms_user']['table']['group'] = t('SMS User');
@@ -18,53 +18,31 @@ function sms_user_views_data() {
   );
   $data['sms_user']['number'] = array(
     'title' => t('Mobile Number'),
-    'help' => t('Display the users Mobile number.'),
+    'help' => t('Display the user\'s mobile number.'),
     'field' => array(
-      'handler' => 'sms_user_handler_field_number',
+      'id' => 'sms_number',
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_string',
+      'id' => 'standard',
     ),
     'sort' => array(
-      'handler' => 'views_handler_sort',
+      'id' => 'standard',
     ),
   );
   $data['sms_user']['status'] = array(
     'title' => t('Mobile Status'),
-    'help' => t('Display the status of the users Mobile number.'),
+    'help' => t('Display the status of the user\'s mobile number confirmation.'),
     'field' => array(
-      'handler' => 'sms_user_handler_field_status',
+      'id' => 'sms_status',
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'sms_user_handler_filter_status',
+      'id' => 'sms_status',
     ),
     'sort' => array(
-      'handler' => 'views_handler_sort',
+      'id' => 'standard',
     ),
   );
   return $data;
-}
-
-/**
- * sms_user_views_handlers
- */
-function sms_user_views_handlers() {
-  return array(
-    'info' => array(
-      'path' => drupal_get_path('module', 'sms_user') . '/includes',
-    ),
-    'handlers' => array(
-      'sms_user_handler_field_number' => array(
-        'parent' => 'views_handler_field',
-      ),
-      'sms_user_handler_field_status' => array(
-        'parent' => 'views_handler_field',
-      ),
-      'sms_user_handler_filter_status' => array(
-        'parent' => 'views_handler_filter_in_operator',
-      ),
-    ),
-  );
 }

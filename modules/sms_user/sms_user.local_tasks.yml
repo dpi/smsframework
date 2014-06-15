@@ -1,0 +1,5 @@
+sms_user.user_edit:
+  route_name: sms_user.user_edit
+  base_route: user.view
+  title: Mobile
+  weight: -8

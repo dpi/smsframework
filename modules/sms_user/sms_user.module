@@ -5,14 +5,20 @@
  * Provides integration between the SMS Framework and Drupal users.
  */
 
+use Drupal\Core\Utility\Token;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+
 define('SMS_USER_BLOCKED', 0);
 define('SMS_USER_PENDING', 1);
 define('SMS_USER_CONFIRMED', 2);
 define('SMS_USER_SMS_REGISTERED', 3);
 define('SMS_USER_MAX_CHARS', 140);
 
-require_once 'sms_user.actions.inc';
-require_once 'sms_user.rules.inc';
+// require_once 'sms_user.actions.inc';
+// require_once 'sms_user.rules.inc';
 
 /**
  * Implements hook_permission().
@@ -31,48 +37,35 @@ function sms_user_permission() {
 }
 
 /**
- * Implements hook_menu().
- */
-function sms_user_menu() {
-  $items = array();
-
-  $items['admin/smsframework/sms_user_options'] = array(
-    'title' => 'SMS User Options',
-    'description' => 'Edit options for SMS and user integration.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sms_user_admin_settings'),
-    'access arguments' => array('administer smsframework'),
-    'file' => 'sms_user.admin.inc',
-  );
-
-  return $items;
-}
-
-/**
  * Implements hook_menu_alter().
+ * XXX not done
  */
-function sms_user_menu_alter(&$callbacks) {
-  $callbacks['user/%user_category/edit/mobile']['page callback'] = 'sms_user_settings';
-  $callbacks['user/%user_category/edit/mobile']['page arguments'] = array(1);
-  $callbacks['user/%user_category/edit/mobile']['module'] = 'sms_user';
-  $callbacks['user/%user_category/edit/mobile']['file'] = 'sms_user.module';
-  //dsm($callbacks);
-}
+//function sms_user_menu_alter(&$callbacks) {
+//  $callbacks['user/%user/edit/mobile']['route_name'] = 'sms_user.user_edit';
+//  $callbacks['user/%user/edit/mobile']['page callback'] = 'sms_user_settings';
+//  $callbacks['user/%user/edit/mobile']['page arguments'] = array(1);
+//  $callbacks['user/%user/edit/mobile']['module'] = 'sms_user';
+//  $callbacks['user/%user/edit/mobile']['file'] = 'sms_user.module';
+//  $callbacks['user/%user/edit/mobile']['access callback'] = TRUE;
+//  dpm($callbacks);
+//}
 
 /**
  * Access control on edit users sms number.
  */
-function sms_user_edit_access($account) {
-  return (user_edit_access($account) && user_access('receive sms', $account));
+function sms_user_edit_access(AccountInterface $account) {
+  return (((Drupal::currentUser()->id() == $account->id()) || Drupal::currentUser()->hasPermission('administer users'))
+    && $account->id() > 0) && $account->hasPermission('receive sms');
 }
 
 /**
  * Send a message to a user.
  */
 function sms_user_send($uid, $message) {
-  $account = user_load($uid);
+  /** @var \Drupal\Core\Session\AccountInterface $account */
+  $account = User::load($uid);
   //Check if the user is enabled to receive SMS
-  if (user_access('receive sms', $account)) {
+  if ($account->hasPermission('receive sms')) {
     if ($account->sms_user[0]['status'] >= SMS_USER_CONFIRMED) {
       return sms_send($account->sms_user[0]['number'], $message, $account->sms_user[0]['gateway']);
     }
@@ -88,9 +81,9 @@ function sms_user_send($uid, $message) {
 /**
  * Returns a verified number of a given user
  */
-function sms_user_get_number($account) {
+function sms_user_get_number(AccountInterface $account) {
   //Check if the user is enabled to receive SMS
-  if (user_access('receive sms', $account)) {
+  if ($account->hasPermission('receive sms')) {
     if ($account->sms_user[0]['status'] >= SMS_USER_CONFIRMED) {
       return $account->sms_user[0]['number'];
     }
@@ -119,12 +112,12 @@ function sms_user_get_uid($number, $status = NULL) {
  * Implements hook_sms_send().
  */
 function sms_user_sms_send(&$number, &$message, &$options, &$gateway) {
-  if (variable_get('sms_user_sleep', 1) && $uid = sms_user_get_uid($number)) {
-    $account = array_shift(user_load_multiple(array($uid), array('status' => 1)));
+  if (\Drupal::config('sms_user.settings')->get('enable_sleep', 1) && $uid = sms_user_get_uid($number)) {
+    $account = User::load($uid);
 
     if (_sms_user_sleep_active($account)) {
       unset($gateway['send']);
-      watchdog('sms_user', 'Message was not sent to @user due to sleep settings.', array('@user' => $account->name));
+      watchdog('sms_user', 'Message was not sent to @user due to sleep settings.', array('@user' => $account->getUsername()));
     }
   }
 }
@@ -140,11 +133,12 @@ function sms_user_sms_send(&$number, &$message, &$options, &$gateway) {
  */
 function _sms_user_sleep_active($account) {
   //if the user has a timezone set in his account get the time there
-  if ((variable_get('configurable_timezones', 1)) && (!empty($account->timezone_name))) {
+  $config = \Drupal::config('system.date');
+  if ($config->get('timezone.user.configurable') && (!empty($account->timezone_name))) {
     $timezone = new DateTimeZone($account->timezone);
   }
   else {
-    $default = variable_get('date_default_timezone', '');
+    $default = $config->get('timezone.default');
     $timezonestring = empty($default) ? 'UTC' : $default;
     $timezone = new DateTimeZone($timezonestring);
   }
@@ -157,10 +151,11 @@ function _sms_user_sleep_active($account) {
   if (!empty($account->sms_user['sleep_enabled'])) {
     $start = $account->sms_user['sleep_start_time'];
     $end = $account->sms_user['sleep_end_time'];
-    }
+  }
   else {
-    $start = variable_get('sms_user_sleep_start_time', 0);
-    $end = variable_get('sms_user_sleep_end_time', 0);
+    $config = \Drupal::config('sms_user.settings');
+    $start = $config->get('sleep_start_time');
+    $end = $config->get('sleep_end_time');
   }
 
   // If values are not set, send the message
@@ -193,269 +188,31 @@ function _sms_user_sleep_active($account) {
 /**
  * Menu callback; provides the forms for adding and confirming a user's mobile number.
  */
-function sms_user_settings($account) {
-  //dsm($account);
-  switch (isset($account->sms_user) ? $account->sms_user['status'] : 0) {
+function sms_user_settings($user) {
+  if (is_numeric($user)) $user = User::load($user);
+  switch (isset($user->sms_user) ? $user->sms_user['status'] : 0) {
     case 0:
-      $output = drupal_get_form('sms_user_settings_add_form', $account);
+      $output = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsAddForm', $user);
+//      $output = drupal_get_form(\Drupal\sms_user\Form\SettingsAddForm::create(\Drupal::getContainer()), $user);
       break;
     case SMS_USER_PENDING:
-      $output = drupal_get_form('sms_user_settings_confirm_form', $account);
+      $output = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsConfirmForm', $user);
+//      $output = drupal_get_form(\Drupal\sms_user\Form\SettingsConfirmForm::create(\Drupal::getContainer()), $user);
       break;
     case SMS_USER_CONFIRMED:
     case SMS_USER_SMS_REGISTERED:
-      $output = drupal_get_form('sms_user_settings_reset_form', $account);
+      $output = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsResetForm', $user);
+//      $output = drupal_get_form(\Drupal\sms_user\Form\SettingsResetForm::create(\Drupal::getContainer()), $user);
       break;
   }
 
-  if (variable_get('sms_user_sleep', 1)) {
-    $output2 = Array();
+  if (\Drupal::config('sms_user.settings')->get('enable_sleep')) {
+    $output2 = array();
     $output2['phoneform'] = $output;
-    $output2['sleepform'] = drupal_get_form('sms_user_settings_sleep_form', $account);
+    $output2['sleepform'] = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsSleepForm', $user);
     $output = $output2;
   }
-
   return drupal_render($output);
-}
-
-/**
- * Displays the user settings form.
- */
-function sms_user_settings_add_form($form, &$form_state, $account) {
-  $form = sms_send_form(TRUE);
-  $form['uid'] = array(
-    '#type' => 'hidden',
-    '#value' => $account->uid,
-  );
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Confirm number'),
-  );
-  $form['#validate'][] = 'sms_user_settings_add_form_validate';
-  $form['#submit'][] = 'sms_user_settings_add_form_submit';
-
-  return $form;
-}
-
-/**
- * Validate the users number.
- */
-function sms_user_settings_add_form_validate($form, &$form_state) {
-  if ($error = sms_user_validate_number($form_state['values']['number'])) {
-    if (is_array($error)) {
-      form_set_error('number', t("This is not a valid number on this website."));
-    }
-    else {
-      form_set_error('number', $error);
-    }
-  }
-
-  if (empty($form_state['values']['gateway'])) {
-    $form_state['values']['gateway'] = array();
-  }
-}
-
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
-function sms_user_settings_add_form_submit($form, &$form_state, $account = NULL) {
-  if (!$account) {
-    $account = user_load($form_state['values']['uid']);
-  }
-  sms_user_send_confirmation($account, $form_state['values']['number'], $form_state['values']['gateway']);
-}
-
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
-function sms_user_settings_confirm_form($form, &$form_state, $account) {
-  $form['uid'] = array(
-    '#type' => 'hidden',
-    '#value' => $account->uid,
-  );
-  $form['number'] = array(
-    '#type' => 'item',
-    '#title' => t('Mobile phone number'),
-    '#markup' => $account->sms_user['number'],
-  );
-  $form['confirm_code'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Confirmation code'),
-    '#description' => t('Enter the confirmation code sent by SMS to your mobile phone.'),
-    '#size' => 4,
-    '#maxlength' => 4,
-  );
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Confirm number'),
-  );
-  $form['reset'] = array(
-    '#type' => 'submit',
-    '#value' => t('Delete & start over'),
-    '#access' => user_access('edit own sms number'),
-  );
-  $form['confirm'] = array(
-    '#type' => 'submit',
-    '#value' => t('Confirm without code'),
-    '#access' => user_access('administer site'),
-  );
-
-  return $form;
-}
-
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
-function sms_user_settings_confirm_form_validate($form, &$form_state) {
-  if ($form_state['clicked_button']['#value'] == t('Confirm number')) {
-    $account = user_load($form_state['values']['uid']);
-    if ($form_state['values']['confirm_code'] != $account->sms_user['code']) {
-      form_set_error('confirm_code', t('The confirmation code is invalid.'));
-    }
-  }
-}
-
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
-function sms_user_settings_confirm_form_submit($form, &$form_state) {
-  $account = user_load($form_state['values']['uid']);
-  if ($form_state['clicked_button']['#value'] == t('Delete & start over')) {
-    sms_user_delete($account->uid);
-  }
-  else {
-    $data = array(
-      'number' => $account->sms_user['number'],
-      'status' => SMS_USER_CONFIRMED,
-      'gateway' => $account->sms_user['gateway'],
-    );
-
-    user_save($account, array('sms_user' => $data), 'mobile');
-    // If the rule module is installed, fire rules
-    if (module_exists('rules')) {
-      rules_invoke_event('sms_user_validated', $account);
-    }
-  }
-}
-
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
-function sms_user_settings_reset_form($form, &$form_state, $account) {
-  $form['uid'] = array(
-    '#type' => 'hidden',
-    '#value' => $account->uid,
-  );
-  $form['sms_user']['number'] = array(
-    '#type' => 'item',
-    '#title' => t('Your mobile phone number'),
-    '#markup' => $account->sms_user['number'],
-//    '#markup' => $account->sms_user['number'] . '@' . $account->sms_user['gateway']['carrier'],
-    '#description' => t('Your mobile phone number has been confirmed.'),
-  );
-
-  $form['reset'] = array(
-    '#type' => 'submit',
-    '#value' => t('Delete & start over'),
-    '#access' => user_access('edit own sms number'),
-  );
-
-  return $form;
-}
-
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
-function sms_user_settings_reset_form_submit($form, &$form_state) {
-  $account = user_load($form_state['values']['uid']);
-  sms_user_delete($account->uid);
-  if (module_exists('rules')) {
-    rules_invoke_event('sms_user_removed', $account);
-  }
-  drupal_set_message(t('Your mobile information has been removed'), 'status');
-}
-
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
-function sms_user_settings_sleep_form($form, &$form_state, $account) {
-  $form['uid'] = array(
-    '#type' => 'hidden',
-    '#value' => $account->uid,
-  );
-  $form['sleep'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Sleep Time'),
-    '#collapsible' => TRUE,
-  );
-
-  $form['sleep']['sleep_enabled'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Disable messages between these hours'),
-    '#description' => t('If enabled, you will not receive messages between the specified hours.'),
-    '#default_value' => isset($account->sms_user['sleep_enabled']) ? $account->sms_user['sleep_enabled'] : NULL,
-  );
-
-  // Determine whether to use the 24-hour or 12-hour clock based on site settings
-  if (strpos(variable_get('date_format_short', 'm/d/Y - H:i'), 'g')) {
-    $format = 'g A';
-  }
-  else {
-    $format = 'H:00';
-  }
-  // Build the list of options based on format
-  $hour = 0;
-  while ($hour < 24) {
-    $options[$hour] = date($format, mktime($hour));
-    $hour++;
-  }
-
-  $form['sleep']['sleep_start_time'] = array(
-    '#type' => 'select',
-    '#multiple' => FALSE,
-    '#options' => $options,
-    '#default_value' => isset($account->sms_user['sleep_start_time']) ? $account->sms_user['sleep_start_time'] : NULL,
-  );
-
-  $form['sleep']['sleep_end_time'] = array(
-    '#type' => 'select',
-    '#multiple' => FALSE,
-    '#options' => $options,
-    '#default_value' => isset($account->sms_user['sleep_end_time']) ? $account->sms_user['sleep_end_time'] : NULL,
-  );
-
-  $form['sleep']['save'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save'),
-  );
-
-  return $form;
-}
-
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
-function sms_user_settings_sleep_form_submit($form, &$form_state) {
-  $account = user_load($form_state['values']['uid']);
-  if (isset($account->sms_user)) {
-    $data = $account->sms_user;
-  }
-  else {
-    $data = Array();
-  }
-  $data['sleep_enabled'] = $form_state['values']['sleep_enabled'];
-  $data['sleep_start_time'] = $form_state['values']['sleep_start_time'];
-  $data['sleep_end_time'] = $form_state['values']['sleep_end_time'];
-  user_save($account, array('sms_user' => $data), 'mobile');
-  drupal_set_message(t('The changes have been saved.'), 'status');
 }
 
 /**
@@ -472,7 +229,8 @@ function sms_user_send_confirmation($account, $number, $options) {
     'gateway' => $options,
   );
 
-  user_save($account, array('sms_user' => $data), 'mobile');
+  $account->sms_user = $data;
+  $account->save();
   sms_send($number, _sms_user_confirm_message($code), $options);
 }
 
@@ -492,38 +250,45 @@ function sms_user_validate_number(&$number) {
 /**
  * Implements hook_user_presave().
  */
-function sms_user_user_presave(&$edit, $account, $category) {
-  return sms_user_save($edit, $account, $category);
+function sms_user_user_presave($account) {
+  // THIS IS NOT NEEDED AS THE INSERT/UPDATE HOOKS SUFFICE
 }
 
 /**
  * Implements hook_user_insert().
  */
-function sms_user_user_insert(&$edit, $account, $category) {
-  return sms_user_save($edit, $account, $category);
+function sms_user_user_insert($account) {
+  return sms_user_save($account);
+}
+
+/**
+ * Implements hook_user_update().
+ */
+function sms_user_user_update($account) {
+  return sms_user_save($account);
 }
 
 /**
  * Implements hook_user_view().
  */
-function sms_user_user_view($account, $view_mode) {
-  global $user;
-  if (user_access('receive sms', $account) && ($user->uid == $account->uid || user_access('administer smsframework'))) {
-    if (isset($account->sms_user['status']) &&
-            $account->sms_user['status'] == SMS_USER_PENDING) {
-      drupal_set_message(t('You need to confirm your mobile number, <a href="@mobile_url">enter the confirmation code sent to your mobile</a>.', array('@mobile_url' => url('user/' . $account->uid . '/edit/mobile'))));
+//function sms_user_user_view(AccountInterface $account, $display, $view_mode, $langcode) {
+function sms_user_user_view(array &$build, UserInterface $account, EntityViewDisplayInterface $display, $view_mode, $langcode) {
+  $user = \Drupal::currentUser();
+  if ($account->hasPermission('receive sms') && ($user->id() == $account->id() || $user->hasPermission('administer smsframework'))) {
+    if (isset($account->sms_user['status']) && $account->sms_user['status'] == SMS_USER_PENDING) {
+      drupal_set_message(t('You need to confirm your mobile number, <a href="@mobile_url">enter the confirmation code sent to your mobile</a>.', array('@mobile_url' => url('user/' . $account->id() . '/edit/mobile'))));
     }
-    $account->content['sms'] = array(
+    $build['sms'] = array(
       '#type' => 'user_profile_category',
       '#title' => t('Mobile'),
     );
-    $account->content['sms']['number'] = array(
+    $build['sms']['number'] = array(
       '#type' => 'user_profile_item',
       '#title' => '',
       '#markup' => isset($account->sms_user['number']) ? $account->sms_user['number'] : '',
     );
-    if ((variable_get('sms_user_sleep', 1)) && ((isset($account->sms_user)) && ($account->sms_user['sleep_enabled']))) {
-      $account->content['sms']['sleep'] = array(
+    if ((\Drupal::config('sms_user.settings')->get('enable_sleep')) && ((isset($account->sms_user)) && ($account->sms_user['sleep_enabled']))) {
+      $build['sms']['sleep'] = array(
         '#type' => 'user_profile_item',
         '#title' => '',
         '#markup' => t('You will not receive messages between ' . $account->sms_user['sleep_start_time'] . ':00 and ' .$account->sms_user['sleep_end_time'] . ':00'),
@@ -537,7 +302,8 @@ function sms_user_user_view($account, $view_mode) {
  */
 function sms_user_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == "user_register_form") {
-    if (variable_get('sms_user_registration_form', 0)) {
+    $config = \Drupal::config('sms_user.settings');
+    if ($config->get('registration_form')) {
       $form['sms_user'] = array(
         '#type' => 'fieldset',
         '#title' => t('Mobile settings'),
@@ -547,7 +313,7 @@ function sms_user_form_alter(&$form, &$form_state, $form_id) {
       );
 
       $required = FALSE;
-      if (variable_get('sms_user_registration_form', 0) == 2) {
+      if ($config->get('registration_form') == 2) {
         $required = TRUE;
       }
 
@@ -564,34 +330,34 @@ function sms_user_form_alter(&$form, &$form_state, $form_id) {
  * Implements hook_user_cancel().
  */
 function sms_user_user_cancel($edit, $account, $method) {
-  return sms_user_delete($account->uid);
+  return sms_user_delete($account->id());
 }
 
 /**
  * Implements hook_user_validate().
- */
 function sms_user_user_validate(&$edit, $account, $category) {
-  if (!empty($edit['sms_user']) && (variable_get('sms_user_registration_form', 0) == 2 || strlen($edit['sms_user']['number']))) {
+  if (!empty($edit['sms_user']) && (\Drupal::config('sms_user.settings')->get('registration_form', 0) == 2 || strlen($edit['sms_user']['number']))) {
     if ($error = sms_user_validate_number($edit['sms_user']['number'])) {
       form_set_error('sms_user][number', $error);
     }
   }
 }
+ * hook_user_user_validate() doesn't exist in D8
+ */
 
 /**
  * Implements hook_user_login().
  */
-function sms_user_user_login(&$edit, $account) {
-  // Check if first it's the user's first time logging in.
-  if (!$account->access && !empty($account->sms_user['number']) && $account->sms_user['status'] <= SMS_USER_CONFIRMED) {
+function sms_user_user_login(AccountInterface $account) {
+  // Check if it's the user's first time logging in.
+  if (!$account->getLastAccessedTime() && !empty($account->sms_user['number']) && $account->sms_user['status'] <= SMS_USER_CONFIRMED) {
     sms_user_send_confirmation($account, $account->sms_user['number'], $account->sms_user['gateway']);
-    drupal_set_message(t('A confirmation message has been sent to your mobile phone. Please @link.', array('@link' => l(t('confirm your number'), 'user/' . $account->uid . '/edit/mobile'))), 'status');
+    drupal_set_message(t('A confirmation message has been sent to your mobile phone. Please @link.', array('@link' => l(t('confirm your number'), 'user/' . $account->id() . '/edit/mobile'))), 'status');
   }
 }
 
 /**
  * Implements hook_user_categories().
- */
 function sms_user_user_categories() {
   $categories['mobile'] = array(
     'name' => 'mobile',
@@ -600,11 +366,16 @@ function sms_user_user_categories() {
   );
   return $categories;
 }
+ * hook_user_categories() doesn't exist in D8
+ */
 
 /**
  * Load user mobile data into the user object.
  *
  * @see sms_user_user()
+ *
+ * @todo the sms_user appendage to $user object needs to be implemented as a
+ * field in D8
  */
 function sms_user_user_load($users) {
   // ERROR: return statement not found in hook_load
@@ -630,10 +401,10 @@ function sms_user_user_load($users) {
  *
  * @see sms_user_user()
  */
-function sms_user_save(&$edit, &$account, $category) {
-  if (($category == 'mobile' || $category == 'account') && isset($edit['sms_user']) && $edit['sms_user']['number'] && (isset($account->uid) && ($account->uid != 0))) {
-    $number = (object)$edit['sms_user'];
-    $number->uid = $account->uid;
+function sms_user_save($account) {
+  if (isset($account->sms_user) && $account->sms_user['number'] && $account->id() != 0) {
+    $number = (object) $account->sms_user;
+    $number->uid = $account->id();
     if (!isset($number->status)) {
       $number->status = NULL;
     }
@@ -642,16 +413,9 @@ function sms_user_save(&$edit, &$account, $category) {
     if (isset($account->sms_user) && sms_user_get_uid($number->number)) { // is existing
       $primary_keys = array('number');
     }
-    drupal_write_record('sms_user', $number, $primary_keys);
-
-    $edit['sms_user']['number'] = NULL;
-    $edit['sms_user']['status'] = NULL;
-    $edit['sms_user']['code'] = NULL;
-    $edit['sms_user']['gateway'] = NULL;
-    $edit['sms_user']['sleep_enabled'] = NULL;
-    $edit['sms_user']['sleep_start_time'] = NULL;
-    $edit['sms_user']['sleep_end_time'] = NULL;
+    return drupal_write_record('sms_user', $number, $primary_keys);
   }
+  return FALSE;
 }
 
 /**
@@ -675,6 +439,7 @@ function sms_user_delete($uid, $number = FALSE) {
     $query->condition('number', $number);
   }
   $num_deleted = $query->execute();
+  return $num_deleted;
 }
 
 /**
@@ -688,8 +453,8 @@ function sms_user_delete($uid, $number = FALSE) {
  *   Created message, ready to send to user.
  */
 function _sms_user_confirm_message($code) {
-  $text_format = variable_get('sms_user_confirmation_message', '[site:name] confirmation code: ') . $code;
-  $text = token_replace($text_format, array('confirm-code' => $code));
+  $text_format = \Drupal::config('sms_user.settings')->get('confirmation_message') . $code;
+  $text = \Drupal::token()->replace($text_format, array('confirm-code' => $code));
   return $text;
 }
 
@@ -719,7 +484,7 @@ function sms_user_tokens($type, $tokens, array $data = array(), array $options =
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'confirm-code':
-            $replacements[$original] = $object['confirm-code'];
+            $replacements[$original] = $data['confirm-code'];
           break;
         case 'mobile-url':
             $replacements[$original] = url("user/$user->uid/edit/mobile", array('absolute' => TRUE));
@@ -767,6 +532,7 @@ function sms_user_token_info() {
  * Implements hook_sms_incoming().
  */
 function sms_user_sms_incoming($op, $number, $message, $options) {
+  $config = \Drupal::config('sms_user.settings');
   switch ($op) {
     case 'pre process':
       if ($account = sms_user_authenticate($number)) {
@@ -776,14 +542,14 @@ function sms_user_sms_incoming($op, $number, $message, $options) {
           'message' => $message,
           'options' => $options,
         );
-        sms_user_login_metadata($account->uid, $metadata);
+        sms_user_login_metadata($account->id(), $metadata);
         _sms_user_switch($account);
       }
-      elseif (variable_get('sms_user_registration_enabled', 0) && $number) {
+      elseif ($config->get('registration_enabled') && $number) {
         if ($account = sms_user_register_new_user($number, $message, $options)) {
           // Send the new user the registration message if one exists.
-          if ($message = variable_get('sms_user_new_account_message', '')) {
-            sms_user_send($account->uid, $message);
+          if ($message = $config->get('new_account_message')) {
+            sms_user_send($account->id(), $message);
           }
         }
       }
@@ -872,17 +638,17 @@ function _sms_user_switch($account = NULL) {
 
   if ($account) {
     $original_user = $user;
-    $original_state = drupal_save_session();
-    drupal_save_session(FALSE);
+    $original_state = \Drupal::service('session_manager')->isEnabled();
+    \Drupal::service('session_manager')->disable();
 
     $user = $account;
     $edit = array();
-    user_module_invoke('login', $edit, $account);
+    \Drupal::moduleHandler()->invokeAll('user_login', $edit, $account);
     watchdog('sms_user', '%name was logged in using SMS.', array('%name' => $user->name));
   }
   elseif (! empty($original_user)) {
     $user = $original_user;
-    drupal_save_session($original_state);
+    if ($original_state) \Drupal::service('session_manager')->enable();
     watchdog('sms_user', '%name was restored as logged in using SMS.', array('%name' => $user->name));
   }
 }
@@ -917,14 +683,18 @@ function sms_user_register_new_user($number, $message, $options) {
   $edit['timezone'] = '';
   // If by chance there's already a user with the same email address, then use
   // it instead of creating a new user.
-  if ((!(empty($mail))) && ($account = array_shift(user_load_multiple(array(), array('mail' => $mail))))) {
-    $account = user_save($account, $edit);
+  $ids = \Drupal::entityQuery('user')
+    ->condition('mail', $mail)
+    ->execute();
+  if ((!(empty($mail))) && ($account = array_shift(User::loadMultiple($ids)))) {
+    $account = User::create($account, $edit);
   }
   else {
     $edit['mail'] = $edit['init'] = $mail;
 
+    $config = \Drupal::config('sms_user.settings');
     // Add password if enabled.
-    if (variable_get('sms_user_allow_password', 0)) {
+    if ($config->get('allow_password')) {
       $lines = explode("\n", $message);
       $words = explode(" ", $lines[0]);
       foreach ($words as $word) {
@@ -944,9 +714,11 @@ function sms_user_register_new_user($number, $message, $options) {
     $edit['name'] = substr(md5($number . strval(REQUEST_TIME)), 0, 10);
 
     // Save the user.
-    $edit['status'] = variable_get('user_register', 1) == 1;
-    $account = user_save('', $edit);
-    watchdog('sms_user', '%name was created using SMS.', array('%name' => $account->name));
+    $edit['status'] = \Drupal::config('user.settings')->get('register') == USER_REGISTER_VISITORS;
+    $account = User::create($edit);
+    $account->save();
+//    $account = user_save('', $edit);
+    watchdog('sms_user', '%name was created using SMS.', array('%name' => $account->getUsername()));
   }
 
 
@@ -960,12 +732,12 @@ function sms_user_register_new_user($number, $message, $options) {
       'message' => $message,
       'options' => $options,
     );
-    sms_user_login_metadata($account->uid, $metadata);
+    sms_user_login_metadata($account->id(), $metadata);
     if ($account->status) {
       // User account is directly enabled.
       _sms_user_switch($account);
     }
-    user_module_invoke('login', $edit, $account);
+    \Drupal::moduleHandler()->invokeAll('user_login', $edit, $account);
 
     return $account;
   }
@@ -983,7 +755,11 @@ function sms_user_register_new_user($number, $message, $options) {
  */
 function sms_user_authenticate($number) {
   if ($uid = sms_user_get_uid($number)) {
-    $account = user_load_multiple(array($uid), array('status' => 1));
+    $ids = \Drupal::entityQuery('user')
+      ->condition('uid', $uid)
+      ->condition('status', 1)
+      ->execute();
+    $account = User::loadMultiple($ids);
     $account = reset($account);
     if (! empty($account)) {
       watchdog('sms_user', '%name was authenticated using SMS.', array('%name' => $account->name));
@@ -997,10 +773,10 @@ function sms_user_authenticate($number) {
 
 /**
  * Implements hook_views_api().
- */
 function sms_user_views_api() {
   return array('api' => 2);
 }
+ */
 
 /**
  * Allows for setting Phonenumber, Status and Gateway using feeds
@@ -1092,10 +868,13 @@ function sms_user_entity_property_info_alter(&$info) {
  * @param unknown_type $name
  * @param unknown_type $type
  * @param unknown_type $info
+ *
+ * @todo the sms_user appendage to $user object needs to be implemented as a
+ * field in D8
  */
 function entity_property_sms_user_get_properties($data, array $options, $name, $type, $info) {
   if (isset($data->uid) && ($data->uid > 0)) {
-    $account = user_load($data->uid);
+    $account = User::load($data->uid);
     if (isset($account->sms_user)) {
       switch ($name) {
         case "sms_user_phone_number" :

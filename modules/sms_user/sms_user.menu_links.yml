@@ -1,0 +1,5 @@
+sms_user.options:
+  title: 'SMS User Options'
+  description: 'Edit options for SMS and user integration.'
+  route_name: sms_user.options
+  parent: sms.admin
