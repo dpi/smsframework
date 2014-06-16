@@ -7,26 +7,6 @@
  * @subpackage sms_track
  */
 
-
-/**
- * Implement hook_install().
- *
-function sms_track_install() {
-  drupal_install_schema('sms_track');
-}
- * This should not be needed in D7
- */
-
-/**
- * Implement hook_uninstall().
- *
-function sms_track_uninstall() {
-  drupal_uninstall_schema('sms_track');
-}
- * This should not be needed in D7
- */
-
-
 /**
  * Implement hook_schema().
  *
@@ -101,3 +81,35 @@ function sms_track_schema() {
 
   return $schema;
 }
+
+
+/**
+ * Implements hook_enable().
+function sms_track_enable() {
+  if (variable_get('sms_track_archive_dir', SMS_DIR_NONE)) {
+    watchdog('sms_track', 'SMS Tracking archive collector enabled');
+  }
+}
+ * @todo Is this the right use of this hook??
+ */
+
+/**
+ * Implements hook_disable().
+function sms_track_disable() {
+  if (variable_get('sms_track_archive_dir', SMS_DIR_NONE)) {
+    watchdog('sms_track', 'SMS Tracking archive collector DISABLED');
+  }
+}
+ * @todo Hook disable doesn't exist in drupal 8
+ */
+
+/**
+ * Update variables to config
+ */
+//function sms_track_update_8000() {
+//  update_variables_to_config('sms_track.settings', array(
+//    'sms_track_archive_dir' => 'archive_dir',
+//    'sms_track_archive_max_age_days' => 'archive_max_age_days',
+//  ));
+//}
+

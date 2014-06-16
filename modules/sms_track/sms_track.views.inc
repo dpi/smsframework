@@ -7,35 +7,10 @@
  * @subpackage sms_track
  */
 
-
-/**
- * Implement hook_views_handlers().
- */
-function sms_track_views_handlers() {
-  return array(
-    'info' => array(
-      'path' => drupal_get_path('module', 'sms_track') . '/views',
-    ),
-    'handlers' => array(
-      'sms_track_handler_field_direction' => array(
-        'parent' => 'views_handler_field',
-      ),
-      'sms_track_handler_field_local_number' => array(
-        'parent' => 'views_handler_field',
-      ),
-      'sms_track_handler_field_gateway' => array(
-        'parent' => 'views_handler_field',
-      ),
-    ),
-  );
-}
-
-
 /**
  * Implement hook_views_data().
  */
 function sms_track_views_data() {
-  // TODO: I have left id and options out of this until I can work out how the handlers work.
   return array(
     'sms_track' => array(
       'table' => array(
@@ -51,68 +26,68 @@ function sms_track_views_data() {
         'title' => t('Timestamp'),
         'help' => t('Message creation timestamp.'),
         'field' => array(
-          'handler' => 'views_handler_field_date',
+          'id' => 'date',
           'click sortable' => TRUE,
         ),
         'argument' => array(
-          'handler' => 'views_handler_argument_date',
+          'id' => 'date',
         ),
         'filter' => array(
-          'handler' => 'views_handler_filter',
+          'id' => 'date',
         ),
         'sort' => array(
-          'handler' => 'views_handler_sort_date',
+          'id' => 'date',
         ),
       ),
       'dir' => array(
         'title' => t('Direction'),
         'help' => t('Incoming or Outgoing.'),
         'field' => array(
-          'handler' => 'sms_track_handler_field_direction',
+          'id' => 'sms_direction',
           'click sortable' => TRUE,
         ),
         'argument' => array(
-          'handler' => 'views_handler_argument',
+          'id' => 'standard',
         ),
         'filter' => array(
-          'handler' => 'views_handler_filter',
+          'id' => 'standard',
         ),
         'sort' => array(
-          'handler' => 'views_handler_sort',
+          'id' => 'standard',
         ),
       ),
       'number' => array(
         'title' => t('Remote number'),
         'help' => t('Phone number of remote recipient/sender.'),
         'field' => array(
-          'handler' => 'views_handler_field',
+          'id' => 'standard',
           'click sortable' => TRUE,
         ),
         'argument' => array(
-          'handler' => 'views_handler_argument',
+          'id' => 'standard',
         ),
         'filter' => array(
-          'handler' => 'views_handler_filter',
+          'id' => 'standard',
         ),
         'sort' => array(
-          'handler' => 'views_handler_sort',
+          'id' => 'standard',
         ),
       ),
       'message' => array(
         'title' => t('Message'),
         'help' => t('The message body text.'),
         'field' => array(
-          'handler' => 'views_handler_field',
+          'id' => 'standard',
           'click sortable' => TRUE,
         ),
         'argument' => array(
-          'handler' => 'views_handler_argument',
+          'id' => 'standard',
         ),
         'filter' => array(
-          'handler' => 'views_handler_filter',
+          'id' => 'standard',
         ),
         'sort' => array(
-          'handler' => 'views_handler_sort',
+          'id' => 'standard',
         ),
       ),
       'local_number' => array(
@@ -120,17 +95,17 @@ function sms_track_views_data() {
         'title' => t('Local number'),
         'help' => t('Phone number or ID of remote recipient/sender.'),
         'field' => array(
-          'handler' => 'sms_track_handler_field_local_number',
+          'id' => 'sms_local_number',
           'click sortable' => TRUE,
         ),
         'argument' => array(
-          'handler' => 'views_handler_argument',
+          'id' => 'standard',
         ),
         'filter' => array(
-          'handler' => 'views_handler_filter',
+          'id' => 'standard',
         ),
         'sort' => array(
-          'handler' => 'views_handler_sort',
+          'id' => 'standard',
         ),
       ),
       'gateway' => array(
@@ -138,17 +113,17 @@ function sms_track_views_data() {
         'title' => t('Gateway'),
         'help' => t('SMS gateway module name.'),
         'field' => array(
-          'handler' => 'sms_track_handler_field_gateway',
+          'id' => 'sms_gateway',
           'click sortable' => TRUE,
         ),
         'argument' => array(
-          'handler' => 'views_handler_argument',
+          'id' => 'standard',
         ),
         'filter' => array(
-          'handler' => 'views_handler_filter',
+          'id' => 'standard',
         ),
         'sort' => array(
-          'handler' => 'views_handler_sort',
+          'id' => 'standard',
         ),
       ),
     ),

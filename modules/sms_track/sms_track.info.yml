@@ -1,0 +1,8 @@
+name: SMS Tracking
+type: module
+description: Message archiving and delivery tracking for the SMS Framework.
+core: 8.x
+package: SMS Framework
+dependencies:
+  - sms
+  - views

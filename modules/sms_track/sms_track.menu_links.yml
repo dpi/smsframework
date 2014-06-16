@@ -1,0 +1,6 @@
+sms_track.admin:
+  title: 'Message tracking'
+  description: 'Options and view for the message archive.'
+  route_name: sms_track.admin
+  parent: sms.admin
+  weight: 1

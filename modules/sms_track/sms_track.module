@@ -32,75 +32,18 @@ function sms_track_help($path, $arg) {
 
 
 /**
- * Implements hook_enable().
- */
-function sms_track_enable() {
-  if (variable_get('sms_track_archive_dir', SMS_DIR_NONE)) {
-    watchdog('sms_track', 'SMS Tracking archive collector enabled');
-  }
-}
-
-
-/**
- * Implements hook_disable().
- */
-function sms_track_disable() {
-  if (variable_get('sms_track_archive_dir', SMS_DIR_NONE)) {
-    watchdog('sms_track', 'SMS Tracking archive collector DISABLED');
-  }
-}
-
-
-/**
  * Implements hook_cron().
  */
 function sms_track_cron() {
   // Ensure that we only run at most once per hour
-  $last_run = variable_get('sms_track_archive_cron_last_run', 0);
+  $last_run = \Drupal::state()->get('sms_track.archive_cron_last_run', 0);
   $time_an_hour_ago = REQUEST_TIME - 3600;
   if ($last_run <= $time_an_hour_ago) {
     // Purge the archive
     sms_track_archive_purge();
-    variable_set('sms_track_archive_cron_last_run', REQUEST_TIME);
+    \Drupal::state()->set('sms_track.archive_cron_last_run', REQUEST_TIME);
   }
 }
-
-
-/**
- * Implements hook_menu().
- *
- * @return
- *   Drupal menu items array
- */
-function sms_track_menu() {
-  $items = array();
-
-  $items['admin/smsframework/sms_track'] = array(
-    'title' => 'Message tracking',
-    'description' => 'Options and view for the message archive.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sms_track_settings_form'),
-    'access arguments' => array('administer smsframework'),
-    'file' => 'sms_track.admin.inc',
-  );
-  $items['admin/smsframework/sms_track/settings'] = array(
-    'title' => 'Settings',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => 0,
-  );
-  $items['admin/smsframework/sms_track/view'] = array(
-    'title' => 'View the archive',
-    'file' => 'sms_track.admin.inc',
-    'page callback' => 'sms_track_admin_view',
-    'access arguments' => array('administer smsframework'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 1,
-    'file' => 'sms_track.admin.inc',
-  );
-
-  return $items;
-}
-
 
 /**
  * Implements hook_sms_send().
@@ -198,7 +141,7 @@ function sms_track_sms_receipt($op, $number, $reference, $status, $options) {
  *   DB Query result
  */
 function sms_track_archive_write($dir, $number, $message, $options = array()) {
-  $archive_dir = variable_get('sms_track_archive_dir', SMS_DIR_NONE);
+  $archive_dir = \Drupal::config('sms_track.settings')->get('archive_dir');
 
   if ($dir == 0) {
     // Outgoing
@@ -288,7 +231,7 @@ function sms_track_update_message($reference, $status) {
   ->execute();
 
   if ($result) {
-    watchdog('sms_track', 'Affected rows: ' . db_affected_rows($result));
+    watchdog('sms_track', 'Affected rows: ' . $result);
   }
 }
 
@@ -316,7 +259,7 @@ function sms_track_views_api() {
 function sms_track_archive_purge($max_age_days = NULL) {
   // Get the configured max_age from the variable table if not given
   if (is_null($max_age_days)) {
-    $max_age_days = variable_get('sms_track_archive_max_age_days', 0);
+    $max_age_days = \Drupal::config('sms_track.settings')->get('archive_max_age_days');
   }
   // Purge with no survivors
   if ($max_age_days > 0) {

@@ -1,0 +1,24 @@
+sms_track.admin:
+  path: '/admin/config/smsframework/sms_track'
+  defaults:
+    _title: Message tracking
+    _form: '\Drupal\sms_track\AdminFormController'
+  requirements:
+    _permission: 'administer smsframework'
+
+sms_track.admin_settings:
+  path: '/admin/config/smsframework/sms_track/settings'
+  defaults:
+    _title: Settings
+    _form: '\Drupal\sms_track\AdminFormController'
+  requirements:
+    _permission: 'administer smsframework'
+
+sms_track.admin_view:
+  path: '/admin/config/smsframework/sms_track/view'
+  defaults:
+    _title: 'View the archive'
+    _content: '\Drupal\sms_track\AdminFormController::adminView'
+  requirements:
+    _permission: 'administer smsframework'
+
