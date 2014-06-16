@@ -11,7 +11,9 @@ use Drupal\views\Plugin\views\filter\InOperator;
 /**
  * Views handler to filter users by sms phone number validation status.
  *
- * @PluginID("sms_status")
+ * @ingroup views_filter_handlers
+ *
+ * @ViewsFilter("sms_status")
  */
 class SmsStatus extends InOperator {
   /**

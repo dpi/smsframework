@@ -179,7 +179,7 @@ class AdminSettingsForm extends ConfigFormBase {
     unset($values['submit'], $values['reset'], $values['form_id'], $values['op'],
         $values['form_token'], $values['form_build_id']);
     
-    $this->config('sms.settings')->setData($values)->save();
+    $this->config('sms_user.settings')->setData($values)->save();
     parent::submitForm($form, $form_state);
   }
 }
