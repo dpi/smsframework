@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Number validation feature module for Drupal SMS Framework.
@@ -25,7 +26,7 @@
  */
 function sms_valid_sms_validate($op, &$number, &$options) {
   if ($op == 'process') {
-    if (variable_get('sms_valid_use_rulesets', FALSE) || array_key_exists('test', $options)) {
+    if (\Drupal::config('sms_valid')->get('use_rulesets') || array_key_exists('test', $options)) {
       $result = sms_valid_validate($number, $options);
 
       if ($result['pass']) {
@@ -37,77 +38,6 @@ function sms_valid_sms_validate($op, &$number, &$options) {
     }
   }
 }
-
-
-/**
- * Implements hook_menu().
- *
- * @return
- *   Drupal menu item array.
- *
- * @ingroup hooks
- */
-function sms_valid_menu() {
-  $items = array();
-
-  $items['admin/smsframework/validation'] = array(
-    'title' => 'Number validation',
-    'description' => 'Configure number validation and rulesets.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sms_valid_admin_settings_form', NULL),
-    'access arguments' => array('administer smsframework'),
-    'file' => 'sms_valid.admin.inc',
-  );
-
-  $items['admin/smsframework/validation/settings'] = array(
-    'title' => 'Settings',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  );
-
-  $items['admin/smsframework/validation/rulesets'] = array(
-    'title' => 'Rulesets',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sms_valid_admin_rulesets_form', NULL),
-    'access arguments' => array('administer smsframework'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => -9,
-    'file' => 'sms_valid.admin.inc',
-  );
-
-  $items['admin/smsframework/validation/ruleset'] = array(
-    'title' => 'Add/Edit ruleset',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sms_valid_admin_ruleset_form'),
-    'access arguments' => array('administer smsframework'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => -8,
-    'file' => 'sms_valid.admin.inc',
-  );
-
-  $items['admin/smsframework/validation/ruleset/%'] = array(
-    'title' => 'Edit ruleset',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sms_valid_admin_ruleset_form', 4),
-    'access arguments' => array('administer smsframework'),
-    'type' => MENU_CALLBACK,
-    'weight' => -7,
-    'file' => 'sms_valid.admin.inc',
-  );
-
-  $items['admin/smsframework/validation/test'] = array(
-    'title' => 'Test validation',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sms_valid_admin_test_form', NULL),
-    'access arguments' => array('administer smsframework'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => -6,
-    'file' => 'sms_valid.admin.inc',
-  );
-
-  return $items;
-}
-
 
 /**
  * Implements hook_theme().
@@ -121,14 +51,20 @@ function sms_valid_theme() {
   return array(
     'sms_valid_admin_rulesets_form' => array(
       'render element' => 'form',
-      'file' => 'sms_valid.admin.inc',
     ),
     'sms_valid_admin_ruleset_form' => array(
       'render element' => 'form',
-      'file' => 'sms_valid.admin.inc',
     ),
   );
 }
+
+/**
+ * Access callback for sms_ruleset Entity type
+ */
+function sms_ruleset_access() {
+  return user_access('administer smsframework');
+}
+
 
 
 /**
@@ -138,19 +74,7 @@ function sms_valid_theme() {
  *   Array of rulesets.
  */
 function sms_valid_get_all_rulesets() {
-  $result = db_query("SELECT * FROM {sms_valid_rules}");
-
-  $rulesets = array();
-  foreach ($result as $row) {
-    $prefix = $row->prefix;
-    $rulesets[$prefix] = $row;
-    $rulesets[$prefix]->rules = unserialize($row->rules);
-  }
-  /*while ($row = db_fetch_array($result)) {
-    $prefix = $row['prefix'];
-    $rulesets[$prefix] = $row;
-    $rulesets[$prefix]['rules'] = unserialize($row['rules']);
-  }*/
+  $rulesets = entity_load_multiple('sms_ruleset');
   return $rulesets;
 }
 
@@ -160,19 +84,11 @@ function sms_valid_get_all_rulesets() {
  * @param $prefix
  *   A numberic prefix.
  *
- * @return
- *   A ruleset array or FALSE.
+ * @return \Drupal\sms_valid\Entity\Ruleset
+ *   A ruleset entity.
  */
 function sms_valid_get_ruleset($prefix) {
-//  $result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix = :prefix LIMIT 1", array(':prefix' => $prefix));
-  // @TODO Lets try this to see if it is a good converstion from D6 to D7
-  $ruleset = db_query_range("SELECT * FROM {sms_valid_rules} WHERE prefix = :prefix", 0, 1, array(':prefix' => $prefix))->fetchAssoc();
-  //if (db_affected_rows()) {
-  if ($ruleset) {
-    $ruleset['rules'] = unserialize($ruleset['rules']);
-    return $ruleset;
-  }
-  return FALSE;
+  return entity_load('sms_ruleset', $prefix);
 }
 
 
@@ -193,46 +109,17 @@ function sms_valid_get_ruleset_for_number($number) {
   for ($i = 0; $i < drupal_strlen($number); $i++) {
     $potential_prefixes[] = drupal_substr($number, 0, $i + 1);
   }
-//  $result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix IN (" . db_placeholders($potential_prefixes, 'int') . ")", $potential_prefixes);
-  // Get the potential rulesets from the DB
-  // TODO Please convert this statement to the D7 database API syntax.
-  //$result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix IN (" . db_placeholders($potential_prefixes, 'int') . ")", $potential_prefixes);
-//  $result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix= %prefix IN ", array(%prefix => $potential_prefixes));
-//  $result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix = :prefix", array(':prefix' => $potential_prefixes));
-  // Drupal6 $result = db_query("SELECT nid, title FROM {node} WHERE uid= %d IN (" . db_placeholders(array(page,story), varchar) . ")", 5, page, story);
-  // Drupal7 $result = db_query("SELECT nid, title FROM {node} WHERE uid= :uid AND type IN (:type)", array(:uid => 5, :type => array(page, story),));
-//  $placeholders = implode(', ', array_fill(0, count($potential_prefixes), "%d"));
-//  $result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix IN ($placeholders)", $potential_prefixes);
 
-  // Drupal 6
-//$result = db_query("SELECT nid, title FROM {node} WHERE uid = %d AND type IN (" . db_placeholders(array('page', 'story'), 'varchar') . ")", 5, 'page', 'story');
-//$result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix IN (" . db_placeholders($potential_prefixes, 'int') . ")", $potential_prefixes);
-
-// Drupal 7
-//$result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix = :prefix AND placeholders IN (:placeholders)", array(
-//  ':prefix' => $potential_prefixes,
-//  ':placeholders' => $placeholders,
-//));
-//dsm($potential_prefixes);
-  // Choose the ruleset with the best match (most chars = highest prefix)
-/*  while ($row = db_fetch_array($result)) {
-    if ($row['prefix'] > $last_prefix) {
-      $best_ruleset = $row;
-    }
-    $best_ruleset['rules'] = unserialize($best_ruleset['rules']);
-  }
-*/
   $best_ruleset = NULL;
   $last_prefix  = NULL;
-//  $result = db_query("SELECT prefix, name, rules, dirs_enabled, iso2 FROM {sms_valid_rules} WHERE prefix = :prefix IN", array(':prefix' => $potential_prefixes));
-  $query = db_select('sms_valid_rules', 'u')
-    ->fields('u', array('prefix', 'name', 'rules', 'dirs_enabled', 'iso2'))
-    ->condition('prefix', $potential_prefixes, 'IN');
-  $result = $query->execute();
-  while ($row = $result->fetchAssoc()) {
-    if ($row['prefix'] > $last_prefix) {
-      $best_ruleset = $row;
-      $best_ruleset['rules'] = unserialize($best_ruleset['rules']);
+  $ids = \Drupal::entityQuery('sms_ruleset')
+    ->condition('prefix', $potential_prefixes, 'IN')
+    ->execute();
+  $rulesets = entity_load_multiple('sms_ruleset', $ids);
+  foreach ($rulesets as $ruleset) {
+    if ($ruleset->prefix > $last_prefix) {
+      $best_ruleset = $ruleset;
+      $last_prefix = $ruleset->prefix;
     }
   }
 
@@ -250,13 +137,9 @@ function sms_valid_get_ruleset_for_number($number) {
  *   Array of prefix numbers.
  */
 function sms_valid_get_prefixes_for_iso2($iso2) {
-  $result = db_query("SELECT prefix FROM {sms_valid_rules} WHERE iso2 = :iso2", array(':iso2' => $iso2));
-  $prefixes = array();
-//TODO  while ($row = db_fetch_object($result)) {
-  foreach ($result as $row) {
-    $prefixes[] = $row->prefix;
-  }
-  return $prefixes;
+  return Drupal::entityQuery('sms_ruleset')
+    ->condition('iso2', $iso2)
+    ->execute();
 }
 
 
@@ -272,20 +155,19 @@ function sms_valid_get_prefixes_for_iso2($iso2) {
  *   Boolean. Whether the ruleset is enabled for this direction.
  */
 function sms_valid_ruleset_is_enabled($prefix, $dir = SMS_DIR_OUT) {
-//  $result = db_query("SELECT dirs_enabled FROM {sms_valid_rules} WHERE prefix = :prefix LIMIT 1", array(':prefix' => $prefix));
-  // This should be very similar to line 195
-  $result = db_query_range("SELECT dirs_enabled FROM {sms_valid_rules} WHERE prefix = :prefix", 0, 1, array(':prefix' => $prefix));
-  $dirs_enabled = $result->fetchField();
+  $ruleset = entity_load('sms_ruleset', $prefix);
 
-  // There must be a better way of doing this, but this works ok
-  if ($dirs_enabled == SMS_DIR_ALL) {
-    return TRUE;
-  }
-  if ($dirs_enabled == SMS_DIR_OUT && $dir == SMS_DIR_OUT) {
-    return TRUE;
-  }
-  if ($dirs_enabled == SMS_DIR_IN    && $dir == SMS_DIR_IN) {
-    return TRUE;
+  if ($ruleset) {
+    // There must be a better way of doing this, but this works ok
+    if ($ruleset->dirs_enabled == SMS_DIR_ALL) {
+      return TRUE;
+    }
+    if ($ruleset->dirs_enabled == SMS_DIR_OUT && $dir == SMS_DIR_OUT) {
+      return TRUE;
+    }
+    if ($ruleset->dirs_enabled == SMS_DIR_IN    && $dir == SMS_DIR_IN) {
+      return TRUE;
+    }
   }
   return FALSE;
 }
@@ -303,10 +185,9 @@ function sms_valid_ruleset_is_enabled($prefix, $dir = SMS_DIR_OUT) {
  *   Bollean. Result of the DB query.
  */
 function sms_valid_ruleset_set_status($prefix, $dir = SMS_DIR_ALL) {
-  return db_update('sms_valid_rules')
-  ->fields(array('dirs_enabled' => $dir))
-  ->condition('prefix', $prefix)
-  ->execute();
+  $ruleset = entity_load('sms_ruleset', $prefix);
+  $ruleset->dirs_enabled = $dir;
+  return $ruleset->save();
 }
 
 
@@ -320,36 +201,7 @@ function sms_valid_ruleset_set_status($prefix, $dir = SMS_DIR_ALL) {
  *   Boolean. Result of the DB query.
  */
 function sms_valid_save_ruleset($ruleset) {
-  $prefix = $ruleset['prefix'];
-  $name   = $ruleset['name'];
-  $iso2   = $ruleset['iso2'];
-  $rules_z = serialize($ruleset['rules']);
-  $dirs_enabled = $ruleset['dirs_enabled'];
-
-  if (sms_valid_get_ruleset($prefix)) {
-    // The ruleset exists so we should update
-    return db_update('sms_valid_rules')
-    ->fields(array(
-        'name' => $name,
-        'rules' => $rules_z,
-        'dirs_enabled' => $dirs_enabled,
-        'iso2' => $iso2,
-    ))
-    ->condition('prefix', $prefix)
-    ->execute();
-  }
-  else {
-    // The ruleset does not exist so we should create
-    return $id = db_insert('sms_valid_rules')
-    ->fields(array(
-        'prefix' => $prefix,
-        'name' => $name,
-        'rules' => $rules_z,
-        'dirs_enabled' => $dirs_enabled,
-        'iso2' => $iso2,
-      ))
-    ->execute();
-  }
+  $ruleset->save();
 }
 
 
@@ -363,9 +215,7 @@ function sms_valid_save_ruleset($ruleset) {
  *   Boolean. Result of the DB query.
  */
 function sms_valid_delete_ruleset($prefix) {
-  return db_delete('sms_valid_rules')
-    ->condition('prefix', $prefix)
-    ->execute();
+  return entity_load('sms_ruleset', $prefix)->delete();
 }
 
 
@@ -380,7 +230,7 @@ function sms_valid_delete_ruleset($prefix) {
  */
 function sms_valid_get_rules($prefix) {
   $ruleset = sms_valid_get_ruleset($prefix);
-  return unserialize($ruleset['rules']);
+  return $ruleset->rules;
 }
 
 
@@ -394,7 +244,7 @@ function sms_valid_get_rules($prefix) {
  *   An array of rules.
  */
 function sms_valid_text_to_rules($text) {
-  $lines = explode("\n", $text);
+  $lines = explode("\n", trim($text));
   $rules = array();
 
   foreach ($lines as $line) {
@@ -488,7 +338,7 @@ function sms_valid_get_rulesets_for_form($include_null_option = FALSE) {
  *   Boolean. Whether this is a local number.
  */
 function sms_valid_is_local_number($number) {
-  $prefix = variable_get('sms_valid_local_number_prefix', '0');
+  $prefix = \Drupal::config('sms_valid.settings')->get('local_number_prefix');
   // A blank prefix string makes this return false
   if ($prefix !== '' && preg_match("/^$prefix/", $number)) {
     return TRUE;
@@ -525,12 +375,13 @@ function sms_valid_validate(&$number, &$options = array()) {
   // Set the default direction if not specified in options
   $dir = (array_key_exists('dir', $options)) ? $options['dir'] : SMS_DIR_OUT;
 
-  $use_global_ruleset   = variable_get('sms_valid_use_global_ruleset',   FALSE);
-  $global_ruleset       = variable_get('sms_valid_global_ruleset',       '64');
-  $local_number_prefix  = variable_get('sms_valid_local_number_prefix',  '0');
-  $local_number_ruleset = variable_get('sms_valid_local_number_ruleset', '64');
-  $last_resort_enabled  = variable_get('sms_valid_last_resort_enabled',  FALSE);
-  $last_resort_ruleset  = variable_get('sms_valid_last_resort_ruleset',  NULL);
+  $config = \Drupal::config('sms_valid.settings');
+  $use_global_ruleset   = $config->get('use_global_ruleset');
+  $global_ruleset       = $config->get('global_ruleset');
+  $local_number_prefix  = $config->get('local_number_prefix');
+  $local_number_ruleset = $config->get('local_number_ruleset');
+  $last_resort_enabled  = $config->get('last_resort_enabled');
+  $last_resort_ruleset  = $config->get('last_resort_ruleset');
 
   // Check if we should use a specific ruleset prefix
   if (array_key_exists('prefix', $options) && $options['prefix'] >= 0) {
@@ -559,7 +410,7 @@ function sms_valid_validate(&$number, &$options = array()) {
   }
   // Check if we should use the global ruleset
   elseif ($use_global_ruleset) {
-    $result['log'][] = 'Using the global prefix validation ruleset.';
+    $result['log'][] = t('Using the global prefix validation ruleset.');
     $prefix  = $global_ruleset;
     $ruleset = sms_valid_get_ruleset($prefix);
     $num     = $number;
@@ -568,7 +419,7 @@ function sms_valid_validate(&$number, &$options = array()) {
   elseif (sms_valid_is_local_number($number)) {
     $prefix  = $local_number_ruleset;
     $ruleset = sms_valid_get_ruleset($prefix);
-    $result['log'][] = 'Identified local number. Using ruleset prefix ' . $prefix;
+    $result['log'][] = t('Identified local number. Using ruleset prefix @prefix', array('@prefix' => $prefix));
     // Strip the local prefix from number
     $num     = preg_replace("/^$local_number_prefix/", '', $number);
   }
@@ -577,23 +428,23 @@ function sms_valid_validate(&$number, &$options = array()) {
     $ruleset  = sms_valid_get_ruleset_for_number($number);
 
     if ($ruleset) {
-      $prefix = $ruleset['prefix'];
-      $result['log'][] = 'Identified ruleset prefix ' . $prefix;
+      $prefix = $ruleset->prefix;
+      $result['log'][] = t('Identified ruleset prefix @prefix', array('@prefix' => $prefix));
     }
     else {
       // Could not identify ruleset prefix
-      $result['log'][] = 'Could NOT identify the ruleset prefix for number ' . $number;
+      $result['log'][] = t('Could NOT identify the ruleset prefix for number @number', array('@number' => $number));
 
       if ($last_resort_enabled && $last_resort_ruleset) {
         // We have a last resort to use
-        $result['log'][] = 'Using last resort ruleset prefix ' . $last_resort_ruleset;
+        $result['log'][] = t('Using last resort ruleset prefix @last_resort', array('@last_resort' => $last_resort_ruleset));
         $prefix  = $last_resort_ruleset;
         $ruleset = sms_valid_get_ruleset($prefix);
       }
       else {
         // No last resort. Fail hard.
-        $result['log'][] = 'No matching rulesets and no last resort ruleset configured.';
-        $result['log'][] = 'Cannot validate this number. Denied by default.';
+        $result['log'][] = t('No matching rulesets and no last resort ruleset configured.');
+        $result['log'][] = t('Cannot validate this number. Denied by default.');
         return $result;
       }
     }
@@ -602,7 +453,7 @@ function sms_valid_validate(&$number, &$options = array()) {
   }
 
   // Get the rules for this ruleset
-  $rules = $ruleset['rules'];
+  $rules = $ruleset->rules;
 
   // Lets make sure we have a rule before trying to sort it
   if ($rules !== NULL) {
@@ -611,26 +462,27 @@ function sms_valid_validate(&$number, &$options = array()) {
   }
 
   // Check whether this ruleset is enabled for the direction of communication
-  if (! sms_valid_ruleset_is_enabled($prefix, $dir)) {
-    $result['log'][] = "Number prefix $prefix does not allow messages in this direction.";
+  if (!sms_valid_ruleset_is_enabled($prefix, $dir)) {
+    $result['log'][] = t('Number prefix @prefix does not allow messages in this direction.', array('@prefix' => $prefix));
     $result['pass']  = FALSE;
     return $result;
   }
 
   // Test the number against each rule prefix until we get a match
-  if (! empty($rules)) {
+  if (!empty($rules)) {
     foreach ($rules as $rule_prefix => $rule) {
-      $result['log'][] = 'Trying rule with prefix ' . $rule_prefix . ' on number ' . $num;
+      $args = array('@prefix' => $prefix, '@rule_prefix' => $rule_prefix, '@number' => $num);
+      $result['log'][] = t('Trying rule with prefix @rule_prefix on number @number', $args);
       if (preg_match("/^$rule_prefix/", $num)) {
         if ($rule['allow']) {
           // Set the full validated number and return
           $number = $prefix . $num;
-          $result['log'][] = "Explicit allow for prefix $prefix $rule_prefix";
+          $result['log'][] = t('Explicit allow for prefix @prefix @rule_prefix', $args);
           $result['pass']  = TRUE;
           return $result;
         }
         else {
-          $result['log'][] = "Explicit deny for prefix $prefix $rule_prefix";
+          $result['log'][] = t('Explicit deny for prefix @prefix @rule_prefix', $args);
           $result['pass']  = FALSE;
           return $result;
         }
@@ -639,6 +491,90 @@ function sms_valid_validate(&$number, &$options = array()) {
   }
 
   // No matching rules. Default deny.
-  $result['log'][] = "Cannot validate this number. Denied by default.";
+  $result['log'][] = t('Cannot validate this number. Denied by default.');
   return $result;
 }
+
+/**
+ * @see sms_valid_admin_ruleset_form()
+ */
+function theme_sms_valid_admin_ruleset_form($variables) {
+  $form = $variables['form'];
+  $header = array();
+  $rows   = array();
+  $rows[] = array(
+    array(
+      'data' => '<strong>' . drupal_render($form['title']) . '</strong>',
+      'colspan' => 3,
+    ),
+  );
+
+  $rows[] = array(
+    drupal_render($form['select_prefix']),
+    drupal_render($form['select']),
+    array(
+      'data' => '',
+      'width' => '80%',
+    ),
+  );
+  unset($form['title']);
+  unset($form['select_prefix']);
+  unset($form['select']);
+
+  $output = _theme(
+    'table', array(
+      'header' => $header,
+      'rows' => $rows,
+    )
+  );
+
+  $output .= drupal_render_children($form);
+
+  return $output;
+}
+
+/**
+ * @see sms_valid_admin_rulesets_form()
+ */
+function theme_sms_valid_admin_rulesets_form($variables)
+{
+  $form = $variables['form'];
+  $output = '';
+  $rows = array();
+  foreach ($form as $prefix => $element) {
+    if (is_array($element) && isset($element['prefix']) && is_array($element['prefix'])) {
+      $rows[] = array(
+        drupal_render($element['prefix']),
+        drupal_render($element['name']),
+        drupal_render($element['iso2']),
+        drupal_render($element['qty_rules']),
+        drupal_render($element[$prefix . '_out']),
+        drupal_render($element[$prefix . '_in']),
+        drupal_render($element[$prefix . '_delete']),
+      );
+      unset($form[$prefix]);
+    }
+  }
+  $output .= drupal_render_children($form['note']);
+  unset($form['note']);
+
+  $header = array(
+    t('Prefix'),
+    t('Name'),
+    t('Country'),
+    t('Qty Rules'),
+    array(
+      'data' => t('Allow messages'),
+      'colspan' => 2,
+    ),
+    t('Delete'));
+
+  $output .= _theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+  ));
+  $output .= drupal_render_children($form);
+
+  return $output;
+}
+

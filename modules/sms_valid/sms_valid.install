@@ -14,22 +14,8 @@
  * @ingroup hooks
  */
 function sms_valid_install() {
-  // TODO The drupal_(un)install_schema functions are called automatically in D7.
-  // drupal_install_schema('sms_valid')
   sms_valid_create_example_ruleset();
 }
-
-
-/**
- * Implements hook_uninstall().
- *
- * @ingroup hooks
- */
-// function sms_valid_uninstall() {
-// TODO The drupal_(un)install_schema functions are called automatically in D7.
-// drupal_uninstall_schema('sms_valid')
-// }
-
 
 /**
  * Implements hook_schema().
@@ -90,60 +76,61 @@ function sms_valid_schema() {
  *   Array of query results.
  */
 function sms_valid_create_example_ruleset(&$ret = array()) {
-  $prefix = 64;
-  $name   = 'New Zealand';
-  $dirs_enabled = 4;
-  $iso2  = 'NZ';
-  $rules = array(
-    '21' => array(
-      'allow' => TRUE,
-      'comment' => 'Vodafone',
-    ),
-    '22' => array(
-      'allow' => TRUE,
-      'comment' => 'Two Degrees Mobile',
-    ),
-    '25' => array(
-      'allow' => FALSE,
-      'comment' => 'Telecom AMPS+TDMA (old)',
-    ),
-    '26' => array(
-      'allow' => FALSE,
-      'comment' => 'Telecom pager network',
-    ),
-    '27' => array(
-      'allow' => TRUE,
-      'comment' => 'Telecom CDMA',
-    ),
-    '28' => array(
-      'allow' => TRUE,
-      'comment' => 'Slingshot',
-    ),
-    '29' => array(
-      'allow' => TRUE,
-      'comment' => 'TelstraClear',
-    ),
+  $default_vals = array(
+    'prefix' => 64,
+    'name' => 'New Zealand',
+    'dirs_enabled' => 4,
+    'iso2' => 'NZ',
+    'rules' => array(
+      '21' => array(
+        'allow' => TRUE,
+        'comment' => 'Vodafone',
+      ),
+      '22' => array(
+        'allow' => TRUE,
+        'comment' => 'Two Degrees Mobile',
+      ),
+      '25' => array(
+        'allow' => FALSE,
+        'comment' => 'Telecom AMPS+TDMA (old)',
+      ),
+      '26' => array(
+        'allow' => FALSE,
+        'comment' => 'Telecom pager network',
+      ),
+      '27' => array(
+        'allow' => TRUE,
+        'comment' => 'Telecom CDMA',
+      ),
+      '28' => array(
+        'allow' => TRUE,
+        'comment' => 'Slingshot',
+      ),
+      '29' => array(
+        'allow' => TRUE,
+        'comment' => 'TelstraClear',
+      ),
+    )
   );
-  $rules_z = serialize($rules);
 
-  $sql = "INSERT INTO {sms_valid_rules} (prefix,name,rules,dirs_enabled,iso2)" .
-                                "VALUES (%d, '%s', '%s', %d, '%s')";
-  // @TODO Please convert this statement to the D7 database API syntax.
-//  $result = db_query($sql, $prefix, $name, $rules_z, $dirs_enabled, $iso2);
-
-  $result = db_insert('sms_valid_rules')
-  ->fields(array(
-    'prefix' => $prefix,
-    'name' => $name,
-    'rules' => $rules_z,
-    'dirs_enabled' => $dirs_enabled,
-    'iso2' => $iso2,
-  ))
-//  $result => $sql;
-  ->execute();
+  $ruleset = entity_create('sms_ruleset', $default_vals)->save();
 
   $ret[] = array(
-    'success' => $result !== FALSE,
-    'query' => check_plain($sql),
+    'success' => !empty($ruleset),
+//    'query' => check_plain($sql),
   );
 }
+
+//function sms_valid_update_8000() {
+//  update_variables_to_config('sms_valid.settings',
+//    array(
+//      'sms_valid_use_rulesets' => 'use_rulesets',
+//      'sms_valid_use_global_ruleset' => 'use_global_ruleset',
+//      'sms_valid_global_ruleset' => 'global_ruleset',
+//      'sms_valid_local_number_prefix' => 'local_number_prefix',
+//      'sms_valid_local_number_ruleset' => 'local_number_ruleset',
+//      'sms_valid_last_resort_enabled' => 'last_resort_enabled',
+//      'sms_valid_last_resort_ruleset' => 'last_resort_ruleset',
+//    )
+//  );
+//}

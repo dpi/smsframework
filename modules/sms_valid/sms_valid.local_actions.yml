@@ -1,0 +1,7 @@
+sms_valid.ruleset_add:
+  route_name: sms_valid.ruleset_add
+  title: 'Add/Edit ruleset'
+  weight: -8
+  appears_on:
+    - sms_valid.ruleset_list
+

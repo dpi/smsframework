@@ -1,0 +1,55 @@
+sms_valid.admin:
+  path: '/admin/config/smsframework/validation'
+  defaults:
+    _title: 'Number validation'
+    _form: '\Drupal\sms_valid\AdminSettingsForm'
+  requirements:
+    _permission: 'administer smsframework'
+
+sms_valid.admin_settings:
+  path: '/admin/config/smsframework/validation/settings'
+  defaults:
+    _title: 'Settings'
+    _form: '\Drupal\sms_valid\AdminSettingsForm'
+  requirements:
+    _permission: 'administer smsframework'
+
+sms_valid.ruleset_list:
+  path: '/admin/config/smsframework/validation/rulesets'
+  defaults:
+    _title: 'Rulesets'
+    _form: '\Drupal\sms_valid\RulesetListForm'
+  requirements:
+    _permission: 'administer smsframework'
+
+sms_valid.ruleset_add:
+  path: '/admin/config/smsframework/validation/ruleset'
+  defaults:
+    _title: 'Add/Edit ruleset'
+    _entity_form: sms_ruleset.add
+  requirements:
+    _permission: 'administer smsframework'
+
+sms_valid.ruleset_edit:
+  path: '/admin/config/smsframework/validation/ruleset/{sms_ruleset}'
+  defaults:
+    _title: 'Edit ruleset'
+    _entity_form: sms_ruleset.edit
+  requirements:
+    _permission: 'administer smsframework'
+
+sms_valid.ruleset_delete:
+  path: '/admin/config/smsframework/validation/ruleset/{sms_ruleset}/delete'
+  defaults:
+    _title: 'Delete ruleset'
+    _entity_form: sms_ruleset.delete
+  requirements:
+    _permission: 'administer smsframework'
+
+sms_valid.test:
+  path: 'admin/smsframework/validation/test'
+  defaults:
+    _title: 'Test validation'
+    _form: '\Drupal\sms_valid\RulesetTestFormController'
+  requirements:
+    _permission: 'administer smsframework'
