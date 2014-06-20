@@ -26,7 +26,7 @@ function sms_sendtophone_menu() {
 
   $items['admin/smsframework/sendtophone'] = array(
     'title' => 'Send to phone',
-    'description' => 'Configure send to phone functinality.',
+    'description' => 'Configure send to phone functionality.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sms_sendtophone_admin_overview'),
     'access arguments' => array('administer smsframework'),
