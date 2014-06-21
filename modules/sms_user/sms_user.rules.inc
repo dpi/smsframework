@@ -42,20 +42,21 @@ function sms_user_rules_action_info() {
   return array(
     'sms_action_user_send' => array(
       'label' => t('Send SMS message to user'),
+      'group' => t('SMS'),
       'arguments' => array(
         'user' => array(
           'type' => 'user',
           'label' => t('User'),
         ),
         'message' => array(
-          'type' => 'string',
+          'type' => 'text',
           'label' => t('Message'),
         ),
       ),
-      'module' => 'SMS Framework',
     ),
     'sms_action_match_user' => array(
       'label' => t('Match mobile number to user'),
+      'group' => t('SMS'),
       'arguments' => array(
         'number' => array(
           'type' => 'string',
@@ -69,7 +70,6 @@ function sms_user_rules_action_info() {
           // 'label callback' => 'rules_action_load_node_variable_label',
         ),
       ),
-      'module' => 'SMS Framework',
     ),
   );
 }
@@ -85,7 +85,6 @@ function sms_action_user_send($user, $message) {
  * Rules action callback to match number to user.
  */
 function sms_action_match_user($number) {
-  $uid = sms_user_get_uid($number);
-  return array('user_loaded' => user_load($user->uid));
+  return array('user_loaded' => user_load(sms_user_get_uid($number)));
 }
 
