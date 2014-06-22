@@ -1,16 +1,6 @@
 <?php
 
 /**
- * Implements hook_init().
- */
-function sms_sendtophone_init() {
-  drupal_add_css(drupal_get_path('module', 'sms_sendtophone') . '/sms_sendtophone.css');
-  if (module_exists('thickbox')) {
-    drupal_add_js(drupal_get_path('module', 'sms_sendtophone') . '/sms_sendtophone.js');
-  }
-}
-
-/**
  * Implements hook_menu().
  */
 function sms_sendtophone_menu() {
@@ -213,6 +203,8 @@ function theme_sms_sendtophone_filter_inline_text() {
   $link_text = !empty($filter->settings['sms_sendtophone_filter_inline_display_text']) ? $filter->settings['sms_sendtophone_filter_inline_display_text'] : t('Send to phone');
   $link = l($link_text, 'sms/sendtophone/inline', array('attributes' => array('title' => t('Send the highlighted text via SMS.'), 'class' => 'sms-sendtophone'), 'query' => array('text' => urlencode($text), drupal_get_destination())));
 
+  // Add css.
+  drupal_add_css(drupal_get_path('module', 'sms_sendtophone') . '/sms_sendtophone.css');
   return '<span class="sms-sendtophone-inline">' . $text . '</span> (' . $link . ')';
 }
 
@@ -239,6 +231,8 @@ function theme_sms_sendtophone_filter_inline_icon() {
 
   $link = l($icon, 'sms/sendtophone/inline', array('attributes' => array('title' => t('Send the highlighted text via SMS.'), 'class' => 'sms-sendtophone'), 'query' => 'text=' . urlencode($text) . '&' . drupal_get_destination(), 'html' => TRUE));
 
+  // Add css.
+  drupal_add_css(drupal_get_path('module', 'sms_sendtophone') . '/sms_sendtophone.css');
   return '<span class="sms-sendtophone-inline">' . $text . '</span> ' . $link;
 }
 
@@ -408,6 +402,8 @@ function sms_sendtophone_form($form, $form_state, $type) {
     '#weight' => 20,
   );
 
+  // Add css.
+  drupal_add_css(drupal_get_path('module', 'sms_sendtophone') . '/sms_sendtophone.css');
   return $form;
 }
 
@@ -458,6 +454,10 @@ function sms_sendtophone_node_view($node, $view_mode, $langcode) {
         '#attributes' => array('class' => array('links', 'inline')),
       );
     }
+  }
+  // Add thickbox js if module exists.
+  if (module_exists('thickbox')) {
+    drupal_add_js(drupal_get_path('module', 'sms_sendtophone') . '/sms_sendtophone.js');
   }
 }
 
