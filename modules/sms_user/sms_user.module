@@ -624,6 +624,26 @@ function sms_user_user_load($users) {
       $users[$record->uid]->sms_user[0] = (array)$record;
     }
   }
+
+  // Initialize users without records with blank info
+  foreach ($users as $id => $user) {
+    if (!isset($user->sms_user)) {
+      $users[$id]->sms_user = array(
+        'uid' => $id,
+        'number' => '',
+        'status' => 0,
+        'code' => 0,
+        'gateway' => '',
+        'sleep_enabled' => 0,
+        'sleep_start_time' => 0,
+        'sleep_end_time' => 0,
+      );
+
+      // @todo: the following is to support messaging that expect account details
+      // with a delta of 0
+      $users[$id]->sms_user[0] = $users[$id]->sms_user;
+    }
+  }
 }
 
 /**
