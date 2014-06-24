@@ -12,11 +12,11 @@
  */
 class sms_user_handler_field_status extends views_handler_field {
   function render($values) {
-    $status = $values->{$this->field_alias};
-    $status_defined = array(
-      SMS_USER_PENDING => t('Pending'),
-      SMS_USER_CONFIRMED => t('Confirmed'),
-    );
-    return $status_defined[$status];
+    $status = @$values->{$this->field_alias};
+    switch ($status) {
+      case SMS_USER_PENDING: return t('Pending');
+      case SMS_USER_CONFIRMED: return t('Confirmed');
+      default: return '';
+    }
   }
 }
