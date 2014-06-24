@@ -120,7 +120,8 @@ function sms_user_get_uid($number, $status = NULL) {
  */
 function sms_user_sms_send(&$number, &$message, &$options, &$gateway) {
   if (variable_get('sms_user_sleep', 1) && $uid = sms_user_get_uid($number)) {
-    $account = array_shift(user_load_multiple(array($uid), array('status' => 1)));
+    $account = user_load_multiple(array($uid), array('status' => 1));
+    $account = array_shift($account);
 
     if (_sms_user_sleep_active($account)) {
       unset($gateway['send']);
