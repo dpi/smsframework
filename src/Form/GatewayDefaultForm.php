@@ -33,7 +33,7 @@ class GatewayDefaultForm extends ConfigFormBase {
       $options[$identifier] = '';
       $form[$gateway['name']]['id'] = array('#markup' => $identifier);
       if ( isset($gateway['configure form'] ) and ( function_exists($gateway['configure form'] ))) {
-        $form[$gateway['name']]['configure'] = array('#markup' => l($this->t('configure'), 'admin/smsframework/gateways/' . $identifier));
+        $form[$gateway['name']]['configure'] = array('#markup' => l($this->t('configure'), 'admin/config/smsframework/gateways/' . $identifier));
       }
       else {
         $form[$gateway['name']]['configure'] = array('#markup' => $this->t('No configuration options'));
