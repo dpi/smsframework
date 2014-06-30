@@ -135,7 +135,7 @@ function sms_track_sms_send_process($op, $number, $message, $options, $gateway, 
     $dir = 0; // outgoing
     $options['gateway_id'] = $gateway['identifier'];
     $options['result']  = $result;
-    $result = sms_track_archive_write($dir, $number, $message, $options);
+    sms_track_archive_write($dir, $number, $message, $options);
   }
 }
 
@@ -153,7 +153,7 @@ function sms_track_sms_send_process($op, $number, $message, $options, $gateway, 
  *   Additional options array including receiver MSISDN
  */
 function sms_track_sms_incoming($op, $number, $message, $options) {
-  if ($op == 'pre process') {
+  if ($op == 'pre process' && isset($number)) {
     // Archiving
     $dir = 1; // incoming
     sms_track_archive_write($dir, $number, $message, $options);
