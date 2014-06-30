@@ -9,25 +9,6 @@
 
 
 /**
- * Implement hook_install().
- *
-function sms_track_install() {
-  drupal_install_schema('sms_track');
-}
- * This should not be needed in D7
- */
-
-/**
- * Implement hook_uninstall().
- *
-function sms_track_uninstall() {
-  drupal_uninstall_schema('sms_track');
-}
- * This should not be needed in D7
- */
-
-
-/**
  * Implement hook_schema().
  *
  * @return
@@ -69,7 +50,7 @@ function sms_track_schema() {
         'size'        => 'normal',
         'not null'    => FALSE),
       'status' => array(
-        'description' => 'Message delivery status. See contants.',
+        'description' => 'Message delivery status. See constants.',
         'type'        => 'int',
         'size'        => 'small',
         'unsigned'    => TRUE,
@@ -100,4 +81,15 @@ function sms_track_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Change the 'status' field from tinyint to smallint. See drupal issues #2295013
+ * and #1959802.
+ */
+function sms_track_update_7001(&$sandbox) {
+  $schema = sms_track_schema();
+  $spec = $schema['sms_track']['fields']['status'];
+
+  db_change_field('sms_track', 'status', 'status', $spec);
 }
