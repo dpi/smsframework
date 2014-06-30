@@ -39,33 +39,40 @@ function sms_actions_do($command, $number, $message) {
   // Keep objects for reuse so that changes actions make to objects can persist.
   static $objects;
 
-  $aids = _trigger_get_hook_aids('sms_actions', $command->op);
+  $aids = trigger_get_assigned_actions($command->hook);
 
   if (!$aids) {
     return;
   }
 
   $context = array(
-    'hook' => 'sms_actions',
-    'op' => $command->op,
-    'number' => $number,
+    'group' => 'sms_actions',
+    'hook' => $command->hook,
+    'from' => $number,
   );
 
   foreach ($aids as $aid => $action_info) {
-    if ($action_info['type'] != 'sms') {
-      if ($action_info['type'] == 'node') {
+    $type = $action_info['type'];
+    if ($type != 'sms') {
+      if ($type == 'node') {
         preg_match('!^[A-z0-9\-]+\s(.+)$!', $message, $matches);
         $params = explode(' ', $matches[1]);
         $node = node_load($params[0]);
-        if (!isset($objects[$action_info['type']])) {
-          $objects[$action_info['type']] = _trigger_normalize_comment_context($action_info['type'], $node);
+        if (!isset($objects[$type])) {
+          $objects[$type] = _trigger_normalize_comment_context($type, $node);
         }
-        $context['hook'] = 'nodeapi';
-        actions_do($aid, $objects[$action_info['type']], $context, $a3, $a4);
+        $context['group'] = 'node';
+        actions_do($aid, $objects[$type], $context);
       }
     }
     else {
-      $result = actions_do($aid, $message, $context, $options);
+      if (!isset($objects[$type])) {
+        $objects[$type] = (object) array(
+          'message' => $message,
+          'from' => $number,
+        );
+      }
+      actions_do($aid, $objects[$type], $context);
     }
   }
 }
@@ -113,11 +120,7 @@ function sms_actions_action_info() {
       'type' => 'sms',
       'label' => t('Send SMS'),
       'configurable' => TRUE,
-      'hooks' => array(
-        'sms_actions' => array('sms_actions'),
-        'nodeapi' => array('presave', 'insert', 'update', 'delete'),
-        'comment' => array('delete', 'insert', 'update'),
-      ),
+      'triggers' => array('sms_actions', 'node_presave', 'comment_insert', 'comment_update', 'comment_delete'),
     ),
   );
 }
@@ -177,8 +180,8 @@ function sms_actions_send_action_submit($form, &$form_state) {
  */
 function sms_actions_send_action($object, $context) {
   global $user;
-  switch ($context['hook']) {
-    case 'nodeapi':
+  switch ($context['group']) {
+    case 'node':
       $node = $context['node'];
       break;
     case 'comment':
@@ -190,6 +193,7 @@ function sms_actions_send_action($object, $context) {
       // object is not passed as $object, but it will still be available
       // in $context.
       $account = $context['account'];
+      $variables['%username'] = $account->name;
       if (isset($context['node'])) {
         $node = $context['node'];
       }
@@ -198,6 +202,9 @@ function sms_actions_send_action($object, $context) {
         watchdog('error', t("Cannot use '%author' token in this context."));
         return;
       }
+      break;
+    case 'sms_actions':
+      // We don't want the default: action for 'sms_actions' group.
       break;
     default:
       // Check context for node.
@@ -213,23 +220,22 @@ function sms_actions_send_action($object, $context) {
 
   $number = $context['number'];
 
-  $variables = array(
-    '%site_name' => variable_get('site_name', 'Drupal'),
-    '%username' => $account->name,
-  );
+  $variables['%site_name'] = variable_get('site_name', 'Drupal');
 
   if (isset($node)) {
     if (!isset($account)) {
       $account = user_load(array('uid' => $node->uid));
+      $variables['%username'] = $account->name;
     }
     if ($context['author'] && $account->sms_user[0]['status'] == 2) {
       $number = $account->sms_user[0]['number'];
     }
 
+    $names = node_type_get_names();
     $variables = array_merge($variables, array(
       '%uid' => $node->uid,
       '%node_url' => url('node/'. $node->nid, array('absolute' => TRUE)),
-      '%node_type' => check_plain(node_get_types('name', $node)),
+      '%node_type' => check_plain($names[$node->type]),
       '%title' => filter_xss($node->title),
       '%teaser' => filter_xss($node->teaser),
       '%body' => filter_xss($node->body),
@@ -238,7 +244,7 @@ function sms_actions_send_action($object, $context) {
   }
 
   $message = strtr($context['message'], $variables);
-  if (isset($node) && $context['author']) {
+  if (isset($node) && $context['author'] && isset($account)) {
     sms_user_send($account->uid, $message);
   }
   else{
@@ -262,17 +268,18 @@ function sms_actions_action_info_alter(&$actions) {
     'node_save_action',
     'node_unpublish_by_keyword_action',
     'system_send_email_action',
+    'sms_actions_send_action',
   );
 
   $commands = sms_actions_get_commands();
   $command_triggers[] = 'sms_actions';
   foreach ($commands as $command) {
-    $command_triggers[] = 'sms_actions_'. $command->discriminator;
+    $command_triggers[] = $command->hook;
   }
 
   foreach ($actions as $hook => $action) {
-    if (in_array($hook, $hooks)) {
-      $actions[$hook]['hooks']['sms_actions'] = $command_triggers;
+    if (in_array($hook, $hooks) && $action['triggers'] != array('any')) {
+      $actions[$hook]['triggers'] = array_unique(array_merge($actions[$hook]['triggers'], $command_triggers));
     }
   }
 }
@@ -280,18 +287,18 @@ function sms_actions_action_info_alter(&$actions) {
 /**
  * Implementation of hook_hook_info().
  */
-function sms_actions_hook_info() {
+function sms_actions_trigger_info() {
   $hooks = array();
 
-  $hooks['sms_actions']['sms_actions']['sms_actions'] = array(
-    'runs when' => t('When an SMS message with any discriminator is received.'),
+  $hooks['sms_actions']['sms_actions'] = array(
+    'label' => t('When an SMS message with any discriminator is received.'),
   );
 
   $commands = sms_actions_get_commands();
 
   foreach ($commands as $command) {
-    $hooks['sms_actions']['sms_actions'][$command->op] = array(
-      'runs when' => t('When an SMS message with the %discriminator discriminator is received.', array('%discriminator' => $command->discriminator)),
+    $hooks['sms_actions'][$command->hook] = array(
+      'label' => t('When an SMS message with the %discriminator discriminator is received.', array('%discriminator' => $command->discriminator)),
     );
   }
 
@@ -305,7 +312,7 @@ function sms_actions_get_commands() {
   $commands =  variable_get('sms_actions_commands', array());
 
   foreach ($commands as $key => $command) {
-    $commands[$key]->op = 'sms_actions_'. $command->discriminator;
+    $commands[$key]->hook = 'sms_actions_'. $command->discriminator;
   }
 
   return $commands;
@@ -324,11 +331,9 @@ function sms_actions_command_load($discriminator) {
  */
 function sms_actions_command_save($command) {
   $commands = sms_actions_get_commands();
-  $is_existing = FALSE;
   $existing_discriminator = !empty($command->old_discriminator) ? $command->old_discriminator : $command->discriminator;
-  $is_existing = count($commands[$existing_discriminator]);
-  if ($is_existing) {
-    db_query("UPDATE {trigger_assignments} SET op = '%s' WHERE op = '%s'", array('sms_actions_'. $command->discriminator, 'sms_actions_'. $existing_discriminator));
+  if (array_key_exists($existing_discriminator, $commands)) {
+    db_query("UPDATE {trigger_assignments} SET hook = '%s' WHERE hook = '%s'", array('sms_actions_'. $command->discriminator, 'sms_actions_'. $existing_discriminator));
   }
   unset($commands[$existing_discriminator]);
   $commands[$command->discriminator] = $command;
@@ -342,7 +347,7 @@ function sms_actions_command_delete($discriminator) {
   $commands = variable_get('sms_actions_commands', array());
   unset($commands[$discriminator]);
   variable_set('sms_actions_commands', $commands);
-  db_query("DELETE FROM {trigger_assignments} WHERE op = '%s'", 'sms_actions_' . $discriminator);
+  db_query("DELETE FROM {trigger_assignments} WHERE hook = '%s'", array('sms_actions_' . $discriminator));
 }
 
 /**
@@ -351,40 +356,39 @@ function sms_actions_command_delete($discriminator) {
 function sms_actions_command_list() {
   $header = array(t('Discriminator'), t('Operations'));
   $commands = sms_actions_get_commands();
-
-  if (!empty($commands)) {
-    foreach ($commands as $command) {
-      $row = array($command->discriminator, l(t('edit'), 'admin/smsframework/actions/edit/'. $command->discriminator));
-      $rows[] = $row;
-    }
+  $rows = array();
+  foreach ($commands as $command) {
+    $row = array($command->discriminator, l(t('edit'), 'admin/smsframework/actions/edit/'. $command->discriminator));
+    $rows[] = $row;
   }
-  else {
-    $rows[] = array(array('data' => t('No commands available.'), 'colspan' => 2));
-  }
-  return theme('table', $header, $rows);
+  return theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+    'empty' => t('No commands available.'),
+  ));
 }
 
 /**
  *
  */
 function sms_actions_edit_command_form($form, &$form_state, $discriminator = NULL) {
-  if (isset($discriminator)) {
-    $command = sms_actions_command_load($discriminator);
-  }
-
   // Check for confirmation forms.
   if (isset($form_state['confirm_delete'])) {
     return sms_actions_command_confirm_delete($form_state, $discriminator);
   }
 
+  if (isset($discriminator)) {
+    $command = sms_actions_command_load($discriminator);
+  }
+
   $form['discriminator'] = array(
     '#type' => 'textfield',
     '#title' => t('Discriminator'),
-    '#description' => t('A keyword that will be used to idenifty incoming messages. The discriminator may consist only of lowercase letters, numbers, and dashes.'),
+    '#description' => t('A keyword that will be used to identify incoming messages. The discriminator may consist only of lowercase letters, numbers, and dashes.'),
     '#size' => 40,
     '#maxlength' => 16,
     '#required' => TRUE,
-    '#default_value' => $command->discriminator,
+    '#default_value' => isset($command) ? $command->discriminator : '',
   );
 
   $form['submit'] = array(
@@ -423,7 +427,7 @@ function sms_actions_edit_command_form_submit($form, &$form_state) {
   // $commands = sms_actions_get_commands();
   $command = new stdClass();
   $command->discriminator = $form_state['values']['discriminator'];
-  $command->old_discriminator = $form_state['values']['old_discriminator'];
+  $command->old_discriminator = isset($form_state['values']['old_discriminator']) ? $form_state['values']['old_discriminator'] : '';
 
   if ($form_state['clicked_button']['#value'] == t('Delete')) {
     if ($form_state['values']['delete'] === TRUE) {
