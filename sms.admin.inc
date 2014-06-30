@@ -134,10 +134,11 @@ function sms_admin_gateway_form_validate($form, &$form_state) {
  */
 function sms_admin_gateway_form_submit($form, &$form_state) {
   $gateway = $form_state['values']['gateway'];
+  $values = $form_state['values'];
 
-  // Remove uneccesary values
-  unset($form_state['values']['op'], $form_state['values']['submit'], $form_state['values']['gateway'], $form_state['values']['form_token'], $form_state['values']['form_id']);
-  variable_set('sms_' . $gateway['identifier'] . '_settings', $form_state['values']);
+  // Remove unnecessary values
+  unset($values['op'], $values['submit'], $values['gateway'], $values['form_token'], $values['form_id'], $values['form_build_id']);
+  variable_set('sms_' . $gateway['identifier'] . '_settings', $values);
   drupal_set_message(t('The gateway settings have been saved.'));
   $form_state['redirect'] = 'admin/smsframework/gateways';
 }
