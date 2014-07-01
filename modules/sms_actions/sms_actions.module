@@ -191,8 +191,8 @@ function sms_actions_send_action($object, $context) {
     case 'user':
       // Because this is not an action of type 'user' the user
       // object is not passed as $object, but it will still be available
-      // in $context.
-      $account = $context['account'];
+      // in $context. Use user_load() to pull in ->sms_user data as well.
+      $account = user_load($context['account']->uid);
       $variables['%username'] = $account->name;
       if (isset($context['node'])) {
         $node = $context['node'];
@@ -224,11 +224,11 @@ function sms_actions_send_action($object, $context) {
 
   if (isset($node)) {
     if (!isset($account)) {
-      $account = user_load(array('uid' => $node->uid));
+      $account = user_load($node->uid);
       $variables['%username'] = $account->name;
     }
-    if ($context['author'] && $account->sms_user[0]['status'] == 2) {
-      $number = $account->sms_user[0]['number'];
+    if ($context['author'] && $account->sms_user['status'] == 2) {
+      $number = $account->sms_user['number'];
     }
 
     $names = node_type_get_names();

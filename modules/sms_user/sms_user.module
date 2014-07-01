@@ -73,8 +73,8 @@ function sms_user_send($uid, $message) {
   $account = user_load($uid);
   //Check if the user is enabled to receive SMS
   if (user_access('receive sms', $account)) {
-    if ($account->sms_user[0]['status'] >= SMS_USER_CONFIRMED) {
-      return sms_send($account->sms_user[0]['number'], $message, $account->sms_user[0]['gateway']);
+    if ($account->sms_user['status'] >= SMS_USER_CONFIRMED) {
+      return sms_send($account->sms_user['number'], $message, $account->sms_user['gateway']);
     }
     else {
       return FALSE;
@@ -91,8 +91,8 @@ function sms_user_send($uid, $message) {
 function sms_user_get_number($account) {
   //Check if the user is enabled to receive SMS
   if (user_access('receive sms', $account)) {
-    if ($account->sms_user[0]['status'] >= SMS_USER_CONFIRMED) {
-      return $account->sms_user[0]['number'];
+    if ($account->sms_user['status'] >= SMS_USER_CONFIRMED) {
+      return $account->sms_user['number'];
     }
     else {
       return FALSE;
