@@ -67,10 +67,10 @@ function sms_sendtophone_page($type = NULL) {
   }
   else {
     if ($user->uid > 0 && !empty($user->sms_user) && empty($user->sms_user['number'])) {
-      $register = t('You need to <a href="@setup">setup</a> your mobile phone to send messages.', array('@setup' => url('user/' . $user->uid . '/mobile')));
+      $register = t('You need to <a href="@setup">setup</a> your mobile phone to send messages.', array('@setup' => url('user/' . $user->uid . '/edit/mobile')));
     }
     elseif ($user->uid > 0 && !empty($user->sms_user) && $user->sms_user['status'] != 2) {
-      $register = t('You need to <a href="@confirm">confirm</a> your mobile phone number to send messages.', array('@confirm' => url('user/' . $user->uid . '/mobile')));
+      $register = t('You need to <a href="@confirm">confirm</a> your mobile phone number to send messages.', array('@confirm' => url('user/' . $user->uid . '/edit/mobile')));
     }
     else {
       $register = t('You do not have permission to send messages. You may need to <a href="@signin">sign in</a> or <a href="@register">register</a> for an account to send messages to a mobile phone.', array('@signin' => url('user', array('query' => array('destination' => $_GET['destination']))), '@register' => url('user/register', array('query' => array('destination' => $_GET['destination'])))));
@@ -373,7 +373,7 @@ function sms_sendtophone_form($form, $form_state, $type) {
     case 'node':
       if (is_numeric(arg(3))) {
         $node = node_load(arg(3));
-        $form['message'] = array(
+        $form['message_display'] = array(
           '#type' => 'textarea',
           '#title' => t('Message preview'),
           '#description' => t('This URL will be sent to the phone.'),
@@ -381,6 +381,10 @@ function sms_sendtophone_form($form, $form_state, $type) {
           '#rows' => 2,
           '#attributes' => array('disabled' => TRUE),
           '#default_value' => url('node/' . $node->nid, array('absolute' => TRUE)),
+        );
+        $form['message'] = array(
+          '#type' => 'value',
+          '#value' => url('node/' . $node->nid, array('absolute' => TRUE)),
         );
       }
       break;
@@ -428,6 +432,7 @@ function sms_sendtophone_form_submit($form, &$form_state) {
   if (sms_send($form_state['values']['number'], $form_state['values']['message'], $form_state['values']['gateway'])) {
     drupal_set_message(t('The message "@message" sent to @number.', array('@message' => $form_state['values']['message'], '@number' => $form_state['values']['number'])));
   }
+  $form_state['redirect'] = $_REQUEST['destination'];
 }
 
 /**
@@ -435,25 +440,43 @@ function sms_sendtophone_form_submit($form, &$form_state) {
  * previously implemented in hook_link
  */
 function sms_sendtophone_node_view($node, $view_mode, $langcode) {
+  global $user;
   $links = array();
-
+  $user = user_load($user->uid);
   $types = variable_get('sms_sendtophone_content_types', array());
   if (in_array($node->type, $types)) {
-    if ($types[$node->type]) {
+    if (user_access('send to any number') || (!empty($user->sms_user['number']) && $user->sms_user['status'] == 2)) {
+      // Only show "send to phone" link if user is permitted to do so.
       $links['sms_sendtophone'] = array(
         'title' => t('Send to phone'),
         'href' => "sms/sendtophone/node/$node->nid",
+        'query' => drupal_get_destination(),
         'attributes' => array(
           'class' => 'sms-sendtophone',
           'title' => 'Send a link via SMS.',
         ),
       );
-      $node->content['links']['sms_sendtophone'] = array(
-        '#theme' => 'links__sms_sendtophone',
-        '#links' => $links,
-        '#attributes' => array('class' => array('links', 'inline')),
-      );
     }
+    else if ($user->uid > 0) {
+      // Show messages to encourage users to register their mobile number.
+      if (empty($user->sms_user['number'])) {
+        $links['sms_sendtophone'] = array(
+          'title' => t('Setup your mobile number to send to phone.'),
+          'href' => 'user/' . $user->uid . '/edit/mobile',
+        );
+      }
+      elseif ($user->sms_user['status'] != 2) {
+        $links['sms_sendtophone'] = array(
+          'title' => t('Confirm your mobile number to send to phone.'),
+          'href' => 'user/' . $user->uid . '/edit/mobile',
+        );
+      }
+    }
+    $node->content['links']['sms_sendtophone'] = array(
+      '#theme' => 'links__sms_sendtophone',
+      '#links' => $links,
+      '#attributes' => array('class' => array('links', 'inline')),
+    );
   }
   // Add thickbox js if module exists.
   if (module_exists('thickbox')) {
