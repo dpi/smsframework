@@ -14,7 +14,7 @@ function sms_rules_event_info() {
       'label' => t('A SMS message is received'),
       'access callback' => 'sms_rules_access_callback',
       'module' => 'sms',
-      'group' => t('SMS Framework'),
+      'group' => t('SMS'),
       'variables' => array(
         'sms' => array(
           'label' => t('SMS Message'),

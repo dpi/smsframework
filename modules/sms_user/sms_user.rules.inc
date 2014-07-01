@@ -12,20 +12,20 @@
  */
 function sms_user_rules_event_info() {
   return array(
-    'sms_user_validated' => array(
+    'sms_user_number_validated' => array(
       'label' => t('User validated SMS code'),
-      'module' => 'SMS',
-      'arguments' => array(
+      'group' => t('SMS'),
+      'variables' => array(
         'user' => array(
           'type' => 'user',
           'label' => t('User validated SMS code'),
         ),
       ),
     ),
-    'sms_user_removed' => array(
+    'sms_user_number_removed' => array(
       'label' => t('User removed mobile phone number'),
-      'module' => 'SMS',
-      'arguments' => array(
+      'group' => t('SMS'),
+      'variables' => array(
         'user' => array(
           'type' => 'user',
           'label' => t('User removed mobile phone number'),
@@ -43,7 +43,7 @@ function sms_user_rules_action_info() {
     'sms_action_user_send' => array(
       'label' => t('Send SMS message to user'),
       'group' => t('SMS'),
-      'arguments' => array(
+      'parameter' => array(
         'user' => array(
           'type' => 'user',
           'label' => t('User'),
@@ -57,10 +57,10 @@ function sms_user_rules_action_info() {
     'sms_action_match_user' => array(
       'label' => t('Match mobile number to user'),
       'group' => t('SMS'),
-      'arguments' => array(
+      'parameter' => array(
         'number' => array(
-          'type' => 'string',
-          'label' => t('Mobile number'),
+          'type' => 'text',
+          'label' => t('Phone number'),
         ),
       ),
       'new variables' => array(
@@ -87,4 +87,3 @@ function sms_action_user_send($user, $message) {
 function sms_action_match_user($number) {
   return array('user_loaded' => user_load(sms_user_get_uid($number)));
 }
-

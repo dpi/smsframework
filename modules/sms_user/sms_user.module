@@ -56,7 +56,6 @@ function sms_user_menu_alter(&$callbacks) {
   $callbacks['user/%user_category/edit/mobile']['page arguments'] = array(1);
   $callbacks['user/%user_category/edit/mobile']['module'] = 'sms_user';
   $callbacks['user/%user_category/edit/mobile']['file'] = 'sms_user.module';
-  //dsm($callbacks);
 }
 
 /**
@@ -338,7 +337,7 @@ function sms_user_settings_confirm_form_submit($form, &$form_state) {
     user_save($account, array('sms_user' => $data), 'mobile');
     // If the rule module is installed, fire rules
     if (module_exists('rules')) {
-      rules_invoke_event('sms_user_validated', $account);
+      rules_invoke_event('sms_user_number_validated', $account);
     }
   }
 }
@@ -377,7 +376,7 @@ function sms_user_settings_reset_form_submit($form, &$form_state) {
   $account = user_load($form_state['values']['uid']);
   sms_user_delete($account->uid);
   if (module_exists('rules')) {
-    rules_invoke_event('sms_user_removed', $account);
+    rules_invoke_event('sms_user_number_removed', $account);
   }
   drupal_set_message(t('Your mobile information has been removed'), 'status');
 }
@@ -1120,9 +1119,10 @@ function entity_property_sms_user_get_properties($data, array $options, $name, $
     if (isset($account->sms_user)) {
       switch ($name) {
         case "sms_user_phone_number" :
-          return $account->sms_user['number'];
+          return isset($account->sms_user['number']) ? $account->sms_user['number'] : '';
           break;
         case "sms_user_status" :
+          if (!isset($account->sms_user['status'])) return t('Blocked');
           switch ($account->sms_user['status']) {
             case SMS_USER_BLOCKED:
               return t('Blocked');
