@@ -520,6 +520,7 @@ function sms_valid_validate(&$number, &$options = array()) {
   $result = array(
     'pass' => NULL,
     'log' => array(),
+    'errors' => array(),
   );
 
   // Set the default direction if not specified in options
@@ -543,6 +544,8 @@ function sms_valid_validate(&$number, &$options = array()) {
   // Check for zero-length value
   if (!strlen($number)) {
     $result['log'][] = t('You must enter a phone number.');
+    $result['errors'][] = t('Zero length phone number specified.');
+    $result['pass']  = FALSE;
     return $result;
   }
 
@@ -559,7 +562,7 @@ function sms_valid_validate(&$number, &$options = array()) {
   }
   // Check if we should use the global ruleset
   elseif ($use_global_ruleset) {
-    $result['log'][] = 'Using the global prefix validation ruleset.';
+    $result['log'][] = t('Using the global prefix validation ruleset.');
     $prefix  = $global_ruleset;
     $ruleset = sms_valid_get_ruleset($prefix);
     $num     = $number;
@@ -568,7 +571,7 @@ function sms_valid_validate(&$number, &$options = array()) {
   elseif (sms_valid_is_local_number($number)) {
     $prefix  = $local_number_ruleset;
     $ruleset = sms_valid_get_ruleset($prefix);
-    $result['log'][] = 'Identified local number. Using ruleset prefix ' . $prefix;
+    $result['log'][] = t('Identified local number. Using ruleset prefix @prefix', array('@prefix' => $prefix));
     // Strip the local prefix from number
     $num     = preg_replace("/^$local_number_prefix/", '', $number);
   }
@@ -578,22 +581,24 @@ function sms_valid_validate(&$number, &$options = array()) {
 
     if ($ruleset) {
       $prefix = $ruleset['prefix'];
-      $result['log'][] = 'Identified ruleset prefix ' . $prefix;
+      $result['log'][] = t('Identified ruleset prefix @prefix', array('@prefix' => $prefix));
     }
     else {
       // Could not identify ruleset prefix
-      $result['log'][] = 'Could NOT identify the ruleset prefix for number ' . $number;
+      $result['log'][] = t('Could NOT identify the ruleset prefix for number @number', array('@number' => $number));
 
       if ($last_resort_enabled && $last_resort_ruleset) {
         // We have a last resort to use
-        $result['log'][] = 'Using last resort ruleset prefix ' . $last_resort_ruleset;
+        $result['log'][] = t('Using last resort ruleset prefix @prefix', array('@prefix' => $last_resort_ruleset));
         $prefix  = $last_resort_ruleset;
         $ruleset = sms_valid_get_ruleset($prefix);
       }
       else {
         // No last resort. Fail hard.
-        $result['log'][] = 'No matching rulesets and no last resort ruleset configured.';
-        $result['log'][] = 'Cannot validate this number. Denied by default.';
+        $result['log'][] = t('No matching rulesets and no last resort ruleset configured.');
+        $result['log'][] = t('Cannot validate this number. Denied by default.');
+        $result['errors'][] = t('Cannot validate this number. Denied by default.');
+        $result['pass']  = FALSE;
         return $result;
       }
     }
@@ -612,7 +617,8 @@ function sms_valid_validate(&$number, &$options = array()) {
 
   // Check whether this ruleset is enabled for the direction of communication
   if (! sms_valid_ruleset_is_enabled($prefix, $dir)) {
-    $result['log'][] = "Number prefix $prefix does not allow messages in this direction.";
+    $result['log'][] = t('Number prefix @prefix does not allow messages in this direction.', array('@prefix' => $prefix));
+    $result['errors'][] = t('Number prefix @prefix does not allow messages in this direction.', array('@prefix' => $prefix));
     $result['pass']  = FALSE;
     return $result;
   }
@@ -625,12 +631,13 @@ function sms_valid_validate(&$number, &$options = array()) {
         if ($rule['allow']) {
           // Set the full validated number and return
           $number = $prefix . $num;
-          $result['log'][] = "Explicit allow for prefix $prefix $rule_prefix";
+          $result['log'][] = t('Explicit allow for prefix @prefix @rule_prefix', array('@prefix' => $prefix, '@rule_prefix' => $rule_prefix));
           $result['pass']  = TRUE;
           return $result;
         }
         else {
-          $result['log'][] = "Explicit deny for prefix $prefix $rule_prefix";
+          $result['log'][] = t('Explicit deny for prefix @prefix @rule_prefix', array('@prefix' => $prefix, '@rule_prefix' => $rule_prefix));
+          $result['errors'][] = t('Number @number denied by sms validation rule @prefix @rule_prefix', array('@number' => $number, '@prefix' => $prefix, '@rule_prefix' => $rule_prefix));
           $result['pass']  = FALSE;
           return $result;
         }
@@ -639,6 +646,8 @@ function sms_valid_validate(&$number, &$options = array()) {
   }
 
   // No matching rules. Default deny.
-  $result['log'][] = "Cannot validate this number. Denied by default.";
+  $result['log'][] = t('Cannot validate this number. Denied by default.');
+  $result['errors'][] = t('Cannot validate this number. No matching sms valid rule found.');
+  $result['pass'] = FALSE;
   return $result;
 }

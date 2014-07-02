@@ -417,9 +417,9 @@ function sms_send_form($required = FALSE) {
  * @see sms_send_form_submit()
  */
 function sms_send_form_validate($form, &$form_state) {
-  $not_valid = sms_validate_number(sms_formatter($form_state['values']['number']), $form_state['values']['gateway']);
-  if ($not_valid) {
-    form_set_error('number', t($not_valid));
+  $errors = sms_validate_number(sms_formatter($form_state['values']['number']), $form_state['values']['gateway']);
+  if ($errors) {
+    form_set_error('number', implode("<br />", $errors));
   }
 }
 
@@ -593,27 +593,29 @@ function sms_formatter($number, $format = 1) {
 
 /**
  * Validates a phone number. Passes number to active gateway for further
- * validation if neccessary.
+ * validation if necessary.
  */
 function sms_validate_number(&$number, $options = array()) {
+  $errors = array();
   if (!strlen($number)) {
-    return t('The phone number is invalid.');
+    $errors[] = t('The phone number is invalid.');
   }
 
-  // Allow the active gateway to provide number validation
+  // Allow the active gateway to provide number validation.
   $gateway = sms_default_gateway();
-  // TODO we neeed some sort of validation this isn't working properly.
-  if (isset($gateway['validate_number'])) {
-    if (function_exists($gateway['validate number']) && $error = $gateway['validate number']($number, $options)) {
-      return $error;
+  // TODO we need some sort of validation this isn't working properly.
+  if (isset($gateway['validate number']) && function_exists($gateway['validate number'])) {
+    if ($error = $gateway['validate number']($number, $options)) {
+      $errors[] = $error;
     }
   }
   if (module_exists('sms_valid')) {
-    if ($error = sms_valid_validate($number, $options)) {
-      return $error;
+    $result = sms_valid_validate($number, $options);
+    if ($result['errors']) {
+      $errors = array_merge($errors, $result['errors']);
     }
   }
-  return NULL;
+  return $errors;
 }
 
 /**

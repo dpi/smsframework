@@ -521,9 +521,12 @@ function sms_valid_admin_test_form_submit(&$form, $form_state) {
     case 1: // Test main validation function
       $error = sms_validate_number($number);
       if ($error) {
-        drupal_set_message(t('Error message from validation function: %error', array('%error' => filter_xss($error))));
+        drupal_set_message(t('Error message from validation function: %error', array('%error' => filter_xss(implode("<br />", $error)))));
+        $pass = FALSE;
       }
-      $pass = (! $error);
+      else {
+        $pass = TRUE;
+      }
       break;
   }
 
