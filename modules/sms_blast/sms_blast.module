@@ -55,29 +55,29 @@ function sms_blast_form() {
  */
 function sms_blast_form_submit(&$form, $form_state) {
   $result = db_query("SELECT uid FROM {sms_user} WHERE status = 2");
-  $success = $failures = 0;
+  $num_passed = $num_failed = 0;
 
   if ($result->rowCount() != 0) {
     $errors = array();
     foreach ($result as $row) {
       try {
         if (sms_user_send($row->uid, $form_state['values']['message'])) {
-          $success++;
+          $num_passed++;
         }
         else {
-          $failures++;
+          $num_failed++;
         }
       }
       catch (Exception $e) {
         $errors[] = $e->getMessage();
-        $failures++;
+        $num_failed++;
       }
     }
-    if ($success) {
-      drupal_set_message(t('The message was sent to %count users.', array('%count' => $success)));
+    if ($num_passed) {
+      drupal_set_message(t('The message was sent to %count users.', array('%count' => $num_passed)));
     }
-    if ($failures) {
-      drupal_set_message(t('The message could not be sent to %count users.', array('%count' => $failures)), 'warning');
+    if ($num_failed) {
+      drupal_set_message(t('The message could not be sent to %count users.', array('%count' => $num_failed)), 'warning');
     }
   }
   else {
