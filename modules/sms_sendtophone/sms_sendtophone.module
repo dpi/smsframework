@@ -91,7 +91,7 @@ function sms_sendtophone_page($type = NULL) {
 function sms_sendtophone_filter_info() {
   $filters['sms_sendtophone'] = array(
     'title' => t('Inline SMS'),
-    'description' => t('Highlights text between [sms] tags and appends a "send to phone" button.'),
+    'description' => t('Highlights text between [sms][/sms] tags and appends a "send to phone" button.'),
     'process callback' => '_sms_sendtophone_filter_inline',
     'tips callback' => '_sms_sendtophone_filter_sms_tips',
     'settings callback' => '_sms_sendtophone_filter_inline_settings',
@@ -104,7 +104,7 @@ function sms_sendtophone_filter_info() {
  * SMS filter tips
  */
 function _sms_sendtophone_filter_sms_tips($filter, $format, $long = FALSE) {
-  return t('Text between [sms][/sms] tags will be highted and appended with a "send to phone" button.');
+  return t('Text between [sms][/sms] tags will be highlighted and appended with a "send to phone" button.');
 }
 
 /**
@@ -166,11 +166,12 @@ function _sms_sendtophone_filter_inline($text, $filter, $format, $langcode, $cac
   }
 
   foreach ($matches as $match) {
-    // TODO Please change this theme call to use an associative array for the $variables parameter.
-    $text = str_replace($match[0], theme('sms_sendtophone_filter_inline_' . $display, array(
-      'text' => $match[1],
-      'filter' => $filter)), $text
-    );
+    $text = str_replace($match[0],
+      theme('sms_sendtophone_filter_inline_' . $display,
+        array(
+          'text' => $match[1],
+          'filter' => $filter)),
+      $text);
   }
   return $text;
 }
@@ -181,7 +182,7 @@ function _sms_sendtophone_filter_inline($text, $filter, $format, $langcode, $cac
 function sms_sendtophone_theme() {
   return array(
     'sms_sendtophone_filter_inline_text' => array(
-      'variables' => array('text' => NULL, 'filter' => NULL),
+      'variables' => array('text' => NULL, 'filter' => NULL)
     ),
     'sms_sendtophone_filter_inline_icon' => array(
       'variables' => array('text' => NULL, 'filter' => NULL),
@@ -196,12 +197,12 @@ function sms_sendtophone_theme() {
  * @todo Please document this function.
  * @see http://drupal.org/node/1354
  */
-function theme_sms_sendtophone_filter_inline_text() {
-  // TODO Number of parameters in this theme funcion does not match number of parameters found in hook_theme.
+function theme_sms_sendtophone_filter_inline_text($variables) {
   $text = $variables['text'];
   $filter = $variables['filter'];
-  $link_text = !empty($filter->settings['sms_sendtophone_filter_inline_display_text']) ? $filter->settings['sms_sendtophone_filter_inline_display_text'] : t('Send to phone');
-  $link = l($link_text, 'sms/sendtophone/inline', array('attributes' => array('title' => t('Send the highlighted text via SMS.'), 'class' => 'sms-sendtophone'), 'query' => array('text' => urlencode($text), drupal_get_destination())));
+  $link_text = !empty($filter->settings['sms_sendtophone_filter_inline_display_text']) ?
+      $filter->settings['sms_sendtophone_filter_inline_display_text'] : t('Send to phone');
+  $link = l($link_text, 'sms/sendtophone/inline', array('attributes' => array('title' => t('Send the highlighted text via SMS.'), 'class' => 'sms-sendtophone'), 'query' => array('text' => $text, drupal_get_destination())));
 
   // Add css.
   drupal_add_css(drupal_get_path('module', 'sms_sendtophone') . '/sms_sendtophone.css');
@@ -212,28 +213,28 @@ function theme_sms_sendtophone_filter_inline_text() {
  * @todo Please document this function.
  * @see http://drupal.org/node/1354
  */
-function theme_sms_sendtophone_filter_inline_icon() {
-  // TODO Number of parameters in this theme funcion does not match number of parameters found in hook_theme.
+function theme_sms_sendtophone_filter_inline_icon($variables) {
   $text = $variables['text'];
-  $format = $variables['format'];
-  if (variable_get("sms_sendtophone_filter_inline_default_icon_$format", 1)) {
+  $filter = $variables['filter'];
+  if (!isset($filter->settings["sms_sendtophone_filter_inline_default_icon"]) || $filter->settings["sms_sendtophone_filter_inline_default_icon"] == 1) {
     $icon_path = drupal_get_path('module', 'sms_sendtophone') . '/sms-send.gif';
   }
   else {
-    $icon_path = variable_get("sms_sendtophone_filter_inline_custom_icon_path_$format", '');
+    $icon_path = $filter->settings["sms_sendtophone_filter_inline_custom_icon_path"];
   }
 
-  $icon = theme('image', array('path' => array(
+  $title = t('Send the highlighted text via SMS.');
+  $icon = theme('image', array(
       'path' => $icon_path,
-      'width' => t(variable_get("sms_sendtophone_filter_inline_display_text_$format", 'Send to phone')),
-      'height' => t('Send the highlighted text via SMS.'),
-    )));
+      'alt' => t($filter->settings["sms_sendtophone_filter_inline_display_text"]),
+      'title' => $title,
+    ));
 
-  $link = l($icon, 'sms/sendtophone/inline', array('attributes' => array('title' => t('Send the highlighted text via SMS.'), 'class' => 'sms-sendtophone'), 'query' => 'text=' . urlencode($text) . '&' . drupal_get_destination(), 'html' => TRUE));
+  $link = l($icon, 'sms/sendtophone/inline', array('attributes' => array('title' => t('Send the highlighted text via SMS.'), 'class' => 'sms-sendtophone'), 'query' => array('text' => $text, drupal_get_destination()), 'html' => TRUE));
 
   // Add css.
   drupal_add_css(drupal_get_path('module', 'sms_sendtophone') . '/sms_sendtophone.css');
-  return '<span class="sms-sendtophone-inline">' . $text . '</span> ' . $link;
+  return '<span class="sms-sendtophone-inline" title="' . $title . '">' . $text . '</span> ' . $link;
 }
 
 /**
@@ -325,29 +326,35 @@ function sms_sendtophone_field_formatter_info() {
 }
 
 /**
- * Implements hook_field_formatter().
+ * Implements hook_field_formatter_view().
  */
-function sms_sendtophone_field_formatter($field, $item, $formatter, $node) {
-  switch ($formatter) {
-    case 'sms_sendtophone':
-      $text = check_plain(strip_tags($item['value']));
+function sms_sendtophone_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
 
-      if ($text) {
-        return $text . theme('sms_sendtophone_field', array('text' => $text));
+  switch ($display['type']) {
+    case 'sms_sendtophone':
+      foreach ($items as $delta => $item) {
+        $text = check_plain(strip_tags($item['value']));
+        $element[$delta] = array(
+          '#type' => 'markup',
+          '#theme' => 'sms_sendtophone_field',
+          '#text' => $text,
+        );
       }
+      break;
   }
+  return $element;
 }
 
 /**
  * @todo Please document this function.
  * @see http://drupal.org/node/1354
  */
-function theme_sms_sendtophone_field() {
-  // TODO Number of parameters in this theme funcion does not match number of parameters found in hook_theme.
+function theme_sms_sendtophone_field($variables) {
   $text = $variables['text'];
-  $link = l(t('Send to phone'), 'sms/sendtophone/field', array('attributes' => array('title' => t('Send this text via SMS.'), 'class' => 'sms-sendtophone'), 'query' => 'text=' . urlencode($text) . '&' . drupal_get_destination()));
+  $link = l(t('Send to phone'), 'sms/sendtophone/field', array('attributes' => array('title' => t('Send this text via SMS.'), 'class' => 'sms-sendtophone'), 'query' => array('text' => $text, drupal_get_destination())));
 
-  return '<span class="sms-sendtophone-field">' . $text . '</span> (' . $link . ')';
+  return '<span class="sms-sendtophone-inline">' . $text . '</span> (' . $link . ')';
 }
 
 /**
@@ -359,6 +366,7 @@ function sms_sendtophone_form($form, $form_state, $type) {
 
   switch ($type) {
     case 'cck':
+    case 'field':
     case 'inline':
       $form['message'] = array(
         '#type' => 'value',
