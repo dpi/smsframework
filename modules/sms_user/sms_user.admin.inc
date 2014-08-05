@@ -7,7 +7,7 @@
  */
 
 /**
- * SMS admin settings.
+ * SMS admin settings form.
  */
 function sms_user_admin_settings($form, &$form_state) {
   $form['sms_user_registration_form'] = array(
@@ -48,8 +48,8 @@ function sms_user_admin_settings($form, &$form_state) {
 
   $form['tokens']['content']['#value'] = theme('token_tree', array('token_types' => array('sms_user')));
   */
-  // Registration settings.
 
+  // Sleep settings.
   $form['sleep'] = array(
     '#type' => 'fieldset',
     '#title' => t('Global Sleep Settings'),
@@ -65,14 +65,14 @@ function sms_user_admin_settings($form, &$form_state) {
     '#default_value' => variable_get('sms_user_sleep', 1),
   );
 
-  // Determine whether to use the 24-hour or 12-hour clock based on site settings
+  // Determine whether to use the 24-hour or 12-hour clock based on site settings.
   if (strpos(variable_get('date_format_short', 'm/d/Y - H:i'), 'g')) {
     $format = 'g A';
   }
   else {
     $format = 'H:00';
   }
-  // Build the list of options based on format
+  // Build the list of options based on format.
   $hour = 0;
   while ($hour < 24) {
     $options[$hour] = date($format, mktime($hour));

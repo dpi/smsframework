@@ -11,6 +11,9 @@
  * @ingroup views_field_handlers
  */
 class sms_user_handler_field_status extends views_handler_field {
+  /**
+   * {@inheritdoc}
+   */
   function render($values) {
     $status = @$values->{$this->field_alias};
     switch ($status) {

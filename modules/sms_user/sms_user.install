@@ -73,8 +73,6 @@ function sms_user_schema() {
 }
 
 /**
- * Implements hook_update().
- *
  * Drop the now dead delta field, and change primary key to number.
  */
 function sms_user_update_1() {
@@ -105,12 +103,15 @@ function sms_user_uninstall() {
 
 }
 
+/**
+ * Update code field to NOT NULL.
+ */
 function sms_user_update_7000() {
   // update code field to NOT NULL
 }
 
 /**
- * Add newcol field to {sms_user} table.
+ * Add sleep_enabled, sleep_start_time, sleep_end_time fields to {sms_user} table.
  */
 function sms_user_update_7003() {
   $spec = array(

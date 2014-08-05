@@ -2,11 +2,11 @@
 
 /**
  * @file
- * The basic views for sms_user.
+ * Provides views integration for the sms_user tables.
  */
 
 /**
- * basic views
+ * Implements hook_views_data().
  */
 function sms_user_views_data() {
   $data['sms_user']['table']['group'] = t('SMS User');
@@ -48,7 +48,7 @@ function sms_user_views_data() {
 }
 
 /**
- * sms_user_views_handlers
+ * Implements hook_views_handlers().
  */
 function sms_user_views_handlers() {
   return array(

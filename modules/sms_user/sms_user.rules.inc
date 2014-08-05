@@ -8,6 +8,7 @@
 
 /*
  * Implements hook_rules_event_info().
+ *
  * @ingroup rules
  */
 function sms_user_rules_event_info() {
@@ -76,6 +77,11 @@ function sms_user_rules_action_info() {
 
 /**
  * Rules action callback to send sms message to user.
+ *
+ * @param object $user
+ *   The user to whom the message will be sent.
+ * @param string $message
+ *   The message to be sent.
  */
 function sms_action_user_send($user, $message) {
   sms_user_send($user->uid, $message);
@@ -83,6 +89,13 @@ function sms_action_user_send($user, $message) {
 
 /**
  * Rules action callback to match number to user.
+ *
+ * @param string $number
+ *   The number to which we want to get the user.
+ *
+ * @return array
+ *   An array conforming to rules conventions with the key 'user_loaded' and a
+ *   value corresponding to the user with the specified number.
  */
 function sms_action_match_user($number) {
   return array('user_loaded' => user_load(sms_user_get_uid($number)));

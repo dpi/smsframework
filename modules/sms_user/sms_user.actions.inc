@@ -1,8 +1,8 @@
 <?php
+
 /**
  * @file
  * SMS User Action Implementation.
- *
  */
 
 /**
@@ -18,8 +18,12 @@ function sms_user_action_info() {
 }
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Callback for the 'Send SMS to Users' action.
+ *
+ * @param object $user
+ *   The user to which the message will be sent.
+ * @param array $context
+ *   The action context.
  */
 function sms_user_send_sms_action(&$user, $context) {
   $message = $context['sms_text'];
@@ -27,10 +31,13 @@ function sms_user_send_sms_action(&$user, $context) {
 }
 
 /**
- * Form for 'send sms' action.
+ * Input form for the 'Send SMS to Users' action.
  *
  * @param array $context
- * @return $form
+ *   The action context.
+ *
+ * @return array
+ *   The form array.
  */
 function sms_user_send_sms_action_form($context) {
   $limit = variable_get('sms_user_max_chars', SMS_USER_MAX_CHARS);
@@ -52,8 +59,7 @@ function sms_user_send_sms_action_form($context) {
 }
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Form validation handler for the 'Send SMS to Users' action.
  */
 function sms_user_send_sms_action_validate($form, $form_state) {
   $sms_text = $form_state['values']['sms_text'];
@@ -69,11 +75,7 @@ function sms_user_send_sms_action_validate($form, $form_state) {
 }
 
 /**
- * Custom submit handler when creating a new action for sending an sms.
- *
- * @param array $form
- * @param array $form_state
- * @return array
+ * Form submit handler for the 'Send SMS to Users' action.
  */
 function sms_user_send_sms_action_submit($form, $form_state) {
   $context['sms_text'] = $form_state['values']['sms_text'];
