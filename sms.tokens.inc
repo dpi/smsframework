@@ -1,7 +1,5 @@
 <?php
 
-// $Id$
-
 /**
  * @file
  * Token callbacks for the sms module.

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Rules module support of the smsframework.
+ * Rules module integration for the smsframework.
  */
 
 /**
@@ -83,6 +83,11 @@ function sms_rules_action_info() {
 
 /**
  * Action Implementation: Send sms.
+ *
+ * @param string $to
+ *   The sms recipient.
+ * @param string $message
+ *   The message to be sent.
  */
 function sms_rules_action_sms_send($to, $message) {
   sms_send($to, $message);
@@ -90,6 +95,12 @@ function sms_rules_action_sms_send($to, $message) {
 
 /**
  * Access callback for the SMS Rules integration.
+ *
+ * @param string $type
+ *  The access type.
+ *
+ * @return bool
+ *  true if the user has access, false if not.
  */
 function sms_rules_access_callback($type) {
   return user_access('administer smsframework');

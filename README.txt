@@ -4,11 +4,13 @@ Description
 Provides a pluggable API for Drupal to interact with SMS messages. 
 
 * sms.module - the core API module
-* sms_blast.module - for sending a batch of messages
-* sms_clickatell.module - support for the Clickatell gateway (http://clickatell.com/)
-* sms_email_gateway.module - support for email gateways
-* sms_sendtophone.module - input filter and node links for sending snippets of text
 * sms_user.module - provides integration with Drupal users
+* sms_blast.module - for sending a batch of messages
+* sms_valid.module - provides extensible validation functionality
+* sms_track.module - records sms inbound and outbound traffic for tracking purposes
+* sms_sendtophone.module - input filter and node links for sending snippets of text via sms
+* sms_actions.module - integrates sms with the actions module
+* sms_devel.module - integrates sms with devel module
 
 Also integrates well with the Messaging module (http://drupal.org/project/messaging).
 

@@ -12,7 +12,7 @@
  */
 interface SmsParserInterface {
   /**
-   * Check access to parser for incoming SMS.
+   * Checks access to parser for incoming SMS.
    *
    * Providers usually do this by checking against an allowed (range of) IP
    * addresses. It could also be with a request parameter.
@@ -24,7 +24,7 @@ interface SmsParserInterface {
    *
    * @param string $originator
    *   The originator of the SMS. Usually the IP address.
-   * @param array $requst
+   * @param array $request
    *   $_REQUEST array, or replacement.
    *
    * @return bool|array
@@ -34,7 +34,7 @@ interface SmsParserInterface {
   static function checkAccess($originator, $request);
 
   /**
-   * Start a parser. Load URI information.
+   * Starts a parser. Load URI information.
    *
    * @param array $request
    *   $_REQUEST array, or replacement.
@@ -42,7 +42,7 @@ interface SmsParserInterface {
   public function __construct($request = array());
 
   /**
-   * Set request.
+   * Sets the request.
    *
    * @param array $request
    *   $_REQUEST array, or replacement.
@@ -50,7 +50,7 @@ interface SmsParserInterface {
   public function setRequest($request);
 
   /**
-   * Retrieve SMS sender number.
+   * Retrieves SMS sender number.
    *
    * @return string
    *   Number or identifier supplied by SMS provider.
@@ -58,7 +58,7 @@ interface SmsParserInterface {
   public function getNumber();
 
   /**
-   * Retrieve SMS message content.
+   * Retrieves SMS message content.
    *
    * @return string
    *   Decoded SMS message body.
@@ -66,7 +66,7 @@ interface SmsParserInterface {
   public function getMessage();
 
   /**
-   * Retrieve sms_incoming() options.
+   * Retrieves sms_incoming() options.
    *
    * @return array
    *   Options as defined by sms_incoming().
@@ -74,22 +74,24 @@ interface SmsParserInterface {
   public function getOptions();
 
   /**
-   * Retrieve the response if any.
+   * Retrieves the response if any.
    *
    * Some SMS provider modules offer a HTTP response content. Lacking an
    * HTTP response object this just provides simple options.
    *
    * @return array
-   *   Array of header values keyed by header name and body.
-   *   array('headers' => array('name' => 'value), 'body' => 'text');
+   *   Array of header values keyed by header name and body. Example:
+   *   @code
+   *     array('headers' => array('name' => 'value), 'body' => 'text');
+   *   @endcode
    */
   public function getResponse();
 
   /**
-   * Parse the request.
+   * Parses the request.
    *
    * @todo Error or return handling. Does it make sense to notify of missing
-   * number, or message?
+   *   number, or message?
    */
   public function parseRequest();
 }

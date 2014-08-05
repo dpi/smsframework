@@ -35,8 +35,6 @@ function sms_schema() {
 }
 
 /**
- * Implements hook_update().
- *
  * Drop the now dead delta field, and change primary key to number.
  */
 function sms_update_1() {
