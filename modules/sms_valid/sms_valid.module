@@ -146,11 +146,7 @@ function sms_valid_get_all_rulesets() {
     $rulesets[$prefix] = $row;
     $rulesets[$prefix]->rules = unserialize($row->rules);
   }
-  /*while ($row = db_fetch_array($result)) {
-    $prefix = $row['prefix'];
-    $rulesets[$prefix] = $row;
-    $rulesets[$prefix]['rules'] = unserialize($row['rules']);
-  }*/
+
   return $rulesets;
 }
 
@@ -190,38 +186,11 @@ function sms_valid_get_ruleset_for_number($number) {
   $number = preg_replace('/[^0-9]/', '', $number);
 
   // Make an array of potential prefixes from the given number
+  $potential_prefixes = array();
   for ($i = 0; $i < drupal_strlen($number); $i++) {
     $potential_prefixes[] = drupal_substr($number, 0, $i + 1);
   }
-//  $result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix IN (" . db_placeholders($potential_prefixes, 'int') . ")", $potential_prefixes);
-  // Get the potential rulesets from the DB
-  // TODO Please convert this statement to the D7 database API syntax.
-  //$result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix IN (" . db_placeholders($potential_prefixes, 'int') . ")", $potential_prefixes);
-//  $result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix= %prefix IN ", array(%prefix => $potential_prefixes));
-//  $result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix = :prefix", array(':prefix' => $potential_prefixes));
-  // Drupal6 $result = db_query("SELECT nid, title FROM {node} WHERE uid= %d IN (" . db_placeholders(array(page,story), varchar) . ")", 5, page, story);
-  // Drupal7 $result = db_query("SELECT nid, title FROM {node} WHERE uid= :uid AND type IN (:type)", array(:uid => 5, :type => array(page, story),));
-//  $placeholders = implode(', ', array_fill(0, count($potential_prefixes), "%d"));
-//  $result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix IN ($placeholders)", $potential_prefixes);
 
-  // Drupal 6
-//$result = db_query("SELECT nid, title FROM {node} WHERE uid = %d AND type IN (" . db_placeholders(array('page', 'story'), 'varchar') . ")", 5, 'page', 'story');
-//$result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix IN (" . db_placeholders($potential_prefixes, 'int') . ")", $potential_prefixes);
-
-// Drupal 7
-//$result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix = :prefix AND placeholders IN (:placeholders)", array(
-//  ':prefix' => $potential_prefixes,
-//  ':placeholders' => $placeholders,
-//));
-//dsm($potential_prefixes);
-  // Choose the ruleset with the best match (most chars = highest prefix)
-/*  while ($row = db_fetch_array($result)) {
-    if ($row['prefix'] > $last_prefix) {
-      $best_ruleset = $row;
-    }
-    $best_ruleset['rules'] = unserialize($best_ruleset['rules']);
-  }
-*/
   $best_ruleset = NULL;
   $last_prefix  = NULL;
 //  $result = db_query("SELECT prefix, name, rules, dirs_enabled, iso2 FROM {sms_valid_rules} WHERE prefix = :prefix IN", array(':prefix' => $potential_prefixes));
@@ -233,6 +202,7 @@ function sms_valid_get_ruleset_for_number($number) {
     if ($row['prefix'] > $last_prefix) {
       $best_ruleset = $row;
       $best_ruleset['rules'] = unserialize($best_ruleset['rules']);
+      $last_prefix = $row['prefix'];
     }
   }
 
