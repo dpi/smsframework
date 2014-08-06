@@ -186,7 +186,13 @@ function sms_cron_queue_info() {
  *   An array of dditional properties as defined by gateway modules.
  */
 function sms_send($number, $message, $options = array()) {
-  $gateway = sms_default_gateway();
+  // Check if preferred gateway is specified in the $options.
+  if (isset($options['gateway'])) {
+    $gateway = sms_gateways('gateway', $options['gateway']);
+  }
+  if (empty($gateway)) {
+    $gateway = sms_default_gateway();
+  }
 
   foreach (module_implements('sms_send') as $module) {
     $function = $module . '_sms_send';
