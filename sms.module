@@ -2,17 +2,19 @@
 
 /**
  * @file
- * The core of the SMS Framework. Provides gateway managment and API for
+ * The core of the SMS Framework. Provides gateway management and API for
  * sending and receiving SMS messages.
  */
 
-// Direction codes
+use Drupal\Core\Form\FormStateInterface;
+
+// Direction codes.
 define('SMS_DIR_NONE',  0);
 define('SMS_DIR_OUT',   1);
 define('SMS_DIR_IN',    2);
 define('SMS_DIR_ALL',   4);
 
-// Message status codes
+// Message status codes.
 // 0=Unknown, 2xx=Positive, 3xx=Positive/Neutral (context-dependent), 4xx=Negative
 define('SMS_MSG_STATUS_UNKNOWN',      0);
 define('SMS_MSG_STATUS_OK',         200);
@@ -22,7 +24,7 @@ define('SMS_MSG_STATUS_ERROR',      400);
 define('SMS_MSG_STATUS_NOCREDIT',   402);
 define('SMS_MSG_STATUS_EXPIRED',    408);
 
-// Gateway response codes
+// Gateway response codes.
 // 0=Unknown, 2xx=Positive, 4xx=Negative(likely client err), 5xx=Negative(likely gateway err)
 define('SMS_GW_UNKNOWN_STATUS',      0);
 define('SMS_GW_OK',                200);
@@ -38,29 +40,15 @@ define('SMS_GW_ERR_DEST_NUMBER',   416);
 define('SMS_GW_ERR_CREDIT',        402);
 define('SMS_GW_ERR_OTHER',         500);
 
-//
+// Carrier status.
 define('SMS_CARRIER_DEFAULT', 0);
 define('SMS_CARRIER_OVERRIDDEN', 1);
 define('SMS_CARRIER_NORMAL', 3);
 
 /**
- * Implements hook_permission().
- */
-function sms_permission() {
-  return array(
-    'administer smsframework' => array(
-      'title' => t('administer smsframework'),
-      'description' => t('Administer SMS Framework'),
-      'restrict access' => TRUE,
-    ),
-  );
-}
-
-/**
  * Implements hook_theme().
  */
 function sms_theme() {
-  $items['sms_admin_default_form'] =
   $items['sms_carriers_admin_form'] = array(
     'render element' => 'form',
   );
@@ -82,21 +70,35 @@ function sms_cron_queue_info() {
 /**
  * Sends a message using the active gateway.
  *
- * @param $number
+ * @param string $number
  *   The destination number.
- *
- * @param $message
+ * @param string $message
  *   The text of the messsage to send.
+ * @param array $options
+ *   An array of additional properties as defined by gateway modules.
  *
- * @param $options
- *   An array of dditional properties as defined by gateway modules.
+ * @return bool
+ *   true if the message was sent to the server, false otherwise.
+ *
+ * @see sms_handle_result().
  */
 function sms_send($number, $message, $options = array()) {
-  $gateway = sms_default_gateway();
+  // Check if preferred gateway is specified in the $options.
+  if (isset($options['gateway'])) {
+    $gateway = sms_gateways('gateway', $options['gateway']);
+  }
+  if (empty($gateway)) {
+    $gateway = sms_default_gateway();
+  }
 
   foreach (\Drupal::moduleHandler()->getImplementations('sms_send') as $module) {
     $function = $module . '_sms_send';
     $function($number, $message, $options, $gateway);
+  }
+
+
+  if (\Drupal::moduleHandler()->moduleExists('token')) {
+    $message = token_replace($message);
   }
 
   $response = NULL;
@@ -115,7 +117,21 @@ function sms_send($number, $message, $options = array()) {
 }
 
 /**
- * Handle the response back from the sms gateway.
+ * Handles the response back from the sms gateway.
+ *
+ * This method also logs an error message to watchdog if there was a failure.
+ *
+ * @param array $result
+ *   An array containing information on the message response, with the keys:
+ *   - status: true if it was successful, false otherwise.
+ *   - message: an error message if the 'status' is false.
+ * @param string $number
+ *   The comma-separated list of the message's recipient numbers.
+ * @param string $message
+ *   The message that was sent.
+ *
+ * @return bool
+ *   true if the message was sent to the server, false otherwise.
  */
 function sms_handle_result($result, $number, $message) {
   if ($result['status']) {
@@ -130,27 +146,38 @@ function sms_handle_result($result, $number, $message) {
         $variables = array_merge($variables, $result['variables']);
       }
     }
-    watchdog('sms', $error_message, $variables, WATCHDOG_ERROR);
+    \Drupal::logger('sms')->error($error_message, $variables);
     return FALSE;
   }
 }
 
 /**
- * Queue worker callback for queued incomming messages.
+ * Queue worker callback for queued incoming messages.
+ *
+ * @param array $item
+ *   An array containing arguments for sending queued message.
+ *
+ * @see sms_cron_queue_info().
  */
-function sms_incoming_queue_worker($item) {
+function sms_incoming_queue_worker(array $item) {
   sms_incoming($item['number'], $item['message'], $item['options']);
 }
 
 /**
- * Callback for incoming messages. Allows gateways modules to pass messages in
- * a standard format for processing.
+ * Handles incoming messages.
  *
- * @param $number
+ * Allows gateways modules to pass messages in a standard format for processing.
+ * Every implementation of hook_sms_incoming() will be invoked by this method.
+ *
+ * Additionally, 'sms_incoming' rules event will be invoked if rules module is
+ * enabled.
+ *
+ * @param string $number
  *   The sender's mobile number.
- *
- * @param $message
+ * @param string $message
  *   The content of the text message.
+ * @param array $options
+ *   An array of additional options.
  */
 function sms_incoming($number, $message, $options = array()) {
   if (\Drupal::moduleHandler()->moduleExists('rules')) {
@@ -165,26 +192,26 @@ function sms_incoming($number, $message, $options = array()) {
 }
 
 /**
- * Callback for incoming message receipts. Allows gateways modules to pass
- * message receipts in a standard format for processing, and provides a basic
- * set of status codes for common code handling.
+ * Handles responses to message transactions.
  *
- * Allowed message status codes are defined as constants at the top of this module.
+ * Allows gateways modules to pass message receipts and other responses to
+ * messages in a standard format for processing, and provides a basic set of
+ * status codes for common code handling.
  *
- * The gateway code and string will often be provided in the $options array as
- * 'gateway_message_status' and 'gateway_message_status_text'.
+ * Allowed message status codes are defined as constants in this module.
+ *
+ * The gateway status code and message should be provided in the $options array
+ * as 'gateway_message_status' and 'gateway_message_status_text'.
  *
  * @param string $number
- * The sender's mobile number.
- *
+ *   The sender's mobile number.
  * @param string $reference
- * Unique message reference code, as provided when message is sent.
- *
- * @param string $message_status
- * An SMS Framework message status code, as per the defined constants.
- *
+ *   Unique message reference code, as provided when message is sent.
+ * @param int $message_status
+ *   (optional) An SMS Framework message status code, per the defined constants.
+ *    Defaults to SMS_GW_UNKNOWN_STATUS.
  * @param array $options
- * Extended options passed by the receipt receiver.
+ *   (optional) Extended options passed by the receipt receiver.
  */
 function sms_receipt($number, $reference, $message_status = SMS_GW_UNKNOWN_STATUS, $options = array()) {
   // Execute three phases
@@ -200,6 +227,9 @@ function sms_default_gateway() {
   return sms_gateways('gateway', sms_default_gateway_id());
 }
 
+/**
+ * Returns the current default gateway machine name.
+ */
 function sms_default_gateway_id() {
   return \Drupal::config('sms.settings')->get('default_gateway');
 }
@@ -217,17 +247,24 @@ function sms_gateway_info() {
 }
 
 /**
- * Log sms message.
+ * Logs sms message.
  *
- * @param $number
- *   Mobile numbers message sent to.
- * @param $message
- *   Message sent.
- * @param $options
- *   Associative array of options passed to gateway.
+ * This is a rudimentary implementation of an sms gateway by simply logging the
+ * message to watchdog.
+ *
+ * @param string $number
+ *   Comma-separated list of mobile numbers message was sent to.
+ * @param string $message
+ *   The message that was sent.
+ * @param array $options
+ *   An associative array of options passed to gateway.
+ *
+ * @return array
+ *   An array containing one key:
+ *   - status: true.
  */
 function sms_send_log($number, $message, $options) {
-  watchdog('sms', 'SMS message sent to %number with the text: @message', array('%number' => $number, '@message' => $message), WATCHDOG_INFO);
+  \Drupal::logger('sms')->info('SMS message sent to %number with the text: @message', array('%number' => $number, '@message' => $message));
   return array('status' => TRUE);
 }
 
@@ -241,37 +278,48 @@ function sms_admin_gateway_title($gateway_id) {
 }
 
 /**
- * Get a list of all gateways
+ * Gets a list of all gateways.
  *
- * @param $op
- *   The format in which to return the list. When set to 'gateway' or 'name',
+ * @param string $op
+ *   (optional) The format in which to return the list. When set to 'gateway' or 'name',
  *   only the specified gateway is returned. When set to 'gateways' or 'names',
- *   all gateways are returned.
+ *   all gateways are returned. Defaults to 'gateways'.
+ * @param string $gateway
+ *   (optional) A gateway identifier string that indicates the gateway to return.
+ *   Leave at default value (NULL) to return all gateways.
  *
- * @param $gateway
- *   A gateway identifier string that indicates the gateway to return. Leave at default
- *   value (NULL) to return all gateways.
- *
- * @return
+ * @return array|string|NULL
  *   Either an array of all gateways or a single gateway, in a variable format.
  */
 function sms_gateways($op = 'gateways', $gateway = NULL) {
   list($_gateways, $_names) = _gateways_build();
 
   switch ($op) {
-    case 'gateways':
-      return $_gateways;
     case 'gateway':
-      $return = empty($_gateways[$gateway]) ? array() : $_gateways[$gateway];
-      $return['identifier'] = $gateway;
-      return $return;
+      if (isset($_gateways[$gateway])) {
+        $return = $_gateways[$gateway];
+        $return['identifier'] = $gateway;
+        return $return;
+      }
+      else {
+        return NULL;
+      }
     case 'names':
       return $_names;
     case 'name':
-      return $_names[$gateway];
+      return isset($_names[$gateway]) ? $_names[$gateway] : NULL;
+    case 'gateways':
+    default:
+      return $_gateways;
   }
 }
 
+/**
+ * Helper function to get gateway definitions in hook_gateway_info.
+ *
+ * @return array
+ *   A array of gateway definitions from hook_gateway_info().
+ */
 function _gateways_build() {
   // @todo Implement caching here
   $_gateways = array();
@@ -281,7 +329,7 @@ function _gateways_build() {
   $config = \Drupal::config('sms.settings');
   $settings = $config->get('gateway_settings');
   foreach ($gateway_array as $identifier => $info) {
-    $info['configuration'] = $settings ? $settings[$identifier] : array();
+    $info['configuration'] = isset($settings[$identifier]) ? $settings[$identifier] : array();
     $_gateways[$identifier] = $info;
     $_names[$identifier] = $info['name'];
   }
@@ -298,8 +346,8 @@ function _gateways_build() {
  * array that is returned can be merged with an existing form using
  * array_merge().
  *
- * @param $required
- *   Specify if the user is required to provide information for the fields.
+ * @param bool $required
+ *   (optional) true if phone number field is required, false otherwise.
  *
  * @see sms_send_form_submit_validate()
  * @see sms_send_form_submit_submit()
@@ -329,10 +377,11 @@ function sms_send_form($required = FALSE) {
  * @see sms_send_form()
  * @see sms_send_form_submit()
  */
-function sms_send_form_validate($form, &$form_state) {
-  $not_valid = sms_validate_number(sms_formatter($form_state['values']['number']), $form_state['values']['gateway']);
-  if ($not_valid) {
-    form_set_error('number', t($not_valid));
+function sms_send_form_validate($form, FormStateInterface $form_state) {
+  $number = sms_formatter($form_state->getValue('number'));
+  $errors = sms_validate_number($number, $form_state->getValue('gateway'));
+  if ($errors) {
+    $form_state->setErrorByName('number', implode("<br />", $errors));
   }
 }
 
@@ -342,32 +391,41 @@ function sms_send_form_validate($form, &$form_state) {
  * @see sms_send_form()
  * @see sms_send_form_validate()
  */
-function sms_send_form_submit($form, &$form_state) {
-  $form_state['values']['number'] = sms_formatter($form_state['values']['number']);
-  sms_send($form_state['values']['number'], $form_state['values']['message'], $form_state['values']['gateway']);
+function sms_send_form_submit($form, FormStateInterface $form_state) {
+  sms_send(sms_formatter($form_state->getValue('number')), $form_state->getValue('message'), $form_state->getValue('gateway', array()));
 }
 
 /******************************************************************************
  * SMS Carrier Functions
  *
- * @todo - consider moving this to email gateway, unless there is a reason to
+ * @todo Consider moving this to email gateway, unless there is a reason to
  * have these functions without the email gateway?
  *****************************************************************************/
 
 /**
- * Get a list of all carriers
+ * Gets a list of all carriers
+ *
+ * @param string $domain
+ *   (optional) The domain for which the carriers are to be listed.
+ *
+ * @return array
+ *   An array of carriers keyed by the domain name and having arrays as values
+ *   with the following keys:
+ *   - name: The human readable name of the carrier.
+ *   - type: The carrier type.
+ *
  * @todo - store carriers in config instead of database
  */
 function sms_carriers($domain = NULL) {
-  $default_carriers = module_invoke_all('sms_carriers');
+  $default_carriers = \Drupal::moduleHandler()->invokeAll('sms_carriers');
   $carriers = array();
 
-  // Load default carriers from code
+  // Load default carriers from code.
   foreach ($default_carriers as $id => $carrier) {
     $carriers[$id] = array('name' => $carrier, 'type' => SMS_CARRIER_DEFAULT);
   }
 
-  // Load overridden carriers from database
+  // Load overridden carriers from database.
   $result = db_query("SELECT name, domain FROM {sms_carriers}");
 
   foreach ($result as $carrier) {
@@ -399,14 +457,27 @@ function sms_carriers($domain = NULL) {
 }
 
 /**
- * Load a single carrier
+ * Loads a single carrier.
+ *
+ * @param string $domain
+ *   The domain for which the carrier is to be loaded.
+ *
+ * @return array
+ *   An array containing the carrier info.
+ *
+ * @see sms_carriers()
  */
 function carrier_load($domain) {
   return sms_carriers($domain);
 }
 
 /**
- * Save a carrier.
+ * Saves a carrier to database.
+ *
+ * @param string $domain
+ *   The domain for which the carrier is to be saved.
+ * @param array $edit
+ *   An array of new values to be saved for the carrier.
  */
 function carrier_save($domain, $edit) {
   if (!empty($domain)) {
@@ -427,7 +498,8 @@ function carrier_save($domain, $edit) {
         drupal_write_record('sms_carriers', $edit);
       }
 
-      // TODO: we need more logic to figure out when someone is changing the domain name
+      // TODO: we need more logic to figure out when someone is changing the
+      // domain name.
     }
   }
   else {
@@ -436,12 +508,17 @@ function carrier_save($domain, $edit) {
   }
 }
 
+/**
+ * Deletes a carrier from the database.
+ *
+ * @param string $domain
+ */
 function carrier_delete($domain) {
   db_delete('sms_carriers')
     ->condition('domain', $domain)
     ->execute();
 
-  //removes carrier from config also
+  // Removes carrier from config also.
   $config = \Drupal::config('sms.settings');
   $enabled_carriers = $config->get('enabled_carriers');
   foreach ($enabled_carriers as $i => $carrier) {
@@ -458,7 +535,15 @@ function carrier_delete($domain) {
  */
 
 /**
- * Formats a number for display.
+ * Formats a number for display using the gateway's formatting functionality.
+ *
+ * @param string $number
+ *   The number to be formatted.
+ * @param array $options
+ *   An array of options.
+ *
+ * @return string
+ *   The formatted number.
  */
 function sms_format_number(&$number, $options = array()) {
   $gateway = sms_default_gateway();
@@ -474,17 +559,22 @@ function sms_format_number(&$number, $options = array()) {
 /**
  * Converts various sms formats into a common format for use in this module.
  *
- * @param $number
- *   The sms number
- * @param $format
- *   Undefined - @todo: decide if this is needed.
+ * @param string $number
+ *   The sms number to be formatted.
+ * @param int $format
+ *   Undefined.
+ *
+ * @return string
+ *   The formatted number.
+ *
+ * @todo Decide if the $format parameter is needed.
  */
 function sms_formatter($number, $format = 1) {
   // Remove non-number characters
   $number = preg_replace("/[^0-9]/", '', $number);
 
   /*
-   @todo - the only length specification in the international numbering plan is that
+   @todo The only length specification in the international numbering plan is that
    numbers should be a maximum of 15 digits.
 
    http://en.wikipedia.org/wiki/E.164
@@ -506,37 +596,61 @@ function sms_formatter($number, $format = 1) {
 }
 
 /**
- * Validates a phone number. Passes number to active gateway for further
- * validation if neccessary.
+ * Validates a phone number.
+ *
+ * This function passes the number to active gateway for further validation if
+ * necessary. It also calls hook_sms_validate() so that other modules can
+ * implement custom validation.
+ *
+ * @param string $number
+ *   Comma-separated list of recipient numbers to validate. Passed by reference.
+ * @param array $options
+ *   A list of additional options.
+ *
+ * @return array
+ *   An array of translated errors. Empty if no errors.
  */
 function sms_validate_number(&$number, $options = array()) {
-  if (!strlen($number)) {
-    return t('The phone number is invalid.');
+  $errors = array();
+  // Ensure there are actual numeric characters.
+  if (!strlen(preg_replace('/[^0-9]/', '', $number))) {
+    $errors[] = t('No phone number provided.');
+    // No need for further validation.
+    return $errors;
   }
 
-  // Allow the active gateway to provide number validation
-  $gateway = sms_default_gateway();
-  // TODO we neeed some sort of validation this isn't working properly.
-  if (isset($gateway['validate_number'])) {
-    if (function_exists($gateway['validate number']) && $error = $gateway['validate number']($number, $options)) {
-      return $error;
+  // Allow other modules to provide number validation.
+  \Drupal::moduleHandler()->invokeAll('sms_validate_number', [$number, $options]);
+
+  // Allow the default (or the specified in $options) gateway to provide number
+  // validation.
+  if (isset($options['gateway'])) {
+    $gateway = sms_gateways('gateway', $options['gateway']);
+  }
+  else {
+    $gateway = sms_default_gateway();
+  }
+  if (isset($gateway['validate number']) && function_exists($gateway['validate number'])) {
+    if ($error = $gateway['validate number']($number, $options)) {
+      $errors += (array) $error;
     }
   }
-  if (\Drupal::moduleHandler()->moduleExists('sms_valid')) {
-    $validation = sms_valid_validate($number, $options);
-    if (!$validation['pass']) {
-      return implode('<br/>', $validation['log']);
-    }
-  }
-  return NULL;
+
+  return $errors;
 }
 
 /**
- * Render a direction code
+ * Returns a direction code
  *
- * @param $out bool Outgoing allowed or not
- * @param $in  bool Incoming allowed or not
- * @return const The constant that defines this direction combination. Usually an integer value.
+ * Direction codes are one of the SMS_DIR_* constants defined in this module.
+ *
+ * @param bool $out
+ *   Outgoing allowed or not
+ * @param bool $in
+ *   Incoming allowed or not
+ *
+ * @return int
+ *   The constant that defines this direction combination.
  */
 function sms_dir($out, $in) {
   if ( $out &&   $in) {
@@ -551,49 +665,17 @@ function sms_dir($out, $in) {
   if (!$out && !$in) {
     return SMS_DIR_NONE;
   }
+  return SMS_DIR_NONE;
 }
 
 /**
  * Returns an array of E.164 international country calling codes
  *
- * @return array Associative array of country calling codes and country names.
+ * @return array
+ *   Associative array of country calling codes and country names.
  */
 function sms_country_codes() {
   return \Drupal::config('sms.settings')->get('country_codes');
-}
-
-/**
- * Returns HTML for the admin default gateway form.
- *
- * @param $form
- *  An form array.
- *
- * @ingroup themeable
- *
- * @todo Update the rendering of this to drupal 8 standard. @see https://drupal.org/node/2195739
- */
-function theme_sms_admin_default_form($variables) {
-  $form = $variables['form'];
-  $rows = array();
-  foreach ($form as $name => $element) {
-    if (is_array($element) && isset($element['id']) && is_array($element['id'])) {
-      $rows[] = array(
-        drupal_render($form['default'][$element['id']['#markup']]),
-        \Drupal\Component\Utility\String::checkPlain($name),
-        $element['configure']['#markup'],
-      );
-      unset($form[$name]);
-    }
-  }
-  $header = array(t('Default'), t('Name'), array(
-      'data' => t('Operations'),
-      'colspan' => 1,
-    ));
-  $output = '';
-  $output .= _theme('table', array('header' => $header, 'rows' => $rows));
-  $output .= drupal_render_children($form);
-
-  return $output;
 }
 
 /**

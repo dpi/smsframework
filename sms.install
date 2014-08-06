@@ -27,28 +27,3 @@ function sms_schema() {
 
   return $schema;
 }
-
-/**
- * Implements hook_update().
- *
- * Drop the now dead delta field, and change primary key to number.
- * @todo Move this to a migration class
- */
-//function sms_update_1() {
-//  $ret = array();
-//  db_drop_primary_key('sms_user');
-//  db_add_primary_key('sms_user', array('number'));
-//  db_add_index('sms_user', 'uid', array('uid'));
-//  db_drop_field('sms_user', 'delta');
-//  return t('SMS database update 1 successful.');
-//}
-//
-//function sms_update_8000() {
-//  update_variables_to_config('sms.settings', array(
-//      'sms_default_gateway'   => 'default_gateway',
-//      'sms_enabled_carriers'  => 'enabled_carriers',
-////       'sms_bootstrap_enabled' => 'bootstrap_enabled',
-////       'sms_bootstrap_routes'  => 'bootstrap_routes',
-////       'sms_bootstrap_queue'   => 'bootstrap_queue',
-//    ));
-//}

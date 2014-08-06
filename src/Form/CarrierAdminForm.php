@@ -9,6 +9,7 @@ namespace Drupal\sms\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Component\Utility\String;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides a configuration form for sms carriers.
@@ -24,7 +25,7 @@ class CarrierAdminForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $carriers = sms_carriers();
     $form = array();
     foreach ($carriers as $id => $carrier) {
@@ -85,7 +86,7 @@ class CarrierAdminForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $enabled_carriers = array();
     foreach ($form_state['values']['status'] as $carrier => $status) {
       if ($status) {

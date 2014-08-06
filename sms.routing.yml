@@ -1,7 +1,7 @@
 sms.admin:
   path: '/admin/config/smsframework'
   defaults:
-    _content: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'SMS Framework'
   requirements:
     _permission: 'administer smsframework'

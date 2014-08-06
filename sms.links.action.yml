@@ -1,6 +1,6 @@
 sms.carrier_add:
-  route_name: sms.carrier_add
   title: 'Add Carrier'
+  route_name: sms.carrier_add
   weight: 1
   appears_on:
     - sms.carrier_admin

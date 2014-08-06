@@ -5,7 +5,8 @@
 
 namespace Drupal\sms\Form;
 
-
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Drupal\Core\Form\ConfirmFormBase;
 
 class CarrierDeleteForm extends ConfirmFormBase {
@@ -17,10 +18,21 @@ class CarrierDeleteForm extends ConfirmFormBase {
   protected $carrier;
 
   /**
+   * The base redirect url from this form.
+   *
+   * @var \Drupal\Core\Url
+   */
+  protected $redirectUrl;
+
+  /**
    * Constructor to provide the attached carrier
    */
   public function __construct() {
     $this->carrier = sms_carriers($this->getRequest()->get('domain'));
+    $this->redirectUrl = new Url(array(
+      'route_name' => 'sms.carrier_admin',
+      'route_parameters' => array(),
+    ));
   }
 
   /**
@@ -57,12 +69,9 @@ class CarrierDeleteForm extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getCancelRoute()
+  public function getCancelUrl()
   {
-    return array(
-      'route_name' => 'sms.carrier_admin',
-      'route_parameters' => array(),
-    );
+    return $this->redirectUrl;
   }
 
   /**
@@ -76,7 +85,7 @@ class CarrierDeleteForm extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state)
+  public function submitForm(array &$form, FormStateInterface $form_state)
   {
     carrier_delete($this->carrier['domain']);
     # XXX D7 porting issue: $carrier below never gets set ??
@@ -88,6 +97,6 @@ class CarrierDeleteForm extends ConfirmFormBase {
     #  drupal_set_message(t('The carrier has been deleted.'));
     #}
 
-    $form_state['redirect'] = 'admin/config/smsframework/carriers';
+    $form_state->setRedirect($this->redirectUrl);
   }
 }

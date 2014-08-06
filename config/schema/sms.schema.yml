@@ -1,0 +1,18 @@
+# Schema for the configuration files of the SMS module.
+
+sms.settings:
+  type: mapping
+  label: 'SMS Framework settings'
+  mapping:
+    default_gateway:
+      type: string
+      label: 'Default gateway for sending sms'
+    bootstrap_queue:
+      type: sequence
+      label: 'Bootstrap Queue'
+    enabled_carriers:
+      type: sequence
+      label: 'Enabled Carriers'
+    country_codes:
+      type: mapping
+      label: 'International Country Codes'

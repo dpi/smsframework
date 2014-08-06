@@ -8,6 +8,7 @@
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides a configuration form for sms carriers.
@@ -23,7 +24,7 @@ class CarrierEditForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state, $domain = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $domain = NULL) {
     $carrier = sms_carriers($domain);
     if (!isset($carrier['domain'])) {
       $carrier['domain']=NULL;
@@ -61,12 +62,12 @@ class CarrierEditForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, array &$form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state) {
     $carriers = sms_carriers();
     if ($form_state['values']['domain'] != $form_state['values']['carrier']) {
       foreach ($carriers as $domain => $carrier) {
         if ($domain == $form_state['values']['domain']) {
-          form_set_error('', $this->t('Domain must be unique.'));
+          $form_state->setErrorByName('', $this->t('Domain must be unique.'));
         }
       }
     }
@@ -75,7 +76,7 @@ class CarrierEditForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $carrier = array(
       'name' => $form_state['values']['name'],
       'domain' => $form_state['values']['domain'],

@@ -8,6 +8,7 @@
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Component\Utility\Xss;
 
@@ -28,7 +29,7 @@ class BootstrapAdminForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state, $op = NULL, $domain = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $op = NULL, $domain = NULL) {
     $bootstrap_config = $this->config('sms.settings');
     // @todo See main comment above.
     $cache_backends = Settings::get('cache_backends', array());
@@ -117,7 +118,7 @@ class BootstrapAdminForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
      $this->config('sms.settings')->set('bootstrap.enabled', $form_state['values']['sms_bootstrap_enabled'])->save();
     parent::submitForm($form, $form_state);
   }

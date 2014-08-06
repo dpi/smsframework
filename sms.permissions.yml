@@ -1,0 +1,3 @@
+administer smsframework:
+  title: 'Administer SMS Framework'
+  restrict access: 1

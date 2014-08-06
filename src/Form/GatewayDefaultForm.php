@@ -7,7 +7,10 @@
 
 namespace Drupal\sms\Form;
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Provides a configuration form for setting the default gateway.
@@ -23,47 +26,61 @@ class GatewayDefaultForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildForm($form, $form_state);
     $gateways = sms_gateways();
     $default = sms_default_gateway_id();
-    $options = array();
-  
+
+    $form['gateways'] = array(
+      '#type' => 'table',
+      '#header' => array(
+        $this->t('Default'),
+        $this->t('Name'),
+        array(
+          'data' => t('Operations'),
+          'colspan' => 1,
+        )
+      ),
+      '#attributes' => array(
+        'id' => 'table-' . $this->getFormID(),
+      ),
+    );
     foreach ($gateways as $identifier => $gateway) {
-      $active = ($identifier == $default);
-      $options[$identifier] = '';
-      $form[$gateway['name']]['id'] = array('#markup' => $identifier);
-      if ( isset($gateway['configure form'] ) and ( function_exists($gateway['configure form'] ))) {
-        $form[$gateway['name']]['configure'] = array('#markup' => l($this->t('configure'), 'admin/config/smsframework/gateways/' . $identifier));
+      $form['gateways'][$identifier] = array(
+        'default' => [
+          '#name' => 'default',
+          '#type' => 'radio',
+          '#default_value' => $default,
+          '#return_value' => $identifier,
+        ],
+        'name' => ['#markup' => String::checkPlain($gateway['name'])],
+      );
+      if (isset($gateway['configure form']) && function_exists($gateway['configure form'] )) {
+        $form['gateways'][$identifier]['configure'] = ['#markup' => $this->l($this->t('configure'), Url::fromRoute('sms.gateway_config', ['gateway_id' => $identifier]))];
       }
       else {
-        $form[$gateway['name']]['configure'] = array('#markup' => $this->t('No configuration options'));
+        $form['gateways'][$identifier]['configure'] = array('#markup' => $this->t('No configuration options'));
       }
     }
-  
-    $form['default'] = array(
-      '#type' => 'radios',
-      '#options' => $options,
-      '#default_value' => $default,
-    );
-  
-    $form['submit'] = array(
-      '#type' => 'submit',
-      '#value' => $this->t('Set default gateway'),
-    );
-  
+    $form['actions']['submit']['#value'] = $this->t('Set default gateway');
     return $form;
+  }
+
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    $form_state->setValue('default', $form_state->getUserInput()['default']);
   }
   
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
-    // Process form submission to set the default gateway
-    if ($form_state['values']['default']) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    // Process form submission to set the default gateway.
+    $default = $form_state->getValue('default');
+    if (sms_gateways('name', $default)) {
       drupal_set_message($this->t('Default gateway updated.'));
 
       $this->config('sms.settings')
-        ->set('default_gateway', $form_state['values']['default'])
+        ->set('default_gateway', $default)
         ->save();
     }
   }

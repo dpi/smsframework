@@ -7,8 +7,9 @@
 
 namespace Drupal\sms\Form;
 
-use \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Provides a configuration form for sms gateways.
@@ -27,7 +28,7 @@ class GatewayConfigForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state, $gateway_id = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $gateway_id = NULL) {
     $gateway = sms_gateways('gateway', $gateway_id);
     if ($gateway && !empty($gateway['configure form']) && function_exists($gateway['configure form'])) {
       $form = $gateway['configure form']($gateway['configuration']);
@@ -52,9 +53,9 @@ class GatewayConfigForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, array &$form_state) {
-    // Pass validation to gateway
-    $function = $form_state['values']['gateway']['configure form'] . '_validate';
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    // Pass validation to gateway.
+    $function = $form_state->getValue(['gateway', 'configure form']) . '_validate';
     if (function_exists($function)) {
       $function($form, $form_state);
     }
@@ -63,15 +64,17 @@ class GatewayConfigForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
-    $gateway = $form_state['values']['gateway'];
-    // Remove unnecessary values
-    unset($form_state['values']['op'], $form_state['values']['submit'], $form_state['values']['gateway'], $form_state['values']['form_token'], $form_state['values']['form_id']);
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    $gateway = $form_state->getValue('gateway');
+    // Remove unnecessary values.
+    $form_state->cleanValues();
+    $form_state->unsetValue('gateway');
+
     $this->config('sms.settings')
-      ->set('gateway_settings.' . $gateway['identifier'], $form_state['values'])
+      ->set('gateway_settings.' . $gateway['identifier'], $form_state->getValues())
       ->save();
     drupal_set_message($this->t('The gateway settings have been saved.'));
-    $form_state['redirect'] = 'admin/config/smsframework/gateways';
+    $form_state->setRedirect('sms.gateway_admin');
   }
 
   /**
