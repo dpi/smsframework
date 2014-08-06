@@ -7,11 +7,13 @@
  * @subpackage sms_track
  */
 
-
 /**
- * Implement hook_handler_field().
+ * Implements hook_handler_field().
  */
 class sms_track_handler_field_direction extends views_handler_field {
+  /**
+   * {@inheritdoc}
+   */
   function render($values) {
     $value = $values->{$this->field_alias};
     switch ($value) {

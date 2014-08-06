@@ -1,21 +1,26 @@
 <?php
+
 /**
  * @file
- * Message tracking module: Admin settings form functions
+ * Message tracking module: Admin settings form functions.
  *
  * @package sms
  * @subpackage sms_track
  */
 
-
 /**
- * Admin settings form
+ * Admin settings form.
+ *
+ * Form builder for sms_track settings form.
  *
  * @return
- *   Drupal form array
+ *   Drupal form array.
+ *
+ * @see sms_track_settings_form_submit()
  */
+
 function sms_track_settings_form() {
-  // Archive section
+  // Archive section.
   $form['archive'] = array(
     '#type'  => 'fieldset',
     '#title' => 'Message archiving',
@@ -51,7 +56,11 @@ function sms_track_settings_form() {
   return $form;
 }
 
-
+/**
+ * Submit handler for sms_track_settings_form.
+ *
+ * @see sms_track_settings_form
+ */
 function sms_track_settings_form_submit($form, &$form_state) {
   $archive_dir_old = variable_get('sms_track_archive_dir', SMS_DIR_NONE);
   $archive_dir = $form_state['values']['archive_dir'];
@@ -60,7 +69,7 @@ function sms_track_settings_form_submit($form, &$form_state) {
   $archive_max_age_days = $form_state['values']['archive_max_age_days'];
   variable_set('sms_track_archive_max_age_days', $archive_max_age_days);
 
-  // Trigger watchdog messages
+  // Trigger watchdog messages.
   if ($archive_dir_old && ! $archive_dir) {
     watchdog('sms_track', 'SMS Tracking archive collector DISABLED');
   }
@@ -73,10 +82,10 @@ function sms_track_settings_form_submit($form, &$form_state) {
 
 
 /**
- * Admin View page
+ * Provides the admin view page from the sms_track view in database.
  *
- * @return
- *   HTML content string
+ * @return string
+ *   HTML content string.
  */
 function sms_track_admin_view() {
   $content = views_embed_view('sms_track', $display_id = 'default');

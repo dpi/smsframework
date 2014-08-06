@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * SMS Framework Message Tracking feature module: views
@@ -7,9 +8,8 @@
  * @subpackage sms_track
  */
 
-
 /**
- * Implement hook_views_handlers().
+ * Implements hook_views_handlers().
  */
 function sms_track_views_handlers() {
   return array(
@@ -32,7 +32,7 @@ function sms_track_views_handlers() {
 
 
 /**
- * Implement hook_views_data().
+ * Implements hook_views_data().
  */
 function sms_track_views_data() {
   // TODO: I have left id and options out of this until I can work out how the handlers work.

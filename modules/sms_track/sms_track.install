@@ -1,18 +1,15 @@
 <?php
+
 /**
  * @file
- * SMS Framework Message Tracking feature module: Install file
+ * SMS Framework Message Tracking feature module: Install file.
  *
  * @package sms
  * @subpackage sms_track
  */
 
-
 /**
- * Implement hook_schema().
- *
- * @return
- *   Drupal schema array
+ * Implements hook_schema().
  */
 function sms_track_schema() {
   $schema['sms_track'] = array(
@@ -84,8 +81,9 @@ function sms_track_schema() {
 }
 
 /**
- * Change the 'status' field from tinyint to smallint. See drupal issues #2295013
- * and #1959802.
+ * Change the 'status' field from tinyint to smallint.
+ *
+ * See drupal issues #2295013 and #1959802.
  */
 function sms_track_update_7001(&$sandbox) {
   $schema = sms_track_schema();

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * SMS Framework Message Tracking feature module: views
@@ -7,9 +8,8 @@
  * @subpackage sms_track
  */
 
-
 /**
- * Implement hook_views_default_views().
+ * Implements hook_views_default_views().
  */
 function sms_track_views_default_views() {
   $view = new view;

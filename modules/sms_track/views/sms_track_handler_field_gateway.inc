@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * SMS Framework Message Tracking feature module: views
@@ -7,11 +8,13 @@
  * @subpackage sms_track
  */
 
-
 /**
- * Implement hook_handler_field().
+ * Implements hook_handler_field().
  */
 class sms_track_handler_field_gateway extends views_handler_field {
+  /**
+   * {@inheritdoc}
+   */
   function render($values) {
     $options_z = $values->{$this->field_alias};
     if (!empty($options_z)) {
