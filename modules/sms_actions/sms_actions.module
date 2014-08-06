@@ -7,7 +7,7 @@
  */
 
 /**
- * Implementation of hook_sms_incoming()
+ * Implementation of hook_sms_incoming().
  */
 function sms_actions_sms_incoming($op, $number, $message) {
   if ($op == 'process') {
@@ -33,7 +33,14 @@ function sms_actions_sms_incoming($op, $number, $message) {
 }
 
 /**
+ * Executes actions defined by sms_actions module.
  *
+ * @param string $command
+ *   The command to execute.
+ * @param string $number
+ *   The phone number associated with the action.
+ * @param string $message
+ *   The message to be sent.
  */
 function sms_actions_do($command, $number, $message) {
   // Keep objects for reuse so that changes actions make to objects can persist.
@@ -126,7 +133,13 @@ function sms_actions_action_info() {
 }
 
 /**
+ * Form constructor for sms_actions_send_action form
  *
+ * @param array $context
+ *   Array containing contextual information for the action.
+ *
+ * @return array
+ *   Drupal form array.
  */
 function sms_actions_send_action_form($context) {
   // Set default values for form.
@@ -162,7 +175,7 @@ function sms_actions_send_action_form($context) {
 }
 
 /**
- * Process sms_actions_send_action form submissions.
+ * Submit handler for sms_actions_send_action form.
  */
 function sms_actions_send_action_submit($form, &$form_state) {
   // Process the HTML form to store configuration. The keyed array that
@@ -176,7 +189,12 @@ function sms_actions_send_action_submit($form, &$form_state) {
 }
 
 /**
- * Implementation of a Drupal action.
+ * Implements the action sms_action_send_action.
+ *
+ * @param object $object
+ *   The object initiating the action.
+ * @param array $context
+ *   The context in which the action is being triggered.
  */
 function sms_actions_send_action($object, $context) {
   global $user;
@@ -253,10 +271,10 @@ function sms_actions_send_action($object, $context) {
 }
 
 /**
- *
+ * Implements hook_action_info_alter().
  */
 function sms_actions_action_info_alter(&$actions) {
-  // Actions to alter
+  // Actions to alter.
   $hooks = array(
     'node_publish_action',
     'node_unpublish_action',
@@ -285,7 +303,7 @@ function sms_actions_action_info_alter(&$actions) {
 }
 
 /**
- * Implementation of hook_hook_info().
+ * Implementation of hook_trigger_info().
  */
 function sms_actions_trigger_info() {
   $hooks = array();
@@ -307,6 +325,11 @@ function sms_actions_trigger_info() {
 
 /**
  * Returns an array of commands objects.
+ *
+ * Command objects are created in the UI.
+ *
+ * @return array
+ *   The list of commands that have been created by the UI.
  */
 function sms_actions_get_commands() {
   $commands =  variable_get('sms_actions_commands', array());
@@ -319,7 +342,13 @@ function sms_actions_get_commands() {
 }
 
 /**
- * Load a specific command.
+ * Loads a specific command.
+ *
+ * @param string $discriminator
+ *   The given name for the command.
+ *
+ * @return object
+ *   The command object with the associated discriminator (machine_name).
  */
 function sms_actions_command_load($discriminator) {
   $commands = variable_get('sms_actions_commands', array());
@@ -327,7 +356,7 @@ function sms_actions_command_load($discriminator) {
 }
 
 /**
- * Save a command.
+ * Saves a command.
  */
 function sms_actions_command_save($command) {
   $commands = sms_actions_get_commands();
@@ -341,7 +370,7 @@ function sms_actions_command_save($command) {
 }
 
 /**
- * Delete a command.
+ * Deletes a command.
  */
 function sms_actions_command_delete($discriminator) {
   $commands = variable_get('sms_actions_commands', array());
@@ -351,7 +380,10 @@ function sms_actions_command_delete($discriminator) {
 }
 
 /**
- * Menu callback: command listing
+ * Menu callback: command listing.
+ *
+ * @return string
+ *   HTML string for the table of commands.
  */
 function sms_actions_command_list() {
   $header = array(t('Discriminator'), t('Operations'));
@@ -369,7 +401,16 @@ function sms_actions_command_list() {
 }
 
 /**
+ * Form constructor for the sms_actions command editing form.
  *
+ * @param string $discriminator
+ *   Determines which command is to be edited. Null for an empty form.
+ *
+ * @return array
+ *   Drupal form array.
+ *
+ * @see sms_actions_edit_command_form_validate()
+ * @see sms_actions_edit_command_form_submit()
  */
 function sms_actions_edit_command_form($form, &$form_state, $discriminator = NULL) {
   // Check for confirmation forms.
@@ -412,7 +453,9 @@ function sms_actions_edit_command_form($form, &$form_state, $discriminator = NUL
 }
 
 /**
+ * Validate handler for sms_actions_edit_command_form().
  *
+ * @see sms_actions_edit_command_form()
  */
 function sms_actions_edit_command_form_validate($form, &$form_state) {
   if (!preg_match('!^[a-z0-9\-]+$!', $form_state['values']['discriminator'])) {
@@ -421,7 +464,9 @@ function sms_actions_edit_command_form_validate($form, &$form_state) {
 }
 
 /**
+ * Submit handler for sms_actions_edit_command_form().
  *
+ * @see sms_actions_edit_command_form()
  */
 function sms_actions_edit_command_form_submit($form, &$form_state) {
   // $commands = sms_actions_get_commands();
@@ -444,7 +489,15 @@ function sms_actions_edit_command_form_submit($form, &$form_state) {
 }
 
 /**
+ * Form constructor for command delete confirmation form.
  *
+ * @param string $discriminator
+ *   Determines which command to confirm deletion.
+ *
+ * @return array
+ *   Drupal form array.
+ *
+ * @see sms_actions_command_confirm_delete_submit()
  */
 function sms_actions_command_confirm_delete($form_state, $discriminator) {
   $command = sms_actions_command_load($discriminator);
@@ -461,7 +514,9 @@ function sms_actions_command_confirm_delete($form_state, $discriminator) {
 }
 
 /**
+ * Submit handler for sms_actions_command_confirm_delete().
  *
+ * @see sms_actions_command_confirm_delete()
  */
 function sms_actions_command_confirm_delete_submit($form, &$form_state) {
   sms_actions_command_delete($form_state['values']['discriminator']);
