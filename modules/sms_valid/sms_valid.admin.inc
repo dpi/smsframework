@@ -1,17 +1,20 @@
 <?php
+
 /**
  * @file
- * SMS Framework core module: Admin settings form functions
+ * SMS Framework core module: Admin settings form functions.
  *
  * @package sms
  * @subpackage sms_valid
  */
 
 /**
- * Validation settings form
+ * Form constructor for validation settings form.
  *
- * @param $prefix
+ * @param int $prefix
  *   Default country code. This should not be used.
+ *
+ * @see sms_valid_admin_settings_form_submit()
  *
  * @ingroup forms
  */
@@ -19,7 +22,7 @@ function sms_valid_admin_settings_form($form, &$form_state, $prefix = 64) {
   $use_rulesets = variable_get('sms_valid_use_rulesets', FALSE);
   $use_global_ruleset = variable_get('sms_valid_use_global_ruleset', FALSE);
 
-  // Mode selector
+  // Mode selector.
   if ($use_rulesets) {
     $mode = ($use_global_ruleset) ? 2 : 1;
   }
@@ -38,7 +41,7 @@ function sms_valid_admin_settings_form($form, &$form_state, $prefix = 64) {
     '#description' => t('Note that this will revert to the default option when the SMS Validation module is disabled.'),
   );
 
-  // Global ruleset section
+  // Global ruleset section.
   $form['global'] = array(
     '#type' => 'fieldset',
     '#title' => 'Global ruleset selection',
@@ -58,7 +61,7 @@ function sms_valid_admin_settings_form($form, &$form_state, $prefix = 64) {
     '#default_value' => variable_get('sms_valid_global_ruleset', $prefix),
   );
 
-  // Local number ruleset section
+  // Local number ruleset section.
   $form['local'] = array(
     '#type' => 'fieldset',
     '#title' => 'Local number detection and handling',
@@ -90,7 +93,7 @@ function sms_valid_admin_settings_form($form, &$form_state, $prefix = 64) {
     '#disabled' => ($use_global_ruleset) ? TRUE : FALSE,
   );
 
-  // Last resort ruleset section
+  // Last resort ruleset section.
   $form['last'] = array(
     '#type' => 'fieldset',
     '#title' => 'Last resort for undetected ruleset prefixes',
@@ -128,6 +131,8 @@ function sms_valid_admin_settings_form($form, &$form_state, $prefix = 64) {
 }
 
 /**
+ * Submit handler for sms_valid_admin_settings_form().
+ *
  * @see sms_valid_admin_settings_form()
  */
 function sms_valid_admin_settings_form_submit(&$form, $form_state) {
@@ -153,7 +158,7 @@ function sms_valid_admin_settings_form_submit(&$form, $form_state) {
 }
 
 /**
- * Validation rulesets list form
+ * Form constructor for validation rulesets list form.
  *
  * @ingroup forms
  */
@@ -206,6 +211,8 @@ function sms_valid_admin_rulesets_form($form, &$form_state) {
 }
 
 /**
+ * Theme function for sms_valid_admin_rulesets_form().
+ *
  * @see sms_valid_admin_rulesets_form()
  */
 function theme_sms_valid_admin_rulesets_form($variables) {
@@ -248,14 +255,16 @@ function theme_sms_valid_admin_rulesets_form($variables) {
 }
 
 /**
+ * Submit handler for sms_valid_admin_rulesets_form().
+ *
  * @see sms_valid_admin_rulesets_form()
  */
 function sms_valid_admin_rulesets_form_submit($form, &$form_state) {
   foreach ($form_state['values'] as $key => $element) {
-    // Nasty hack to get these values
+    // Nasty hack to get these values.
     $items = explode('_', $key);
     if (count($items) == 2) {
-      // Just run once for each prefix
+      // Just run once for each prefix.
       if ($items[1] == 'out') {
         $prefix = $items[0];
 
@@ -276,9 +285,9 @@ function sms_valid_admin_rulesets_form_submit($form, &$form_state) {
 }
 
 /**
- * Validation ruleset editing form
+ * Form constructor for validation ruleset editing.
  *
- * @param $prefix
+ * @param int $prefix
  *   Prefix for ruleset that will be displayed on page load.
  *
  * @ingroup forms
@@ -291,7 +300,7 @@ function sms_valid_admin_ruleset_form($form, &$form_state, $prefix = NULL) {
     $ruleset = sms_valid_get_ruleset($prefix);
   }
 
-  // Ruleset selection area
+  // Ruleset selection area.
   $form['title'] = array(
     '#type' => 'item',
     '#markup' => t('Choose a ruleset from the drop down box and click Refresh to update the ruleset form below.'),
@@ -309,13 +318,13 @@ function sms_valid_admin_ruleset_form($form, &$form_state, $prefix = NULL) {
     '#submit' => array('sms_valid_admin_ruleset_form_select'),
   );
 
-  // Ruleset editor area
+  // Ruleset editor area.
   $form['ruleset'] = array(
     '#type' => 'fieldset',
     '#title' => 'Ruleset',
   );
 
-  // If this is a new ruleset then this should be a textfield
+  // If this is a new ruleset then this should be a textfield.
   $form['ruleset']['prefix'] = array(
     '#type' => 'textfield',
     '#title' => t('Prefix'),
@@ -333,7 +342,7 @@ function sms_valid_admin_ruleset_form($form, &$form_state, $prefix = NULL) {
     '#default_value' => ($ruleset) ? $ruleset['name'] : '',
   );
 
-  // Display a proper country list if the countries_api module is loaded
+  // Display a proper country list if the countries_api module is loaded.
   if (function_exists('countries_api_get_array')) {
     $options[''] = '(none)';
     $options = array_merge($options, countries_api_get_array());
@@ -386,6 +395,8 @@ function sms_valid_admin_ruleset_form($form, &$form_state, $prefix = NULL) {
 
 
 /**
+ * Theme function for sms_valid_admin_ruleset_form().
+ *
  * @see sms_valid_admin_ruleset_form()
  */
 function theme_sms_valid_admin_ruleset_form($variables) {
@@ -425,6 +436,8 @@ function theme_sms_valid_admin_ruleset_form($variables) {
 
 
 /**
+ * Redirects to the ruleset edit form base on the ruleset selected.
+ *
  * @see sms_valid_admin_ruleset_form()
  */
 function sms_valid_admin_ruleset_form_select(&$form, $form_state) {
@@ -434,6 +447,8 @@ function sms_valid_admin_ruleset_form_select(&$form, $form_state) {
 
 
 /**
+ * Submit handler for the sms_valid_admin_ruleset_form().
+ *
  * @see sms_valid_admin_ruleset_form()
  */
 function sms_valid_admin_ruleset_form_submit(&$form, $form_state) {
@@ -455,9 +470,9 @@ function sms_valid_admin_ruleset_form_submit(&$form, $form_state) {
 
 
 /**
- * Validation number test form
+ * Form constructor for the number validation test form.
  *
- * @param $last_test_validation_number
+ * @param string $last_test_validation_number
  *   Number that will appear in the text field.
  *
  * @ingroup forms
@@ -496,6 +511,8 @@ function sms_valid_admin_test_form($form, &$form_state, $last_test_validation_nu
 
 
 /**
+ * Submit handler for sms_valid_admin_test_form()
+ *
  * @see sms_valid_admin_test_form()
  */
 function sms_valid_admin_test_form_submit(&$form, $form_state) {

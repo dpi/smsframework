@@ -1,43 +1,25 @@
 <?php
+
 /**
  * @file
- * SMS Framework Number Validation feature module: Install file
+ * SMS Framework Number Validation feature module: Install file.
  *
  * @package sms
  * @subpackage sms_valid
  */
 
-
 /**
  * Implements hook_install().
- *
- * @ingroup hooks
  */
 function sms_valid_install() {
-  // TODO The drupal_(un)install_schema functions are called automatically in D7.
-  // drupal_install_schema('sms_valid')
   sms_valid_create_example_ruleset();
 }
-
-
-/**
- * Implements hook_uninstall().
- *
- * @ingroup hooks
- */
-// function sms_valid_uninstall() {
-// TODO The drupal_(un)install_schema functions are called automatically in D7.
-// drupal_uninstall_schema('sms_valid')
-// }
-
 
 /**
  * Implements hook_schema().
  *
- * @return
- *   Drupal schema.
- *
- * @ingroup hooks
+ * @return array
+ *   Drupal schema array.
  */
 function sms_valid_schema() {
   $schema = array();
@@ -84,9 +66,9 @@ function sms_valid_schema() {
 
 
 /**
- * Create an example number validation ruleset
+ * Create an example number validation ruleset.
  *
- * @param $ret
+ * @param array $ret
  *   Array of query results.
  */
 function sms_valid_create_example_ruleset(&$ret = array()) {

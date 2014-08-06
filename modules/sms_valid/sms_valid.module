@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Number validation feature module for Drupal SMS Framework.
@@ -7,21 +8,18 @@
  * @subpackage sms_valid
  */
 
-
 /**
  * Implements hook_sms_validate().
  *
- * @param $op
+ * @param string $op
  *   Validation operation to work on.
- * @param $number
+ * @param string $number
  *   Phone number string.
- * @param $options
+ * @param array $options
  *   Array of options.
  *
- * @return
- *   NULL if validation succeeded. Error string if failed.
- *
- * @ingroup hooks
+ * @return string|null
+ *   NULL if validation succeeded. Error message if failed.
  */
 function sms_valid_sms_validate($op, &$number, &$options) {
   if ($op == 'process') {
@@ -41,11 +39,6 @@ function sms_valid_sms_validate($op, &$number, &$options) {
 
 /**
  * Implements hook_menu().
- *
- * @return
- *   Drupal menu item array.
- *
- * @ingroup hooks
  */
 function sms_valid_menu() {
   $items = array();
@@ -111,11 +104,6 @@ function sms_valid_menu() {
 
 /**
  * Implements hook_theme().
- *
- * @return
- *   Array of Drupal theme items.
- *
- * @ingroup hooks
  */
 function sms_valid_theme() {
   return array(
@@ -132,10 +120,10 @@ function sms_valid_theme() {
 
 
 /**
- * Get all rulesets
+ * Gets all rulesets.
  *
- * @return
- *   Array of rulesets.
+ * @return array
+ *   Array of rulesets keyed by prefix.
  */
 function sms_valid_get_all_rulesets() {
   $result = db_query("SELECT * FROM {sms_valid_rules}");
@@ -151,19 +139,16 @@ function sms_valid_get_all_rulesets() {
 }
 
 /**
- * Get a ruleset for a given prefix
+ * Gets a ruleset for a given prefix.
  *
- * @param $prefix
- *   A numberic prefix.
+ * @param int $prefix
+ *   A numeric prefix.
  *
- * @return
- *   A ruleset array or FALSE.
+ * @return array|false
+ *   A ruleset array or false if not found.
  */
 function sms_valid_get_ruleset($prefix) {
-//  $result = db_query("SELECT * FROM {sms_valid_rules} WHERE prefix = :prefix LIMIT 1", array(':prefix' => $prefix));
-  // @TODO Lets try this to see if it is a good converstion from D6 to D7
   $ruleset = db_query_range("SELECT * FROM {sms_valid_rules} WHERE prefix = :prefix", 0, 1, array(':prefix' => $prefix))->fetchAssoc();
-  //if (db_affected_rows()) {
   if ($ruleset) {
     $ruleset['rules'] = unserialize($ruleset['rules']);
     return $ruleset;
@@ -173,7 +158,7 @@ function sms_valid_get_ruleset($prefix) {
 
 
 /**
- * Get the best ruleset for a given phone number
+ * Get the best ruleset for a given phone number.
  *
  * @param $number
  *   A phone number.
@@ -182,7 +167,7 @@ function sms_valid_get_ruleset($prefix) {
  *   A ruleset array or NULL.
  */
 function sms_valid_get_ruleset_for_number($number) {
-  // Strip all non-digit chars including whitespace
+  // Strip all non-digit chars including whitespace.
   $number = preg_replace('/[^0-9]/', '', $number);
 
   // Make an array of potential prefixes from the given number
@@ -193,7 +178,6 @@ function sms_valid_get_ruleset_for_number($number) {
 
   $best_ruleset = NULL;
   $last_prefix  = NULL;
-//  $result = db_query("SELECT prefix, name, rules, dirs_enabled, iso2 FROM {sms_valid_rules} WHERE prefix = :prefix IN", array(':prefix' => $potential_prefixes));
   $query = db_select('sms_valid_rules', 'u')
     ->fields('u', array('prefix', 'name', 'rules', 'dirs_enabled', 'iso2'))
     ->condition('prefix', $potential_prefixes, 'IN');
@@ -211,12 +195,12 @@ function sms_valid_get_ruleset_for_number($number) {
 
 
 /**
- * Get prefixes for a given ISO country code
+ * Gets prefixes for a given ISO country code.
  *
- * @param $iso2
- *   A two-character ISO-3166-1 alpha-2 country code
+ * @param string $iso2
+ *   A two-character ISO-3166-1 alpha-2 country code.
  *
- * @return
+ * @return int[]
  *   Array of prefix numbers.
  */
 function sms_valid_get_prefixes_for_iso2($iso2) {
@@ -231,19 +215,17 @@ function sms_valid_get_prefixes_for_iso2($iso2) {
 
 
 /**
- * Check what directions are enabled for a ruleset
+ * Checks what directions are enabled for a ruleset.
  *
- * @param $prefix
+ * @param int $prefix
  *   A prefix number.
- * @param $dir
+ * @param int $dir
  *   The direction code that you want to check. See SMS_DIR_* constants.
  *
- * @return
- *   Boolean. Whether the ruleset is enabled for this direction.
+ * @return bool
+ *   true if the ruleset is enabled for this direction, false otherwise.
  */
 function sms_valid_ruleset_is_enabled($prefix, $dir = SMS_DIR_OUT) {
-//  $result = db_query("SELECT dirs_enabled FROM {sms_valid_rules} WHERE prefix = :prefix LIMIT 1", array(':prefix' => $prefix));
-  // This should be very similar to line 195
   $result = db_query_range("SELECT dirs_enabled FROM {sms_valid_rules} WHERE prefix = :prefix", 0, 1, array(':prefix' => $prefix));
   $dirs_enabled = $result->fetchField();
 
@@ -262,15 +244,15 @@ function sms_valid_ruleset_is_enabled($prefix, $dir = SMS_DIR_OUT) {
 
 
 /**
- * Set enabled directions for a ruleset
+ * Sets enabled directions for a ruleset.
  *
- * @param $prefix
+ * @param int $prefix
  *   A prefix number.
- * @param $dir
+ * @param int $dir
  *   The direction code that you want to set. See SMS_DIR_* constants.
  *
- * @return
- *   Bollean. Result of the DB query.
+ * @return bool
+ *   true on success, false otherwise.
  */
 function sms_valid_ruleset_set_status($prefix, $dir = SMS_DIR_ALL) {
   return db_update('sms_valid_rules')
@@ -281,13 +263,13 @@ function sms_valid_ruleset_set_status($prefix, $dir = SMS_DIR_ALL) {
 
 
 /**
- * Create or update a ruleset
+ * Creates or updates a ruleset.
  *
- * @param $ruleset
+ * @param array $ruleset
  *   A ruleset array.
  *
- * @return
- *   Boolean. Result of the DB query.
+ * @return bool
+ *   true on success, false otherwise.
  */
 function sms_valid_save_ruleset($ruleset) {
   $prefix = $ruleset['prefix'];
@@ -297,7 +279,7 @@ function sms_valid_save_ruleset($ruleset) {
   $dirs_enabled = $ruleset['dirs_enabled'];
 
   if (sms_valid_get_ruleset($prefix)) {
-    // The ruleset exists so we should update
+    // The ruleset exists so we use update query.
     return db_update('sms_valid_rules')
     ->fields(array(
         'name' => $name,
@@ -309,7 +291,7 @@ function sms_valid_save_ruleset($ruleset) {
     ->execute();
   }
   else {
-    // The ruleset does not exist so we should create
+    // The ruleset does not exist so we use insert query.
     return $id = db_insert('sms_valid_rules')
     ->fields(array(
         'prefix' => $prefix,
@@ -324,13 +306,13 @@ function sms_valid_save_ruleset($ruleset) {
 
 
 /**
- * Delete a ruleset
+ * Deletes a specified ruleset.
  *
- * @param $prefix
- *   A prefix number.
+ * @param int $prefix
+ *   A prefix number specifying which ruleset to delete.
  *
- * @return
- *   Boolean. Result of the DB query.
+ * @return bool
+ *   true on success, false otherwise.
  */
 function sms_valid_delete_ruleset($prefix) {
   return db_delete('sms_valid_rules')
@@ -340,12 +322,12 @@ function sms_valid_delete_ruleset($prefix) {
 
 
 /**
- * Get the rules for a prefix
+ * Gets the rules for a specified prefix.
  *
- * @param $rules
- *   A prefix number.
+ * @param $prefix
+ *   A prefix number specifying which ruleset's rules to get.
  *
- * @return
+ * @return array
  *   An array of rules.
  */
 function sms_valid_get_rules($prefix) {
@@ -355,12 +337,12 @@ function sms_valid_get_rules($prefix) {
 
 
 /**
- * Distill rules text into a rules array
+ * Distills rules text into a rules array.
  *
- * @param $text
+ * @param string $text
  *   A text string containing rules for a ruleset.
  *
- * @return
+ * @return array
  *   An array of rules.
  */
 function sms_valid_text_to_rules($text) {
@@ -399,12 +381,12 @@ function sms_valid_text_to_rules($text) {
 
 
 /**
- * Implode a rules array into rules text
+ * Implodes a rules array into rules text.
  *
- * @param $rules
+ * @param array $rules
  *   A rules array.
  *
- * @return
+ * @return string
  *   A text string containing rules for a ruleset.
  */
 function sms_valid_rules_to_text($rules) {
@@ -423,22 +405,22 @@ function sms_valid_rules_to_text($rules) {
 
 
 /**
- * Get country codes for form options
+ * Gets country codes for form options.
  *
- * @param $include_null_option
- *   Whether to include a null option in the resulting array. TRUE or FALSE.
+ * @param bool $include_null_option
+ *   true to include a null option in the resulting array, false to not include.
  *
- * @return
+ * @return array
  *   Options array that can be used in a form select element.
  */
 function sms_valid_get_rulesets_for_form($include_null_option = FALSE) {
   $options = array();
-  // We only really need a null option on the send form
+  // We only really need a null option on the send form.
   if ($include_null_option) {
     $options[-1] = '(auto select)';
   }
 
-  // Other options
+  // Other options.
   $rulesets = sms_valid_get_all_rulesets();
   foreach ($rulesets as $prefix => $ruleset) {
     $suffix = (!empty($ruleset->iso2)) ? ' (' . $ruleset->iso2 . ')' : '';
@@ -449,17 +431,17 @@ function sms_valid_get_rulesets_for_form($include_null_option = FALSE) {
 
 
 /**
- * Check if number is a local number
+ * Checks if a number is a local number.
  *
- * @param $number
- *   A phone number
+ * @param string $number
+ *   A phone number.
  *
- * @return
- *   Boolean. Whether this is a local number.
+ * @return bool
+ *   true if this is a local number, false otherwise.
  */
 function sms_valid_is_local_number($number) {
   $prefix = variable_get('sms_valid_local_number_prefix', '0');
-  // A blank prefix string makes this return false
+  // A blank prefix string makes this return false.
   if ($prefix !== '' && preg_match("/^$prefix/", $number)) {
     return TRUE;
   }
@@ -470,21 +452,22 @@ function sms_valid_is_local_number($number) {
 
 
 /**
- * Validate a number
+ * Validates a number.
  *
- * @param $number
- *   A phone number.
- * @param $options
- *   An array of options.
- *   - dir  : Direction of message. See SMS_DIR_* constants.
+ * @param string $number
+ *   A phone number to validate.
+ * @param array $options
+ *   An array of options containing the following:
+ *   - dir: Direction of message. See SMS_DIR_* constants.
  *
- * @return
- *   Array with the validation result.
- *   - pass : The validation result.
- *       - TRUE  if the number passed validation checks.
- *       - FALSE if the number is denied by validation.
- *       - NULL  if the number could not be validated.
- *   - log  : Array of log strings. The last record is the most significant.
+ * @return array
+ *   Array with the validation results, a key-value array with the following:
+ *   - pass: array The validation result having the following possible values
+ *       - true  if the number passed validation checks.
+ *       - false if the number is denied by validation.
+ *       - null  if the number could not be validated.
+ *   - log: Array of log messages. The last record is the most significant.
+ *   - errors: Array of error messages. The last record is the most significant.
  */
 function sms_valid_validate(&$number, &$options = array()) {
   $result = array(
@@ -493,7 +476,7 @@ function sms_valid_validate(&$number, &$options = array()) {
     'errors' => array(),
   );
 
-  // Set the default direction if not specified in options
+  // Set the default direction if not specified in options.
   $dir = (array_key_exists('dir', $options)) ? $options['dir'] : SMS_DIR_OUT;
 
   $use_global_ruleset   = variable_get('sms_valid_use_global_ruleset',   FALSE);
@@ -503,7 +486,7 @@ function sms_valid_validate(&$number, &$options = array()) {
   $last_resort_enabled  = variable_get('sms_valid_last_resort_enabled',  FALSE);
   $last_resort_ruleset  = variable_get('sms_valid_last_resort_ruleset',  NULL);
 
-  // Check if we should use a specific ruleset prefix
+  // Check if we should use a specific ruleset prefix.
   if (array_key_exists('prefix', $options) && $options['prefix'] >= 0) {
     $specific_prefix = $options['prefix'];
   }
@@ -511,7 +494,7 @@ function sms_valid_validate(&$number, &$options = array()) {
     $specific_prefix = NULL;
   }
 
-  // Check for zero-length value
+  // Check for zero-length value.
   if (!strlen($number)) {
     $result['log'][] = t('You must enter a phone number.');
     $result['errors'][] = t('Zero length phone number specified.');
@@ -522,15 +505,15 @@ function sms_valid_validate(&$number, &$options = array()) {
   // Remove all whitespace
   $number = preg_replace('/[^\d]/', '', $number);
 
-  // Check if we should use a specific ruleset
+  // Check if we should use a specific ruleset.
   if ($specific_prefix) {
     $prefix  = $specific_prefix;
     $ruleset = sms_valid_get_ruleset($prefix);
-    // Strip ruleset prefix (if exist) and leading zeros from the number
+    // Strip ruleset prefix (if exist) and leading zeros from the number.
     $num     = preg_replace("/^$prefix/", '', $number);
     $num     = ltrim($num, '0');
   }
-  // Check if we should use the global ruleset
+  // Check if we should use the global ruleset.
   elseif ($use_global_ruleset) {
     $result['log'][] = t('Using the global prefix validation ruleset.');
     $prefix  = $global_ruleset;
@@ -545,7 +528,7 @@ function sms_valid_validate(&$number, &$options = array()) {
     // Strip the local prefix from number
     $num     = preg_replace("/^$local_number_prefix/", '', $number);
   }
-  // Perform ruleset discovery
+  // Perform ruleset discovery.
   else {
     $ruleset  = sms_valid_get_ruleset_for_number($number);
 
@@ -554,7 +537,7 @@ function sms_valid_validate(&$number, &$options = array()) {
       $result['log'][] = t('Identified ruleset prefix @prefix', array('@prefix' => $prefix));
     }
     else {
-      // Could not identify ruleset prefix
+      // Could not identify ruleset prefix.
       $result['log'][] = t('Could NOT identify the ruleset prefix for number @number', array('@number' => $number));
 
       if ($last_resort_enabled && $last_resort_ruleset) {
@@ -572,20 +555,20 @@ function sms_valid_validate(&$number, &$options = array()) {
         return $result;
       }
     }
-    // Strip the ruleset prefix from the number
+    // Strip the ruleset prefix from the number.
     $num = preg_replace("/^$prefix/", '', $number);
   }
 
-  // Get the rules for this ruleset
+  // Get the rules for this ruleset.
   $rules = $ruleset['rules'];
 
-  // Lets make sure we have a rule before trying to sort it
+  // Lets make sure we have a rule before trying to sort it.
   if ($rules !== NULL) {
-    // Sort the rules by prefix (key) in reverse order (largest to smallest)
+    // Sort the rules by prefix (key) in reverse order (largest to smallest).
     krsort($rules);
   }
 
-  // Check whether this ruleset is enabled for the direction of communication
+  // Check whether this ruleset is enabled for the direction of communication.
   if (! sms_valid_ruleset_is_enabled($prefix, $dir)) {
     $result['log'][] = t('Number prefix @prefix does not allow messages in this direction.', array('@prefix' => $prefix));
     $result['errors'][] = t('Number prefix @prefix does not allow messages in this direction.', array('@prefix' => $prefix));
@@ -593,13 +576,13 @@ function sms_valid_validate(&$number, &$options = array()) {
     return $result;
   }
 
-  // Test the number against each rule prefix until we get a match
+  // Test the number against each rule prefix until we get a match.
   if (! empty($rules)) {
     foreach ($rules as $rule_prefix => $rule) {
       $result['log'][] = 'Trying rule with prefix ' . $rule_prefix . ' on number ' . $num;
       if (preg_match("/^$rule_prefix/", $num)) {
         if ($rule['allow']) {
-          // Set the full validated number and return
+          // Set the full validated number and return.
           $number = $prefix . $num;
           $result['log'][] = t('Explicit allow for prefix @prefix @rule_prefix', array('@prefix' => $prefix, '@rule_prefix' => $rule_prefix));
           $result['pass']  = TRUE;
