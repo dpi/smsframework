@@ -1,6 +1,11 @@
 (function ($) {
 
   Drupal.behaviors.smssendtophone = {
+    /**
+     * Adds javascript behavior to open sms-sendtophone form in a thickbox.
+     *
+     * @param context
+     */
     attach: function (context) {
       $("a.sms-sendtophone").addClass('thickbox').each(function(i) {
         if ($(this).attr('href').search(/\?/) < 0) {
