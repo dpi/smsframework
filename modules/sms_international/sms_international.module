@@ -7,9 +7,17 @@
 
 /**
  * Take a number including country code and make sure it is valid.
+ *
+ * @param string $number
+ *   The number to be validated.
+ * @param array $options
+ *   Validation options.
+ *
+ * @return bool|string
+ *
  */
 function sms_international_validate_number($number, $options = array()) {
-  // Replace all non-digit charecters with spaces
+  // Replace all non-digit characters with spaces.
   $number = preg_replace("/[^0-9]/", '', $number);
   $number = trim($number);
   $number = ltrim($number, '0'); // Remove leading zeros
@@ -37,7 +45,7 @@ function sms_international_validate_number($number, $options = array()) {
 }
 
 /**
- *
+ * Returns a list of country names and country codes.
  */
 function sms_international_countries() {
   return array(
