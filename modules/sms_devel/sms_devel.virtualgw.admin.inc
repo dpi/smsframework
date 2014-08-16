@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Virtual Gateway for the sms_devel module: Admin forms include
@@ -9,12 +10,15 @@
 
 
 /**
- * Configuration form for gateway module
+ * Form constructor for the gateway module configuration form.
  *
- * @param $configuration
+ * @param array $configuration
+ *   Array containing configuration information.
  *
  * @return
- *   Drupal form array
+ *   Drupal form array.
+ *
+ * @see sms_devel_virtualgw_form()
  */
 function sms_devel_virtualgw_settings_form($configuration) {
   $form['sms_devel_virtualgw_link'] = array(
@@ -27,14 +31,9 @@ function sms_devel_virtualgw_settings_form($configuration) {
 
 
 /**
- * The big form
- *
- * @return
- *   Drupal system settings form array.
+ * Form constructor for the virtual gateway configuration.
  */
 function sms_devel_virtualgw_form($form, &$form_state) {
-  // Include js
-
   $form['sms_devel_virtualgw_settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('Settings'),
@@ -169,8 +168,9 @@ function sms_devel_virtualgw_form($form, &$form_state) {
 
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Submit handler for sms_devel_virtualgw_form().
+ *
+ * @see sms_devel_virtualgw_form()
  */
 function sms_devel_virtualgw_form_save_settings($form, &$form_state) {
   variable_set('sms_devel_virtualgw_autoreply_enabled',

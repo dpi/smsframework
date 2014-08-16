@@ -1,11 +1,13 @@
 <?php
+
 /**
  * @file
  * Development and testing tools for Drupal SMS Framework.
  *
  * @package sms
  * @subpackage sms_devel
- *//*
+ */
+/*
 include DRUPAL_ROOT . '/' . 'sms_devel.send_form.inc';
 include DRUPAL_ROOT . '/' . 'sms_devel.virtualgw.inc';
 include DRUPAL_ROOT . '/' . 'sms_devel.virtualgw.admin.inc';*/
@@ -16,11 +18,6 @@ include 'sms_devel.virtualgw.admin.inc';
 
 /**
  * Implements hook_menu().
- *
- * @return
- *   Drupal menu item array.
- *
- * @ingroup hooks
  */
 function sms_devel_menu() {
   $items = array();
@@ -77,11 +74,6 @@ function sms_devel_menu() {
 
 /**
  * Implements hook_gateway_info().
- *
- * @return
- *   SMS Franework gateway info array
- *
- * @ingroup hooks
  */
 function sms_devel_gateway_info() {
   return array(

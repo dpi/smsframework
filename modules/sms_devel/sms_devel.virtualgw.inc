@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Virtual Gateway for the sms_devel module of the SMS Framework.
@@ -24,14 +25,19 @@ define('SMS_DEVEL_VIRTUALGW_TYPE_RECEIPT', 2);
  *   gw_number - The sender of the message. MSISDN or text string. Min=3, max=11 chars.
  *   reference - Message reference tag (to appear on any receipt).
  *
- * @param $number
- *   MSISDN of message recipient. Expected to include the country code prefix.
- * @param $message
+ * @param string $number
+ *   MSISDN of message recipient. Should include the country code prefix.
+ * @param string $message
  *   Message body text.
- * @param $options
+ * @param array $options
  *   Options array from SMS Framework.
- * @return
- *   Gateway response array.
+ *
+ * @return array
+ *   Gateway response array with the following keys:
+ *   - status: true (successful) or false (failed).
+ *   - status_code: standardized sms gateway status codes.
+ *   - gateway_status_code: gateway-specific status code.
+ *   - gateway_status_text: text describing the gateway-specific status code.
  */
 function sms_devel_virtualgw_send($number, $message, $options) {
   // Set a default sender if it is not specified
@@ -61,8 +67,14 @@ function sms_devel_virtualgw_send($number, $message, $options) {
 
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Handles incoming messages.
+ *
+ * @param string $number
+ *   The sender numbers.
+ * @param string $message
+ *   The message received.
+ * @param array $options
+ *   Array of options.
  */
 function sms_devel_virtualgw_receiver($number = NULL, $message = NULL, $options = array()) {
   // Handle HTTP requests rather than direct function calls
@@ -82,8 +94,19 @@ function sms_devel_virtualgw_receiver($number = NULL, $message = NULL, $options 
 
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Writes incoming and outgoing messages to the log.
+ *
+ * @param string $type
+ *   The message type (incoming or outgoing).
+ * @param string $number
+ *   The sender numbers.
+ * @param string $message
+ *   The message received.
+ * @param array $options
+ *   Array of options.
+ *
+ * @return boolean
+ *   true if logging was successful, false otherwise.
  */
 function sms_devel_virtualgw_log_insert($type, $number = '', $message = '', $options = array()) {
   $options_z = serialize($options);
@@ -104,8 +127,14 @@ function sms_devel_virtualgw_log_insert($type, $number = '', $message = '', $opt
 
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Invokes additional virtual gateway features eg: autoreplies, receipts.
+ *
+ * @param string $number
+ *   The recipient numbers.
+ * @param string $message
+ *   The message being sent.
+ * @param array $options
+ *   An array of options.
  */
 function sms_devel_virtualgw_sendlogic($number, $message, $options) {
   $autoreply_enabled = variable_get('sms_devel_virtualgw_autoreply_enabled', FALSE);
@@ -117,7 +146,7 @@ function sms_devel_virtualgw_sendlogic($number, $message, $options) {
     // $echo_message = $autoreply_format . $message;
     $echo_message = 'echo: ' . $message;
 
-    // Swap the numbers for the echo
+    // Swap the numbers for the echo.
     $echo_number  = $options['gw_number'];
     $echo_options = array('gw_number' => $number);
 
@@ -138,8 +167,7 @@ function sms_devel_virtualgw_sendlogic($number, $message, $options) {
 
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Ajax page callback providing logged virtual gateway activity.
  */
 function sms_devel_virtualgw_js_getactivity() {
   // We should not need to get a default limit - expect it in the request
@@ -208,8 +236,7 @@ function sms_devel_virtualgw_js_getactivity() {
 
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Performs an ajax send to virtual gateway.
  */
 function sms_devel_virtualgw_ahah_send() {
   $result = drupal_http_request(

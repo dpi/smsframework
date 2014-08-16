@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Test send form include for the sms_devel module of the SMS Framework.
@@ -9,24 +10,21 @@
 
 
 /**
- * Test send form
+ * Form constructor for sms_devel test send form.
  *
- * @return
- *   Drupal form array.
- *
- * @ingroup forms
+ * @see sms_devel_send_form_submit()
  */
 function sms_devel_send_form($form, &$form_state) {
-  // Begin my form
+  // Message to the user about the form.
   $form['about'] = array(
     '#type' => 'item',
     '#value' => 'This is a basic form that contains:<ul><li>include sms_send_form()</li><li>message text field</li><li>submit button</li></ul>The form validation includes sms_send_form_validate().<br/>The form submission includes sms_send_form_submit() which sends the message, and a little note that the form submitted ok.',
   );
 
-  // Include the sms_send_form from the SMS Framework core
+  // Include the sms_send_form from the SMS Framework core.
   $form = array_merge($form, sms_send_form());
 
-  // Message text field for my form
+  // Message text field for the send form.
   $form['message'] = array(
     '#type' => 'textarea',
     '#title' => t('Message'),
@@ -35,7 +33,7 @@ function sms_devel_send_form($form, &$form_state) {
     '#resizable' => FALSE,
   );
 
-  // Submit button for my form
+  // Submit button for the send form.
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Submit',
@@ -47,11 +45,12 @@ function sms_devel_send_form($form, &$form_state) {
 }
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Submit handler for sms_devel test send form.
+ *
+ * @see sms_devel_send_form()
  */
 function sms_devel_send_form_submit($form, &$form_state) {
-  // These is what happens after the SMS has been sent
+  // Display a message to the user.
   $number  = $form_state['values']['number'];
   $message = $form_state['values']['message'];
   drupal_set_message(check_plain(t("Form submitted ok for number $number and message: $message")));
