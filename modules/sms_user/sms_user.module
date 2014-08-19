@@ -259,7 +259,10 @@ function sms_user_settings($account) {
  * @ingroup forms
  */
 function sms_user_settings_add_form($form, &$form_state, $account) {
+  // Use SMS Send form for 'number' and 'gateway' fields.
   $form = sms_send_form(TRUE);
+  // Add element validation for number.
+  $form['number']['#element_validate'] = array('sms_user_validate_number_element');
   $form['uid'] = array(
     '#type' => 'hidden',
     '#value' => $account->uid,
@@ -268,42 +271,23 @@ function sms_user_settings_add_form($form, &$form_state, $account) {
     '#type' => 'submit',
     '#value' => t('Confirm number'),
   );
-  $form['#validate'][] = 'sms_user_settings_add_form_validate';
   $form['#submit'][] = 'sms_user_settings_add_form_submit';
-
   return $form;
 }
 
 /**
- * Validation callback for sms_user_settings_add_form().
+ * Submits the user number confirmation request form.
  *
- * @see sms_user_settings_add_form_submit()
- */
-function sms_user_settings_add_form_validate($form, &$form_state) {
-  if ($error = sms_user_validate_number($form_state['values']['number'])) {
-    if (is_array($error)) {
-      form_set_error('number', t("This is not a valid number on this website."));
-    }
-    else {
-      form_set_error('number', $error);
-    }
-  }
-
-  if (empty($form_state['values']['gateway'])) {
-    $form_state['values']['gateway'] = array();
-  }
-}
-
-/**
- * Submit callback for sms_user_settings_add_form().
- *
- * @see sms_user_settings_add_form_validate()
+ * @see sms_user_settings_add_form()
  */
 function sms_user_settings_add_form_submit($form, &$form_state, $account = NULL) {
+  $number = $form_state['values']['number'];
+  $gateway = empty($form_state['values']['gateway']) ? array() : $form_state['values']['gateway'];
   if (!$account) {
     $account = user_load($form_state['values']['uid']);
   }
-  sms_user_send_confirmation($account, $form_state['values']['number'], $form_state['values']['gateway']);
+
+  sms_user_send_confirmation($account, $number, $gateway);
 }
 
 /**
@@ -356,6 +340,7 @@ function sms_user_settings_confirm_form($form, &$form_state, $account) {
  * Validates the user number code verification form.
  *
  * @see sms_user_settings_confirm_form_submit()
+ * @see sms_user_settings_confirm_form()
  */
 function sms_user_settings_confirm_form_validate($form, &$form_state) {
   if ($form_state['clicked_button']['#value'] == t('Confirm number')) {
@@ -369,12 +354,13 @@ function sms_user_settings_confirm_form_validate($form, &$form_state) {
 /**
  * Submits the user number code verification form.
  *
+ * @see sms_user_settings_confirm_form_validate()
  * @see sms_user_settings_confirm_form()
  */
 function sms_user_settings_confirm_form_submit($form, &$form_state) {
   $account = user_load($form_state['values']['uid']);
   if ($form_state['clicked_button']['#value'] == t('Delete & start over')) {
-    sms_user_delete($account->uid);
+    sms_user_delete_user_info($account->uid);
   }
   else {
     $data = array(
@@ -431,7 +417,7 @@ function sms_user_settings_reset_form($form, &$form_state, $account) {
  */
 function sms_user_settings_reset_form_submit($form, &$form_state) {
   $account = user_load($form_state['values']['uid']);
-  sms_user_delete($account->uid);
+  sms_user_delete_user_info($account->uid);
   if (module_exists('rules')) {
     rules_invoke_event('sms_user_number_removed', $account);
   }
@@ -439,17 +425,16 @@ function sms_user_settings_reset_form_submit($form, &$form_state) {
 }
 
 /**
- * Form constructor for the verified user number reset form.
+ * Form constructor for the user sleep settings form.
  *
  * @param object $account
  *   The user account object.
  *
- * @see sms_user_settings_reset_form_validate()
- * @see sms_user_settings_reset_form_submit()
+ * @see sms_user_settings_sleep_form_submit()
  *
  * @ingroup forms
  */
-function sms_user_settings_sleep_form_validat($form, &$form_state, $account) {
+function sms_user_settings_sleep_form($form, &$form_state, $account) {
   $form['uid'] = array(
     '#type' => 'hidden',
     '#value' => $account->uid,
@@ -550,20 +535,19 @@ function sms_user_send_confirmation($account, $number, $options) {
 }
 
 /**
- * Validates the phone number.
+ * Form element validation callback.
  *
- * @param string $number
- *   The phone number to validate.
- *
- * @return string|string[]
- *   An error message or array of error messages for an error, null if no error.
+ * Validates that the phone number is valid for the system, and is not in use
+ * by another user.
  */
-function sms_user_validate_number(&$number) {
+function sms_user_validate_number_element($element, &$form_state, $form) {
+  $number = $element['#value'];
+
   if ($error = sms_validate_number($number)) {
-    return $error;
+    form_error($element, $error);
   }
   elseif (sms_user_get_uid($number)) {
-    return t('This phone number is already registered to another user.');
+    form_error($element, t('This phone number is already registered to another user.'));
   }
 }
 
@@ -631,6 +615,8 @@ function sms_user_form_alter(&$form, &$form_state, $form_id) {
 
 
       $form['sms_user'] += sms_send_form($required);
+      $form['sms_user']['number']['#element_validate'] = array('sms_user_validate_number_element');
+
 
       return $form;
     }
@@ -642,18 +628,7 @@ function sms_user_form_alter(&$form, &$form_state, $form_id) {
  * Implements hook_user_cancel().
  */
 function sms_user_user_cancel($edit, $account, $method) {
-  return sms_user_delete($account->uid);
-}
-
-/**
- * Implements hook_user_validate().
- */
-function sms_user_user_validate(&$edit, $account, $category) {
-  if (!empty($edit['sms_user']) && (variable_get('sms_user_registration_form', 0) == 2 || strlen($edit['sms_user']['number']))) {
-    if ($error = sms_user_validate_number($edit['sms_user']['number'])) {
-      form_set_error('sms_user][number', $error);
-    }
-  }
+  return sms_user_delete_user_info($account->uid);
 }
 
 /**
@@ -717,7 +692,7 @@ function sms_user_user_load($users) {
         'sleep_end_time' => 0,
       );
 
-      // @todo The following is BC-shim to support code that expect account
+      // @todo The following is a BC-shim to support code that expectS account.
       // details with a delta of 0.
       $users[$id]->sms_user[0] = $users[$id]->sms_user;
     }
@@ -741,7 +716,6 @@ function sms_user_save(&$edit, &$account, $category) {
     if (isset($account->sms_user) && sms_user_get_uid($number->number)) { // is existing
       $primary_keys = array('number');
     }
-    drupal_write_record('sms_user', $number, $primary_keys);
 
     $edit['sms_user']['number'] = NULL;
     $edit['sms_user']['status'] = NULL;
@@ -750,20 +724,25 @@ function sms_user_save(&$edit, &$account, $category) {
     $edit['sms_user']['sleep_enabled'] = NULL;
     $edit['sms_user']['sleep_start_time'] = NULL;
     $edit['sms_user']['sleep_end_time'] = NULL;
+
+    return drupal_write_record('sms_user', $number, $primary_keys);
   }
+  return FALSE;
 }
 
 /**
- * Deletes a user's mobile information from the database
+ * Deletes a user's mobile information from the database.
  *
- * @param $uid
+ * @param int|object $uid
  *   The uid of the user who's data is to be removed.
- * @param $number
+ * @param string|bool $number
  *   The number to delete. Defaults to FALSE which will delete all numbers.
  *
- * @see sms_user_user()
+ * @return bool|int
+ *
+ * @see sms_user_user_cancel()
  */
-function sms_user_delete($uid, $number = FALSE) {
+function sms_user_delete_user_info($uid, $number = FALSE) {
   if (is_object($uid)) {
     $uid = $uid->uid;
   }
@@ -773,7 +752,7 @@ function sms_user_delete($uid, $number = FALSE) {
   if ($number) {
     $query->condition('number', $number);
   }
-  $num_deleted = $query->execute();
+  return $query->execute();
 }
 
 /**
@@ -1196,7 +1175,6 @@ function entity_property_sms_user_get_properties($data, array $options, $name, $
       switch ($name) {
         case "sms_user_phone_number" :
           return isset($account->sms_user['number']) ? $account->sms_user['number'] : '';
-          break;
         case "sms_user_status" :
           if (!isset($account->sms_user['status'])) return t('Blocked');
           switch ($account->sms_user['status']) {
