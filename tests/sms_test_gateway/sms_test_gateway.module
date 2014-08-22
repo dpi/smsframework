@@ -27,10 +27,15 @@ function sms_test_gateway_gateway_info() {
 function sms_test_gateway_send($number = NULL, $message = NULL, $options = array()) {
   static $result;
 
+  if (!isset($result)) {
+    $result = variable_get('sms_test_gateway_result', array());
+  }
+
   if (!is_null($number) && !is_null($message)) {
     $result['number'] = $number;
     $result['message'] = $message;
     $result['options'] = $options;
+    variable_set('sms_test_gateway_result', $result);
   }
   return array('status' => TRUE, 'result' => $result);
 }

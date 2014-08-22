@@ -16,3 +16,4 @@ files[] = sms_user.module
 files[] = sms_user.rules.inc
 files[] = sms_user.views.inc
 files[] = sms_user.views_default.inc
+files[] = tests/sms_user.test
