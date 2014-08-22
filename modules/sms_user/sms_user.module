@@ -417,10 +417,10 @@ function sms_user_settings_reset_form($form, &$form_state, $account) {
  */
 function sms_user_settings_reset_form_submit($form, &$form_state) {
   $account = user_load($form_state['values']['uid']);
-  sms_user_delete_user_info($account->uid);
   if (module_exists('rules')) {
     rules_invoke_event('sms_user_number_removed', $account);
   }
+  sms_user_delete_user_info($account->uid);
   drupal_set_message(t('Your mobile information has been removed'), 'status');
 }
 
