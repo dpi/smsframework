@@ -262,7 +262,7 @@ function sms_user_settings_add_form($form, &$form_state, $account) {
   // Use SMS Send form for 'number' and 'gateway' fields.
   $form = sms_send_form(TRUE);
   // Add element validation for number.
-  $form['number']['#element_validate'] = array('sms_user_validate_number_element');
+  $form['number']['#element_validate'][] = 'sms_user_validate_number_element';
   $form['uid'] = array(
     '#type' => 'hidden',
     '#value' => $account->uid,
@@ -544,7 +544,9 @@ function sms_user_validate_number_element($element, &$form_state, $form) {
   $number = $element['#value'];
 
   if ($error = sms_validate_number($number)) {
-    form_error($element, $error);
+    foreach ($error as $lerror) {
+      form_error($element, $lerror);
+    }
   }
   elseif (sms_user_get_uid($number)) {
     form_error($element, t('This phone number is already registered to another user.'));
