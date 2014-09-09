@@ -5,6 +5,38 @@
  *
  */
 
+/**
+ * Checks if the Generic User Registration settings are correctly configured
+ * 
+ * Implemenents hook_requirements()
+ */
+function sms_user_requirements($phase) {
+  $requirements = array();
+  if ($phase == 'runtime') {
+    $sms_user_registration_enabled = variable_get('sms_user_registration_enabled');
+    $user_email_verification = variable_get('user_email_verification');
+    $user_register = variable_get('user_register');
+    if ($sms_user_registration_enabled) {
+      $requirements['sms_user'] = array(
+        'title' => t('SMS User'),
+        'value' => "Enabled",
+        'description' => t("You allow users to register via SMS."),
+        'severity' =>  REQUIREMENT_OK,
+      );
+      if ($user_email_verification)  {
+        $requirements['sms_user']['value'] = "Partially Working";
+        $requirements['sms_user']['description'] .= t(' But you require Email verification. You should switch that off on the ' . l('account settings page', 'admin/config/people/accounts'));
+        $requirements['sms_user']['severity'] =  REQUIREMENT_WARNING;
+      }
+      if (!$user_register) {
+        $requirements['sms_user']['value'] = "Partially Working";
+        $requirements['sms_user']['description'] .= t(' Users can not register so all SMS users will be blocked. You should switch visitor registration on, on the ' . l('account settings page', 'admin/config/people/accounts'));
+        $requirements['sms_user']['severity'] = REQUIREMENT_ERROR;
+      }
+    }
+  }
+  return $requirements;
+}
 
 /**
  * Implements hook_install().
