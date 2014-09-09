@@ -414,7 +414,7 @@ function _gateways_build() {
 
   $gateway_array = module_invoke_all('gateway_info');
   foreach ($gateway_array as $identifier => $info) {
-    $info['configuration'] = variable_get('sms_' . $identifier . '_settings', '');
+    $info['configuration'] = variable_get('sms_' . $identifier . '_settings', array());
     $_gateways[$identifier] = $info;
     $_names[$identifier] = $info['name'];
   }

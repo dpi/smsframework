@@ -1,0 +1,130 @@
+<?php
+
+/**
+ * @file
+ * Contains tests for the functions in sms_user.module and user integration.
+ */
+
+/**
+ * Provides integration tests for the sms_user module.
+ *
+ * @todo Add tests for creation of users via sms.
+ * @todo Add tests for integration with rules and actions modules.
+ */
+class SmsUserWebTest extends DrupalWebTestCase {
+
+  /**
+   * Provides information on the test.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'SMS User Integration Test',
+      'description' => 'Integration tests for SMS User module.',
+      'group' => 'SMS Framework',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function setUp() {
+    parent::setUp('sms', 'sms_test_gateway', 'sms_user');
+  }
+
+  /**
+   * Tests user adding phone number.
+   */
+  function testNumberConfirmationAndSmsUserSend() {
+    // Set up test default gateway.
+    variable_set('sms_default_gateway', 'test');
+    $user = $this->drupalCreateUser(array('receive sms', 'edit own sms number'));
+    $this->drupalLogin($user);
+
+    // Post user confirmation request.
+    $edit = array('number' => '1234567890');
+    $this->drupalPost('user/' . $user->uid . '/edit/mobile', $edit, t('Confirm number'));
+    $this->assertResponse(200);
+    // Get the code that was sent.
+    $gw_result = sms_test_gateway_send();
+    preg_match('/\b([0-9]{4})\b/', $gw_result['result']['message'], $matches);
+    $code = $matches[1];
+    // Post the code for confirmation.
+    $this->drupalPost('user/' . $user->uid . '/edit/mobile', array('confirm_code' => $code), t('Confirm number'));
+    $this->assertResponse(200);
+    // Confirm user's number is verified.
+    $user = user_load($user->uid, TRUE);
+    $this->assertTrue($user->sms_user['number'] == $edit['number'] && $user->sms_user['status'] == SMS_USER_CONFIRMED, 'Successfully confirmed user phone number ' . $edit['number']);
+
+    // Send sms to user with registered number.
+    $message = 'Test user message';
+    $this->assertTrue(sms_user_send($user->uid, $message), 'Successfully sent message to user with permission');
+    $gw_result = sms_test_gateway_send();
+    $this->assertEqual($gw_result['result'],
+      array('number' => $user->sms_user['number'], 'message' => $message, 'options' => $user->sms_user['gateway']), 'Message sent through the correct gateway.');
+
+    // Test sms_user_authenticate() on this user.
+    $account = sms_user_authenticate($user->sms_user['number']);
+    $this->assertEqual($user->uid, $account->uid, 'Correctly authenticated user by phone number.');
+
+    // Get a user with no permissions and test failed sending.
+    $user1 = $this->drupalCreateUser(array());
+    $this->assertFalse(sms_user_send($user1->uid, $message), 'Failed sending to user without permission');
+
+    // Clear user confirmed number.
+    $this->drupalPost('user/' . $user->uid . '/edit/mobile', array(), t('Delete & start over'));
+    $this->assertResponse(200);
+    $user = user_load($user->uid, TRUE);
+    $this->assertTrue($user->sms_user['number'] == '' && $user->sms_user['status'] == 0, 'Successfully deleted user confirmed number');
+
+    // Test that sending fails when confirmed number is deleted.
+    $this->assertFalse(sms_user_send($user->uid, $message), 'Failed sending to user without confirmed number');
+
+    // Test failure to authenticate a non-existent number.
+    $this->assertFalse(sms_user_authenticate(rand(23400000000, 23499999999)), 'Failed to authenticate non-existent number.');
+  }
+
+  /**
+   * Tests sms_user admin options.
+   */
+  public function testSmsUserOptions() {
+    $user = $this->drupalCreateUser(array('administer smsframework', 'receive sms', 'edit own sms number'));
+    $this->drupalLogin($user);
+
+    // Set the sms_user admin options.
+    $edit = array(
+      'sms_user_registration_form' => 0,
+      'sms_user_confirmation_message' => $this->randomString(20),
+      'sms_user_sleep' => 1,
+      'sms_user_sleep_start_time' => 1,
+      'sms_user_sleep_end_time' => 1,
+      'sms_user_registration_enabled' => 1,
+      'sms_user_allow_password' => 1,
+      'sms_user_new_account_message' => $this->randomString(30),
+      'sms_user_max_chars' => 160,
+    );
+    $this->drupalPost('admin/smsframework/sms_user_options', $edit, t('Save configuration'));
+    $this->assertResponse(200);
+
+    // Verify that the variables are set.
+    foreach ($edit as $name=>$value) {
+      $this->assertEqual($value, variable_get($name), sprintf('Variable %s has been set.', $name));
+    }
+
+    // Check that the user registration page honors the mobile number field
+    // visibility settings.
+    $this->drupalLogout();
+    variable_set('sms_user_registration_form', 0);
+    $this->drupalGet('user/register');
+    $this->assertNoField('sms_user[number]', 'No number field in registration form.');
+
+    variable_set('sms_user_registration_form', 1);
+    $this->drupalGet('user/register');
+    $this->assertField('sms_user[number]', 'Number field in registration form.');
+
+    variable_set('sms_user_registration_form', 2);
+    $this->drupalGet('user/register');
+    $this->assertField('sms_user[number]', 'Number field in registration form.');
+    $this->assertText('Phone number *', 'Number field is required.');
+  }
+
+}

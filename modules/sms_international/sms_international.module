@@ -2,7 +2,7 @@
 
 /**
  * @file
- *
+ * Contains sms_international module.
  */
 
 /**
@@ -20,16 +20,20 @@ function sms_international_validate_number($number, $options = array()) {
   // Replace all non-digit characters with spaces.
   $number = preg_replace("/[^0-9]/", '', $number);
   $number = trim($number);
-  $number = ltrim($number, '0'); // Remove leading zeros
+  // Remove leading zeros.
+  $number = ltrim($number, '0');
 
-
+  $candidates = array();
   for ($i = 0; $i < 4; $i++) {
     $candidates[] = substr($number, 0, $i + 1);
   }
-
-  $result = db_query("SELECT iso, country_code, min_length, max_length FROM {sms_international} WHERE country_code IN (" . db_placeholders($candidates, 'varchar') . ") AND status = 1", $candidates);
+  $result = db_select('sms_international', 's')
+    ->fields('s', array('iso', 'country_code', 'min_length', 'max_length'))
+    ->condition('country_code', $candidates, 'IN')
+    ->condition('status', 1)
+    ->execute();
   $countries = array();
-  while ($country = db_fetch_array($result)) {
+  foreach ($result as $country) {
     $countries[] = $country;
     $codes[$country['country_code']] = $country['iso'];
   }
@@ -41,7 +45,7 @@ function sms_international_validate_number($number, $options = array()) {
     }
   }
 
-  return 'false';
+  return FALSE;
 }
 
 /**

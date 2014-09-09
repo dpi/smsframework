@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * @file
+ * A test gateway to be used for testing the sms framework
+ */
+
+/**
+ * Implements hook_gateway_info().
+ */
+function sms_test_gateway_gateway_info() {
+  return array(
+    'test' => array(
+      'name' => t('For testing'),
+      'send' => 'sms_test_gateway_send',
+      'configure form' => 'sms_test_gateway_config_form',
+      'delivery process' => 'sms_test_gateway_delivery_process',
+      'delivery get' => 'sms_test_gateway_delivery_get',
+      'send form' => 'sms_test_gateway_send_form',
+    ),
+  );
+}
+
+/**
+ * Send callback
+ */
+function sms_test_gateway_send($number = NULL, $message = NULL, $options = array()) {
+  static $result;
+
+  if (!isset($result)) {
+    $result = variable_get('sms_test_gateway_result', array());
+  }
+
+  if (!is_null($number) && !is_null($message)) {
+    $result['number'] = $number;
+    $result['message'] = $message;
+    $result['options'] = $options;
+    variable_set('sms_test_gateway_result', $result);
+  }
+  return array('status' => TRUE, 'result' => $result);
+}
+
+/**
+ * Form builder for configure form.
+ */
+function sms_test_gateway_config_form($configuration) {
+  $configuration += array(
+    'ssl' => false,
+    'username' => '',
+    'password' => '',
+    'method' => '',
+    'server' => '',
+  );
+  $form['ssl'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use SSL Encyption'),
+    '#description' => t('Drupal\'s built-in HTTP client only supports SSL on PHP 4.3 compiled with OpenSSL.'),
+    '#default_value' => $configuration['ssl'] ?: '',
+  );
+  $form['username'] = array(
+    '#type' => 'textfield',
+    '#title' => t('User'),
+    '#description' => t('The username of the Test gateway account.'),
+    '#size' => 40,
+    '#maxlength' => 255,
+    '#default_value' => $configuration['username'] ?: '',
+  );
+  $form['password'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Password'),
+    '#description' => t('The current password on the Test gateway account.'),
+    '#size' => 30,
+    '#maxlength' => 64,
+    '#default_value' => $configuration['password'] ?: '',
+  );
+
+  $form['method'] = array(
+    '#type' => 'radios',
+    '#title' => t('Send Method'),
+    '#description' => t('The method to use for sending sms.'),
+    '#options' => array(t('HTTP GET (Split server request if recipients > 400)'), t('HTTP GET (Use POST if recipients > 500)'), t('HTTP POST'), t('SMPP (Not yet implemented)')),
+    '#default_value' => $configuration['method'] ?: '',
+  );
+
+  $form['server'] = array(
+    '#type' => 'textfield',
+    '#title' => t('API Server URL'),
+    '#description' => t('The url for accessing the Test api server.'),
+    '#size' => 40,
+    '#maxlength' => 255,
+    '#default_value' => $configuration['server'] ?: '',
+  );
+
+  return $form;
+}

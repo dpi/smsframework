@@ -80,7 +80,7 @@ function sms_user_send($uid, $message) {
   $account = user_load($uid);
   // Check if the user is enabled to receive SMS.
   if (user_access('receive sms', $account)) {
-    if ($account->sms_user['status'] >= SMS_USER_CONFIRMED) {
+    if ($account->sms_user['status'] == SMS_USER_CONFIRMED) {
       return sms_send($account->sms_user['number'], $message, $account->sms_user['gateway']);
     }
     else {
@@ -104,7 +104,7 @@ function sms_user_send($uid, $message) {
 function sms_user_get_number($account) {
   // Check if the user is enabled to receive SMS.
   if (user_access('receive sms', $account)) {
-    if ($account->sms_user['status'] >= SMS_USER_CONFIRMED) {
+    if ($account->sms_user['status'] == SMS_USER_CONFIRMED) {
       return $account->sms_user['number'];
     }
     else {
@@ -213,7 +213,7 @@ function _sms_user_sleep_active($account) {
 }
 
 /**
- * Menu callback for admin settings form.
+ * Menu callback for user profile settings form.
  *
  * Provides the forms for adding and confirming a user's mobile number.
  *
@@ -330,7 +330,7 @@ function sms_user_settings_confirm_form($form, &$form_state, $account) {
   $form['confirm'] = array(
     '#type' => 'submit',
     '#value' => t('Confirm without code'),
-    '#access' => user_access('administer site'),
+    '#access' => user_access('administer smsframework'),
   );
 
   return $form;
@@ -674,8 +674,8 @@ function sms_user_user_load($users) {
       $record->gateway = unserialize($record->gateway);
       $users[$record->uid]->sms_user = (array)$record;
 
-      // @todo The following is BC-shim to support messaging that expect account
-      // details with a delta of 0.
+      // @todo The following is BC-shim to support messaging that expects
+      // account details with a delta of 0.
       $users[$record->uid]->sms_user[0] = (array)$record;
     }
   }
@@ -694,7 +694,7 @@ function sms_user_user_load($users) {
         'sleep_end_time' => 0,
       );
 
-      // @todo The following is a BC-shim to support code that expectS account.
+      // @todo The following is a BC-shim to support code that expects account
       // details with a delta of 0.
       $users[$id]->sms_user[0] = $users[$id]->sms_user;
     }
@@ -975,7 +975,7 @@ function sms_user_register_new_user($number, $message, $options) {
   $edit['timezone'] = '';
   // If by chance there's already a user with the same email address, then use
   // it instead of creating a new user.
-  if ((!(empty($mail))) && ($account = array_shift(user_load_multiple(array(), array('mail' => $mail))))) {
+  if (!empty($mail) && ($account = array_shift(user_load_multiple(array(), array('mail' => $mail), TRUE)))) {
     $account = user_save($account, $edit);
   }
   else {
@@ -993,7 +993,7 @@ function sms_user_register_new_user($number, $message, $options) {
       }
     }
     // Auto-generated password.
-    if (!isset($edit['pass']) || (!$edit['pass'])) {
+    if (!isset($edit['pass']) || !$edit['pass']) {
       $edit['pass'] = user_password();
     }
 

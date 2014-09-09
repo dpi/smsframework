@@ -1,0 +1,115 @@
+<?php
+
+/**
+ * @file
+ * Contains tests for the functions in sms.module and core sms framework.
+ */
+
+/**
+ * Provides basic units tests for the SMS Framework.
+ */
+class SmsFrameworkTest extends DrupalUnitTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'SMS Framework Basic Tests',
+      'description' => 'Tests basic functionality of SMS Framework.',
+      'group' => 'SMS Framework',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function tearDown() {
+    parent::tearDown();
+  }
+
+}
+
+/**
+ * Provides integration tests for the SMS Framework.
+ */
+class SmsFrameworkWebTest extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'SMS Framework Integration Test',
+      'description' => 'Integration tests for the SMS Framework.',
+      'group' => 'SMS Framework',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('sms', 'sms_test_gateway');
+    $user = $this->drupalCreateUser(array('administer smsframework'));
+    $this->drupalLogin($user);
+  }
+
+  /**
+   * Tests that the correct gateways list is obtained.
+   */
+  function testGatewaysList() {
+    $this->assertEqual(array('log' => t('Log only'), 'test' => t('For testing')), sms_gateways('names'));
+  }
+
+  /**
+   * Tests setting up the default gateway.
+   */
+  function testDefaultGateway() {
+    // Set up default log gateway.
+    $this->drupalPost('admin/smsframework/gateways', array('default' => 'log'), t('Set default gateway'));
+    $this->assertResponse(200);
+    $gw = sms_default_gateway();
+    $this->assertEqual($gw['identifier'], 'log', 'Default gateway set to log.');
+
+    // Set up default test gateway.
+    $this->drupalPost('admin/smsframework/gateways', array('default' => 'test'), t('Set default gateway'));
+    $this->assertResponse(200);
+    $gw = sms_default_gateway();
+    $this->assertEqual($gw['identifier'], 'test', 'Default gateway set to test.');
+  }
+
+  /**
+   * Tests configuring a specific gateway.
+   */
+  function testGatewayConfiguration() {
+    $edit = array(
+      'username' => 'test',
+      'password' => 'testword',
+      'server' => 'test.example.com/api',
+      'method' => 0,
+      'ssl' => false,
+    );
+    $this->drupalPost('admin/smsframework/gateways/test', $edit, t('Save'));
+    $this->assertResponse(200);
+    $gateway = sms_gateways('gateway', 'test');
+    $this->assertEqual($edit, $gateway['configuration'], 'SMS Test gateway successfully configured.');
+  }
+
+  /**
+   * Tests the sending of messages.
+   */
+  public function testSendSms() {
+    $message = 'This is a test message';
+    $number = '23412345678';
+    $options = array(
+      'sender' => 'Sender',
+      'gateway' => 'test'
+    );
+
+    // Send sms to test gateway.
+    $result = sms_send($number, $message, $options);
+    $this->assertTrue($result, 'Message successfully sent.');
+    $gw_result = sms_test_gateway_send();
+    $this->assertEqual($gw_result['result'], array('number' => $number, 'message' => $message, 'options' => $options), 'Message sent to the correct gateway.');
+  }
+
+}

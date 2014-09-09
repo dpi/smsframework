@@ -110,18 +110,15 @@ function sms_devel_virtualgw_receiver($number = NULL, $message = NULL, $options 
  */
 function sms_devel_virtualgw_log_insert($type, $number = '', $message = '', $options = array()) {
   $options_z = serialize($options);
-  // @TODO Please review the conversion of this statement to the D7 database API syntax.
-  /* db_query("INSERT INTO {sms_devel_virtualgw} (created, type, number,
-   message, options) VALUES (%d, %d, '%s', '%s', '%s')", REQUEST_TIME, $type, $number, $message, $options_z) */
   $result = $id = db_insert('sms_devel_virtualgw')
-  ->fields(array(
-    'created' => REQUEST_TIME,
-    'type' => $type,
-    'number' => $number,
-    'message' => $message,
-    'options' => $options_z,
-  ))
-  ->execute();
+    ->fields(array(
+      'created' => REQUEST_TIME,
+      'type' => $type,
+      'number' => $number,
+      'message' => $message,
+      'options' => $options_z,
+    ))
+    ->execute();
   return $result;
 }
 
@@ -183,16 +180,18 @@ function sms_devel_virtualgw_js_getactivity() {
 
   $lines = array();
 
-  $result = db_query("SELECT * FROM {sms_devel_virtualgw} ORDER BY created LIMIT %d", $limit);
-  while ($row = db_fetch_object($result)) {
+  $result = db_query("SELECT * FROM {sms_devel_virtualgw} ORDER BY created LIMIT %d", $limit)->execute();
+  foreach ($result as $row) {
     $options = unserialize($row->options);
     switch ($row->type) {
       case SMS_DEVEL_VIRTUALGW_TYPE_OUT:
         $from = $options['sender'];
         $to   = $row->number;
+        break;
       case SMS_DEVEL_VIRTUALGW_TYPE_IN:
         $from = $row->number;
         $to   = $options['sender'];
+        break;
       case SMS_DEVEL_VIRTUALGW_TYPE_RECEIPT:
         // Receipt
     }
@@ -231,7 +230,7 @@ function sms_devel_virtualgw_js_getactivity() {
   unset($logfield['#prefix'], $logfield['#suffix']); // Prevent duplicate wrappers.
   $output = drupal_render($logfield);
 
-  return drupal_json_output(array('status' => TRUE, 'data' => $output));
+  drupal_json_output(array('status' => TRUE, 'data' => $output));
 }
 
 
