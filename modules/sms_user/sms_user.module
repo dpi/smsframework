@@ -88,7 +88,7 @@ function sms_user_send($uid, $message) {
     }
   }
   else {
-    drupal_set_message(t("User %user is not enabled to receive SMS, see 'receive sms' permission", array('%user' => $account->name)), 'status', TRUE);
+    watchdog(WATCHDOG_INFO, "User %user is not enabled to receive SMS, see 'receive sms' permission", array('%user' => $account->name));
   }
 }
 
