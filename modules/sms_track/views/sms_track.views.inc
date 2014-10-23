@@ -151,6 +151,87 @@ function sms_track_views_data() {
           'handler' => 'views_handler_sort',
         ),
       ),
+      // Additional Author and Recipient ID fields.
+      'author' => array(
+        'title' => t('Author'),
+        'help' => t('User ID of remote author.'),
+        'field' => array(
+          'handler' => 'views_handler_field',
+          'click sortable' => TRUE,
+        ),
+        'argument' => array(
+          'handler' => 'views_handler_argument',
+        ),
+        'filter' => array(
+          'handler' => 'views_handler_filter',
+        ),
+        'sort' => array(
+          'handler' => 'views_handler_sort',
+        ),
+        'relationship' => array(
+          'title' => t('SMS Author'),
+          'help' => t('Relate sms to the user who created it. This relationship will create one record for each sms sent by the user.'),
+          'handler' => 'views_handler_relationship',
+          'base' => 'users',
+          'base field' => 'uid',
+          'field' => 'author',
+          'label' => t('Author'),
+        ),
+      ),
+      'recipient' => array(
+        'title' => t('Recipient'),
+        'help' => t('User ID of remote recipient.'),
+        'field' => array(
+          'handler' => 'views_handler_field',
+          'click sortable' => TRUE,
+        ),
+        'argument' => array(
+          'handler' => 'views_handler_argument',
+        ),
+        'filter' => array(
+          'handler' => 'views_handler_filter',
+        ),
+        'sort' => array(
+          'handler' => 'views_handler_sort',
+        ),
+        'relationship' => array(
+          'title' => t('SMS Recipient'),
+          'help' => t('Relate sms to the user who received it. This relationship will create one record for each sms received by the user.'),
+          'handler' => 'views_handler_relationship',
+          'base' => 'users',
+          'base field' => 'uid',
+          'field' => 'recipient',
+          'label' => t('Recipient'),
+        ),
+      ),
     ),
   );
+}
+
+/**
+ * Implements hook_views_query_alter()
+ */
+function sms_track_views_query_alter(&$view, &$query) {
+  // Use an OR condition for the contextual filters.
+  if ($view->name == 'my_messages') {
+    $query->where[0]['type'] = 'OR';
+  }
+}
+
+/**
+ * Implements hook_views_post_render()
+ */
+function sms_track_views_post_render(&$view, &$output, &$cache) {
+  // Change the class names of rows to lowercase after token replacement.
+  if ($view->name == 'my_messages') {
+    $results = $view->result;
+    foreach ($results as $key => $value) {
+      if ($results[$key]->sms_track_dir == "0") {
+        $output = preg_replace('/Outbound/', 'outbound', $output, 1);
+      }
+      elseif ($results[$key]->sms_track_dir == "1") {
+        $output = preg_replace('/Inbound/', 'inbound', $output, 1);
+      }
+    }
+  }
 }

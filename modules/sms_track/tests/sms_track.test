@@ -1,0 +1,123 @@
+<?php
+
+/**
+ * Provides common helper methods for SMS Track module tests.
+ */
+class SmsTrackWebTestCase extends DrupalWebTestCase {
+
+  /**
+   * Function that creates a user with the administrator role.
+   */
+  public function drupalCreateAdminUser(array $permissions = array('receive sms', 'edit own sms number')) {
+    $roles = user_roles();
+    $index = array_search('administrator', $roles);
+    $user = $this->drupalCreateUser($permissions);
+    $user->roles[$index] = 'administrator';
+    return user_save($user);
+  }
+}
+/**
+ * Provides integration tests for the SMS Framework.
+ */
+class SmsTrackArchiveTestCase extends SmsTrackWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'SMS Track Integration Test',
+      'description' => 'Integration tests for the SMS Framework Track Module.',
+      'group' => 'SMS Framework',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp('sms', 'sms_test_gateway', 'sms_track', 'sms_user', 'sms_devel');
+  }
+
+  /**
+   * Tests recording a message sent from one site user to another.
+   */
+  public function testArchiveWriteForSentMessages() {
+
+    // Create Author User
+    $author = $this->drupalCreateAdminUser();
+    $this->drupalLogin($author);
+
+    // Set up test default gateway.
+    variable_set('sms_default_gateway', 'test');
+
+    $archiving_settings = array(
+      'archive_dir' => '4',
+    );
+    $this->drupalPost('admin/smsframework/sms_track', $archiving_settings, t('Save'));
+
+    $sms_user_settings = array(
+      'sms_user_registration_enabled' => TRUE,
+      'sms_user_allow_password' => TRUE,
+    );
+    $this->drupalPost('admin/smsframework/sms_user_options', $sms_user_settings, t('Save configuration'));
+
+    // Confirm author number.
+    $edit = array('number' => '1234567890');
+    $this->drupalPost('user/' . $author->uid . '/edit/mobile', $edit, t('Confirm number'));
+    $this->drupalPost(NULL, NULL, t('Confirm without code'));
+    $this->assertText('Your mobile phone number has been confirmed.', 'Authors number is confirmed');
+
+    $this->drupalLogout();
+
+    // Create Recipient User
+    $recipient = $this->drupalCreateAdminUser();
+    $this->drupalLogin($recipient);
+
+    // Confirm recipient number.
+    $edit = array('number' => '0987654321');
+    $this->drupalPost('user/' . $recipient->uid . '/edit/mobile', $edit, t('Confirm number'));
+    $this->drupalPost(NULL, NULL, t('Confirm without code'));
+    $this->assertText('Your mobile phone number has been confirmed.', 'Recipients number is confirmed');
+
+    $this->drupalLogout();
+
+    $this->drupalLogin($author);
+
+    $test_message = array(
+      'number' => '0987654321',
+      'message' => 'Test archiving messages from one registered number to another',
+    );
+
+   $this->drupalPost('admin/smsframework/devel', $test_message, t('Submit'));
+   $this->assertResponse(200);
+   $this->assertText('Form submitted ok for number ' . $test_message['number'] . ' and message: ' . $test_message['message'], 'Successfully sent message to recipient with registered number');
+
+    // Test whether author and recipient uids were recorded properly.
+    $this->drupalGet('user/' . $author->uid . '/my-messages');
+    $this->assertRaw('<td class="views-field views-field-message" >
+            ' . $test_message['message'] . '          </td>',
+      'Message recorded and displayed properly on Author\'s My Messages page.');
+    $this->assertRaw($author->name,
+      'Author\'s name recorded and displayed properly on Author\'s My Messages page.');
+    $this->assertRaw($recipient->name,
+      'Recipient\'s name recorded and displayed properly on Author\'s My Messages page.');
+
+    $this->drupalLogout();
+    $this->drupalLogin($recipient);
+
+    // Test whether author and recipient uids were recorded properly.
+    $this->drupalGet('user/' . $recipient->uid . '/my-messages');
+    $this->assertRaw('<td class="views-field views-field-message" >
+            ' . $test_message['message'] . '          </td>',
+      'Message recorded and displayed properly on Recipient\'s My Messages page.');
+    $this->assertRaw($author->name,
+      'Author\'s name recorded and displayed properly on Recipient\'s My Messages page.');
+    $this->assertRaw($recipient->name,
+      'Recipient\'s name recorded and displayed properly on Recipient\'s My Messages page.');
+
+    // Test that a user can only view their own messages.
+    $this->drupalLogout();
+    $this->drupalGet('user/' . $author->uid . '/my-messages');
+    $this->assertResponse(403, 'Access denied from anonymous user to My Messages page.');
+    $this->drupalLogout();
+    $user = $this->drupalCreateUser();
+    $this->drupalLogin($user);
+    $this->drupalGet('user/' . $author->uid . '/my-messages');
+    $this->assertResponse(403, 'Access denied from authenticated user to another user\'s My Messages page.');
+  }
+}

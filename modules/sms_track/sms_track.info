@@ -13,4 +13,5 @@ files[] = views/sms_track_handler_field_local_number.inc
 files[] = sms_track.admin.inc
 files[] = sms_track.install
 files[] = sms_track.module
+files[] = tests/sms_track.test
 

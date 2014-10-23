@@ -56,6 +56,21 @@ function sms_track_cron() {
   }
 }
 
+/**
+ *  Implements hook_permission().
+ */
+function sms_track_permission() {
+  return array(
+    'view own sms messages' => array(
+      'title' => t('View user\'s own sms messages.'),
+      'description' => t('View sms messages that were sent or received by currently logged in user.'),
+    ),
+    'view all sms messages' => array(
+      'title' => t('View all sms messages.'),
+      'description' => t('View sms messages that were sent or received by any user.'),
+    ),
+  );
+}
 
 /**
  * Implements hook_menu().
@@ -78,7 +93,6 @@ function sms_track_menu() {
   );
   $items['admin/smsframework/sms_track/view'] = array(
     'title' => 'View the archive',
-    'file' => 'sms_track.admin.inc',
     'page callback' => 'sms_track_admin_view',
     'access arguments' => array('administer smsframework'),
     'type' => MENU_LOCAL_TASK,
@@ -184,7 +198,13 @@ function sms_track_sms_receipt($op, $number, $reference, $status, $options) {
  *   (optional) an array of additional options.
  */
 function sms_track_archive_write($dir, $number, $message, $options = array()) {
+  global $user;
+  $remote_user = FALSE;
   $archive_dir = variable_get('sms_track_archive_dir', SMS_DIR_NONE);
+  // Query the database for the uid of the user that owns the $number
+  if (module_exists("sms_user") && variable_get('sms_user_registration_enabled')) {
+    $remote_user = sms_user_get_uid($number);
+  }
 
   if ($dir == 0) {
     // Outgoing message.
@@ -203,6 +223,9 @@ function sms_track_archive_write($dir, $number, $message, $options = array()) {
           $status = SMS_GW_ERR_OTHER;
         }
       }
+      // Add the author and recipient
+      $author = $user->uid;
+      $recipient = ($remote_user) ? $remote_user : $user->uid;
     }
     else {
       return;
@@ -214,6 +237,9 @@ function sms_track_archive_write($dir, $number, $message, $options = array()) {
       $reference = NULL;
       // Inbound message status is always the same.
       $status = SMS_MSG_STATUS_OK;
+      // Add the author and recipient
+      $recipient = $user->uid;
+      $author = ($remote_user) ? $remote_user : $user->uid;
     }
     else {
       return;
@@ -235,6 +261,8 @@ function sms_track_archive_write($dir, $number, $message, $options = array()) {
     'status' => $status,
     'created' => $created,
     'options' => $options_z,
+    'author' => $author,
+    'recipient' => $recipient,
   ))
   ->execute();
 
@@ -278,7 +306,7 @@ function sms_track_update_message($reference, $status) {
  */
 function sms_track_views_api() {
   return array(
-    'api' => 2,
+    'api' => 3,
     'path' => drupal_get_path('module', 'sms_track') . '/views',
   );
 }
