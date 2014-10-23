@@ -467,7 +467,9 @@ function sms_send_form($required = FALSE) {
  * @see sms_send_form_submit()
  */
 function sms_send_form_validate($form, &$form_state) {
-  $errors = sms_validate_number(sms_formatter($form_state['values']['number']), $form_state['values']['gateway']);
+  $number = sms_formatter($form_state['values']['number']);
+  $errors = sms_validate_number($number,
+      isset($form_state['values']['gateway'])? $form_state['values']['gateway']: array());
   if ($errors) {
     form_set_error('number', implode("<br />", $errors));
   }
@@ -480,8 +482,9 @@ function sms_send_form_validate($form, &$form_state) {
  * @see sms_send_form_validate()
  */
 function sms_send_form_submit($form, &$form_state) {
-  $form_state['values']['number'] = sms_formatter($form_state['values']['number']);
-  sms_send($form_state['values']['number'], $form_state['values']['message'], $form_state['values']['gateway']);
+  $number = sms_formatter($form_state['values']['number']);
+  sms_send($number, $form_state['values']['message'],
+      isset($form_state['values']['gateway'])? $form_state['values']['gateway']: array());
 }
 
 /******************************************************************************
