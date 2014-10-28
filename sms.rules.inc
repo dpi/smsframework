@@ -105,3 +105,36 @@ function sms_rules_action_sms_send($to, $message) {
 function sms_rules_access_callback($type) {
   return user_access('administer smsframework');
 }
+
+/**
+ * Implements hook_rules_condition_info()
+ */
+function sms_rules_condition_info() {
+  return array(
+    'sms_message_contains_keyword' => array(
+      'label' => t('An incoming SMS message contains keyword'),
+      'arguments' => array(
+        'sms:select' => array(
+          'label' => t('SMS Message'),
+          'description' => t('The SMS message and metadata.'),
+          'type' => 'sms',
+        ),
+        'keyword' => array(
+          'label' => t('Keyword'),
+          'description' => t("The keyword to look for."),
+          'type' => 'text',
+        ),
+      ),
+      'access callback' => 'sms_rules_access_callback',
+      'module' => 'sms',
+      'group' => t('SMS'),
+    ),
+  );
+}
+
+/**
+ * Condition sms_message_contains_keyword
+ */
+function sms_message_contains_keyword($sms, $keyword) {
+  return (strpos($sms['message'],trim($keyword)) !== FALSE) ? TRUE : FALSE;
+}
