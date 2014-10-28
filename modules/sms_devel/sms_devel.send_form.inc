@@ -36,9 +36,16 @@ function sms_devel_send_form($form, &$form_state) {
   // Submit button for the send form.
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => 'Submit',
+    '#value' => 'Send Message',
     '#validate' => array('sms_send_form_validate'),
     '#submit' => array('sms_send_form_submit', 'sms_devel_send_form_submit'),
+  );
+
+  // Receive Message Button for testing incoming messages.
+  $form['receive'] = array(
+    '#type' => 'submit',
+    '#value' => 'Receive Message',
+    '#submit' => array('sms_devel_receive_form_submit'),
   );
 
   return $form;
@@ -54,4 +61,17 @@ function sms_devel_send_form_submit($form, &$form_state) {
   $number  = $form_state['values']['number'];
   $message = $form_state['values']['message'];
   drupal_set_message(check_plain(t("Form submitted ok for number $number and message: $message")));
+}
+
+/**
+ * Submit handler for Receive Message button on sms_devel test send form.
+ *
+ * @see sms_devel_send_form()
+ */
+function sms_devel_receive_form_submit($form, &$form_state) {
+  // Display a message to the user.
+  $number  = $form_state['values']['number'];
+  $message = $form_state['values']['message'];
+  sms_incoming($number, $message);
+  drupal_set_message(check_plain(t("Message received from number $number and message: $message")));
 }
