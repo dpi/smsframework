@@ -312,7 +312,7 @@ function sms_incoming($number, $message, $options = array()) {
  *   The sender's mobile number.
  * @param string $reference
  *   Unique message reference code, as provided when message is sent.
- * @param string $message_status
+ * @param int $message_status
  *   (optional) An SMS Framework message status code, per the defined constants.
  *    Defaults to SMS_GW_UNKNOWN_STATUS.
  * @param array $options
@@ -393,8 +393,6 @@ function sms_gateways($op = 'gateways', $gateway = NULL) {
   list($_gateways, $_names) = _gateways_build();
 
   switch ($op) {
-    case 'gateways':
-      return $_gateways;
     case 'gateway':
       $return = $_gateways[$gateway];
       $return['identifier'] = $gateway;
@@ -403,6 +401,9 @@ function sms_gateways($op = 'gateways', $gateway = NULL) {
       return $_names;
     case 'name':
       return $_names[$gateway];
+    case 'gateways':
+    default:
+      return $_gateways;
   }
 }
 
@@ -749,6 +750,7 @@ function sms_dir($out, $in) {
   if (!$out && !$in) {
     return SMS_DIR_NONE;
   }
+  return SMS_DIR_NONE;
 }
 
 /**
@@ -801,7 +803,6 @@ function sms_country_codes() {
     56 => "Chile",
     86 => "China",
     57 => "Colombia",
-    269 => "Comoros",
     242 => "Congo",
     243 => "Democratic Republic Congo",
     682 => "Cook Islands",

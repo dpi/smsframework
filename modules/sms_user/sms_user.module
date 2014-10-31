@@ -84,11 +84,12 @@ function sms_user_send($uid, $message) {
       return sms_send($account->sms_user['number'], $message, $account->sms_user['gateway']);
     }
     else {
+      watchdog('sms_user', "User %user has not validated mobile number", array('%user' => $account->name), WATCHDOG_ALERT);
       return FALSE;
     }
   }
   else {
-    watchdog(WATCHDOG_INFO, "User %user is not enabled to receive SMS, see 'receive sms' permission", array('%user' => $account->name));
+    watchdog('sms_user', "User %user is not enabled to receive SMS, see 'receive sms' permission", array('%user' => $account->name), WATCHDOG_ALERT);
   }
 }
 
@@ -111,6 +112,7 @@ function sms_user_get_number($account) {
       return FALSE;
     }
   }
+  return FALSE;
 }
 
 /**
@@ -172,7 +174,6 @@ function _sms_user_sleep_active($account) {
   }
   $date = new DateTime();
   $date->setTimezone( $timezone );
-  $current_hour = $date->format('G');
   $current_hour = date('G');
 
   // User has individual settings, which will always override globals.
@@ -224,6 +225,7 @@ function _sms_user_sleep_active($account) {
  *   Rendered HTML for the account settings form.
  */
 function sms_user_settings($account) {
+  $output = array();
   switch (isset($account->sms_user) ? $account->sms_user['status'] : 0) {
     case 0:
       $output = drupal_get_form('sms_user_settings_add_form', $account);
@@ -779,7 +781,6 @@ function _sms_user_confirm_message($code) {
  * Implements hook_tokens().
  */
 function sms_user_tokens($type, $tokens, array $data = array(), array $options = array()) {
-//function sms_user_tokens($type, $object = NULL, $options = array()) {
   global $user;
   $replacements = array();
 
@@ -787,7 +788,7 @@ function sms_user_tokens($type, $tokens, array $data = array(), array $options =
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'confirm-code':
-            $replacements[$original] = $object['confirm-code'];
+          $replacements[$original] = $data['confirm-code'];
           break;
         case 'mobile-url':
             $replacements[$original] = url("user/$user->uid/edit/mobile", array('absolute' => TRUE));
