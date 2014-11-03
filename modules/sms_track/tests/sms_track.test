@@ -83,7 +83,7 @@ class SmsTrackArchiveTestCase extends SmsTrackWebTestCase {
       'message' => 'Test archiving messages from one registered number to another',
     );
 
-   $this->drupalPost('admin/smsframework/devel', $test_message, t('Submit'));
+   $this->drupalPost('admin/smsframework/devel', $test_message, t('Send Message'));
    $this->assertResponse(200);
    $this->assertText('Form submitted ok for number ' . $test_message['number'] . ' and message: ' . $test_message['message'], 'Successfully sent message to recipient with registered number');
 
