@@ -12,3 +12,7 @@ files[] = sms.tokens.inc
 files[] = sms.rules.inc
 files[] = sms.parser.inc
 files[] = tests/sms.module.test
+files[] = tests/sms.rules.test
+
+test_dependencies[] = rules
+test_dependencies[] = rules_admin
