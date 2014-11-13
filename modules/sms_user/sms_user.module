@@ -640,7 +640,7 @@ function sms_user_user_login(&$edit, $account) {
   // Check if it's the user's first time logging in.
   if (!$account->access && !empty($account->sms_user['number']) && $account->sms_user['status'] <= SMS_USER_CONFIRMED) {
     sms_user_send_confirmation($account, $account->sms_user['number'], $account->sms_user['gateway']);
-    drupal_set_message(t('A confirmation message has been sent to your mobile phone. Please @link.', array('@link' => l(t('confirm your number'), 'user/' . $account->uid . '/edit/mobile'))), 'status');
+    drupal_set_message(t('A confirmation message has been sent to your mobile phone. Please !link.', array('!link' => l(t('confirm your number'), 'user/' . $account->uid . '/edit/mobile'))), 'status');
   }
 }
 
