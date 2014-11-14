@@ -45,8 +45,8 @@ class SmsUserWebTest extends DrupalWebTestCase {
     $this->drupalPost('user/' . $user->uid . '/edit/mobile', $edit, t('Confirm number'));
     $this->assertResponse(200);
     // Get the code that was sent.
-    $gw_result = sms_test_gateway_send();
-    preg_match('/\b([0-9]{4})\b/', $gw_result['result']['message'], $matches);
+    $gw_result = sms_test_gateway_result();
+    preg_match('/\b([0-9]{4})\b/', $gw_result['message'], $matches);
     $code = $matches[1];
     // Post the code for confirmation.
     $this->drupalPost('user/' . $user->uid . '/edit/mobile', array('confirm_code' => $code), t('Confirm number'));
@@ -58,8 +58,7 @@ class SmsUserWebTest extends DrupalWebTestCase {
     // Send sms to user with registered number.
     $message = 'Test user message';
     $this->assertTrue(sms_user_send($user->uid, $message), 'Successfully sent message to user with permission');
-    $gw_result = sms_test_gateway_send();
-    $this->assertEqual($gw_result['result'],
+    $this->assertEqual(sms_test_gateway_result(),
       array('number' => $user->sms_user['number'], 'message' => $message, 'options' => $user->sms_user['gateway']), 'Message sent through the correct gateway.');
 
     // Test sms_user_authenticate() on this user.

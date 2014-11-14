@@ -108,8 +108,7 @@ class SmsFrameworkWebTest extends DrupalWebTestCase {
     // Send sms to test gateway.
     $result = sms_send($number, $message, $options);
     $this->assertTrue($result, 'Message successfully sent.');
-    $gw_result = sms_test_gateway_send();
-    $this->assertEqual($gw_result['result'], array('number' => $number, 'message' => $message, 'options' => $options), 'Message sent to the correct gateway.');
+    $this->assertEqual(sms_test_gateway_result(), array('number' => $number, 'message' => $message, 'options' => $options), 'Message sent to the correct gateway.');
   }
 
 }

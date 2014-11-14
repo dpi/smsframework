@@ -51,8 +51,8 @@ class SmsBlastWebTest extends DrupalWebTestCase {
     $this->assertText('The message was sent to 1 users.', 'Message sent to 1 user.');
 
     // Get the resulting message that was sent and confirm.
-    $gw_result = sms_test_gateway_send();
-    $this->assertEqual($gw_result['result']['message'], $message, 'Successfully sent sms blast message');
+    $gw_result = sms_test_gateway_result();
+    $this->assertEqual($gw_result['message'], $message, 'Successfully sent sms blast message');
   }
 
 }
