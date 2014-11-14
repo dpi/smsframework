@@ -80,7 +80,7 @@ function sms_user_send($uid, $message) {
   $account = user_load($uid);
   // Check if the user is enabled to receive SMS.
   if (user_access('receive sms', $account)) {
-    if ($account->sms_user['status'] == SMS_USER_CONFIRMED) {
+    if ($account->sms_user['status'] >= SMS_USER_CONFIRMED) {
       return sms_send($account->sms_user['number'], $message, $account->sms_user['gateway']);
     }
     else {
@@ -104,7 +104,7 @@ function sms_user_send($uid, $message) {
 function sms_user_get_number($account) {
   // Check if the user is enabled to receive SMS.
   if (user_access('receive sms', $account)) {
-    if ($account->sms_user['status'] == SMS_USER_CONFIRMED) {
+    if ($account->sms_user['status'] >= SMS_USER_CONFIRMED) {
       return $account->sms_user['number'];
     }
     else {
@@ -935,12 +935,14 @@ function _sms_user_switch($account = NULL) {
     $user = $account;
     $edit = array();
     user_module_invoke('login', $edit, $account);
-    watchdog('sms_user', '%name was logged in using SMS.', array('%name' => $user->name));
+    $username = ($user->uid > 0) ? $user->name : variable_get('anonymous', t('Anonymous'));
+    watchdog('sms_user', '%name was logged in using SMS.', array('%name' => $username));
   }
   elseif (! empty($original_user)) {
     $user = $original_user;
     drupal_save_session($original_state);
-    watchdog('sms_user', '%name was restored as logged in using SMS.', array('%name' => $user->name));
+    $username = ($user->uid > 0) ? $user->name : variable_get('anonymous', t('Anonymous'));
+    watchdog('sms_user', '%name was restored as logged in using SMS.', array('%name' => $username));
   }
 }
 
