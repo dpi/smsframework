@@ -135,6 +135,7 @@ function sms_track_sms_send_process($op, $number, $message, $options, $gateway, 
   if ($op == 'post process') {
     // Archiving (outgoing == 0)
     $dir = 0;
+    $options = (isset($options) && is_array($options))? $options : array();
     $options['gateway_id'] = $gateway['identifier'];
     $options['result']  = $result;
     sms_track_archive_write($dir, $number, $message, $options);
@@ -209,7 +210,7 @@ function sms_track_archive_write($dir, $number, $message, $options = array()) {
   if ($dir == 0) {
     // Outgoing message.
     if ($archive_dir == SMS_DIR_ALL || $archive_dir == SMS_DIR_OUT) {
-      $reference = (array_key_exists('reference', $options)) ? $options['reference'] : NULL;
+      $reference = (isset($options) && is_array($options) && array_key_exists('reference', $options)) ? $options['reference'] : NULL;
 
       // Status code may be provided by send result handler.
       $status = (is_array($options['result'])) ? $options['result']['status_code'] : NULL;
@@ -246,7 +247,7 @@ function sms_track_archive_write($dir, $number, $message, $options = array()) {
     }
   }
 
-  $gw_number = (array_key_exists('gw_number', $options)) ? $options['gw_number'] : NULL;
+  $gw_number = (isset($options) && is_array($options) && array_key_exists('gw_number', $options)) ? $options['gw_number'] : NULL;
   $created   = REQUEST_TIME;
   $options_z = serialize($options);
 
