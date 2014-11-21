@@ -169,7 +169,7 @@ function sms_user_update_7003() {
         'not null' => FALSE,
       ),
     );
-  foreach ($spec as $key=>$value) {
+  foreach ($spec as $key => $value) {
     db_add_field('sms_user', $key, $value);
   }
 }

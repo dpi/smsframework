@@ -105,7 +105,7 @@ class SmsUserWebTest extends DrupalWebTestCase {
     $this->assertResponse(200);
 
     // Verify that the variables are set.
-    foreach ($edit as $name=>$value) {
+    foreach ($edit as $name => $value) {
       $this->assertEqual($value, variable_get($name), sprintf('Variable %s has been set.', $name));
     }
 
