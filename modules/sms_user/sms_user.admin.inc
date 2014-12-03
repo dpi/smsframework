@@ -95,6 +95,21 @@ function sms_user_admin_settings($form, &$form_state) {
       '#default_value' => variable_get('sms_user_sleep_end_time', 0),
   );
 
+  // SMS User opt-out settings.
+  $form['opt_out'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('User Opt Out Settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['opt_out']['sms_user_allow_opt_out'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow users to opt-out of receiving messages from this site'),
+    '#description' => t('If checked, users will be able to opt out of receiving messages from the site.'),
+    '#default_value' => variable_get('sms_user_allow_opt_out', 1),
+  );
+
   // Registration settings.
   $form['registration'] = array(
     '#type' => 'fieldset',

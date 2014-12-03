@@ -146,7 +146,11 @@ function sms_user_sms_send(&$number, &$message, &$options, &$gateway) {
     $account = user_load_multiple(array($uid), array('status' => 1));
     $account = array_shift($account);
 
-    if (_sms_user_sleep_active($account)) {
+    if (_sms_user_opted_out($account)) {
+      unset($gateway['send']);
+      watchdog('sms_user', 'Message was not sent to @user because user opted out.', array('@user' => $account->name));
+    }
+    else if (_sms_user_sleep_active($account)) {
       unset($gateway['send']);
       watchdog('sms_user', 'Message was not sent to @user due to sleep settings.', array('@user' => $account->name));
     }
@@ -214,6 +218,25 @@ function _sms_user_sleep_active($account) {
 }
 
 /**
+ * Checks if user opted out of sms messages from the site.
+ *
+ * @param object $account
+ *   The user account object.
+ *
+ * @return bool
+ *   TRUE if the user chose to opt out of messages from the site indefinitely.
+ */
+function _sms_user_opted_out($account) {
+
+  // If the users sms_user_opt_out field is set, return true.
+  if (variable_get('sms_user_allow_opt_out', 1) && $account->sms_user['sms_user_opt_out']) {
+    return TRUE;
+  }
+  return FALSE;
+
+}
+
+/**
  * Menu callback for user profile settings form.
  *
  * Provides the forms for adding and confirming a user's mobile number.
@@ -244,6 +267,10 @@ function sms_user_settings($account) {
     $output2['phoneform'] = $output;
     $output2['sleepform'] = drupal_get_form('sms_user_settings_sleep_form', $account);
     $output = $output2;
+  }
+
+  if (variable_get('sms_user_allow_opt_out', 1)) {
+    $output['opt_out_form'] = drupal_get_form('sms_user_opt_out_form', $account);
   }
 
   return drupal_render($output);
@@ -511,6 +538,62 @@ function sms_user_settings_sleep_form_submit($form, &$form_state) {
 }
 
 /**
+ * Form constructor for the user opt out form.
+ *
+ * @param object $account
+ *   The user account object.
+ *
+ * @see sms_user_opt_out_form_submit()
+ *
+ * @ingroup forms
+ */
+function sms_user_opt_out_form($form, &$form_state, $account) {
+
+  $form['uid'] = array(
+    '#type' => 'hidden',
+    '#value' => $account->uid,
+  );
+
+  $form['opt_out'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Opt Out'),
+    '#collapsible' => TRUE,
+  );
+
+  $form['opt_out']['sms_user_opt_out'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Opt out of sms messages from this site.'),
+    '#description' => t('If enabled, you will not receive messages from this site.'),
+    '#default_value' => isset($account->sms_user['sms_user_opt_out']) ? $account->sms_user['sms_user_opt_out'] : NULL,
+  );
+
+  $form['opt_out']['set'] = array(
+    '#type' => 'submit',
+    '#value' => t('Set'),
+  );
+
+  return $form;
+}
+
+/**
+ * Submits the user opt out form.
+ *
+ * @see sms_user_opt_out_form()
+ */
+function sms_user_opt_out_form_submit($form, &$form_state) {
+  $account = user_load($form_state['values']['uid']);
+  if (isset($account->sms_user)) {
+    $data = $account->sms_user;
+  }
+  else {
+    $data = Array();
+  }
+  $data['sms_user_opt_out'] = $form_state['values']['sms_user_opt_out'];
+  user_save($account, array('sms_user' => $data), 'mobile');
+  drupal_set_message(t('The changes have been saved.'), 'status');
+}
+
+/**
  * Sends confirmation code to user for number verification.
  *
  * @param object $account
@@ -595,6 +678,13 @@ function sms_user_user_view($account, $view_mode) {
         '#markup' => t('You will not receive messages between ' . $account->sms_user['sleep_start_time'] . ':00 and ' .$account->sms_user['sleep_end_time'] . ':00'),
       );
     }
+    if (variable_get('sms_user_allow_opt_out', 1) && isset($account->sms_user) && ($account->sms_user['sms_user_opt_out'])) {
+      $account->content['sms']['opt_out'] = array(
+        '#type' => 'user_profile_item',
+        '#title' => '',
+        '#markup' => t('You will not receive any messages from the site.'),
+      );
+    }
   }
 }
 
@@ -667,7 +757,7 @@ function sms_user_user_categories() {
  */
 function sms_user_user_load($users) {
   $result = db_select('sms_user', 'u')
-    ->fields('u', array('uid', 'number', 'status', 'code', 'gateway', 'sleep_enabled', 'sleep_start_time', 'sleep_end_time'))
+    ->fields('u', array('uid', 'number', 'status', 'code', 'gateway', 'sleep_enabled', 'sleep_start_time', 'sleep_end_time', 'sms_user_opt_out'))
     ->condition('uid', array_keys($users), 'IN')
     ->execute();
 
@@ -694,6 +784,7 @@ function sms_user_user_load($users) {
         'sleep_enabled' => 0,
         'sleep_start_time' => 0,
         'sleep_end_time' => 0,
+        'sms_user_opt_out' => 0,
       );
 
       // @todo The following is a BC-shim to support code that expects account
@@ -728,6 +819,7 @@ function sms_user_save(&$edit, &$account, $category) {
     $edit['sms_user']['sleep_enabled'] = NULL;
     $edit['sms_user']['sleep_start_time'] = NULL;
     $edit['sms_user']['sleep_end_time'] = NULL;
+    $edit['sms_user']['sms_user_opt_out'] = NULL;
 
     return drupal_write_record('sms_user', $number, $primary_keys);
   }

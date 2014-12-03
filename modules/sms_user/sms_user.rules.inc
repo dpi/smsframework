@@ -72,6 +72,29 @@ function sms_user_rules_action_info() {
         ),
       ),
     ),
+    // Actions for opting out and opting in for sms messages from the site.
+    'sms_action_opt_out' => array(
+      'label' => t('Let user opt out of sms messages from the site via SMS.'),
+      'group' => t('SMS'),
+      'arguments' => array(
+        'sms:select' => array(
+          'label' => t('SMS Message'),
+          'description' => t('The SMS message and metadata.'),
+          'type' => 'sms',
+        ),
+      ),
+    ),
+    'sms_action_opt_in' => array(
+      'label' => t('Let user opt in for sms messages from the site via SMS.'),
+      'group' => t('SMS'),
+      'arguments' => array(
+        'sms:select' => array(
+          'label' => t('SMS Message'),
+          'description' => t('The SMS message and metadata.'),
+          'type' => 'sms',
+        ),
+      ),
+    ),
   );
 }
 
@@ -99,4 +122,40 @@ function sms_action_user_send($user, $message) {
  */
 function sms_action_match_user($number) {
   return array('user_loaded' => user_load(sms_user_get_uid($number)));
+}
+
+/**
+ * Action Implementation: Check the SMS User opt out checkbox.
+ *
+ * @param array $sms
+ *   The message that was sent and it's metadata.
+ */
+function sms_action_opt_out($sms) {
+  $account = user_load(sms_user_get_uid($sms['number']));
+  if (isset($account->sms_user)) {
+    $data = $account->sms_user;
+  }
+  else {
+    $data = Array();
+  }
+  $data['sms_user_opt_out'] = TRUE;
+  user_save($account, array('sms_user' => $data), 'mobile');
+}
+
+/**
+ * Action Implementation: Uncheck SMS User the opt out checkbox.
+ *
+ * @param array $sms
+ *   The message that was sent and it's metadata.
+ */
+function sms_action_opt_in($sms) {
+  $account = user_load(sms_user_get_uid($sms['number']));
+  if (isset($account->sms_user)) {
+    $data = $account->sms_user;
+  }
+  else {
+    $data = Array();
+  }
+  $data['sms_user_opt_out'] = FALSE;
+  user_save($account, array('sms_user' => $data), 'mobile');
 }
