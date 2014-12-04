@@ -12,193 +12,94 @@
  * Implements hook_views_default_views().
  */
 function sms_track_views_default_views() {
-  $view = new view;
+  $view = new view();
   $view->name = 'sms_track';
   $view->description = 'All archived SMS messages - in and out';
   $view->tag = 'sms';
-  $view->view_php = '';
   $view->base_table = 'sms_track';
-  $view->is_cacheable = FALSE;
-  $view->api_version = 2;
+  $view->human_name = '';
+  $view->core = 0;
+  $view->api_version = '3.0';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Default */
   $handler = $view->new_display('default', 'Default', 'default');
-  $handler->override_option('fields', array(
+  $handler->display->display_options['title'] = 'SMS Archive';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['access']['perm'] = 'view all sms messages';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['grouping'] = '';
+  $handler->display->display_options['style_options']['columns'] = array(
+    'dir' => 'dir',
+    'number' => 'number',
+    'message' => 'message',
+    'created' => 'created',
+    'local_number' => 'local_number',
+    'gateway' => 'gateway',
+  );
+  $handler->display->display_options['style_options']['default'] = 'created';
+  $handler->display->display_options['style_options']['info'] = array(
     'dir' => array(
-      'label' => 'Direction',
-      'alter' => array(
-        'alter_text' => 0,
-        'text' => '',
-        'make_link' => 0,
-        'path' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-      ),
-      'exclude' => 0,
-      'id' => 'dir',
-      'table' => 'sms_track',
-      'field' => 'dir',
-      'relationship' => 'none',
+      'sortable' => 1,
+      'separator' => '',
     ),
     'number' => array(
-      'id' => 'number',
-      'table' => 'sms_track',
-      'field' => 'number',
+      'sortable' => 1,
+      'separator' => '',
     ),
     'message' => array(
-      'label' => 'Message',
-      'alter' => array(
-        'alter_text' => 0,
-        'text' => '',
-        'make_link' => 0,
-        'path' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-      ),
-      'exclude' => 0,
-      'id' => 'message',
-      'table' => 'sms_track',
-      'field' => 'message',
-      'relationship' => 'none',
+      'sortable' => 1,
+      'separator' => '',
     ),
     'created' => array(
-      'label' => 'Timestamp',
-      'alter' => array(
-        'alter_text' => 0,
-        'text' => '',
-        'make_link' => 0,
-        'path' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-      ),
-      'date_format' => 'small',
-      'custom_date_format' => '',
-      'exclude' => 0,
-      'id' => 'created',
-      'table' => 'sms_track',
-      'field' => 'created',
-      'relationship' => 'none',
+      'sortable' => 1,
+      'separator' => '',
     ),
     'local_number' => array(
-      'label' => 'Local number',
-      'alter' => array(
-        'alter_text' => 0,
-        'text' => '',
-        'make_link' => 0,
-        'path' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-      ),
-      'exclude' => 0,
-      'id' => 'local_number',
-      'table' => 'sms_track',
-      'field' => 'local_number',
-      'relationship' => 'none',
+      'sortable' => 1,
+      'separator' => '',
     ),
     'gateway' => array(
-      'label' => 'Gateway',
-      'alter' => array(
-        'alter_text' => 0,
-        'text' => '',
-        'make_link' => 0,
-        'path' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-      ),
-      'exclude' => 0,
-      'id' => 'gateway',
-      'table' => 'sms_track',
-      'field' => 'gateway',
-      'relationship' => 'none',
+      'sortable' => 1,
+      'separator' => '',
     ),
-  ));
-  $handler->override_option('access', array(
-    'type' => 'role',
-    'role' => array(
-      '3' => 3,
-    ),
-  ));
-  $handler->override_option('title', 'SMS Archive');
-  $handler->override_option('empty', 'There are no SMS messages in the archive.');
-  $handler->override_option('empty_format', '1');
-  $handler->override_option('items_per_page', 30);
-  $handler->override_option('use_pager', '1');
-  $handler->override_option('style_plugin', 'table');
-  $handler->override_option('style_options', array(
-    'grouping' => '',
-    'override' => 1,
-    'sticky' => 0,
-    'order' => 'desc',
-    'columns' => array(
-      'dir' => 'dir',
-      'number' => 'number',
-      'message' => 'message',
-      'created' => 'created',
-      'local_number' => 'local_number',
-      'gateway' => 'gateway',
-    ),
-    'info' => array(
-      'dir' => array(
-        'sortable' => 1,
-        'separator' => '',
-      ),
-      'number' => array(
-        'sortable' => 1,
-        'separator' => '',
-      ),
-      'message' => array(
-        'sortable' => 1,
-        'separator' => '',
-      ),
-      'created' => array(
-        'sortable' => 1,
-        'separator' => '',
-      ),
-      'local_number' => array(
-        'sortable' => 1,
-        'separator' => '',
-      ),
-      'gateway' => array(
-        'sortable' => 1,
-        'separator' => '',
-      ),
-    ),
-    'default' => 'created',
-  ));
+  );
+  $handler->display->display_options['style_options']['order'] = 'desc';
+  /* No results behavior: Global: Text area */
+  $handler->display->display_options['empty']['text']['id'] = 'area';
+  $handler->display->display_options['empty']['text']['table'] = 'views';
+  $handler->display->display_options['empty']['text']['field'] = 'area';
+  $handler->display->display_options['empty']['text']['content'] = 'There are no SMS messages in the archive.';
+  $handler->display->display_options['empty']['text']['format'] = '1';
+  /* Field: SMS Archive: Direction */
+  $handler->display->display_options['fields']['dir']['id'] = 'dir';
+  $handler->display->display_options['fields']['dir']['table'] = 'sms_track';
+  $handler->display->display_options['fields']['dir']['field'] = 'dir';
+  /* Field: SMS Archive: Remote number */
+  $handler->display->display_options['fields']['number']['id'] = 'number';
+  $handler->display->display_options['fields']['number']['table'] = 'sms_track';
+  $handler->display->display_options['fields']['number']['field'] = 'number';
+  /* Field: SMS Archive: Message */
+  $handler->display->display_options['fields']['message']['id'] = 'message';
+  $handler->display->display_options['fields']['message']['table'] = 'sms_track';
+  $handler->display->display_options['fields']['message']['field'] = 'message';
+  /* Field: SMS Archive: Timestamp */
+  $handler->display->display_options['fields']['created']['id'] = 'created';
+  $handler->display->display_options['fields']['created']['table'] = 'sms_track';
+  $handler->display->display_options['fields']['created']['field'] = 'created';
+  /* Field: SMS Archive: Local number */
+  $handler->display->display_options['fields']['local_number']['id'] = 'local_number';
+  $handler->display->display_options['fields']['local_number']['table'] = 'sms_track';
+  $handler->display->display_options['fields']['local_number']['field'] = 'local_number';
+  /* Field: SMS Archive: Gateway */
+  $handler->display->display_options['fields']['gateway']['id'] = 'gateway';
+  $handler->display->display_options['fields']['gateway']['table'] = 'sms_track';
+  $handler->display->display_options['fields']['gateway']['field'] = 'gateway';
   $views[$view->name] = $view;
 
   // View for sent and received messages
