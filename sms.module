@@ -690,8 +690,8 @@ function sms_formatter($number, $format = 1) {
  * Validates a phone number.
  *
  * This function passes the number to active gateway for further validation if
- * necessary. It also calls the sms_valid_validation() method if the sms_valid
- * module is enabled.
+ * necessary. It also calls hook_sms_validate() so that other modules can
+ * implement custom validation.
  *
  * @param string $number
  *   Comma-separated list of recipient numbers to validate. Passed by reference.
@@ -703,24 +703,30 @@ function sms_formatter($number, $format = 1) {
  */
 function sms_validate_number(&$number, $options = array()) {
   $errors = array();
-  if (!strlen($number)) {
-    $errors[] = t('The phone number is invalid.');
+  // Ensure there are actual numeric characters.
+  if (!strlen(preg_replace('/[^0-9]/', '', $number))) {
+    $errors[] = t('No phone number provided.');
+    // No need for further validation.
+    return $errors;
   }
 
-  // Allow the active gateway to provide number validation.
-  $gateway = sms_default_gateway();
-  // TODO we need some sort of validation this isn't working properly.
+  // Allow other modules to provide number validation.
+  $errors = module_invoke_all('sms_validate_number', $number, $options);
+
+  // Allow the default (or the specified in $options) gateway to provide number
+  // validation.
+  if (isset($options['gateway'])) {
+    $gateway = sms_gateways('gateway', $options['gateway']);
+  }
+  else {
+    $gateway = sms_default_gateway();
+  }
   if (isset($gateway['validate number']) && function_exists($gateway['validate number'])) {
     if ($error = $gateway['validate number']($number, $options)) {
-      $errors[] = $error;
+      $errors += (array) $error;
     }
   }
-  if (module_exists('sms_valid')) {
-    $result = sms_valid_validate($number, $options);
-    if ($result['errors']) {
-      $errors = array_merge($errors, $result['errors']);
-    }
-  }
+
   return $errors;
 }
 
