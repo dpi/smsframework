@@ -9,10 +9,10 @@
  */
 
 /**
- * Implements hook_sms_validate().
+ * Implements hook_sms_validate_number().
  *
- * @param string $op
- *   Validation operation to work on.
+ * Provides validation based on the configured rulesets.
+ *
  * @param string $number
  *   Phone number string.
  * @param array $options
@@ -21,19 +21,18 @@
  * @return string|null
  *   NULL if validation succeeded. Error message if failed.
  */
-function sms_valid_sms_validate($op, &$number, &$options) {
-  if ($op == 'process') {
-    if (variable_get('sms_valid_use_rulesets', FALSE) || array_key_exists('test', $options)) {
-      $result = sms_valid_validate($number, $options);
+function sms_valid_sms_validate_number($number, $options) {
+  if (variable_get('sms_valid_use_rulesets', FALSE) || array_key_exists('test', $options)) {
+    $result = sms_valid_validate($number, $options);
 
-      if ($result['pass']) {
-        return NULL;
-      }
-      else {
-        return array_pop($result['log']);
-      }
+    if ($result['pass'] === false || !empty($result['errors'])) {
+      return $result['errors'];
+    }
+    else {
+      return array();
     }
   }
+  return array();
 }
 
 
