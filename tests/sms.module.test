@@ -94,7 +94,7 @@ class SmsFrameworkWebTest extends DrupalWebTestCase {
       ';ajklf a/s,MFA' => false,
       '] W[OPQIRW' => false,
       '9996789065' => true,
-      '123456789098765' => true,
+      '1234567890987654' => true,
     );
 
     // Test validation with default gateway (log).
@@ -108,7 +108,7 @@ class SmsFrameworkWebTest extends DrupalWebTestCase {
       '389427-9238' => false,
       '=-,x2-4n292' => false,
       '9996789065' => false,
-      '123456789098765' => false,
+      '1234567890987654' => false,
     ) + $test_numbers;
 
     // Test validation with test gateway that has custom validation.

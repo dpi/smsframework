@@ -176,19 +176,20 @@ function sms_valid_get_ruleset_for_number($number) {
   }
 
   $best_ruleset = NULL;
-  $last_prefix  = NULL;
-  $query = db_select('sms_valid_rules', 'u')
-    ->fields('u', array('prefix', 'name', 'rules', 'dirs_enabled', 'iso2'))
-    ->condition('prefix', $potential_prefixes, 'IN');
-  $result = $query->execute();
-  while ($row = $result->fetchAssoc()) {
-    if ($row['prefix'] > $last_prefix) {
-      $best_ruleset = $row;
-      $best_ruleset['rules'] = unserialize($best_ruleset['rules']);
-      $last_prefix = $row['prefix'];
+  if ($potential_prefixes) {
+    $last_prefix = NULL;
+    $query = db_select('sms_valid_rules', 'u')
+      ->fields('u', array('prefix', 'name', 'rules', 'dirs_enabled', 'iso2'))
+      ->condition('prefix', $potential_prefixes, 'IN');
+    $result = $query->execute();
+    while ($row = $result->fetchAssoc()) {
+      if ($row['prefix'] > $last_prefix) {
+        $best_ruleset = $row;
+        $best_ruleset['rules'] = unserialize($best_ruleset['rules']);
+        $last_prefix = $row['prefix'];
+      }
     }
   }
-
   return $best_ruleset;
 }
 
@@ -468,7 +469,7 @@ function sms_valid_is_local_number($number) {
  *   - log: Array of log messages. The last record is the most significant.
  *   - errors: Array of error messages. The last record is the most significant.
  */
-function sms_valid_validate(&$number, &$options = array()) {
+function sms_valid_validate($number, $options = array()) {
   $result = array(
     'pass' => NULL,
     'log' => array(),
@@ -501,7 +502,7 @@ function sms_valid_validate(&$number, &$options = array()) {
     return $result;
   }
 
-  // Remove all whitespace
+  // Remove all non-numeric characters.
   $number = preg_replace('/[^\d]/', '', $number);
 
   // Check if we should use a specific ruleset.
@@ -517,9 +518,10 @@ function sms_valid_validate(&$number, &$options = array()) {
     $result['log'][] = t('Using the global prefix validation ruleset.');
     $prefix  = $global_ruleset;
     $ruleset = sms_valid_get_ruleset($prefix);
+    // @todo - why don't we strip the prefix in the global ruleset case.
     $num     = $number;
   }
-  // Check if this is a local number
+  // Check if this is a local number.
   elseif (sms_valid_is_local_number($number)) {
     $prefix  = $local_number_ruleset;
     $ruleset = sms_valid_get_ruleset($prefix);

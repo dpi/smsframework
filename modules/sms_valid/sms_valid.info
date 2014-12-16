@@ -8,4 +8,5 @@ dependencies[] = sms
 files[] = sms_valid.admin.inc
 files[] = sms_valid.install
 files[] = sms_valid.module
+files[] = sms_valid.test
 
