@@ -10,9 +10,10 @@
  */
 namespace Drupal\sms_user\Form;
 
-use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Datetime\Entity\DateFormat;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\ConfigFormBase;
-use Drupal\system\Entity\DateFormat;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\user\Entity\User;
 
 /**
@@ -30,7 +31,7 @@ class SettingsSleepForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state, $account=NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, AccountInterface $account = NULL) {
     if (!isset($account)) {
       $account = $this->currentUser();
     }
@@ -59,7 +60,7 @@ class SettingsSleepForm extends ConfigFormBase {
       $format = 'H:00';
     }
     // Build the list of options based on format
-    $hour = 0;
+    $hour = 0; $options = array();
     while ($hour < 24) {
       $options[$hour] = date($format, mktime($hour));
       $hour++;
@@ -90,17 +91,11 @@ class SettingsSleepForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
-    $account = User::load($form_state['values']['uid']);
-    if (isset($account->sms_user)) {
-      $data = $account->sms_user;
-    }
-    else {
-      $data = array();
-    }
-    $account->sms_user['sleep_enabled'] = $form_state['values']['sleep_enabled'];
-    $account->sms_user['sleep_start_time'] = $form_state['values']['sleep_start_time'];
-    $account->sms_user['sleep_end_time'] = $form_state['values']['sleep_end_time'];
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    $account = User::load($form_state->getValue('uid'));
+    $account->sms_user['sleep_enabled'] = $form_state->getValue('sleep_enabled');
+    $account->sms_user['sleep_start_time'] = $form_state->getValue('sleep_start_time');
+    $account->sms_user['sleep_end_time'] = $form_state->getValue('sleep_end_time');
     $account->save();
     drupal_set_message(t('The changes have been saved.'), 'status');
   }

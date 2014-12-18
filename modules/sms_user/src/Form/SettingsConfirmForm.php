@@ -10,8 +10,9 @@
  */
 namespace Drupal\sms_user\Form;
 
-use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\user\Entity\User;
 
 /**
@@ -29,7 +30,7 @@ class SettingsConfirmForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state, $account=NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, AccountInterface $account = NULL) {
     if (!isset($account)) {
       $account = $this->currentUser();
     }
@@ -57,12 +58,12 @@ class SettingsConfirmForm extends ConfigFormBase {
     $form['actions']['reset'] = array(
       '#type' => 'submit',
       '#value' => t('Delete & start over'),
-      '#access' => user_access('edit own sms number'),
+      '#access' => $account->hasPermission('edit own sms number'),
     );
     $form['actions']['confirm'] = array(
       '#type' => 'submit',
       '#value' => t('Confirm without code'),
-      '#access' => user_access('administer site'),
+      '#access' => $account->hasPermission('administer smsframework'),
     );
   
     return $form;
@@ -71,11 +72,11 @@ class SettingsConfirmForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, array &$form_state) {
-    if ($form_state['triggering_element']['#value'] == $form_state['values']['submit']) {
-      $account = User::load($form_state['values']['uid']);
-      if ($form_state['values']['confirm_code'] != $account->sms_user['code']) {
-        form_set_error('confirm_code', t('The confirmation code is invalid.'));
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    if ($form_state->getTriggeringElement()['#value'] == $form_state->getValue('submit')) {
+      $account = User::load($form_state->getValue('uid'));
+      if ($form_state->getValue('confirm_code') != $account->sms_user['code']) {
+        $form_state->setErrorByName('confirm_code', t('The confirmation code is invalid.'));
       }
     }
   }
@@ -83,15 +84,15 @@ class SettingsConfirmForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
-    $account = User::load($form_state['values']['uid']);
-    if ($form_state['triggering_element']['#value'] == $form_state['values']['reset']) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    $account = User::load($form_state->getValue('uid'));
+    if ($form_state->getTriggeringElement()['#value'] == $form_state->getValue('reset')) {
       sms_user_delete($account->id());
     }
     else {
       $account->sms_user['status'] = SMS_USER_CONFIRMED;
       $account->save();
-      // If the rule module is installed, fire rules
+      // If rules module is installed, fire the number validated rules event.
       if (\Drupal::moduleHandler()->moduleExists('rules')) {
         rules_invoke_event('sms_user_validated', $account);
       }

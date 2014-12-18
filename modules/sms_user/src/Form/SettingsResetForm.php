@@ -10,8 +10,9 @@
  */
 namespace Drupal\sms_user\Form;
 
-use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\user\Entity\User;
 
 /**
@@ -29,7 +30,7 @@ class SettingsResetForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state, $account=NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, AccountInterface $account = NULL) {
     if (!isset($account)) {
       $account = $this->currentUser();
     }
@@ -57,8 +58,8 @@ class SettingsResetForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
-    $account = User::load($form_state['values']['uid']);
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    $account = User::load($form_state->getValue('uid'));
     sms_user_delete($account->id());
     if (\Drupal::moduleHandler()->moduleExists('rules')) {
       rules_invoke_event('sms_user_removed', $account);

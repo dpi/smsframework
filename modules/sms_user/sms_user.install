@@ -57,6 +57,13 @@ function sms_user_schema() {
         'default' => 0,
         'not null' => FALSE,
       ),
+      'opted_out' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'default' => 0,
+        'not null' => TRUE,
+      ),
     ),
     'primary key' => array('number'),
     'indexes' => array('uid' => array('uid')),
@@ -87,7 +94,8 @@ function sms_user_update_7000() {
 }
 
 /**
- * Add newcol field to {sms_user} table.
+ * Add sleep_enabled, sleep_start_time, sleep_end_time fields to {sms_user}
+ * table.
  */
 function sms_user_update_7003() {
   $spec = array(
@@ -113,29 +121,25 @@ function sms_user_update_7003() {
         'not null' => FALSE,
       ),
     );
-  foreach ($spec as $key=>$value) {
+  foreach ($spec as $key => $value) {
     db_add_field('sms_user', $key, $value);
   }
 }
 
 /**
- * Implements hook_update().
- *
- * @todo Implement migration here.
+ * Add sms_user_opt_out field to {sms_user} table.
  */
-//function sms_user_update_8000() {
-//  update_variables_to_config('sms_user.settings',
-//      array(
-//        'sms_user_registration_enabled' => 'registration_enabled',
-//        'sms_user_allow_password' => 'allow_password',
-//        'sms_user_new_account_message' => 'new_account_message',
-//        'sms_user_registration_form' => 'registration_form',
-//        'sms_user_confirmation_message' => 'confirmation_message',
-//        'sms_user_sleep' => 'enable_sleep',
-//        'sms_user_sleep_start_time' => 'sleep_start_time',
-//        'sms_user_sleep_end_time' => 'sleep_end_time',
-//        'sms_user_max_chars' => 'max_chars',
-//      )
-//    );
-//}
-
+function sms_user_update_7004() {
+  $spec = array(
+    'sms_user_opt_out' => array(
+      'type' => 'int',
+      'size' => 'tiny',
+      'unsigned' => TRUE,
+      'default' => 0,
+      'not null' => TRUE,
+    ),
+  );
+  foreach ($spec as $key=>$value) {
+    db_add_field('sms_user', $key, $value);
+  }
+}

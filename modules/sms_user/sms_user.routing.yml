@@ -7,8 +7,9 @@ sms_user.options:
     _permission: 'administer smsframework'
 
 sms_user.user_edit:
-  path: 'user/{user}/edit/mobile'
+  path: '/user/{user}/mobile'
   defaults:
-    _content: 'sms_user_settings'
+    _controller: 'sms_user_settings'
   requirements:
-    _access: 'TRUE'
+    _permission: 'receive sms'
+    _entity_access: 'user.update'

@@ -1,0 +1,7 @@
+receive sms:
+  title: 'receive sms'
+  description: 'Receive SMS from the site.'
+
+edit own sms number:
+  title: 'edit own sms number'
+  description: 'Edit own SMS number.'
