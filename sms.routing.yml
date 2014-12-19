@@ -9,7 +9,7 @@ sms.admin:
 sms.gateway_admin:
   path: '/admin/config/smsframework/gateways'
   defaults:
-    _form: '\Drupal\sms\form\GatewayDefaultForm'
+    _form: '\Drupal\sms\Form\GatewayDefaultForm'
     _title: 'Gateway configuration'
   requirements:
     _permission: 'administer smsframework'
@@ -17,15 +17,15 @@ sms.gateway_admin:
 sms.gateway_config:
   path: '/admin/config/smsframework/gateways/{gateway_id}'
   defaults:
-    _form: '\Drupal\sms\form\GatewayConfigForm'
-    _title_callback: '\Drupal\sms\form\GatewayConfigForm::getTitle'
+    _form: '\Drupal\sms\Form\GatewayConfigForm'
+    _title_callback: '\Drupal\sms\Form\GatewayConfigForm::getTitle'
   requirements:
     _permission: 'administer smsframework'
 
 sms.carrier_admin:
   path: '/admin/config/smsframework/carriers'
   defaults:
-    _form: '\Drupal\sms\form\CarrierAdminForm'
+    _form: '\Drupal\sms\Form\CarrierAdminForm'
     _title: 'Carrier configuration'
   requirements:
     _permission: 'administer smsframework'
@@ -34,7 +34,7 @@ sms.carrier_add:
   path: '/admin/config/smsframework/carriers/add'
   defaults:
     domain: ''
-    _form: '\Drupal\sms\form\CarrierEditForm'
+    _form: '\Drupal\sms\Form\CarrierEditForm'
     _title: 'Add Carrier'
   requirements:
     _permission: 'administer smsframework'
@@ -42,7 +42,7 @@ sms.carrier_add:
 sms.carrier_edit:
   path: '/admin/config/smsframework/carriers/edit/{domain}'
   defaults:
-    _form: '\Drupal\sms\form\CarrierEditForm'
+    _form: '\Drupal\sms\Form\CarrierEditForm'
     _title: 'Edit carrier'
   requirements:
     _permission: 'administer smsframework'
@@ -51,14 +51,14 @@ sms.carrier_delete:
   path: '/admin/config/smsframework/carriers/delete/{domain}'
   defaults:
     _title: 'Delete carrier'
-    _form: '\Drupal\sms\form\CarrierDeleteForm'
+    _form: '\Drupal\sms\Form\CarrierDeleteForm'
   requirements:
     _permission: 'administer smsframework'
 
 sms.bootstrap_admin:
   path: '/admin/config/smsframework/bootstrap'
   defaults:
-    _form: '\Drupal\sms\form\BootstrapAdminForm'
+    _form: '\Drupal\sms\Form\BootstrapAdminForm'
     _title: 'Incoming SMS bootstrap'
   requirements:
     _permission: 'administer smsframework'

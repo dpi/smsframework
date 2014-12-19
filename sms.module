@@ -98,7 +98,7 @@ function sms_send($number, $message, $options = array()) {
 
 
   if (\Drupal::moduleHandler()->moduleExists('token')) {
-    $message = token_replace($message);
+    $message = \Drupal::token()->replace($message);
   }
 
   $response = NULL;
@@ -107,7 +107,7 @@ function sms_send($number, $message, $options = array()) {
   }
   $result = sms_handle_result($response, $number, $message);
 
-  // Post process hook
+  // Post process hook.
   foreach (\Drupal::moduleHandler()->getImplementations('sms_send_process') as $module) {
     $function = $module . '_sms_send_process';
     $function('post process', $number, $message, $options, $gateway, $result);
@@ -326,10 +326,9 @@ function _gateways_build() {
   $_names = array();
 
   $gateway_array = \Drupal::moduleHandler()->invokeAll('gateway_info');
-  $config = \Drupal::config('sms.settings');
-  $settings = $config->get('gateway_settings');
   foreach ($gateway_array as $identifier => $info) {
-    $info['configuration'] = isset($settings[$identifier]) ? $settings[$identifier] : array();
+    $settings = \Drupal::config('sms.gateway.' . $identifier)->get('settings');
+    $info['configuration'] = isset($settings) ? $settings : array();
     $_gateways[$identifier] = $info;
     $_names[$identifier] = $info['name'];
   }

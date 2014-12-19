@@ -14,5 +14,17 @@ sms.settings:
       type: sequence
       label: 'Enabled Carriers'
     country_codes:
-      type: mapping
+      type: sequence
       label: 'International Country Codes'
+      sequence:
+        - type: string
+
+# Configuration for sms gateways.
+sms.gateway.*:
+  type: mapping
+  label: 'SMS Gateway settings'
+  mapping:
+    settings:
+      type: sequence
+      sequence:
+        - type: string
