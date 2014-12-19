@@ -9,4 +9,5 @@ files[] = sms_devel.module
 files[] = sms_devel.send_form.inc
 files[] = sms_devel.virtualgw.admin.inc
 files[] = sms_devel.virtualgw.inc
+files[] = tests/sms_devel.test
 
