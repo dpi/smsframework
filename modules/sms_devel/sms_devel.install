@@ -9,28 +9,6 @@
 
 
 /**
- * Implements hook_install().
- *
- * @ingroup hooks
- */
-function sms_devel_install() {
-//  TODO The drupal_(un)install_schema functions are called automatically in D7.
-//  drupal_install_schema('sms_devel')
-}
-
-
-/**
- * Implements hook_uninstall().
- *
- * @ingroup hooks
- */
-function sms_devel_uninstall() {
-  // TODO The drupal_(un)install_schema functions are called automatically in D7.
-  // drupal_uninstall_schema('sms_devel')
-}
-
-
-/**
  * Implements hook_schema().
  *
  * @return

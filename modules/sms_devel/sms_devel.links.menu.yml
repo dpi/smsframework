@@ -1,0 +1,5 @@
+sms_devel.admin:
+  route_name: sms_devel.admin
+  title: Devel
+  description: 'Development and testing tools.'
+  parent: sms.admin
