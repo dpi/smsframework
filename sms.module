@@ -186,9 +186,9 @@ function sms_incoming($number, $message, $options = array()) {
   }
 
   // Execute three phases
-  \Drupal::moduleHandler()->invokeAll('sms_incoming', 'pre process', $number, $message, $options);
-  \Drupal::moduleHandler()->invokeAll('sms_incoming', 'process', $number, $message, $options);
-  \Drupal::moduleHandler()->invokeAll('sms_incoming', 'post process', $number, $message, $options);
+  \Drupal::moduleHandler()->invokeAll('sms_incoming', ['pre process', $number, $message, $options]);
+  \Drupal::moduleHandler()->invokeAll('sms_incoming', ['process', $number, $message, $options]);
+  \Drupal::moduleHandler()->invokeAll('sms_incoming', ['post process', $number, $message, $options]);
 }
 
 /**
