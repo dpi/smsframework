@@ -42,14 +42,14 @@ class SmsUserWebTest extends WebTestBase {
 
     // Post user confirmation request.
     $edit = array('number' => '1234567890');
-    $this->drupalPostForm('user/' . $user->id() . '/edit/mobile', $edit, t('Confirm number'));
+    $this->drupalPostForm('user/' . $user->id() . '/mobile', $edit, t('Confirm number'));
     $this->assertResponse(200);
     // Get the code that was sent.
     $gw_result = sms_test_gateway_result();
     preg_match('/\b([0-9]{4})\b/', $gw_result['message'], $matches);
     $code = $matches[1];
     // Post the code for confirmation.
-    $this->drupalPostForm('user/' . $user->id() . '/edit/mobile', array('confirm_code' => $code), t('Confirm number'));
+    $this->drupalPostForm('user/' . $user->id() . '/mobile', array('confirm_code' => $code), t('Confirm number'));
     $this->assertResponse(200);
     // Confirm user's number is verified.
     $user = User::load($user->id());
@@ -70,7 +70,7 @@ class SmsUserWebTest extends WebTestBase {
     $this->assertFalse(sms_user_send($user1->id(), $message), 'Failed sending to user without permission');
 
     // Clear user confirmed number.
-    $this->drupalPostForm('user/' . $user->id() . '/edit/mobile', array(), t('Delete & start over'));
+    $this->drupalPostForm('user/' . $user->id() . '/mobile', array(), t('Delete & start over'));
     $this->assertResponse(200);
     $this->resetAll();
     $user = User::load($user->id());
@@ -150,13 +150,13 @@ class SmsUserWebTest extends WebTestBase {
 
     // Confirm excluded_user number.
     $edit = array('number' => '1234567890');
-    $this->drupalPostForm('user/' . $excluded_user->id() . '/edit/mobile', $edit, t('Confirm number'));
+    $this->drupalPostForm('user/' . $excluded_user->id() . '/mobile', $edit, t('Confirm number'));
     $this->drupalPostForm(NULL, NULL, t('Confirm without code'));
     $this->assertText('Your mobile phone number has been confirmed.', 'Authors number is confirmed');
 
     // Set the Opt Out checkbox.
     $opt_out = array('opted_out' => TRUE );
-    $this->drupalPostForm('user/' . $excluded_user->id() . '/edit/mobile', $opt_out, t('Set'));
+    $this->drupalPostForm('user/' . $excluded_user->id() . '/mobile', $opt_out, t('Set'));
     $this->assertText(t('The changes have been saved.'), 'Excluded user has chosen to opt out of messages from the site.');
 
     $test_message1 = array(
@@ -177,13 +177,13 @@ class SmsUserWebTest extends WebTestBase {
 
     // Confirm normal_user number.
     $edit = array('number' => '0987654321');
-    $this->drupalPostForm('user/' . $normal_user->id() . '/edit/mobile', $edit, t('Confirm number'));
+    $this->drupalPostForm('user/' . $normal_user->id() . '/mobile', $edit, t('Confirm number'));
     $this->drupalPostForm(NULL, NULL, t('Confirm without code'));
     $this->assertText('Your mobile phone number has been confirmed.', 'Authors number is confirmed');
 
     // Set the Opt Out checkbox.
     $setting = array('opted_out' => FALSE );
-    $this->drupalPostForm('user/' . $normal_user->id() . '/edit/mobile', $setting, t('Set'));
+    $this->drupalPostForm('user/' . $normal_user->id() . '/mobile', $setting, t('Set'));
     $this->assertText(t('The changes have been saved.'), t('Author has chosen opt in for messages from the site.'));
 
     $test_message2 = array(
@@ -208,7 +208,7 @@ class SmsUserWebTest extends WebTestBase {
     $this->assertFalse($this->config('sms_user.settings')->get('allow_opt_out'), 'Opt out globally disabled.');
 
     // Confirm that the opt-out button is not available to users.
-    $this->drupalGet('user/' . $excluded_user->id() . '/edit/mobile');
+    $this->drupalGet('user/' . $excluded_user->id() . '/mobile');
     $this->assertNoText(t('Opt out of sms messages from this site.'), t('Opt out checkbox not visible in UI.'));
 
     // Ensure opt out doesn't work when message is sent.
