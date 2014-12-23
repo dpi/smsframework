@@ -1,7 +1,7 @@
 name: SMS Blast
 description: Allows bulk text messages to be sent to registered users.
 type: module
+core: 8.x
 package: SMS Framework
 dependencies:
  - sms_user
-core: 8.x
