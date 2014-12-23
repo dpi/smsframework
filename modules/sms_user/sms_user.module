@@ -198,38 +198,36 @@ function _sms_user_opted_out(AccountInterface $account) {
  *
  * Provides the forms for adding and confirming a user's mobile number.
  *
- * @param \Drupal\Core\Session\AccountInterface $user
- *   The users whose settings are to be configured.
+ * @param \Drupal\Core\Session\AccountInterface $account
+ *   The users account.
  *
  * @return string
  *   Rendered HTML for the account settings form.
  */
-function sms_user_settings(AccountInterface $user) {
-  // We have to use the argument name $user so that 'user.update' access check
-  // will load the correct user entity for checking.
+function sms_user_settings(AccountInterface $account) {
   $output = array();
-  switch (isset($user->sms_user) ? $user->sms_user['status'] : 0) {
+  switch (isset($account->sms_user) ? $account->sms_user['status'] : 0) {
     case 0:
-      $output = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsAddForm', $user);
+      $output = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsAddForm', $account);
       break;
     case SMS_USER_PENDING:
-      $output = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsConfirmForm', $user);
+      $output = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsConfirmForm', $account);
       break;
     case SMS_USER_CONFIRMED:
     case SMS_USER_SMS_REGISTERED:
-      $output = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsResetForm', $user);
+      $output = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsResetForm', $account);
       break;
   }
 
   if (\Drupal::config('sms_user.settings')->get('enable_sleep')) {
     $output2 = array();
     $output2['phoneform'] = $output;
-    $output2['sleepform'] = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsSleepForm', $user);
+    $output2['sleepform'] = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsSleepForm', $account);
     $output = $output2;
   }
 
   if (\Drupal::config('sms_user.settings')->get('allow_opt_out')) {
-    $output['opt_out_form'] = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsOptOutForm', $user);
+    $output['opt_out_form'] = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsOptOutForm', $account);
   }
 
   return $output;
@@ -436,7 +434,7 @@ function sms_user_user_load(array $accounts) {
 
       // @todo The following is a BC-shim to support code that expects account
       // details with a delta of 0.
-      $accounts[$id]->sms_user[0] = $accounts[$id]->sms_user;
+      $users[$id]->sms_user[0] = $account[$id]->sms_user;
     }
   }
 }
