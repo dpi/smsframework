@@ -1,0 +1,36 @@
+# Schema for the configuration files of the SMS User module.
+
+sms_user.settings:
+  type: mapping
+  label: 'SMS User settings'
+  mapping:
+    registration_form:
+      type: boolean
+      label: 'Show mobile fields during user registration'
+    confirmation_message:
+      type: string
+      label: 'Confirmation message format'
+    enable_sleep:
+      type: boolean
+      label: 'Enable sleep hours'
+    sleep_start_time:
+      type: string
+      label: 'Sleep start time'
+    sleep_end_time:
+      type: string
+      label: 'Sleep end time'
+    allow_opt_out:
+      type: boolean
+      label: 'Allow users to opt-out of receiving messages from this site'
+    registration_enabled:
+      type: boolean
+      label: 'Enable registration of new users via SMS'
+    allow_password:
+      type: boolean
+      label: 'Allow password creation when registering via SMS'
+    new_account_message:
+      type: string
+      label: 'New user message via SMS'
+    max_chars:
+      type: integer
+      label: 'Maximum number of chars for SMS sending using actions'
