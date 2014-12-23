@@ -60,14 +60,10 @@ class SettingsResetForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $account = User::load($form_state->getValue('uid'));
-    if (sms_user_delete($account->id())) {
-      if (\Drupal::moduleHandler()->moduleExists('rules')) {
-        rules_invoke_event('sms_user_removed', $account);
-      }
-      // Save account changes to trigger reload.
-      unset($account->sms_user);
-      $account->save();
-      drupal_set_message(t('Your mobile information has been removed'), 'status');
+    sms_user_delete($account->id());
+    if (\Drupal::moduleHandler()->moduleExists('rules')) {
+      rules_invoke_event('sms_user_removed', $account);
     }
+    drupal_set_message(t('Your mobile information has been removed'), 'status');
   }
 }
