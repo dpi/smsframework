@@ -8,7 +8,9 @@
 namespace Drupal\sms_valid;
 
 use Drupal\Core\Form\FormBase;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Drupal\sms_valid\Entity\Ruleset;
 
 /**
  * Class RulesetListController
@@ -16,14 +18,12 @@ use Drupal\Core\Url;
  * Validation rulesets list form
  * @todo This doesn't implement EntityListControllerInterface because of the form involved
  */
-class RulesetListForm extends FormBase
-{
+class RulesetListForm extends FormBase {
 
   /**
    * {@inheritdoc}
    */
-  public function getFormId()
-  {
+  public function getFormId() {
     return 'sms_valid_admin_rulesets_form';
   }
 
@@ -31,46 +31,61 @@ class RulesetListForm extends FormBase
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state)
-  {
-    $rulesets = sms_valid_get_all_rulesets();
-
-    $form['note'] = array(
-      '#type' => 'item',
-      '#value' => t('A ruleset is a number prefix with a set of deeper number prefixes, each with an allow/deny directive. For example, a ruleset prefix "64" and a rule like "21+" would allow a number like "64-21-123-4567". You can choose to have one big ruleset or you can split them into manageable rulesets by country, category, or whatever you decide.'),
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $header = array(
+      'prefix' => t('Prefix'),
+      'name' => t('Name'),
+      'iso2' => t('Country'),
+      'qty_rules' => t('Qty Rules'),
+      'in_out' => array(
+        'data' => t('Allow messages'),
+        'colspan' => 2,
+      ),
+      'operations' => t('Delete'),
     );
 
-    foreach ($rulesets as $r) {
-      $prefix = $r->prefix;
-      $qty_rules = count($r->rules);
-      $rule_edit = ' (' . l(t('edit'), "admin/config/smsframework/validation/ruleset/$prefix") . ')';
+    $form['rulesets'] = array(
+      '#type' => 'table',
+      '#header' => $header,
+      '#rows' => array(),
+    );
 
-      $form[$prefix]['prefix'] = array(
+    foreach (Ruleset::loadMultiple() as $ruleset) {
+      $prefix = $ruleset->prefix;
+      $qty_rules = count($ruleset->rules);
+      $rule_edit = ' (' . $this->l($this->t('edit'), new Url('sms_valid.ruleset_edit', ['sms_ruleset' => $prefix])) . ')';
+
+      $form['rulesets'][$prefix]['prefix'] = array(
         '#type' => 'textfield',
         '#size' => 5,
         '#maxlength' => 5,
         '#disabled' => TRUE,
-        '#value' => $r->prefix,
+        '#value' => $ruleset->prefix,
       );
-      $form[$prefix]['name'] = array('#markup' => $r->name);
-      $form[$prefix]['iso2'] = array('#markup' => $r->iso2);
-      $form[$prefix]['qty_rules'] = array('#markup' => $qty_rules . $rule_edit);
-      $form[$prefix][$prefix . '_out'] = array(
+      $form['rulesets'][$prefix]['name'] = array('#markup' => $ruleset->name);
+      $form['rulesets'][$prefix]['iso2'] = array('#markup' => $ruleset->iso2);
+      $form['rulesets'][$prefix]['qty_rules'] = array('#markup' => $qty_rules . $rule_edit);
+      $form['rulesets'][$prefix]['out'] = array(
         '#type' => 'checkbox',
         '#title' => 'Outbound',
         '#default_value' => sms_valid_ruleset_is_enabled($prefix, SMS_DIR_OUT),
       );
-      $form[$prefix][$prefix . '_in'] = array(
+      $form['rulesets'][$prefix]['in'] = array(
         '#type' => 'checkbox',
         '#title' => 'Inbound',
         '#default_value' => sms_valid_ruleset_is_enabled($prefix, SMS_DIR_IN),
       );
-      $form[$prefix][$prefix . '_delete'] = array(
+      $form['rulesets'][$prefix]['delete'] = array(
         '#type' => 'checkbox',
         '#title' => 'Delete',
         '#default_value' => FALSE,
       );
     }
+
+    $form['note'] = array(
+      '#type' => 'item',
+      '#value' => t('A ruleset is a number prefix with a set of deeper number prefixes, each with an allow/deny directive. For example, a ruleset prefix "64" and a rule like "21+" would allow a number like "64-21-123-4567". You can choose to have one big ruleset or you can split them into manageable rulesets by country, category, or whatever you decide.'),
+    );
 
     $form['submit'] = array(
       '#type' => 'submit',
@@ -84,34 +99,19 @@ class RulesetListForm extends FormBase
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state)
-  {
-    foreach ($form_state['values'] as $key => $element) {
-      // @todo Nasty hack to get these values
-      $items = explode('_', $key);
-      if (count($items) == 2) {
-        // Just run once for each prefix
-        if ($items[1] == 'out') {
-          $prefix = $items[0];
-
-          // Handle deletes
-          $delete = $form_state['values'][$prefix . '_delete'];
-          if ($delete) {
-            // Redirect to delete confirm form
-            // @todo Add a confirm form to verify user intent to delete all
-            // these rulesets before submitting.
-            sms_valid_delete_ruleset($prefix);
-          }
-          else {
-            $out = $form_state['values'][$prefix . '_out'];
-            $in = $form_state['values'][$prefix . '_in'];
-            sms_valid_ruleset_set_status($prefix, sms_dir($out, $in));
-          }
-        }
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    foreach ($form_state->getValue('rulesets') as $prefix => $checkboxes) {
+      // Delete immediately if specified.
+      if ($checkboxes['delete']) {
+        // @todo Add a confirm form to verify user intent to delete all these
+        // rulesets before submitting.
+        Ruleset::load($prefix)->delete();
+      }
+      else {
+        sms_valid_ruleset_set_status($prefix, sms_dir($checkboxes['out'], $checkboxes['in']));
       }
     }
     drupal_set_message(t('Rulesets saved.'));
   }
+
 }
-
-

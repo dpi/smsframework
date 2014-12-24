@@ -1,17 +1,17 @@
 sms_valid.admin:
+  title: 'Settings'
   route_name: sms_valid.admin
   base_route: sms_valid.admin
-  title: 'Settings'
   weight: -10
 
 sms_valid.ruleset_list:
+  title: 'Rulesets'
   route_name: sms_valid.ruleset_list
   base_route: sms_valid.admin
-  title: 'Rulesets'
   weight: -9
 
 sms_valid.test:
+  title: 'Test validation'
   route_name: sms_valid.test
   base_route: sms_valid.admin
-  title: 'Test validation'
   weight: -6

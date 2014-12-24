@@ -13,7 +13,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  * @ConfigEntityType(
  *   id = "sms_ruleset",
  *   label = @Translation("SMS Ruleset"),
- *   controllers = {
+ *   handlers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigEntityStorage",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "access" = "Drupal\Entity\EntityAccessController",
@@ -24,7 +24,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *       "delete" = "Drupal\sms_valid\RulesetDeleteForm",
  *     },
  *   },
- *   config_prefix = "sms_valid.ruleset",
+ *   config_prefix = "ruleset",
  *   entity_keys = {
  *     "id" = "prefix",
  *     "uuid" = "uuid",

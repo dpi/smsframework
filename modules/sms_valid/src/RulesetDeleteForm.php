@@ -8,6 +8,8 @@
 namespace Drupal\sms_valid;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Provides the ruleset delete confirmation form.
@@ -31,13 +33,8 @@ class RulesetDeleteForm extends EntityConfirmFormBase {
     /**
      * {@inheritdoc}
      */
-  public function getCancelRoute() {
-    return array(
-      'route_name' => 'sms_valid.ruleset_edit',
-      'route_parameters' => array(
-        'sms_ruleset' => $this->entity->id(),
-      ),
-    );
+  public function getCancelUrl() {
+    return new Url('sms_valid.ruleset_edit', ['sms_ruleset' => $this->entity->id()]);
   }
 
     /**
@@ -57,15 +54,12 @@ class RulesetDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     // Delete the ruleset.
     $this->entity->delete();
     drupal_set_message($this->t('The ruleset has been deleted.'));
-    watchdog('sms_valid', 'Deleted ruleset @name.', array('@name' => $this->entity->label()));
-    $form_state['redirect_route'] = array(
-      'route_name' => 'sms_valid.ruleset_list',
-      'route_parameters' => array(),
-    );
+    $this->logger('sms_valid')->info('Deleted ruleset @name.', array('@name' => $this->entity->label()));
+    $form_state->setRedirect('sms_valid.ruleset_list');
   }
 
 }

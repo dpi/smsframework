@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * SMS Framework Number Validation feature module: Install file
@@ -7,6 +8,7 @@
  * @subpackage sms_valid
  */
 
+use \Drupal\Component\Utility\String;
 
 /**
  * Implements hook_install().
@@ -117,20 +119,6 @@ function sms_valid_create_example_ruleset(&$ret = array()) {
 
   $ret[] = array(
     'success' => !empty($ruleset),
-//    'query' => check_plain($sql),
+//    'query' => String::checkPlain($sql),
   );
 }
-
-//function sms_valid_update_8000() {
-//  update_variables_to_config('sms_valid.settings',
-//    array(
-//      'sms_valid_use_rulesets' => 'use_rulesets',
-//      'sms_valid_use_global_ruleset' => 'use_global_ruleset',
-//      'sms_valid_global_ruleset' => 'global_ruleset',
-//      'sms_valid_local_number_prefix' => 'local_number_prefix',
-//      'sms_valid_local_number_ruleset' => 'local_number_ruleset',
-//      'sms_valid_last_resort_enabled' => 'last_resort_enabled',
-//      'sms_valid_last_resort_ruleset' => 'last_resort_ruleset',
-//    )
-//  );
-//}
