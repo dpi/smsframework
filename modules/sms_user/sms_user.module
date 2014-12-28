@@ -221,14 +221,14 @@ function sms_user_settings(AccountInterface $user) {
       break;
   }
 
-  if (\Drupal::config('sms_user.settings')->get('enable_sleep')) {
+  if (\Drupal::config('sms_user.settings')->get('enable_sleep') && $user->sms_user['number'] && $user->sms_user['status'] == SMS_USER_CONFIRMED) {
     $output2 = array();
     $output2['phoneform'] = $output;
     $output2['sleepform'] = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsSleepForm', $user);
     $output = $output2;
   }
 
-  if (\Drupal::config('sms_user.settings')->get('allow_opt_out')) {
+  if (\Drupal::config('sms_user.settings')->get('allow_opt_out') && $user->sms_user['number'] && $user->sms_user['status'] == SMS_USER_CONFIRMED) {
     $output['opt_out_form'] = \Drupal::formBuilder()->getForm('\Drupal\sms_user\Form\SettingsOptOutForm', $user);
   }
 

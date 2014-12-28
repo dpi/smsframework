@@ -35,6 +35,10 @@ class SmsUserWebTest extends WebTestBase {
     $edit = array('number' => '1234567890');
     $this->drupalPostForm('user/' . $user->id() . '/mobile', $edit, t('Confirm number'));
     $this->assertResponse(200);
+    // Confirm that opt-out and sleep settings options are not available yet.
+    $this->assertNoFieldByXPath('//input[@name="opted_out"]', null, 'SMS User opt out settings not available for unconfirmed user.');
+    $this->assertNoFieldByXPath('//input[@name="sleep_enabled"]', null, 'SMS User sleep enable settings not available for unconfirmed user.');
+
     // Get the code that was sent.
     $gw_result = sms_test_gateway_result();
     preg_match('/\b([0-9]{4})\b/', $gw_result['message'], $matches);
@@ -45,6 +49,9 @@ class SmsUserWebTest extends WebTestBase {
     // Confirm user's number is verified.
     $user = User::load($user->id());
     $this->assertTrue($user->sms_user['number'] == $edit['number'] && $user->sms_user['status'] == SMS_USER_CONFIRMED, 'Successfully confirmed user phone number ' . $edit['number']);
+    // Confirm that opt-out and sleep settings options are now available.
+    $this->assertFieldByXPath('//input[@name="opted_out"]', null, 'SMS User opt out settings available after number confirmed.');
+    $this->assertFieldByXPath('//input[@name="sleep_enabled"]', null, 'SMS User sleep enable settings available after number confirmed.');
 
     // Send sms to user with registered number.
     $message = 'Test user message';
