@@ -619,7 +619,7 @@ function sms_validate_number(&$number, $options = array()) {
   }
 
   // Allow other modules to provide number validation.
-  \Drupal::moduleHandler()->invokeAll('sms_validate_number', [$number, $options]);
+  $errors = \Drupal::moduleHandler()->invokeAll('sms_validate_number', [$number, $options]);
 
   // Allow the default (or the specified in $options) gateway to provide number
   // validation.

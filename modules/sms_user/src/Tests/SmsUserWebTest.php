@@ -23,15 +23,6 @@ class SmsUserWebTest extends WebTestBase {
   public static $modules = ['sms', 'sms_test_gateway', 'sms_user', 'syslog', 'sms_devel'];
 
   /**
-   * Returns the config() object.
-   *
-   * @return \Drupal\Core\Config\Config
-   */
-  protected function config($name) {
-    return $this->container->get('config.factory')->get($name);
-  }
-
-  /**
    * Tests user adding phone number.
    */
   public function testNumberConfirmationAndSmsUserSend() {

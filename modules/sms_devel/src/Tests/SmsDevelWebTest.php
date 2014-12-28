@@ -19,15 +19,6 @@ class SmsDevelWebTest extends WebTestBase {
   public static $modules = ['sms', 'sms_test_gateway', 'sms_devel'];
 
   /**
-   * Returns the config() object.
-   *
-   * @return \Drupal\Core\Config\Config
-   */
-  protected function config($name) {
-    return $this->container->get('config.factory')->get($name);
-  }
-
-  /**
    * Tests if messages sent using the test send form are stored properly.
    */
   public function testDevelSendReceiveForm() {

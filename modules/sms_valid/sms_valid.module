@@ -9,6 +9,7 @@
  */
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\sms_valid\Entity\Ruleset;
 
 
@@ -177,8 +178,18 @@ function sms_valid_ruleset_set_status($prefix, $dir = SMS_DIR_ALL) {
  * @return bool
  *   true on success, false otherwise.
  */
-function sms_valid_save_ruleset($ruleset) {
-  $ruleset->save();
+function sms_valid_save_ruleset(array $ruleset) {
+  try {
+    if ($object = Ruleset::load($ruleset['prefix'])) {
+      return (bool) $object->save();
+    }
+    else {
+      return (bool) Ruleset::create($ruleset)->save();
+    }
+  }
+  catch (EntityStorageException $e) {
+    return false;
+  }
 }
 
 
