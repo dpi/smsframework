@@ -20,11 +20,17 @@ class SmsValidWebTest extends DrupalWebTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp('sms', 'sms_valid');
     $this->adminUser = $this->drupalCreateUser(array('administer smsframework'));
   }
 
+  /**
+   * Tests the sms_valid_validate() function.
+   */
   public function testSmsValidValidate() {
     // Test that the default rulesets are added already.
     $this->drupalLogin($this->adminUser);
@@ -56,6 +62,9 @@ class SmsValidWebTest extends DrupalWebTestCase {
     }
   }
 
+  /**
+   * Tests the creation, update and deletion of sms_valid rulesets.
+   */
   public function testCrudSmsValidRulesets() {
     $this->drupalLogin($this->adminUser);
 
@@ -112,6 +121,9 @@ class SmsValidWebTest extends DrupalWebTestCase {
 
   }
 
+  /**
+   * Tests the application of the sms_valid settings form and settings.
+   */
   public function testSmsValidSettingsForm() {
     // Create two rulesets for test.
     $ruleset = $this->randomRuleset();
@@ -186,6 +198,9 @@ class SmsValidWebTest extends DrupalWebTestCase {
     $this->assertTrue($result['pass'], 'Fallback rule validation passed as expected for 1189751234');
   }
 
+  /**
+   * Tests the internal sms_valid functions.
+   */
   public function testSmsValidFunctions() {
     // Clear all rulesets.
     $count = count(sms_valid_get_all_rulesets());
