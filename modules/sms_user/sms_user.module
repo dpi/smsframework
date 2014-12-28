@@ -262,14 +262,14 @@ function sms_user_settings($account) {
       break;
   }
 
-  if (variable_get('sms_user_sleep', 1)) {
+  if (variable_get('sms_user_sleep', 1) && $account->sms_user['number'] && $account->sms_user['status'] == SMS_USER_CONFIRMED) {
     $output2 = Array();
     $output2['phoneform'] = $output;
     $output2['sleepform'] = drupal_get_form('sms_user_settings_sleep_form', $account);
     $output = $output2;
   }
 
-  if (variable_get('sms_user_allow_opt_out', 1)) {
+  if (variable_get('sms_user_allow_opt_out', 1) && $account->sms_user['number'] && $account->sms_user['status'] == SMS_USER_CONFIRMED) {
     $output['opt_out_form'] = drupal_get_form('sms_user_opt_out_form', $account);
   }
 
