@@ -18,7 +18,7 @@ function sms_actions_sms_incoming($op, $number, $message) {
       }
     }
 
-    if ($active_command) {
+    if (!empty($active_command)) {
       sms_actions_do($active_command, $number, $message);
     }
     else {
@@ -64,12 +64,13 @@ function sms_actions_do($command, $number, $message) {
       if ($type == 'node') {
         preg_match('!^[A-z0-9\-]+\s(.+)$!', $message, $matches);
         $params = explode(' ', $matches[1]);
-        $node = node_load($params[0]);
-        if (!isset($objects[$type])) {
-          $objects[$type] = _trigger_normalize_comment_context($type, $node);
+        if ($node = node_load($params[0])) {
+          if (!isset($objects[$type])) {
+            $objects[$type] = _trigger_normalize_comment_context($type, $node);
+          }
+          $context['group'] = 'node';
+          actions_do($aid, $objects[$type], $context);
         }
-        $context['group'] = 'node';
-        actions_do($aid, $objects[$type], $context);
       }
     }
     else {

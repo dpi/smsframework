@@ -4,3 +4,4 @@ package = SMS Framework
 dependencies[] = sms
 dependencies[] = trigger
 core = 7.x
+files[] = sms_actions.test
