@@ -46,7 +46,8 @@ function sms_actions_do($command, $number, $message) {
   // Keep objects for reuse so that changes actions make to objects can persist.
   static $objects;
 
-  $aids = trigger_get_assigned_actions($command->hook);
+  $aids = trigger_get_assigned_actions($command->hook)
+        + trigger_get_assigned_actions('sms_actions');
 
   if (!$aids) {
     return;

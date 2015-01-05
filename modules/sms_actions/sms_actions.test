@@ -168,6 +168,22 @@ class SmsActionWebTest extends DrupalWebTestCase {
     // Assert that the configured message '!This is a test!' was sent.
     $result = sms_test_gateway_result();
     $this->assertEqual($edit['message'], $result['message'], 'SMS actions sent as configured');
+
+    // "Any" discriminator test.
+    sms_actions_command_save((object) array(
+      // Add a new discriminator.
+      'discriminator' => 'test23',
+    ));
+    $this->drupalPost('admin/structure/trigger/sms_actions', $post, t('Assign'), array(), array(), 'trigger-sms-actions-assign-form');
+    $this->assertResponse(200);
+    // Reset triggered actions so the new ones can reload.
+    drupal_static_reset('trigger_get_assigned_actions');
+    sms_test_gateway_result(true);
+    sms_incoming('6789012345', 'testy', array());
+    $this->assertEqual(array(), sms_test_gateway_result(), 'Non-existent discriminator not triggered.');
+    sms_incoming('4567123890', 'test23', array());
+    $result = sms_test_gateway_result();
+    $this->assertEqual($edit['message'], $result['message'], 'Existing discriminator triggered for the "Any" discriminator trigger.');
   }
 
 }
