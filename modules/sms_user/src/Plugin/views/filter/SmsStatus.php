@@ -6,6 +6,8 @@
  */
 
 namespace Drupal\sms_user\Plugin\views\filter;
+
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Plugin\views\filter\InOperator;
 
 /**
@@ -20,9 +22,9 @@ class SmsStatus extends InOperator {
    * {@inheritdoc}
    */
   function getValueOptions() {
-    if (!isset($this->value_options)) {
-      $this->value_title = t('Status');
-      $this->value_options = array(
+    if (!isset($this->valueOptions)) {
+      $this->valueTitle = t('Status');
+      $this->valueOptions = array(
         SMS_USER_PENDING => t('Pending'),
         SMS_USER_CONFIRMED => t('Confirmed'),
       );
@@ -32,7 +34,7 @@ class SmsStatus extends InOperator {
   /**
    * {@inheritdoc}
    */
-  function valueForm(&$form, &$form_state) {
+  function valueForm(&$form, FormStateInterface $form_state) {
     // Only values from that defined ones
     parent::valueForm($form, $form_state);
     $form['value']['#type'] = 'select';

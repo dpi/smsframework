@@ -461,6 +461,7 @@ function sms_user_save(AccountInterface $account) {
     // Remove BC-shim before save.
     unset($info[0]);
 
+    $info['gateway'] = serialize($info['gateway']);
     return db_merge('sms_user')
       ->key('uid', $info['uid'])
       ->fields($info)
@@ -571,7 +572,8 @@ function sms_user_sms_incoming($op, $number, $message, $options) {
           'options' => $options,
         );
         sms_user_login_metadata($account->id(), $metadata);
-        _sms_user_switch($account);
+        // @todo fix this in https://www.drupal.org/node/2401699
+        // _sms_user_switch($account);
       }
       elseif ($config->get('registration_enabled') && $number) {
         if ($account = sms_user_register_new_user($number, $message, $options)) {
@@ -583,7 +585,8 @@ function sms_user_sms_incoming($op, $number, $message, $options) {
       }
       break;
     case 'post process':
-      _sms_user_switch();
+      // @todo fix this in https://www.drupal.org/node/2401699
+      // _sms_user_switch();
       break;
   }
 }
@@ -661,13 +664,13 @@ function sms_user_login_metadata($uid = NULL, $metadata = NULL, $reset = FALSE) 
  */
 function _sms_user_switch(AccountInterface $account = NULL) {
   if ($account) {
-    $edit = array();
     \Drupal::service('account_switcher')->switchTo($account);
-    \Drupal::moduleHandler()->invokeAll('user_login', $edit, $account);
+    \Drupal::moduleHandler()->invokeAll('user_login', [$account]);
     \Drupal::logger('sms_user')->info('%name was logged in using SMS.', array('%name' => $account->getUsername()));
   }
   else {
     \Drupal::service('account_switcher')->switchBack();
+    $account = \Drupal::currentUser();
     \Drupal::logger('sms_user')->info('%name was restored as logged in using SMS.', array('%name' => $account->getUsername()));
   }
 }
@@ -783,6 +786,9 @@ function sms_user_authenticate($number) {
     if (!empty($account)) {
       \Drupal::logger('sms_user')->info('%name was authenticated using SMS.', array('%name' => $account->getUserName()));
       return $account;
+    }
+    else {
+      return false;
     }
   }
   else {

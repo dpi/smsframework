@@ -397,8 +397,6 @@ display:
         groups:
           1: AND
       display_extenders: {  }
-      field_langcode: '***LANGUAGE_language_content***'
-      field_langcode_add_to_query: null
   page_1:
     display_plugin: page
     id: page_1
@@ -420,5 +418,3 @@ display:
         menu_name: main
         weight: 0
       display_extenders: {  }
-      field_langcode: '***LANGUAGE_language_content***'
-      field_langcode_add_to_query: null
