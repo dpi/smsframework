@@ -5,5 +5,4 @@ package = SMS Framework
 core = 7.x
 files[] = sms_sendtophone.css
 files[] = sms_sendtophone.module
-
-
+files[] = sms_sendtophone.test

@@ -455,7 +455,9 @@ function sms_sendtophone_form_submit($form, &$form_state) {
   if (sms_send($form_state['values']['number'], $form_state['values']['message'], $form_state['values']['gateway'])) {
     drupal_set_message(t('The message "@message" sent to @number.', array('@message' => $form_state['values']['message'], '@number' => $form_state['values']['number'])));
   }
-  $form_state['redirect'] = $_REQUEST['destination'];
+  if (isset($_REQUEST['destination'])) {
+    $form_state['redirect'] = $_REQUEST['destination'];
+  }
 }
 
 /**
