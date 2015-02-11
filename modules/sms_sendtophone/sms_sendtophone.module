@@ -343,7 +343,7 @@ function sms_sendtophone_form($form_state, $type) {
       $form['message'] = array('#type' => 'value', '#value' => $_GET['text']);
       $form['message_preview'] = array(
         '#type' => 'item',
-        '#value' => '<p class="message-preview">'. $_GET['text'] .'</p>',
+        '#value' => '<p class="message-preview">'. check_plain($_GET['text']) .'</p>',
         '#title' => t('Message preview'),
       );
       break;
