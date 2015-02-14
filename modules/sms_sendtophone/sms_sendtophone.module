@@ -147,7 +147,7 @@ function _sms_sendtophone_filter_inline_settings($form, &$form_state, $filter, $
     '#type' => 'checkbox',
     '#title' => t('Use default icon'),
     '#description' => t('If "Icon" is selected above and this option is enabled, the default icon that came with the module will be used.'),
-    '#default_value' => !empty($filter->settings['sms_sendtophone_filter_inline_display_icon']) ? $filter->settings['sms_sendtophone_filter_inline_display_icon'] : 1,
+    '#default_value' => !empty($filter->settings['sms_sendtophone_filter_inline_default_icon']) ? $filter->settings['sms_sendtophone_filter_inline_default_icon'] : 1,
   );
 
   $elements["sms_sendtophone_filter_inline_custom_icon_path"] = array(
@@ -387,7 +387,7 @@ function sms_sendtophone_form($form, $form_state, $type) {
       );
       $form['message_preview'] = array(
         '#type' => 'item',
-        '#markup' => '<p class="message-preview">' . $_GET['text'] . '</p>',
+        '#markup' => '<p class="message-preview">' . check_plain($_GET['text']) . '</p>',
         '#title' => t('Message preview'),
       );
       break;
@@ -514,7 +514,7 @@ function sms_sendtophone_node_view($node, $view_mode, $langcode) {
 function sms_sendtophone_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'sms_sendtophone_inline_form' || $form_id == 'sms_sendtophone_node_form' || $form_id == 'sms_sendtophone_cck_form') {
     if (!user_access('send to any number')) {
-      // Makes number field plain text
+      // Makes number field plain text.
       $form['sms']['number']['#type'] = 'item';
       $form['sms']['number']['#value'] = $form['sms']['number']['#default_value'];
     }
