@@ -84,4 +84,12 @@ class GatewayDefaultForm extends ConfigFormBase {
         ->save();
     }
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEditableConfigNames() {
+    return ['sms.settings'];
+  }
+
 }

@@ -96,4 +96,12 @@ class CarrierAdminForm extends ConfigFormBase {
     $this->config('sms.settings')->set('enabled_carriers', $enabled_carriers)->save();
     drupal_set_message($this->t('The configuration options have been saved.'));
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEditableConfigNames() {
+    return ['sms.settings'];
+  }
+
 }

@@ -10,12 +10,13 @@
 namespace Drupal\sms_track;
 
 use Drupal\Core\Form\FormBase;
+use Drupal\Core\Form\FormStateInterface;
 
 class AdminFormController extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state)
+  public function buildForm(array $form, FormStateInterface $form_state)
   {
     // Get sms_track configuration
     $config = $this->config('sms_track.settings');
@@ -59,15 +60,15 @@ class AdminFormController extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state)
+  public function submitForm(array &$form, FormStateInterface $form_state)
   {
     // Get sms_track configuration
-    $config = $this->config('sms_track.settings');
+    $config = $this->configFactory()->getEditable('sms_track.settings');
     $archive_dir_old = $config->get('archive_dir');
-    $archive_dir = $form_state['values']['archive_dir'];
+    $archive_dir = $form_state->getValue('archive_dir');
     $config->set('archive_dir', $archive_dir);
 
-    $archive_max_age_days = $form_state['values']['archive_max_age_days'];
+    $archive_max_age_days = $form_state->getValue('archive_max_age_days');
     $config->set('archive_max_age_days', $archive_max_age_days);
 
     $config->save();

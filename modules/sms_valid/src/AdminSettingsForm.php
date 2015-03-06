@@ -159,7 +159,8 @@ class AdminSettingsForm extends FormBase {
       ) + $form_state->getValues();
     unset($values['note'], $values['mode']);
     // Save to config.
-    $this->config('sms_valid.settings')->setData($values)->save();
+    $this->configFactory()->getEditable('sms_valid.settings')->setData($values)->save();
     drupal_set_message(t('Settings saved.'));
   }
+
 }

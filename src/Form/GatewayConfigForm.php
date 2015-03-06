@@ -70,7 +70,7 @@ class GatewayConfigForm extends ConfigFormBase {
     $form_state->cleanValues();
     $form_state->unsetValue('gateway');
 
-    $this->config('sms.gateway.' . $gateway['identifier'])
+    $this->configFactory()->getEditable('sms.gateway.' . $gateway['identifier'])
       ->set('settings' , $form_state->getValues())
       ->save();
     drupal_set_message($this->t('The gateway settings have been saved.'));
@@ -84,4 +84,12 @@ class GatewayConfigForm extends ConfigFormBase {
     $gateway = sms_gateways('gateway', $gateway_id);
     return sprintf('%s gateway', $gateway['name']);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEditableConfigNames() {
+    return [];
+  }
+
 }

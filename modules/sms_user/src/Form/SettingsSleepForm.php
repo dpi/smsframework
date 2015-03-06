@@ -99,4 +99,12 @@ class SettingsSleepForm extends ConfigFormBase {
     $account->save();
     drupal_set_message(t('The changes have been saved.'), 'status');
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEditableConfigNames() {
+    return [];
+  }
+
 }

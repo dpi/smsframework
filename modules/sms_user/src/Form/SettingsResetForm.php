@@ -70,4 +70,12 @@ class SettingsResetForm extends ConfigFormBase {
       drupal_set_message(t('Your mobile information has been removed'), 'status');
     }
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEditableConfigNames() {
+    return [];
+  }
+
 }

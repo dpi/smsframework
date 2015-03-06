@@ -85,4 +85,12 @@ class CarrierEditForm extends ConfigFormBase {
     drupal_set_message($this->t('The carrier has been saved.'));
     $form_state['redirect'] = 'admin/config/smsframework/carriers';
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEditableConfigNames() {
+    return [];
+  }
+
 }

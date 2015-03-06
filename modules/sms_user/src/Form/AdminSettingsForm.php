@@ -199,4 +199,12 @@ class AdminSettingsForm extends ConfigFormBase {
     $this->config('sms_user.settings')->setData($form_state->getValues())->save();
     parent::submitForm($form, $form_state);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEditableConfigNames() {
+    return ['sms_user.settings'];
+  }
+
 }

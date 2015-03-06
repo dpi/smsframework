@@ -23,7 +23,7 @@ class SmsBlastWebTest extends WebTestBase {
    */
   function testSendBlast() {
     // Set up test default gateway and test user.
-    $this->container->get('config.factory')->get('sms.settings')->set('default_gateway', 'test')->save();
+    $this->container->get('config.factory')->getEditable('sms.settings')->set('default_gateway', 'test')->save();
     $user = $this->drupalCreateUser(array('receive sms', 'Send SMS Blast'));
     $this->drupalLogin($user);
     $data = array(

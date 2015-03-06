@@ -57,4 +57,12 @@ class SettingsAddForm extends ConfigFormBase {
     $account = User::load($form_state->getValue('uid'));
     sms_user_send_confirmation($account, $form_state->getValue('number'), $form_state->getValue('gateway'));
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEditableConfigNames() {
+    return [];
+  }
+
 }

@@ -16,7 +16,8 @@ use Drupal\Component\Utility\Xss;
  * Provides a overview form for sms bootstrap options.
  *
  * @todo The approach used in implementing bootstrap in D7 will not work in D8
- *   since the inclusion of cache files has been removed from D8 bootstrap.
+ *   since the inclusion of cache files has been removed from D8 bootstrap. Use
+ *   a stack middleware instead to implement this functionality.
  */
 class BootstrapAdminForm extends ConfigFormBase {
   /**
@@ -122,4 +123,12 @@ class BootstrapAdminForm extends ConfigFormBase {
      $this->config('sms.settings')->set('bootstrap.enabled', $form_state['values']['sms_bootstrap_enabled'])->save();
     parent::submitForm($form, $form_state);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEditableConfigNames() {
+    return ['sms.settings'];
+  }
+
 }
