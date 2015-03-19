@@ -719,9 +719,9 @@ function sms_user_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
- * Implements hook_user_cancel().
+ * Implements hook_user_delete().
  */
-function sms_user_user_cancel($edit, $account, $method) {
+function sms_user_user_delete($account) {
   return sms_user_delete_user_info($account->uid);
 }
 
