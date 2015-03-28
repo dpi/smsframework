@@ -5,6 +5,18 @@
  */
 class SmsUserRulesWebTestCase extends DrupalWebTestCase {
 
+  public static function getInfo() {
+    return array(
+      'name' => 'SMS User Rules Web Test',
+      'description' => 'Tests the rules integration for SMS User module.',
+      'group' => 'SMS Framework',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp('sms', 'sms_test_gateway', 'sms_user', 'sms_devel', 'rules', 'rules_admin');
+  }
+
   /**
    * Function that creates a user with the administrator role.
    */
@@ -14,23 +26,6 @@ class SmsUserRulesWebTestCase extends DrupalWebTestCase {
     $user = $this->drupalCreateUser($permissions);
     $user->roles[$index] = 'administrator';
     return user_save($user);
-  }
-}
-/**
- * Provides tests for the Opt Out and Opt In via Sms rules Actions.
- */
-class SmsUserOptOutViaSmsTestCase extends SmsUserRulesWebTestCase {
-
-  public static function getInfo() {
-    return array(
-      'name' => 'SMS User Rules Webtest',
-      'description' => 'Tests the rules integration for SMS User module.',
-      'group' => 'SMS User',
-    );
-  }
-
-  public function setUp() {
-    parent::setUp('sms', 'sms_test_gateway', 'sms_user', 'sms_devel', 'rules', 'rules_admin');
   }
 
   /**
