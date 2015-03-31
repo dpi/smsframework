@@ -78,6 +78,7 @@ class SmsTrackArchiveTestCase extends SmsTrackWebTestCase {
 
     $this->drupalLogin($author);
 
+    // Send messages to registered users and confirm they are recorded properly.
     $test_message = array(
       'number' => '0987654321',
       'message' => 'Test archiving messages from one registered number to another',
@@ -89,12 +90,11 @@ class SmsTrackArchiveTestCase extends SmsTrackWebTestCase {
 
     // Test whether author and recipient uids were recorded properly.
     $this->drupalGet('user/' . $author->uid . '/my-messages');
-    $this->assertRaw('<td class="views-field views-field-message" >
-            ' . $test_message['message'] . '          </td>',
+    $this->assertTextInXPath('//tbody/tr[2]/td[1]', $test_message['message'],
       'Message recorded and displayed properly on Author\'s My Messages page.');
-    $this->assertRaw($author->name,
+    $this->assertTextInXPath('//tbody/tr[2]/td[2]', $author->name,
       'Author\'s name recorded and displayed properly on Author\'s My Messages page.');
-    $this->assertRaw($recipient->name,
+    $this->assertTextInXPath('//tbody/tr[2]/td[3]', $recipient->name,
       'Recipient\'s name recorded and displayed properly on Author\'s My Messages page.');
 
     $this->drupalLogout();
@@ -102,12 +102,45 @@ class SmsTrackArchiveTestCase extends SmsTrackWebTestCase {
 
     // Test whether author and recipient uids were recorded properly.
     $this->drupalGet('user/' . $recipient->uid . '/my-messages');
-    $this->assertRaw('<td class="views-field views-field-message" >
-            ' . $test_message['message'] . '          </td>',
+    $this->assertTextInXPath('//tbody/tr[2]/td[1]', $test_message['message'],
       'Message recorded and displayed properly on Recipient\'s My Messages page.');
-    $this->assertRaw($author->name,
+    $this->assertTextInXPath('//tbody/tr[2]/td[2]', $author->name,
       'Author\'s name recorded and displayed properly on Recipient\'s My Messages page.');
-    $this->assertRaw($recipient->name,
+    $this->assertTextInXPath('//tbody/tr[2]/td[3]', $recipient->name,
+      'Recipient\'s name recorded and displayed properly on Recipient\'s My Messages page.');
+
+    // Test sending messages to unknown number.
+    $test_message = array(
+      'number' => '23456789103',
+      'message' => 'Test archive of message sent to unknown recipient',
+    );
+    $this->drupalPost('admin/smsframework/devel', $test_message, t('Send Message'));
+    $this->assertResponse(200);
+    $this->assertText('Form submitted ok for number ' . $test_message['number'] . ' and message: ' . $test_message['message'], 'Successfully sent message to unknown recipient');
+
+    $this->drupalGet('user/' . $recipient->uid . '/my-messages');
+    $this->assertTextInXPath('//tbody/tr[3]/td[1]', $test_message['message'],
+      'Message recorded and displayed properly on Author\'s My Messages page.');
+    $this->assertTextInXPath('//tbody/tr[3]/td[2]', $recipient->name,
+      'Author\'s name recorded and displayed properly on Author\'s My Messages page.');
+    $this->assertTextInXPath('//tbody/tr[3]/td[3]', 'Anonymous (not verified)',
+      'Recipient\'s name recorded and displayed properly on Author\'s My Messages page.');
+
+    // Test receiving messages from unknown number.
+    $test_message = array(
+      'number' => '23456789103',
+      'message' => 'Test archive of message received from unknown recipient',
+    );
+    $this->drupalPost('admin/smsframework/devel', $test_message, t('Receive Message'));
+    $this->assertResponse(200);
+    $this->assertText('Message received from number ' . $test_message['number'] . ' and message: ' . $test_message['message'], 'Successfully received message from unknown sender');
+
+    $this->drupalGet('user/' . $recipient->uid . '/my-messages');
+    $this->assertTextInXPath('//tbody/tr[4]/td[1]', $test_message['message'],
+      'Message recorded and displayed properly on Recipient\'s My Messages page.');
+    $this->assertTextInXPath('//tbody/tr[4]/td[2]', 'Anonymous (not verified)',
+      'Author\'s name recorded and displayed properly on Recipient\'s My Messages page.');
+    $this->assertTextInXPath('//tbody/tr[4]/td[3]', $recipient->name,
       'Recipient\'s name recorded and displayed properly on Recipient\'s My Messages page.');
 
     // Test that a user can only view their own messages.
@@ -120,4 +153,35 @@ class SmsTrackArchiveTestCase extends SmsTrackWebTestCase {
     $this->drupalGet('user/' . $author->uid . '/my-messages');
     $this->assertResponse(403, 'Access denied from authenticated user to another user\'s My Messages page.');
   }
+
+  /**
+   * Asserts that some text exists in the current page following the given XPath.
+   *
+   * @param string $xpath
+   *   XPath used to find the text.
+   * @param string $text
+   *   The text that is to be checked.
+   * @param string $message
+   *   (optional) Message to display.
+   * @param string $group
+   *   (optional) The group this message belongs to.
+   *
+   * @return bool
+   *   TRUE on pass, FALSE on fail.
+   */
+  protected function assertTextInXPath($xpath, $text, $message = NULL, $group = 'Other') {
+    if (!$message) {
+      $message = t('"@text" found', array('@text' => $text));
+    }
+    /** @var SimpleXMLElement $xml_node */
+    foreach ($this->xpath($xpath) as $xml_node) {
+      $xml = filter_xss($xml_node->asXML(), array());
+      if (strpos($xml, $text) !== FALSE) {
+        return $this->pass($message, $group);
+      }
+    };
+
+    return $this->fail($message, $group);
+  }
+
 }

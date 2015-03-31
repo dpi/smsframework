@@ -226,7 +226,7 @@ function sms_track_archive_write($dir, $number, $message, $options = array()) {
       }
       // Add the author and recipient
       $author = $user->uid;
-      $recipient = ($remote_user) ? $remote_user : $user->uid;
+      $recipient = ($remote_user) ? $remote_user : 0;
     }
     else {
       return;
@@ -238,9 +238,9 @@ function sms_track_archive_write($dir, $number, $message, $options = array()) {
       $reference = NULL;
       // Inbound message status is always the same.
       $status = SMS_MSG_STATUS_OK;
-      // Add the author and recipient
+      // Add the author and recipient.
+      $author = ($remote_user) ? $remote_user : 0;
       $recipient = $user->uid;
-      $author = ($remote_user) ? $remote_user : $user->uid;
     }
     else {
       return;
