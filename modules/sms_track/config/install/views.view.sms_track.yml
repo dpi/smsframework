@@ -1,5 +1,16 @@
-base_field: id
+langcode: en
+status: true
+dependencies:
+  module:
+    - sms_track
+    - user
+id: sms_track
+label: 'SMS Track'
+module: sms_track
+description: 'All archived SMS messages - in and out'
+tag: sms
 base_table: sms_track
+base_field: id
 core: 8.x
 description: 'All archived SMS messages - in and out'
 status: true
@@ -8,26 +19,25 @@ display:
     display_plugin: default
     id: default
     display_title: Master
-    position: 1
+    position: 0
     display_options:
       access:
         type: role
       cache:
         type: none
-        options: {  }
       query:
         type: views_query
         options:
           disable_sql_rewrite: false
           distinct: false
-          slave: false
-          query_comment: ''
+          replica: false
+          query_comment: false
           query_tags: {  }
       exposed_form:
         type: basic
         options:
-          submit_button: Apply
-          reset_button: 0
+          submit_button: Filter
+          reset_button: true
           reset_button_label: Reset
           exposed_sorts_label: 'Sort by'
           expose_sort_order: 1
@@ -36,10 +46,10 @@ display:
       pager:
         type: full
         options:
-          items_per_page: '30'
-          offset: '0'
-          id: '0'
-          total_pages: ''
+          items_per_page: 50
+          offset: 0
+          id: 0
+          total_pages: 0
           tags:
             previous: '‹ previous'
             next: 'next ›'
@@ -48,8 +58,8 @@ display:
           expose:
             items_per_page: 0
             items_per_page_label: 'Items per page'
-            items_per_page_options: '5, 10, 20, 40, 60'
-            items_per_page_options_all: 0
+            items_per_page_options: '5, 10, 25, 50'
+            items_per_page_options_all: false
             items_per_page_options_all_label: '- All -'
             offset: 0
             offset_label: Offset
@@ -59,13 +69,10 @@ display:
         options:
           grouping: {  }
           row_class: ''
-          default_row_class: 1
-          row_class_special: 1
-          override: 1
-          sticky: 0
-          caption: ''
+          default_row_class: true
+          override: true
+          sticky: false
           summary: ''
-          description: ''
           columns:
             dir: dir
             number: number
@@ -175,7 +182,6 @@ display:
           empty_zero: 0
           hide_alter_empty: 1
           plugin_id: sms_direction
-          provider: sms_track
         number:
           id: number
           table: sms_track
@@ -225,7 +231,6 @@ display:
           empty_zero: 0
           hide_alter_empty: 1
           plugin_id: standard
-          provider: views
         message:
           id: message
           table: sms_track
@@ -275,7 +280,6 @@ display:
           empty_zero: 0
           hide_alter_empty: 1
           plugin_id: standard
-          provider: views
         created:
           id: created
           table: sms_track
@@ -327,6 +331,7 @@ display:
           date_format: long
           custom_date_format: ''
           timezone: ''
+          plugin_id: date
         local_number:
           id: local_number
           table: sms_track
@@ -376,7 +381,6 @@ display:
           empty_zero: 0
           hide_alter_empty: 1
           plugin_id: sms_local_number
-          provider: sms_track
         gateway:
           id: gateway
           table: sms_track
@@ -426,7 +430,6 @@ display:
           empty_zero: 0
           hide_alter_empty: 1
           plugin_id: sms_gateway
-          provider: sms_track
       filters: {  }
       sorts: {  }
       header: {  }
@@ -434,8 +437,3 @@ display:
       empty: {  }
       relationships: {  }
       arguments: {  }
-label: 'SMS Track'
-module: views
-id: sms_track
-tag: sms
-langcode: und
