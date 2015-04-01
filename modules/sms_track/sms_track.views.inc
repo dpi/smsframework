@@ -126,6 +126,59 @@ function sms_track_views_data() {
           'id' => 'standard',
         ),
       ),
+      // Additional Author and Recipient ID fields.
+      'author' => array(
+        'title' => t('Author'),
+        'help' => t('User ID of remote author.'),
+        'field' => array(
+          'id' => 'standard',
+          'click sortable' => TRUE,
+        ),
+        'argument' => array(
+          'id' => 'standard',
+        ),
+        'filter' => array(
+          'id' => 'standard',
+        ),
+        'sort' => array(
+          'id' => 'standard',
+        ),
+        'relationship' => array(
+          'title' => t('SMS Author'),
+          'help' => t('Relate sms to the user who created it. This relationship will create one record for each sms sent by the user.'),
+          'id' => 'standard',
+          'base' => 'users',
+          'base field' => 'uid',
+          'field' => 'author',
+          'label' => t('Author'),
+        ),
+      ),
+      'recipient' => array(
+        'title' => t('Recipient'),
+        'help' => t('User ID of remote recipient.'),
+        'field' => array(
+          'id' => 'standard',
+          'click sortable' => TRUE,
+        ),
+        'argument' => array(
+          'id' => 'standard',
+        ),
+        'filter' => array(
+          'id' => 'standard',
+        ),
+        'sort' => array(
+          'id' => 'standard',
+        ),
+        'relationship' => array(
+          'title' => t('SMS Recipient'),
+          'help' => t('Relate sms to the user who received it. This relationship will create one record for each sms received by the user.'),
+          'id' => 'standard',
+          'base' => 'users',
+          'base field' => 'uid',
+          'field' => 'recipient',
+          'label' => t('Recipient'),
+        ),
+      ),
     ),
   );
 }

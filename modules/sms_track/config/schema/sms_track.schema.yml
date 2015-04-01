@@ -1,0 +1,10 @@
+sms_track.settings:
+  type: mapping
+  label: 'SMS Track Settings'
+  mapping:
+    archive_dir:
+      type: integer
+      label: 'Allowed Archiving Direction'
+    archive_max_age_days:
+      type: integer
+      label: 'Number of days after which archive is purged'

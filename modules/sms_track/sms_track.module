@@ -7,18 +7,12 @@
  * @subpackage sms_track
  */
 
-
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\views\Plugin\views\query\QueryPluginBase;
+use \Drupal\views\ViewExecutable;
 
 /**
  * Implements hook_help().
- *
- * @param $path
- *   URI string
- * @param $arg
- *  Page argument array
- *
- * @return
- *   HTML page content string
  */
 function sms_track_help($path, $arg) {
   $output = '';
@@ -49,8 +43,8 @@ function sms_track_cron() {
  * Implements hook_sms_send().
  */
 function sms_track_sms_send($number, $message, &$options = array(), $gateway) {
-  // Tracking
-  // Place a tracking reference on a sent message if we need to
+  // Tracking.
+  // Place a tracking reference on a sent message if we need to.
   if (!empty($options) && !array_key_exists('reference', $options)) {
     $options['reference'] = md5($number . $message);
   }
@@ -59,26 +53,27 @@ function sms_track_sms_send($number, $message, &$options = array(), $gateway) {
 /**
  * Implements hook_sms_send_process().
  *
- * @param $op
- *   Operation string (pre process, process, post process)
- * @param $number
- *   MSISDN of recipient
- * @param $message
- *   SMS message body string
- * @param $options
- *   Additional options array including sender
- * @param $gateway
- *   Gateway array for the active gateway
- * @param $result
- *   Result array from the gateway response handler
+ * @param string $op
+ *   Operation string (pre process, process, post process).
+ * @param string $number
+ *   MSISDN of recipient.
+ * @param string $message
+ *   SMS message body.
+ * @param array $options
+ *   Additional options array including sender.
+ * @param array $gateway
+ *   Gateway array for the active gateway.
+ * @param array $result
+ *   Result array from the gateway response handler.
  */
 function sms_track_sms_send_process($op, $number, $message, $options, $gateway, $result) {
   if ($op == 'post process') {
-    // Archiving
-    $dir = 0; // outgoing
+    // Archiving (outgoing == 0)
+    $dir = 0;
+    $options = (isset($options) && is_array($options))? $options : array();
     $options['gateway_id'] = $gateway['identifier'];
     $options['result']  = $result;
-    $result = sms_track_archive_write($dir, $number, $message, $options);
+    sms_track_archive_write($dir, $number, $message, $options);
   }
 }
 
@@ -86,19 +81,19 @@ function sms_track_sms_send_process($op, $number, $message, $options, $gateway, 
 /**
  * Implements hook_sms_incoming().
  *
- * @param $op
- *   SMS incoming operation string (pre process, process, post process)
- * @param $number
- *   MSISDN of sender
- * @param $message
- *   SMS message body string
- * @param $options
- *   Additional options array including receiver MSISDN
+ * @param string $op
+ *   SMS incoming operation string (pre process, process, post process).
+ * @param string $number
+ *   MSISDN of sender.
+ * @param string $message
+ *   SMS message body string.
+ * @param array $options
+ *   Additional options including receiver MSISDN.
  */
 function sms_track_sms_incoming($op, $number, $message, $options) {
-  if ($op == 'pre process') {
-    // Archiving
-    $dir = 1; // incoming
+  if ($op == 'pre process' && isset($number)) {
+    // Archiving (incoming == 1)
+    $dir = 1;
     sms_track_archive_write($dir, $number, $message, $options);
   }
 }
@@ -107,42 +102,47 @@ function sms_track_sms_incoming($op, $number, $message, $options) {
 /**
  * Implements hook_sms_receipt().
  *
- * @param $op
- *   Operation string
- * @param $number
- *   MSISDN
- * @param $reference
- *   Reference code of the message
- * @param $message_status
- *   Message status code. See sms constants
- * @param $options
- *   Additional options array
+ * @param string $op
+ *   Operation string.
+ * @param string $number
+ *   MSISDN (number) of recipient.
+ * @param string $reference
+ *   Reference code of the message.
+ * @param string $status
+ *   Message status code. See sms constants.
+ * @param array $options
+ *   Additional options array.
  */
 function sms_track_sms_receipt($op, $number, $reference, $status, $options) {
   if ($op == 'pre process') {
-    // Tracking
+    // Tracking.
     sms_track_update_message($reference, $status);
   }
 }
 
 
 /**
- * Write a record to the DB table
+ * Writes a record to the DB table.
  *
- * @param $direction
- *   Direction integer of message (0=outgoing, 1=incoming)
- * @param $number
- *   MSISDN of remote
- * @param $message
- *   SMS message body string
- * @param $options
- *   Array of additional options
- * @return
- *   DB Query result
+ * @param int $dir
+ *   Direction of message transmission (0=outgoing, 1=incoming).
+ * @param string $number
+ *   MSISDN of recipient or sender.
+ * @param string $message
+ *   SMS message body.
+ * @param array $options
+ *   (optional) an array of additional options.
  */
 function sms_track_archive_write($dir, $number, $message, $options = array()) {
+  $user = \Drupal::currentUser();
+  $remote_user = false;
   $archive_dir = \Drupal::config('sms_track.settings')->get('archive_dir');
+  // Query the database for the uid of the user that owns the $number
+  if (\Drupal::moduleHandler()->moduleExists("sms_user") && \Drupal::config('sms_user.settings')->get('registration_enabled')) {
+    $remote_user = sms_user_get_uid($number);
+  }
 
+  $reference = $author = $recipient = $status = NULL;
   if ($dir == 0) {
     // Outgoing
     if ($archive_dir == SMS_DIR_ALL || $archive_dir == SMS_DIR_OUT) {
@@ -160,115 +160,131 @@ function sms_track_archive_write($dir, $number, $message, $options = array()) {
           $status = SMS_GW_ERR_OTHER;
         }
       }
+      // Add the author and recipient
+      $author = $user->id();
+      $recipient = ($remote_user) ? $remote_user : 0;
     }
     else {
       return;
     }
   }
   elseif ($dir == 1) {
-    // Incoming
+    // Incoming message.
     if ($archive_dir == SMS_DIR_ALL || $archive_dir == SMS_DIR_IN) {
       $reference = NULL;
-      // Inbound message status is always the same
+      // Inbound message status is always the same.
       $status = SMS_MSG_STATUS_OK;
+      // Add the author and recipient
+      $recipient = $user->id();
+      $author = ($remote_user) ? $remote_user : 0;
     }
     else {
       return;
     }
   }
 
-  $gw_number = (array_key_exists('gw_number', $options)) ? $options['gw_number'] : NULL;
+  $gw_number = (isset($options) && is_array($options) && array_key_exists('gw_number', $options)) ? $options['gw_number'] : NULL;
   $created   = REQUEST_TIME;
   $options_z = serialize($options);
 
-  // @TODO Please review the conversion of this statement to the D7 database API syntax.
-  /* db_query("INSERT INTO {sms_track} (reference, dir, number,
-   gw_number, message, status, created, options) VALUES
-   ('%s', %d, '%s', '%s', '%s', %d, %d, '%s')", $reference, $dir, $number, $gw_number, $message, $status, $created, $options_z) */
-
+  // Write the record to the database.
   $result = $id = db_insert('sms_track')
-  ->fields(array(
-    'reference' => $reference,
-    'dir' => $dir,
-    'number' => $number,
-    'gw_number' => $gw_number,
-    'message' => $message,
-    'status' => $status,
-    'created' => $created,
-    'options' => $options_z,
-  ))
+    ->fields(array(
+      'reference' => $reference,
+      'dir' => $dir,
+      'number' => $number,
+      'gw_number' => $gw_number,
+      'message' => $message,
+      'status' => $status,
+      'created' => $created,
+      'options' => $options_z,
+      'author' => $author,
+      'recipient' => $recipient,
+    ))
   ->execute();
 
   if (! $result) {
     $to_from = ($dir == 0) ? 'To' : 'From';
-    watchdog('sms_track', 'Failed to record message: ' . $to_from . ' ' . $number . ': ' . $message);
+    \Drupal::logger('sms_track')->error('Failed to record message: ' . $to_from . ' ' . $number . ': ' . $message);
   }
 }
 
 /**
- * Update a message with a new status code
+ * Updates a message with a new status code.
  *
- * @param $reference
- *   Message reference code
- * @param $status
- *   Message status code. See sms constants
+ * @param string $reference
+ *   Message reference code.
+ * @param int $status
+ *   Message status code. See sms constants.
  *
- * @todo Log record handling
+ * @todo Log record handling.
  */
 function sms_track_update_message($reference, $status) {
   $updated = REQUEST_TIME;
 
-  watchdog('sms_track', $reference . ' ' . $status . ' ' . $updated);
+  \Drupal::logger('sms_track')->notice($reference . ' ' . $status . ' ' . $updated);
 
-  // @TODO Please review the conversion of this statement to the D7 database API syntax.
-  /* db_query('UPDATE {sms_track} SET status = %d, updated = %d WHERE reference = \'%s\'', $status, $updated, $reference) */
   $result = db_update('sms_track')
-  ->fields(array(
-    'status' => $status,
-    'updated' => $updated,
-  ))
-  ->condition('reference', $reference)
-  ->execute();
+    ->fields(array(
+      'status' => $status,
+      'updated' => $updated,
+    ))
+    ->condition('reference', $reference)
+    ->execute();
 
   if ($result) {
-    watchdog('sms_track', 'Affected rows: ' . $result);
+    \Drupal::logger('sms_track')->notice('Affected rows: ' . $result->rowCount());
   }
 }
 
 
 /**
- * Implements hook_views_api().
+ * Purges all archived messages after a certain number of days.
  *
- * @return
- *   Views API required information array
- */
-function sms_track_views_api() {
-  return array(
-    'api' => 2,
-    'path' => drupal_get_path('module', 'sms_track') . '/views',
-  );
-}
-
-
-/**
- * Purge all archived messages after a certain number of days
- *
- * @param $max_age_days
- *   Maximum age of tracked messages in days
+ * @param int $max_age_days
+ *   (optional) Maximum age of tracked messages in days. If null or not supplied,
+ *     the pre-configured value is used (default is 0).
  */
 function sms_track_archive_purge($max_age_days = NULL) {
-  // Get the configured max_age from the variable table if not given
+  // Get the configured max_age from the variable table if not given.
   if (is_null($max_age_days)) {
     $max_age_days = \Drupal::config('sms_track.settings')->get('archive_max_age_days');
   }
-  // Purge with no survivors
+  // Purge with no survivors.
   if ($max_age_days > 0) {
     $max_age_secs = $max_age_days * 86400;
     $oldest = REQUEST_TIME - $max_age_secs;
-    // @TODO Please review the conversion of this statement to the D7 database API syntax.
-    /* db_query("DELETE FROM {sms_track} WHERE created < %d", $oldest) */
-    $result = db_delete('sms_track')
-    ->condition('created', $oldest, '<')
-    ->execute();
+    db_delete('sms_track')
+      ->condition('created', $oldest, '<')
+      ->execute();
+  }
+}
+
+/**
+ * Implements hook_views_query_alter().
+ */
+function sms_track_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
+  // Use an OR condition for the contextual filters.
+  if ($view->name == 'my_messages') {
+    $query->where[0]['type'] = 'OR';
+  }
+}
+
+/**
+ * Implements hook_views_post_render()
+ */
+function sms_track_views_post_render(ViewExecutable $view, &$output, $cache) {
+  var_export($view, true);
+  // Change the class names of rows to lowercase after token replacement.
+  if ($view->name == 'my_messages') {
+    $results = $view->result;
+    foreach ($results as $key => $value) {
+      if ($results[$key]->sms_track_dir == "0") {
+        $output = preg_replace('/Outbound/', 'outbound', $output, 1);
+      }
+      elseif ($results[$key]->sms_track_dir == "1") {
+        $output = preg_replace('/Inbound/', 'inbound', $output, 1);
+      }
+    }
   }
 }

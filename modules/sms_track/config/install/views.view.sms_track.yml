@@ -12,8 +12,6 @@ tag: sms
 base_table: sms_track
 base_field: id
 core: 8.x
-description: 'All archived SMS messages - in and out'
-status: true
 display:
   default:
     display_plugin: default
@@ -22,7 +20,9 @@ display:
     position: 0
     display_options:
       access:
-        type: role
+        type: perm
+        options:
+          perm: 'view all sms messages'
       cache:
         type: none
       query:
@@ -31,7 +31,7 @@ display:
           disable_sql_rewrite: false
           distinct: false
           replica: false
-          query_comment: false
+          query_comment: ''
           query_tags: {  }
       exposed_form:
         type: basic
@@ -40,7 +40,7 @@ display:
           reset_button: true
           reset_button_label: Reset
           exposed_sorts_label: 'Sort by'
-          expose_sort_order: 1
+          expose_sort_order: true
           sort_asc_label: Asc
           sort_desc_label: Desc
       pager:
@@ -61,9 +61,9 @@ display:
             items_per_page_options: '5, 10, 25, 50'
             items_per_page_options_all: false
             items_per_page_options_all_label: '- All -'
-            offset: 0
+            offset: false
             offset_label: Offset
-          quantity: '9'
+          quantity: 9
       style:
         type: table
         options:
@@ -82,49 +82,49 @@ display:
             gateway: gateway
           info:
             dir:
-              sortable: 1
+              sortable: true
               default_sort_order: asc
               align: ''
               separator: ''
-              empty_column: 0
+              empty_column: false
               responsive: ''
             number:
-              sortable: 1
+              sortable: true
               default_sort_order: asc
               align: ''
               separator: ''
-              empty_column: 0
+              empty_column: false
               responsive: ''
             message:
-              sortable: 1
+              sortable: true
               default_sort_order: asc
               align: ''
               separator: ''
-              empty_column: 0
+              empty_column: false
               responsive: ''
             created:
-              sortable: 1
+              sortable: true
               default_sort_order: asc
               align: ''
               separator: ''
-              empty_column: 0
+              empty_column: false
               responsive: ''
             local_number:
-              sortable: 1
+              sortable: true
               default_sort_order: asc
               align: ''
               separator: ''
-              empty_column: 0
+              empty_column: false
               responsive: ''
             gateway:
-              sortable: 1
+              sortable: true
               default_sort_order: asc
               align: ''
               separator: ''
-              empty_column: 0
+              empty_column: false
               responsive: ''
           default: created
-          empty_table: 0
+          empty_table: false
       row:
         type: fields
         options:
@@ -141,46 +141,46 @@ display:
           group_type: group
           admin_label: ''
           label: Direction
-          exclude: 0
+          exclude: false
           alter:
-            alter_text: 0
+            alter_text: false
             text: ''
-            make_link: 0
+            make_link: false
             path: ''
-            absolute: 0
-            external: 0
-            replace_spaces: 0
+            absolute: false
+            external: false
+            replace_spaces: false
             path_case: none
-            trim_whitespace: 0
+            trim_whitespace: false
             alt: ''
             rel: ''
             link_class: ''
             prefix: ''
             suffix: ''
             target: ''
-            nl2br: 0
-            max_length: ''
-            word_boundary: 1
-            ellipsis: 1
-            more_link: 0
+            nl2br: false
+            max_length: null
+            word_boundary: true
+            ellipsis: true
+            more_link: false
             more_link_text: ''
             more_link_path: ''
-            strip_tags: 0
-            trim: 0
+            strip_tags: false
+            trim: false
             preserve_tags: ''
-            html: 0
+            html: false
           element_type: ''
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: 1
+          element_label_colon: true
           element_wrapper_type: ''
           element_wrapper_class: ''
-          element_default_classes: 1
+          element_default_classes: true
           empty: ''
-          hide_empty: 0
-          empty_zero: 0
-          hide_alter_empty: 1
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
           plugin_id: sms_direction
         number:
           id: number
@@ -190,46 +190,46 @@ display:
           group_type: group
           admin_label: ''
           label: 'Remote number'
-          exclude: 0
+          exclude: false
           alter:
-            alter_text: 0
+            alter_text: false
             text: ''
-            make_link: 0
+            make_link: false
             path: ''
-            absolute: 0
-            external: 0
-            replace_spaces: 0
+            absolute: false
+            external: false
+            replace_spaces: false
             path_case: none
-            trim_whitespace: 0
+            trim_whitespace: false
             alt: ''
             rel: ''
             link_class: ''
             prefix: ''
             suffix: ''
             target: ''
-            nl2br: 0
-            max_length: ''
-            word_boundary: 1
-            ellipsis: 1
-            more_link: 0
+            nl2br: false
+            max_length: null
+            word_boundary: true
+            ellipsis: true
+            more_link: false
             more_link_text: ''
             more_link_path: ''
-            strip_tags: 0
-            trim: 0
+            strip_tags: false
+            trim: false
             preserve_tags: ''
-            html: 0
+            html: false
           element_type: ''
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: 1
+          element_label_colon: true
           element_wrapper_type: ''
           element_wrapper_class: ''
-          element_default_classes: 1
+          element_default_classes: true
           empty: ''
-          hide_empty: 0
-          empty_zero: 0
-          hide_alter_empty: 1
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
           plugin_id: standard
         message:
           id: message
@@ -239,46 +239,46 @@ display:
           group_type: group
           admin_label: ''
           label: Message
-          exclude: 0
+          exclude: false
           alter:
-            alter_text: 0
+            alter_text: false
             text: ''
-            make_link: 0
+            make_link: false
             path: ''
-            absolute: 0
-            external: 0
-            replace_spaces: 0
+            absolute: false
+            external: false
+            replace_spaces: false
             path_case: none
-            trim_whitespace: 0
+            trim_whitespace: false
             alt: ''
             rel: ''
             link_class: ''
             prefix: ''
             suffix: ''
             target: ''
-            nl2br: 0
-            max_length: ''
-            word_boundary: 1
-            ellipsis: 1
-            more_link: 0
+            nl2br: false
+            max_length: null
+            word_boundary: true
+            ellipsis: true
+            more_link: false
             more_link_text: ''
             more_link_path: ''
-            strip_tags: 0
-            trim: 0
+            strip_tags: false
+            trim: false
             preserve_tags: ''
-            html: 0
+            html: false
           element_type: ''
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: 1
+          element_label_colon: true
           element_wrapper_type: ''
           element_wrapper_class: ''
-          element_default_classes: 1
+          element_default_classes: true
           empty: ''
-          hide_empty: 0
-          empty_zero: 0
-          hide_alter_empty: 1
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
           plugin_id: standard
         created:
           id: created
@@ -288,46 +288,46 @@ display:
           group_type: group
           admin_label: ''
           label: Timestamp
-          exclude: 0
+          exclude: false
           alter:
-            alter_text: 0
+            alter_text: false
             text: ''
-            make_link: 0
+            make_link: false
             path: ''
-            absolute: 0
-            external: 0
-            replace_spaces: 0
+            absolute: false
+            external: false
+            replace_spaces: false
             path_case: none
-            trim_whitespace: 0
+            trim_whitespace: false
             alt: ''
             rel: ''
             link_class: ''
             prefix: ''
             suffix: ''
             target: ''
-            nl2br: 0
-            max_length: ''
-            word_boundary: 1
-            ellipsis: 1
-            more_link: 0
+            nl2br: false
+            max_length: null
+            word_boundary: true
+            ellipsis: true
+            more_link: false
             more_link_text: ''
             more_link_path: ''
-            strip_tags: 0
-            trim: 0
+            strip_tags: false
+            trim: false
             preserve_tags: ''
-            html: 0
+            html: false
           element_type: ''
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: 1
+          element_label_colon: true
           element_wrapper_type: ''
           element_wrapper_class: ''
-          element_default_classes: 1
+          element_default_classes: true
           empty: ''
-          hide_empty: 0
-          empty_zero: 0
-          hide_alter_empty: 1
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
           date_format: long
           custom_date_format: ''
           timezone: ''
@@ -340,46 +340,46 @@ display:
           group_type: group
           admin_label: ''
           label: 'Local number'
-          exclude: 0
+          exclude: false
           alter:
-            alter_text: 0
+            alter_text: false
             text: ''
-            make_link: 0
+            make_link: false
             path: ''
-            absolute: 0
-            external: 0
-            replace_spaces: 0
+            absolute: false
+            external: false
+            replace_spaces: false
             path_case: none
-            trim_whitespace: 0
+            trim_whitespace: false
             alt: ''
             rel: ''
             link_class: ''
             prefix: ''
             suffix: ''
             target: ''
-            nl2br: 0
-            max_length: ''
-            word_boundary: 1
-            ellipsis: 1
-            more_link: 0
+            nl2br: false
+            max_length: null
+            word_boundary: true
+            ellipsis: true
+            more_link: false
             more_link_text: ''
             more_link_path: ''
-            strip_tags: 0
-            trim: 0
+            strip_tags: false
+            trim: false
             preserve_tags: ''
-            html: 0
+            html: false
           element_type: ''
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: 1
+          element_label_colon: true
           element_wrapper_type: ''
           element_wrapper_class: ''
-          element_default_classes: 1
+          element_default_classes: true
           empty: ''
-          hide_empty: 0
-          empty_zero: 0
-          hide_alter_empty: 1
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
           plugin_id: sms_local_number
         gateway:
           id: gateway
@@ -389,51 +389,69 @@ display:
           group_type: group
           admin_label: ''
           label: Gateway
-          exclude: 0
+          exclude: false
           alter:
-            alter_text: 0
+            alter_text: false
             text: ''
-            make_link: 0
+            make_link: false
             path: ''
-            absolute: 0
-            external: 0
-            replace_spaces: 0
+            absolute: false
+            external: false
+            replace_spaces: false
             path_case: none
-            trim_whitespace: 0
+            trim_whitespace: false
             alt: ''
             rel: ''
             link_class: ''
             prefix: ''
             suffix: ''
             target: ''
-            nl2br: 0
-            max_length: ''
-            word_boundary: 1
-            ellipsis: 1
-            more_link: 0
+            nl2br: false
+            max_length: null
+            word_boundary: true
+            ellipsis: true
+            more_link: false
             more_link_text: ''
             more_link_path: ''
-            strip_tags: 0
-            trim: 0
+            strip_tags: false
+            trim: false
             preserve_tags: ''
-            html: 0
+            html: false
           element_type: ''
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: 1
+          element_label_colon: true
           element_wrapper_type: ''
           element_wrapper_class: ''
-          element_default_classes: 1
+          element_default_classes: true
           empty: ''
-          hide_empty: 0
-          empty_zero: 0
-          hide_alter_empty: 1
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
           plugin_id: sms_gateway
       filters: {  }
       sorts: {  }
       header: {  }
       footer: {  }
-      empty: {  }
+      empty:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: false
+          content:
+            value: 'There are no SMS messages in the archive.'
+            format: basic_html
+          plugin_id: text
       relationships: {  }
       arguments: {  }
+      display_extenders: {  }
+    cache_metadata:
+      contexts:
+        - 'languages:language_interface'
+      cacheable: false

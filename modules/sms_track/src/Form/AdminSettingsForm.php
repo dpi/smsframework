@@ -1,26 +1,30 @@
 <?php
 /**
  * @file
- * Message tracking module: Admin settings form functions
- *
- * @package sms
- * @subpackage sms_track
+ * Contains \Drupal\sms_track\Form\AdminSettingsForm
  */
 
-namespace Drupal\sms_track;
+namespace Drupal\sms_track\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
-class AdminFormController extends FormBase {
+class AdminSettingsForm extends FormBase {
+
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state)
-  {
-    // Get sms_track configuration
+  public function getFormId() {
+    return 'sms_track_settings_form';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    // Get sms_track configuration.
     $config = $this->config('sms_track.settings');
-    // Archive section
+    // Archive section.
     $form['archive'] = array(
       '#type'  => 'fieldset',
       '#title' => 'Message archiving',
@@ -50,7 +54,7 @@ class AdminFormController extends FormBase {
 
     $form['submit'] = array(
       '#type' => 'submit',
-      '#value' => t('Save'),
+      '#value' => $this->t('Save'),
     );
 
     return $form;
@@ -60,8 +64,7 @@ class AdminFormController extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state)
-  {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     // Get sms_track configuration
     $config = $this->configFactory()->getEditable('sms_track.settings');
     $archive_dir_old = $config->get('archive_dir');
@@ -75,32 +78,23 @@ class AdminFormController extends FormBase {
 
     // Trigger watchdog messages
     if ($archive_dir_old && ! $archive_dir) {
-      watchdog('sms_track', 'SMS Tracking archive collector DISABLED');
+      $this->logger('sms_track')->notice('SMS Tracking archive collector DISABLED');
     }
     if (! $archive_dir_old && $archive_dir) {
-      watchdog('sms_track', 'SMS Tracking archive collector enabled');
+      $this->logger('sms_track')->notice('SMS Tracking archive collector enabled');
     }
 
-    drupal_set_message(t('Settings saved.'));
+    drupal_set_message($this->t('Settings saved.'));
   }
 
-
   /**
-   * Admin View page controller used in the router
+   * Provides the admin view page from the sms_track view in database.
    *
    * @return string
-   *   HTML content string
+   *   HTML content string.
    */
   function adminView() {
-    $content = views_embed_view('sms_track', $display_id = 'default');
-    return $content;
+    return views_embed_view('sms_track');
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getFormId()
-  {
-    return 'sms_track_settings_form';
-  }
 }

@@ -8,10 +8,7 @@
  */
 
 /**
- * Implement hook_schema().
- *
- * @return
- *   Drupal schema array
+ * Implements hook_schema().
  */
 function sms_track_schema() {
   $schema['sms_track'] = array(
@@ -21,95 +18,89 @@ function sms_track_schema() {
         'description' => 'The primary identifier.',
         'type'        => 'serial',
         'unsigned'    => TRUE,
-        'not null'    => TRUE),
+        'not null'    => TRUE
+      ),
       'reference' => array(
         'description' => 'Reference code of message. Enough for an md5 hash.',
         'type'        => 'varchar',
         'length'      => 32,
-        'not null'    => FALSE),
+        'not null'    => FALSE
+      ),
       'dir' => array(
         'description' => '0=out 1=in.',
         'type'        => 'int',
         'size'        => 'tiny',
         'unsigned'    => TRUE,
-        'not null'    => TRUE),
+        'not null'    => TRUE
+      ),
       'number' => array(
         'description' => 'If direction=0 this is recipient. If direction=1 this is sender.',
         'type'        => 'varchar',
         'length'      => 20,
-        'not null'    => TRUE),
+        'not null'    => TRUE
+      ),
       'gw_number' => array(
         'description' => 'If direction=0 this is sender. If direction=1 this is recipient.',
         'type'        => 'varchar',
         'length'      => 20,
-        'not null'    => FALSE),
+        'not null'    => FALSE
+      ),
       'message' => array(
         'description' => 'Message text.',
         'type'        => 'text',
         'size'        => 'normal',
-        'not null'    => FALSE),
+        'not null'    => FALSE
+      ),
       'status' => array(
-        'description' => 'Message delivery status. See contants.',
+        'description' => 'Message delivery status. See constants.',
         'type'        => 'int',
-        'size'        => 'tiny',
+        'size'        => 'small',
         'unsigned'    => TRUE,
-        'not null'    => FALSE),
+        'not null'    => FALSE
+      ),
       'created' => array(
         'description' => 'The creation timestamp.',
         'type'        => 'int',
         'unsigned'    => TRUE,
-        'not null'    => TRUE),
+        'not null'    => TRUE
+      ),
       'updated' => array(
         'description' => 'The modification timestamp.',
         'type'        => 'int',
         'unsigned'    => TRUE,
-        'not null'    => FALSE),
+        'not null'    => FALSE
+      ),
       'options' => array(
         'description' => 'Options used when sending/receiving message.',
         'type'        => 'text',
         'size'        => 'normal',
-        'not null'    => FALSE),
+        'not null'    => FALSE
+      ),
       'log' => array(
         'description' => 'An array of status changes.',
         'type'        => 'text',
         'size'        => 'normal',
-        'not null'    => FALSE),
+        'not null'    => FALSE
       ),
+      // Additional Author and Recipient fields.
+      'author' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "Author's {users}.uid.",
+        'default' => 0,
+      ),
+      'recipient' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "Recipient's {users}.uid.",
+        'default' => 0,
+      ),
+    ),
     'unique keys' => array(),
     'primary key' => array('id'),
   );
 
   return $schema;
 }
-
-
-/**
- * Implements hook_enable().
-function sms_track_enable() {
-  if (variable_get('sms_track_archive_dir', SMS_DIR_NONE)) {
-    watchdog('sms_track', 'SMS Tracking archive collector enabled');
-  }
-}
- * @todo Is this the right use of this hook??
- */
-
-/**
- * Implements hook_disable().
-function sms_track_disable() {
-  if (variable_get('sms_track_archive_dir', SMS_DIR_NONE)) {
-    watchdog('sms_track', 'SMS Tracking archive collector DISABLED');
-  }
-}
- * @todo Hook disable doesn't exist in drupal 8
- */
-
-/**
- * Update variables to config
- */
-//function sms_track_update_8000() {
-//  update_variables_to_config('sms_track.settings', array(
-//    'sms_track_archive_dir' => 'archive_dir',
-//    'sms_track_archive_max_age_days' => 'archive_max_age_days',
-//  ));
-//}
-

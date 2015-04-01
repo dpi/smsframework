@@ -1,0 +1,11 @@
+views.field.sms_direction:
+  type: views_field
+  label: 'The direction of sms (in or out).'
+
+views.field.sms_gateway:
+  type: views_field
+  label: 'The default sms gateway'
+
+views.field.sms_local_number:
+  type: views_field
+  label: 'Local numbers'

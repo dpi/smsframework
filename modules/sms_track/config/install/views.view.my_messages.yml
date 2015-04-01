@@ -600,8 +600,6 @@ display:
           entity_field: uid
           plugin_id: user_uid
       display_extenders: {  }
-      field_langcode: '***LANGUAGE_language_content***'
-      field_langcode_add_to_query: null
       title: 'My Messages'
   page_1:
     display_plugin: page
@@ -610,8 +608,6 @@ display:
     position: 1
     display_options:
       display_extenders: {  }
-      field_langcode: '***LANGUAGE_language_content***'
-      field_langcode_add_to_query: null
       path: user/%/my-messages
       menu:
         type: none

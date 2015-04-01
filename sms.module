@@ -378,7 +378,7 @@ function sms_send_form($required = FALSE) {
  */
 function sms_send_form_validate($form, FormStateInterface $form_state) {
   $number = sms_formatter($form_state->getValue('number'));
-  $errors = sms_validate_number($number, $form_state->getValue('gateway'));
+  $errors = sms_validate_number($number, $form_state->getValue('gateway', array()));
   if ($errors) {
     $form_state->setErrorByName('number', implode("<br />", $errors));
   }
