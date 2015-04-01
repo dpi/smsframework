@@ -135,11 +135,13 @@ function sms_track_sms_receipt($op, $number, $reference, $status, $options) {
  */
 function sms_track_archive_write($dir, $number, $message, $options = array()) {
   $user = \Drupal::currentUser();
-  $remote_user = false;
   $archive_dir = \Drupal::config('sms_track.settings')->get('archive_dir');
   // Query the database for the uid of the user that owns the $number
-  if (\Drupal::moduleHandler()->moduleExists("sms_user") && \Drupal::config('sms_user.settings')->get('registration_enabled')) {
+  if (\Drupal::moduleHandler()->moduleExists("sms_user")) {
     $remote_user = sms_user_get_uid($number);
+  }
+  else {
+    $remote_user = false;
   }
 
   $reference = $author = $recipient = $status = NULL;
@@ -265,26 +267,7 @@ function sms_track_archive_purge($max_age_days = NULL) {
  */
 function sms_track_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
   // Use an OR condition for the contextual filters.
-  if ($view->name == 'my_messages') {
+  if ($view->storage->id() == 'my_messages') {
     $query->where[0]['type'] = 'OR';
-  }
-}
-
-/**
- * Implements hook_views_post_render()
- */
-function sms_track_views_post_render(ViewExecutable $view, &$output, $cache) {
-  var_export($view, true);
-  // Change the class names of rows to lowercase after token replacement.
-  if ($view->name == 'my_messages') {
-    $results = $view->result;
-    foreach ($results as $key => $value) {
-      if ($results[$key]->sms_track_dir == "0") {
-        $output = preg_replace('/Outbound/', 'outbound', $output, 1);
-      }
-      elseif ($results[$key]->sms_track_dir == "1") {
-        $output = preg_replace('/Inbound/', 'inbound', $output, 1);
-      }
-    }
   }
 }
