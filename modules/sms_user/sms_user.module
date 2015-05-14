@@ -464,13 +464,13 @@ function sms_user_save(AccountInterface $account) {
     $info = (array) $account->sms_user;
     $info['uid'] = $account->id();
     if (!isset($info['status'])) {
-      $info['status'] = NULL;
+      $info['status'] = 0;
     }
 
     // Remove BC-shim before save.
     unset($info[0]);
 
-    $info['gateway'] = serialize($info['gateway']);
+    $info['gateway'] = isset($info['gateway']) ? serialize($info['gateway']) : '';
     return db_merge('sms_user')
       ->key('uid', $info['uid'])
       ->fields($info)
