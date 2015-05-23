@@ -7,7 +7,7 @@
 
 namespace Drupal\sms\Form;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -53,7 +53,7 @@ class GatewayDefaultForm extends ConfigFormBase {
           '#default_value' => $default,
           '#return_value' => $identifier,
         ],
-        'name' => ['#markup' => String::checkPlain($gateway['name'])],
+        'name' => ['#markup' => SafeMarkup::checkPlain($gateway['name'])],
       );
       if (isset($gateway['configure form']) && function_exists($gateway['configure form'] )) {
         $form['gateways'][$identifier]['configure'] = ['#markup' => $this->l($this->t('configure'), Url::fromRoute('sms.gateway_config', ['gateway_id' => $identifier]))];
