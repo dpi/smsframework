@@ -22,6 +22,23 @@ function sms_track_views_data() {
           'weight' => 0,
         ),
       ),
+      'id' => array(
+        'title' => t('ID'),
+        'help' => t('Message archive ID.'),
+        'field' => array(
+          'id' => 'standard',
+          'click sortable' => TRUE,
+        ),
+        'argument' => array(
+          'id' => 'standard',
+        ),
+        'filter' => array(
+          'id' => 'standard',
+        ),
+        'sort' => array(
+          'id' => 'standard',
+        ),
+      ),
       'created' => array(
         'title' => t('Timestamp'),
         'help' => t('Message creation timestamp.'),
