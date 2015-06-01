@@ -742,7 +742,7 @@ function sms_user_user_login(&$edit, $account) {
 function sms_user_user_categories() {
   $categories['mobile'] = array(
     'name' => 'mobile',
-    'title' => 'Mobile',
+    'title' => t('Mobile'),
     'weight' => 10,
   );
   return $categories;
