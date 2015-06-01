@@ -200,11 +200,13 @@ function sms_track_sms_receipt($op, $number, $reference, $status, $options) {
  */
 function sms_track_archive_write($dir, $number, $message, $options = array()) {
   global $user;
-  $remote_user = FALSE;
   $archive_dir = variable_get('sms_track_archive_dir', SMS_DIR_NONE);
-  // Query the database for the uid of the user that owns the $number
-  if (module_exists("sms_user") && variable_get('sms_user_registration_enabled')) {
+  // Query the database for the uid of the user that owns the number.
+  if (module_exists("sms_user")) {
     $remote_user = sms_user_get_uid($number);
+  }
+  else {
+    $remote_user = FALSE;
   }
 
   if ($dir == 0) {
@@ -213,11 +215,11 @@ function sms_track_archive_write($dir, $number, $message, $options = array()) {
       $reference = (isset($options) && is_array($options) && array_key_exists('reference', $options)) ? $options['reference'] : NULL;
 
       // Status code may be provided by send result handler.
-      $status = (is_array($options['result'])) ? $options['result']['status_code'] : NULL;
+      $status = (isset($options['result']) && is_array($options['result'])) ? $options['result']['status_code'] : NULL;
 
       // Or render a status code from a simple true/false result.
-      if (! $status) {
-        if ($options['result']) {
+      if (!$status) {
+        if (!empty($options['result'])) {
           $status = SMS_GW_OK;
         }
         else {

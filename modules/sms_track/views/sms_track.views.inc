@@ -47,6 +47,26 @@ function sms_track_views_data() {
           'weight' => 0,
         ),
       ),
+      'id' => array(
+        'title' => t('ID'),
+        'help' => t('Message archive ID.'),
+        'field' => array(
+          'handler' => 'views_handler_field_numeric',
+          'click sortable' => TRUE,
+        ),
+        'argument' => array(
+          'handler' => 'views_handler_argument_numeric',
+          'numeric' => TRUE,
+        ),
+        'filter' => array(
+          'handler' => 'views_handler_filter_numeric',
+          'numeric' => TRUE,
+        ),
+        'sort' => array(
+          'handler' => 'views_handler_sort_numeric',
+          'numeric' => TRUE,
+        ),
+      ),
       'created' => array(
         'title' => t('Timestamp'),
         'help' => t('Message creation timestamp.'),
