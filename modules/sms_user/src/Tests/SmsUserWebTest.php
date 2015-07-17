@@ -109,25 +109,43 @@ class SmsUserWebTest extends WebTestBase {
     }
 
     // Check that the user registration page honors the mobile number field
-    // visibility settings.
+    // visibility and required options.
     $this->drupalLogout();
+    // Mobile fields disabled.
     $this->config('sms_user.settings')->set('registration_form', 0)->save();
     $this->resetAll();
     $this->drupalGet('user/register');
     $this->assertNoField('sms_user[number]', 'No number field in registration form.');
 
+    // Mobile fields optional.
     $this->config('sms_user.settings')->set('registration_form', 1)->save();
     $this->resetAll();
     $this->drupalGet('user/register');
     $this->assertField('sms_user[number]', 'Number field in registration form.');
+    // Post without the mobile number and confirm success.
+    $edit = array(
+        'name' => $this->randomMachineName(),
+        'mail' => $this->randomMachineName() . '@example.com',
+      );
+    $this->drupalPostForm(NULL, $edit, 'Create new account');
+    $this->assertUrl('<front>');
+    $this->assertText('A welcome message with further instructions has been sent to your email address.', 'Successfully posted registration form without optional mobile number.');
 
+    // Mobile fields required.
     $this->config('sms_user.settings')->set('registration_form', 2)->save();
     $this->resetAll();
     $this->drupalGet('user/register');
     $this->assertField('sms_user[number]', 'Number field in registration form.');
-
     $required_phone_field = $this->xpath('//input[@name="sms_user[number]" and @required="required"]');
     $this->assertEqual(count($required_phone_field), 1, 'Number field marked as required.');
+    // Post without the mobile number and confirm validation failure.
+    $edit = array(
+        'name' => $this->randomMachineName(),
+        'mail' => $this->randomMachineName() . '@example.com',
+      );
+    $this->drupalPostForm(NULL, $edit, 'Create new account');
+    $this->assertUrl('user/register');
+    $this->assertText('Phone number field is required.', 'Failed to post registration form without required mobile number.');
   }
 
   /**
