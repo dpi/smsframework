@@ -7,6 +7,8 @@
  */
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\sms\Message\SmsMessage;
+use Drupal\sms\Message\SmsMessageInterface;
 
 // Direction codes.
 define('SMS_DIR_NONE',  0);
@@ -15,14 +17,13 @@ define('SMS_DIR_IN',    2);
 define('SMS_DIR_ALL',   4);
 
 // Message status codes.
-// 0=Unknown, 2xx=Positive, 3xx=Positive/Neutral (context-dependent), 4xx=Negative
-define('SMS_MSG_STATUS_UNKNOWN',      0);
-define('SMS_MSG_STATUS_OK',         200);
-define('SMS_MSG_STATUS_DELIVERED',  202);
-define('SMS_MSG_STATUS_QUEUED',     302);
-define('SMS_MSG_STATUS_ERROR',      400);
-define('SMS_MSG_STATUS_NOCREDIT',   402);
-define('SMS_MSG_STATUS_EXPIRED',    408);
+define('SMS_MSG_STATUS_UNKNOWN',    SmsMessageInterface::STATUS_UNKNOWN);
+define('SMS_MSG_STATUS_OK',         SmsMessageInterface::STATUS_OK);
+define('SMS_MSG_STATUS_DELIVERED',  SmsMessageInterface::STATUS_DELIVERED);
+define('SMS_MSG_STATUS_QUEUED',     SmsMessageInterface::STATUS_QUEUED);
+define('SMS_MSG_STATUS_ERROR',      SmsMessageInterface::STATUS_ERROR);
+define('SMS_MSG_STATUS_NOCREDIT',   SmsMessageInterface::STATUS_NO_CREDIT);
+define('SMS_MSG_STATUS_EXPIRED',    SmsMessageInterface::STATUS_EXPIRED);
 
 // Gateway response codes.
 // 0=Unknown, 2xx=Positive, 4xx=Negative(likely client err), 5xx=Negative(likely gateway err)
@@ -73,82 +74,19 @@ function sms_cron_queue_info() {
  * @param string $number
  *   The destination number.
  * @param string $message
- *   The text of the messsage to send.
+ *   The text of the message to send.
  * @param array $options
  *   An array of additional properties as defined by gateway modules.
  *
  * @return bool
  *   true if the message was sent to the server, false otherwise.
  *
- * @see sms_handle_result().
+ * @see \Drupal\sms\Provider\DefaultSmsProvider::handleResult().
  */
-function sms_send($number, $message, $options = array()) {
-  // Check if preferred gateway is specified in the $options.
-  if (isset($options['gateway'])) {
-    $gateway = sms_gateways('gateway', $options['gateway']);
-  }
-  if (empty($gateway)) {
-    $gateway = sms_default_gateway();
-  }
-
-  foreach (\Drupal::moduleHandler()->getImplementations('sms_send') as $module) {
-    $function = $module . '_sms_send';
-    $function($number, $message, $options, $gateway);
-  }
-
-
-  if (\Drupal::moduleHandler()->moduleExists('token')) {
-    $message = \Drupal::token()->replace($message);
-  }
-
-  $response = NULL;
-  if (isset($gateway['send']) && function_exists($gateway['send'])) {
-    $response = $gateway['send']($number, $message, $options);
-  }
-  $result = sms_handle_result($response, $number, $message);
-
-  // Post process hook.
-  foreach (\Drupal::moduleHandler()->getImplementations('sms_send_process') as $module) {
-    $function = $module . '_sms_send_process';
-    $function('post process', $number, $message, $options, $gateway, $result);
-  }
-
-  return $result;
-}
-
-/**
- * Handles the response back from the sms gateway.
- *
- * This method also logs an error message to watchdog if there was a failure.
- *
- * @param array $result
- *   An array containing information on the message response, with the keys:
- *   - status: true if it was successful, false otherwise.
- *   - message: an error message if the 'status' is false.
- * @param string $number
- *   The comma-separated list of the message's recipient numbers.
- * @param string $message
- *   The message that was sent.
- *
- * @return bool
- *   true if the message was sent to the server, false otherwise.
- */
-function sms_handle_result($result, $number, $message) {
-  if ($result['status']) {
-    return TRUE;
-  }
-  else {
-    $error_message = 'Sending SMS to %number failed.';
-    $variables['%number'] = $number;
-    if ($result['message']) {
-      $error_message .= ' The gateway said ' . $result['message'];
-      if (!empty($result['variables'])) {
-        $variables = array_merge($variables, $result['variables']);
-      }
-    }
-    \Drupal::logger('sms')->error($error_message, $variables);
-    return FALSE;
-  }
+function sms_send($number, $message, array $options = array()) {
+  $sender = isset($options['sender']) ? $options['sender'] : '';
+  $sms = new SmsMessage($sender, explode(',', $number), $message, $options);
+  return \Drupal::service('sms_provider.default')->send($sms, $options);
 }
 
 /**
@@ -178,17 +116,13 @@ function sms_incoming_queue_worker(array $item) {
  *   The content of the text message.
  * @param array $options
  *   An array of additional options.
+ *
+ * @deprecated use \Drupal\sms\Provider\SmsProviderInterface::incoming() instead.
  */
-function sms_incoming($number, $message, $options = array()) {
-  if (\Drupal::moduleHandler()->moduleExists('rules')) {
-    $options += array('number' => $number, 'message' => $message);
-    rules_invoke_event('sms_incoming', $options);
-  }
-
-  // Execute three phases
-  \Drupal::moduleHandler()->invokeAll('sms_incoming', ['pre process', $number, $message, $options]);
-  \Drupal::moduleHandler()->invokeAll('sms_incoming', ['process', $number, $message, $options]);
-  \Drupal::moduleHandler()->invokeAll('sms_incoming', ['post process', $number, $message, $options]);
+function sms_incoming($number, $message, array $options = array()) {
+  $sender = isset($options['sender']) ? $options['sender'] : '';
+  $sms = new SmsMessage($sender, explode(',', $number), $message, $options);
+  \Drupal::service('sms_provider.default')->incoming($sms, $options);
 }
 
 /**
@@ -212,12 +146,11 @@ function sms_incoming($number, $message, $options = array()) {
  *    Defaults to SMS_GW_UNKNOWN_STATUS.
  * @param array $options
  *   (optional) Extended options passed by the receipt receiver.
+ *
+ * @deprecated use \Drupal\sms\Provider\SmsProviderInterface::receipt() instead.
  */
 function sms_receipt($number, $reference, $message_status = SMS_GW_UNKNOWN_STATUS, $options = array()) {
-  // Execute three phases
-  \Drupal::moduleHandler()->invokeAll('sms_receipt', 'pre process', $number, $reference, $message_status, $options);
-  \Drupal::moduleHandler()->invokeAll('sms_receipt', 'process', $number, $reference, $message_status, $options);
-  \Drupal::moduleHandler()->invokeAll('sms_receipt', 'post process', $number, $reference, $message_status, $options);
+  \Drupal::service('sms_provider.default')->receipt($number, $reference, $message_status, $options);
 }
 
 /**
@@ -252,9 +185,7 @@ function sms_gateway_info() {
  * This is a rudimentary implementation of an sms gateway by simply logging the
  * message to watchdog.
  *
- * @param string $number
- *   Comma-separated list of mobile numbers message was sent to.
- * @param string $message
+ * @param \Drupal\sms\Message\SmsMessageInterface $sms
  *   The message that was sent.
  * @param array $options
  *   An associative array of options passed to gateway.
@@ -263,8 +194,8 @@ function sms_gateway_info() {
  *   An array containing one key:
  *   - status: true.
  */
-function sms_send_log($number, $message, $options) {
-  \Drupal::logger('sms')->info('SMS message sent to %number with the text: @message', array('%number' => $number, '@message' => $message));
+function sms_send_log(SmsMessageInterface $sms, $options) {
+  \Drupal::logger('sms')->info('SMS message sent to %number with the text: @message', array('%number' => implode(',', $sms->getRecipients()), '@message' => $sms->getMessage()));
   return array('status' => TRUE);
 }
 
@@ -544,7 +475,7 @@ function carrier_delete($domain) {
  * @return string
  *   The formatted number.
  */
-function sms_format_number(&$number, $options = array()) {
+function sms_format_number(&$number, array $options = array()) {
   $gateway = sms_default_gateway();
 
   if (!empty($gateway['format number']) && function_exists($gateway['format number'])) {
@@ -609,7 +540,7 @@ function sms_formatter($number, $format = 1) {
  * @return array
  *   An array of translated errors. Empty if no errors.
  */
-function sms_validate_number(&$number, $options = array()) {
+function sms_validate_number(&$number, array $options = array()) {
   $errors = array();
   // Ensure there are actual numeric characters, but allow empty strings.
   if ($number !== '' && preg_replace('/[^0-9]/', '', $number) === '') {
@@ -717,5 +648,3 @@ function theme_sms_carriers_admin_form($variables) {
 
   return $output;
 }
-
-

@@ -55,7 +55,7 @@ class SettingsAddForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $account = User::load($form_state->getValue('uid'));
-    sms_user_send_confirmation($account, $form_state->getValue('number'), $form_state->getValue('gateway'));
+    sms_user_send_confirmation($account, $form_state->getValue('number'), (array) $form_state->getValue('gateway'));
   }
 
   /**

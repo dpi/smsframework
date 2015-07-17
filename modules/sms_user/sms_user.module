@@ -8,6 +8,7 @@
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -37,7 +38,7 @@ function sms_user_send($uid, $message) {
   // Check if the user is enabled to receive SMS.
   if ($account->hasPermission('receive sms')) {
     if ($account->sms_user['status'] >= SMS_USER_CONFIRMED) {
-      return sms_send($account->sms_user['number'], $message, $account->sms_user['gateway']);
+      return sms_send($account->sms_user['number'], $message, (array) $account->sms_user['gateway']);
     }
     else {
       \Drupal::logger('sms_user')->alert("User %user has not validated mobile number", array('%user' => $account->getUsername()));
@@ -98,17 +99,23 @@ function sms_user_get_uid($number, $status = NULL) {
 /**
  * Implements hook_sms_send().
  */
-function sms_user_sms_send(&$number, &$message, &$options, &$gateway) {
-  if (\Drupal::config('sms_user.settings')->get('enable_sleep', 1) && $uid = sms_user_get_uid($number)) {
-    $account = User::load($uid);
+function sms_user_sms_send_process($step, SmsMessageInterface $sms, array $options, $gateway) {
+  if ($step == 'pre process') {
+    if (\Drupal::config('sms_user.settings')->get('enable_sleep', 1) && $uid = sms_user_get_uid($sms->getRecipients()[0])) {
+      $account = User::load($uid);
 
-    if (_sms_user_opted_out($account)) {
-      unset($gateway['send']);
-      \Drupal::logger('sms_user')->info('Message was not sent to @user because user opted out.', array('@user' => $account->getUsername()));
-    }
-    else if (_sms_user_sleep_active($account)) {
-      unset($gateway['send']);
-      \Drupal::logger('sms_user')->info('Message was not sent to @user due to sleep settings.', array('@user' => $account->getUsername()));
+      if (_sms_user_opted_out($account)) {
+        \Drupal::logger('sms_user')
+          ->info('Message was not sent to @user because user opted out.', array('@user' => $account->getUsername()));
+        return FALSE;
+      }
+      else {
+        if (_sms_user_sleep_active($account)) {
+          \Drupal::logger('sms_user')
+            ->info('Message was not sent to @user due to sleep settings.', array('@user' => $account->getUsername()));
+          return FALSE;
+        }
+      }
     }
   }
 }
@@ -205,7 +212,7 @@ function _sms_user_opted_out(AccountInterface $account) {
  *   Rendered HTML for the account settings form.
  */
 function sms_user_settings(AccountInterface $user) {
-  // We have to use the argument name $user so that 'user.update' access check
+  // We have to use the argument $user so that 'user.update' access check
   // will load the correct user entity for checking.
   $output = array();
   switch (isset($user->sms_user) ? $user->sms_user['status'] : 0) {
@@ -247,7 +254,7 @@ function sms_user_settings(AccountInterface $user) {
  *
  * @see \Drupal\sms_user\Form\SettingsAddForm::submitForm()
  */
-function sms_user_send_confirmation($account, $number, $options) {
+function sms_user_send_confirmation($account, $number, array $options) {
   $code = rand(1000, 9999);
   $number = sms_formatter($number);
   $data = array(
@@ -374,7 +381,7 @@ function sms_user_user_cancel($edit, $account, $method) {
 function sms_user_user_login(AccountInterface $account) {
   // Check if it's the user's first time logging in.
   if (!$account->getLastAccessedTime() && !empty($account->sms_user['number']) && $account->sms_user['status'] <= SMS_USER_CONFIRMED) {
-    sms_user_send_confirmation($account, $account->sms_user['number'], $account->sms_user['gateway']);
+    sms_user_send_confirmation($account, $account->sms_user['number'], (array) $account->sms_user['gateway']);
     drupal_set_message(t('A confirmation message has been sent to your mobile phone. Please @link.', array('@link' => l(t('confirm your number'), 'user/' . $account->id() . '/edit/mobile'))), 'status');
   }
 }
@@ -560,8 +567,10 @@ function sms_user_token_info() {
 /**
  * Implements hook_sms_incoming().
  */
-function sms_user_sms_incoming($op, $number, $message, $options) {
+function sms_user_sms_incoming($op, SmsMessageInterface $sms, array $options) {
   $config = \Drupal::config('sms_user.settings');
+  $number = $sms->getRecipients()[0];
+  $message = $sms->getMessage();
   switch ($op) {
     case 'pre process':
       if ($account = sms_user_authenticate($number)) {

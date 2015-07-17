@@ -4,6 +4,7 @@
  * @file
  * A test gateway to be used for testing the sms framework
  */
+use Drupal\sms\Message\SmsMessageInterface;
 
 /**
  * Implements hook_gateway_info().
@@ -23,18 +24,31 @@ function sms_test_gateway_gateway_info() {
 }
 
 /**
- * Send callback
+ * Send callback.
+ *
+ * @param \Drupal\sms\Message\SmsMessageInterface $sms
+ *   The message to be sent
+ * @param array $options
+ *   Options for sending the message.
+ *
+ * @return array
  */
-function sms_test_gateway_send($number = NULL, $message = NULL, $options = array()) {
+function sms_test_gateway_send(SmsMessageInterface $sms, array $options = array()) {
   $result = &drupal_static('sms_test_gateway_result');
 
-  if (!is_null($number) && !is_null($message)) {
-    $result['number'] = $number;
-    $result['message'] = $message;
+  if (!is_null($sms->getRecipients()) && !is_null($sms->getMessage())) {
+    $result['number'] = implode(',',$sms->getRecipients());
+    $result['message'] = $sms->getMessage();
     $result['options'] = $options;
     \Drupal::state()->set('sms_test_gateway_result', $result);
   }
-  return array('status' => TRUE, 'result' => $result);
+  return [
+    'status' => TRUE,
+    'credit_balance' => 1000,
+    'credits_used' => count($sms->getRecipients()),
+    'error_message' => '',
+    'report' => $result,
+  ];
 }
 
 function sms_test_gateway_result($reset = FALSE) {
@@ -55,14 +69,14 @@ function sms_test_gateway_result($reset = FALSE) {
 /**
  * Implements hook_sms_incoming().
  */
-function sms_test_gateway_sms_incoming($op, $number, $message, $options) {
+function sms_test_gateway_sms_incoming($op, SmsMessageInterface $sms, array $options) {
   // Save incoming result for later retrieval.
   $key = 'sms_test_gateway_get_incoming' . $op;
   $result = &drupal_static($key);
 
-  if (!is_null($number) && !is_null($message)) {
-    $result['number'] = $number;
-    $result['message'] = $message;
+  if (!is_null($sms->getRecipients()) && !is_null($sms->getMessage())) {
+    $result['number'] = $sms->getRecipients()[0];
+    $result['message'] = $sms->getMessage();
     $result['options'] = $options;
     \Drupal::state()->set($key, $result);
   }

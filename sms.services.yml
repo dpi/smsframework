@@ -1,0 +1,4 @@
+services:
+  sms_provider.default:
+    class: Drupal\sms\Provider\DefaultSmsProvider
+    arguments: ['@module_handler']
