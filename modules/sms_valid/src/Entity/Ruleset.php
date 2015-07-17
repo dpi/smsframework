@@ -31,7 +31,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "label" = "name"
  *   },
  *   links = {
- *     "edit-form" = "sms_valid.ruleset_edit",
+ *     "edit-form" = "/admin/config/smsframework/validation/ruleset/{sms_ruleset}",
  *   }
  * )
  *
