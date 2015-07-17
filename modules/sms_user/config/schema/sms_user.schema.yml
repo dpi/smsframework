@@ -5,7 +5,7 @@ sms_user.settings:
   label: 'SMS User settings'
   mapping:
     registration_form:
-      type: boolean
+      type: integer
       label: 'Show mobile fields during user registration'
     confirmation_message:
       type: string

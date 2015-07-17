@@ -1,4 +1,4 @@
-registration_form: false
+registration_form: 0
 confirmation_message: '[site:name] confirmation code: '
 enable_sleep: true
 sleep_start_time: '0'
