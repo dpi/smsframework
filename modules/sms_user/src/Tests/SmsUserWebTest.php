@@ -25,7 +25,7 @@ class SmsUserWebTest extends WebTestBase {
   /**
    * Tests user adding phone number.
    */
-  public function ptestNumberConfirmationAndSmsUserSend() {
+  public function testNumberConfirmationAndSmsUserSend() {
     // Set up test default gateway.
     $this->config('sms.settings')->set('default_gateway', 'test')->save();
     $user = $this->drupalCreateUser(array('receive sms', 'edit own sms number'));
@@ -133,7 +133,7 @@ class SmsUserWebTest extends WebTestBase {
   /**
    * Tests whether a user can opt out and in for sms messages from the site.
    */
-  public function ptestSmsUserOptOut() {
+  public function testSmsUserOptOut() {
 
     // Create Excluded User
     $excluded_user = $this->drupalCreateUser(array('administer smsframework', 'receive sms', 'edit own sms number'));
