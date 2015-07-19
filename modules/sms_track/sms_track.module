@@ -56,10 +56,8 @@ function sms_track_sms_send(SmsMessageInterface $sms, array $options, $gateway) 
  *
  * @param string $op
  *   Operation string (pre process, process, post process).
- * @param string $number
- *   MSISDN of recipient.
- * @param string $message
- *   SMS message body.
+ * @param \Drupal\sms\Message\SmsMessageInterface $sms
+ *   The SMS message object.
  * @param array $options
  *   Additional options array including sender.
  * @param array $gateway
@@ -84,10 +82,8 @@ function sms_track_sms_send_process($op, SmsMessageInterface $sms, array $option
  *
  * @param string $op
  *   SMS incoming operation string (pre process, process, post process).
- * @param string $number
- *   MSISDN of sender.
- * @param string $message
- *   SMS message body string.
+ * @param \Drupal\sms\Message\SmsMessageInterface $sms
+ *   The SMS message object.
  * @param array $options
  *   Additional options including receiver MSISDN.
  */

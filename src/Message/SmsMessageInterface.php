@@ -66,21 +66,21 @@ interface SmsMessageInterface {
   const STATUS_EXPIRED = 408;
 
   /**
-   * Get the list of recipients of this SMS message.
+   * Gets the list of recipients of this SMS message.
    *
    * @return array
    */
   public function getRecipients();
 
   /**
-   * Get the options for building or sending this SMS message.
+   * Gets the options for building or sending this SMS message.
    *
    * @return array
    */
   public function getOptions();
 
   /**
-   * Get the option specified by the key $name.
+   * Gets the option specified by the key $name.
    *
    * @param string
    *   The name of the option.
@@ -89,14 +89,14 @@ interface SmsMessageInterface {
   public function getOption($name);
 
   /**
-   * Get the name of the sender of this SMS message.
+   * Gets the name of the sender of this SMS message.
    *
    * @return string
    */
   public function getSender();
 
   /**
-   * Get the message to be sent.
+   * Gets the message to be sent.
    *
    * @return string
    */

@@ -97,7 +97,7 @@ function sms_user_get_uid($number, $status = NULL) {
 }
 
 /**
- * Implements hook_sms_send().
+ * Implements hook_sms_send_process().
  */
 function sms_user_sms_send_process($step, SmsMessageInterface $sms, array $options, $gateway) {
   if ($step == 'pre process') {

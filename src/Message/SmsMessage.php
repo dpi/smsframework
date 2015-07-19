@@ -45,7 +45,7 @@ class SmsMessage implements SmsMessageInterface {
   protected $options = array();
 
   /**
-   * Create a new instance of an SMS message.
+   * Creates a new instance of an SMS message.
    *
    * @param string
    *   The sender of the message.

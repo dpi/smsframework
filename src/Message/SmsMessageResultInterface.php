@@ -48,7 +48,7 @@ interface SmsMessageResultInterface {
   /**
    * Gets the credit balance after the SMS was sent.
    *
-   * @return integer
+   * @return int
    *   The value of the balance. This number is in the SMS gateway's chosen
    *   denomination.
    */
@@ -57,7 +57,7 @@ interface SmsMessageResultInterface {
   /**
    * Gets the SMS credits used for this transaction.
    *
-   * @return integer
+   * @return int
    *   The amount of SMS credits used in the gateway's chosen denomination.
    */
   public function getCreditsUsed();

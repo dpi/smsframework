@@ -9,6 +9,8 @@ namespace Drupal\sms\Provider;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Message\SmsMessageResult;
+use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\SmsException;
 
 /**
@@ -50,6 +52,8 @@ class DefaultSmsProvider implements SmsProviderInterface {
     $gateway = sms_gateways('gateway', $gateway_id);
 
     if ($this->preProcess($sms, $options, $gateway)) {
+      $this->moduleHandler->invokeAll('sms_send', [$sms, $options, $gateway]);
+      // @todo Apply token replacements.
       $result = $this->process($sms, $options, $gateway);
       $this->postProcess($sms, $options, $gateway, $result);
       return $result;
@@ -73,9 +77,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *   TRUE if the message was successfully sent.
    */
   protected function process(SmsMessageInterface $sms, array $options, array $gateway) {
-    $this->moduleHandler->invokeAll('sms_send', [$sms, $options, $gateway]);
-    // @todo Apply token replacements.
-    $response = $gateway['send']($sms, $options);
+    $response = new SmsMessageResult($gateway['send']($sms, $options));
     $result = $this->handleResult($response, $sms);
     return $result;
   }
@@ -120,7 +122,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * Handles the response back from the SMS gateway.
    *
-   * @param array $result
+   * @param \Drupal\sms\Message\SmsMessageResultInterface $result
    *   The result to be handled.
    * @param \Drupal\sms\Message\SmsMessageInterface $sms
    *   The message that was sent.
@@ -131,14 +133,14 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *
    * @throws \Drupal\sms\SmsException
    */
-  protected function handleResult(array $result, SmsMessageInterface $sms) {
-    if ($result['status']) {
+  protected function handleResult(SmsMessageResultInterface $result, SmsMessageInterface $sms) {
+    if ($result->getStatus()) {
       return TRUE;
     }
     else {
       // @todo Review all of this.
       $error_message = t('Sending SMS to %number failed.', ['%number' => implode(',', $sms->getRecipients())]);
-      if ($message = $result['error_message']) {
+      if ($message = $result->getErrorMessage()) {
         $error_message .= t(' The gateway said %message.', ['%message' => $message]);
       }
       \Drupal::logger('sms')->error($message);
@@ -150,7 +152,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * {@inheritdoc}
    */
   public function incoming(SmsMessageInterface $sms, array $options) {
-    // @todo Implement rules event integration here for incoming sms.
+    // @todo Implement rules event integration here for incoming SMS.
     // Execute three phases.
     $this->moduleHandler->invokeAll('sms_incoming', array('pre process', $sms, $options));
     $this->moduleHandler->invokeAll('sms_incoming', array('process', $sms, $options));
@@ -161,7 +163,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * {@inheritdoc}
    */
   public function receipt($number, $reference, $message_status = SMS_GW_UNKNOWN_STATUS, $options = array()) {
-    // @todo Implement rules event integration here for incoming sms.
+    // @todo Implement rules event integration here for incoming SMS.
     // Execute three phases.
     $this->moduleHandler->invokeAll('sms_receipt', array('pre process', $number, $reference, $message_status, $options));
     $this->moduleHandler->invokeAll('sms_receipt', array('process', $number, $reference, $message_status, $options));
