@@ -1,7 +1,7 @@
 # Schema for the configuration files of the SMS module.
 
 sms.settings:
-  type: mapping
+  type: config_object
   label: 'SMS Framework settings'
   mapping:
     default_gateway:
@@ -21,7 +21,7 @@ sms.settings:
 
 # Configuration for sms gateways.
 sms.gateway.*:
-  type: mapping
+  type: config_object
   label: 'SMS Gateway settings'
   mapping:
     settings:

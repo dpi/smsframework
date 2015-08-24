@@ -1,7 +1,7 @@
 # Schema for the configuration files of the SMS User module.
 
 sms_user.settings:
-  type: mapping
+  type: config_object
   label: 'SMS User settings'
   mapping:
     registration_form:

@@ -1,5 +1,5 @@
 sms_track.settings:
-  type: mapping
+  type: config_object
   label: 'SMS Track Settings'
   mapping:
     archive_dir:
