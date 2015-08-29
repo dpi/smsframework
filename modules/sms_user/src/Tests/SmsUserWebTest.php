@@ -7,7 +7,7 @@
 
 namespace Drupal\sms_user\Tests;
 
-use Drupal\simpletest\WebTestBase;
+use Drupal\sms\Tests\SmsFrameworkWebTestBase;
 use Drupal\user\Entity\User;
 
 /**
@@ -18,16 +18,16 @@ use Drupal\user\Entity\User;
  * @todo Add tests for creation of users via sms.
  * @todo Add tests for integration with rules and actions modules.
  */
-class SmsUserWebTest extends WebTestBase {
+class SmsUserWebTest extends SmsFrameworkWebTestBase {
 
-  public static $modules = ['sms', 'sms_test_gateway', 'sms_user', 'syslog', 'sms_devel'];
+  public static $modules = ['sms_user', 'syslog', 'sms_devel'];
 
   /**
    * Tests user adding phone number.
    */
   public function testNumberConfirmationAndSmsUserSend() {
     // Set up test default gateway.
-    $this->config('sms.settings')->set('default_gateway', 'test')->save();
+    $this->setDefaultGateway('test');
     $user = $this->drupalCreateUser(array('receive sms', 'edit own sms number'));
     $this->drupalLogin($user);
 
@@ -158,8 +158,7 @@ class SmsUserWebTest extends WebTestBase {
     $this->drupalLogin($excluded_user);
 
     // Set up test default gateway.
-    $this->config('sms.settings')->set('default_gateway', 'test')->save();
-
+    $this->setDefaultGateway('test');
     $sms_user_settings = array(
       'registration_enabled' => TRUE,
       'allow_password' => TRUE,

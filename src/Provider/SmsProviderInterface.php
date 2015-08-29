@@ -7,6 +7,7 @@
 
 namespace Drupal\sms\Provider;
 
+use Drupal\sms\Gateway\GatewayInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 
 /**
@@ -47,7 +48,8 @@ interface SmsProviderInterface {
    * messages in a standard format for processing, and provides a basic set of
    * status codes for common code handling.
    *
-   * Allowed message status codes are defined as constants in sms.module
+   * Allowed message status codes are defined as constants in
+   * @link \Drupal\sms\Gateway\GatewayInterface @endlink
    *
    * The original gateway code and string will often be provided in the $options
    * array as 'gateway_message_status' and 'gateway_message_status_text'.
@@ -63,6 +65,6 @@ interface SmsProviderInterface {
    * @param array $options
    *   (optional) Extended options passed by the receipt receiver.
    */
-  public function receipt($number, $reference, $message_status = SMS_GW_UNKNOWN_STATUS, $options = array());
+  public function receipt($number, $reference, $message_status = GatewayInterface::STATUS_UNKNOWN, array $options = array());
 
 }

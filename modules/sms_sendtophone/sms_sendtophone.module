@@ -429,7 +429,7 @@ function sms_sendtophone_form_validate($form, &$form_state) {
  * @see http://drupal.org/node/1354
  */
 function sms_sendtophone_form_submit($form, &$form_state) {
-  if (sms_send($form_state['values']['number'], $form_state['values']['message'], $form_state['values']['gateway'])) {
+  if (sms_send($form_state['values']['number'], $form_state['values']['message'], (array) $form_state['values']['gateway'])) {
     drupal_set_message(t('The message "@message" sent to @number.', array('@message' => $form_state['values']['message'], '@number' => $form_state['values']['number'])));
   }
 }

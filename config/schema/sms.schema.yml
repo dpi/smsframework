@@ -22,9 +22,22 @@ sms.settings:
 # Configuration for sms gateways.
 sms.gateway.*:
   type: config_object
-  label: 'SMS Gateway settings'
+  label: 'SMS Gateway configuration'
   mapping:
-    settings:
+    label:
+      type: label
+      label: 'Human readable gateway label'
+    name:
+      type: string
+      label: 'Gateway machine name'
+    plugin_id:
+      type: string
+      label: 'Gateway plugin type'
+    enabled:
+      type: boolean
+      label: 'Gateway enabled status'
+    custom:
       type: sequence
+      label: 'Additional gateway-specific configuration'
       sequence:
         - type: string

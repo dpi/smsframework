@@ -8,6 +8,7 @@
  */
 
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\sms\Gateway\GatewayInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
 use \Drupal\views\ViewExecutable;
@@ -43,7 +44,7 @@ function sms_track_cron() {
 /**
  * Implements hook_sms_send().
  */
-function sms_track_sms_send(SmsMessageInterface $sms, array $options, $gateway) {
+function sms_track_sms_send(SmsMessageInterface $sms, array $options, GatewayInterface $gateway) {
   // Tracking.
   // Place a tracking reference on a sent message if we need to.
   if (!empty($options) && !array_key_exists('reference', $options)) {
@@ -60,17 +61,17 @@ function sms_track_sms_send(SmsMessageInterface $sms, array $options, $gateway) 
  *   The SMS message object.
  * @param array $options
  *   Additional options array including sender.
- * @param array $gateway
+ * @param \Drupal\sms\Gateway\GatewayInterface $gateway
  *   Gateway array for the active gateway.
- * @param array $result
- *   Result array from the gateway response handler.
+ * @param bool|array $result
+ *   The result from the gateway response handler.
  */
-function sms_track_sms_send_process($op, SmsMessageInterface $sms, array $options, $gateway, $result) {
+function sms_track_sms_send_process($op, SmsMessageInterface $sms, array $options, GatewayInterface $gateway, $result) {
   if ($op == 'post process') {
     // Archiving (outgoing == 0)
     $dir = 0;
     $options = (isset($options) && is_array($options))? $options : array();
-    $options['gateway_id'] = $gateway['identifier'];
+    $options['gateway_id'] = $gateway->getIdentifier();
     $options['result']  = $result;
     sms_track_archive_write($dir, implode(',', $sms->getRecipients()), $sms->getMessage(), $options);
   }
@@ -112,7 +113,7 @@ function sms_track_sms_incoming($op, SmsMessageInterface $sms, array $options) {
  * @param array $options
  *   Additional options array.
  */
-function sms_track_sms_receipt($op, $number, $reference, $status, $options) {
+function sms_track_sms_receipt($op, $number, $reference, $status, array $options) {
   if ($op == 'pre process') {
     // Tracking.
     sms_track_update_message($reference, $status);
@@ -132,7 +133,7 @@ function sms_track_sms_receipt($op, $number, $reference, $status, $options) {
  * @param array $options
  *   (optional) an array of additional options.
  */
-function sms_track_archive_write($dir, $number, $message, $options = array()) {
+function sms_track_archive_write($dir, $number, $message, array $options = array()) {
   $user = \Drupal::currentUser();
   $archive_dir = \Drupal::config('sms_track.settings')->get('archive_dir');
   // Query the database for the uid of the user that owns the $number
@@ -155,10 +156,10 @@ function sms_track_archive_write($dir, $number, $message, $options = array()) {
       // Or render a status code from a simple true/false result
       if (! $status) {
         if ($options['result']) {
-          $status = SMS_GW_OK;
+          $status = GatewayInterface::STATUS_OK;
         }
         else {
-          $status = SMS_GW_ERR_OTHER;
+          $status = GatewayInterface::STATUS_ERR_OTHER;
         }
       }
       // Add the author and recipient
@@ -174,7 +175,7 @@ function sms_track_archive_write($dir, $number, $message, $options = array()) {
     if ($archive_dir == SMS_DIR_ALL || $archive_dir == SMS_DIR_IN) {
       $reference = NULL;
       // Inbound message status is always the same.
-      $status = SMS_MSG_STATUS_OK;
+      $status = SmsMessageInterface::STATUS_OK;
       // Add the author and recipient
       $recipient = $user->id();
       $author = ($remote_user) ? $remote_user : 0;

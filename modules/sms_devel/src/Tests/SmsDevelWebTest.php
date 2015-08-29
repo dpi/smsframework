@@ -7,16 +7,16 @@
 
 namespace Drupal\sms_devel\Tests;
 
-use Drupal\simpletest\WebTestBase;
+use Drupal\sms\Tests\SmsFrameworkWebTestBase;
 
 /**
  * Tests the send/receive form provided by SMS Devel.
  *
  * @group SMS Framework
  */
-class SmsDevelWebTest extends WebTestBase {
+class SmsDevelWebTest extends SmsFrameworkWebTestBase {
 
-  public static $modules = ['sms', 'sms_test_gateway', 'sms_devel'];
+  public static $modules = ['sms_devel'];
 
   /**
    * Tests if messages sent using the test send form are stored properly.
@@ -28,7 +28,7 @@ class SmsDevelWebTest extends WebTestBase {
     $this->drupalLogin($user);
 
     // Set up test default gateway.
-    $this->config('sms.settings')->set('default_gateway', 'test')->save();
+    $this->setDefaultGateway('test');
 
     $test_message1 = array(
       'number' => '1234567890',

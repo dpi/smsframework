@@ -4,3 +4,10 @@ sms.carrier_add:
   weight: 1
   appears_on:
     - sms.carrier_admin
+
+sms.gateway_add:
+  title: 'Add Configurable Gateway'
+  route_name: sms.gateway_add
+  weight: 1
+  appears_on:
+    - sms.gateway_admin

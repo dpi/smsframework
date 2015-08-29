@@ -2,13 +2,16 @@
 
 /**
  * @file
- * Contains GatewayConfigForm class
+ * Contains \Drupal\sms\Form\GatewayConfigForm
  */
 
 namespace Drupal\sms\Form;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\sms\Gateway\GatewayManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -18,6 +21,32 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * form more streamlined
  */
 class GatewayConfigForm extends ConfigFormBase {
+
+  /**
+   * The gateway manager.
+   *
+   * @var \Drupal\sms\Gateway\GatewayManagerInterface
+   */
+  protected $gatewayManager;
+
+  /**
+   * Creates new Gateway configuration form.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory, GatewayManagerInterface $gateway_manager) {
+    $this->setConfigFactory($config_factory);
+    $this->gatewayManager = $gateway_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('plugin.manager.sms_gateway')
+    );
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -29,18 +58,27 @@ class GatewayConfigForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, $gateway_id = NULL) {
-    $gateway = sms_gateways('gateway', $gateway_id);
-    if ($gateway && !empty($gateway['configure form']) && function_exists($gateway['configure form'])) {
-      $form = $gateway['configure form']($gateway['configuration']);
-      $form['#title'] = $this->t('@gateway configuration', array('@gateway' => $gateway['name']));
-
+    $gateway = $this->gatewayManager->getGateway($gateway_id);
+    if ($gateway && $gateway->isConfigurable()) {
+      $form['title'] = [
+        '#type' => 'item',
+        '#title' => $gateway->getLabel(),
+        '#markup' => '(' . $gateway->getName() . ')',
+      ];
+      $form['enabled'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Enable this gateway'),
+        '#default_value' => $gateway->isEnabled(),
+      ];
+      $form = $gateway->buildConfigurationForm($form, $form_state);
+      $form['#title'] = $this->t('@gateway configuration', array('@gateway' => $gateway->getLabel()));
       $form['submit'] = array(
         '#type' => 'submit',
-        '#value' => $this->t('Save'),
+        '#value' => $this->t('Save configuration'),
       );
-      $form['gateway'] = array(
+      $form['gateway_id'] = array(
         '#type' => 'value',
-        '#value' => $gateway,
+        '#value' => $gateway->getIdentifier(),
       );
   
       return $form;
@@ -55,24 +93,24 @@ class GatewayConfigForm extends ConfigFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     // Pass validation to gateway.
-    $function = $form_state->getValue(['gateway', 'configure form']) . '_validate';
-    if (function_exists($function)) {
-      $function($form, $form_state);
-    }
+    $gateway = $this->gatewayManager->getGateway($form_state->getValue('gateway_id'));
+    $gateway->validateConfigurationForm($form, $form_state);
   }
 
   /**
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $gateway = $form_state->getValue('gateway');
-    // Remove unnecessary values.
-    $form_state->cleanValues();
-    $form_state->unsetValue('gateway');
-
-    $this->configFactory()->getEditable('sms.gateway.' . $gateway['identifier'])
-      ->set('settings' , $form_state->getValues())
-      ->save();
+    // Call the gateway submission callback before saving configuration.
+    $gateway = $this->gatewayManager->getGateway($form_state->getValue('gateway_id'));
+    $gateway->setEnabled($form_state->getValue('enabled'));
+    $form_state
+      ->unsetValue('title')
+      ->unsetValue('enabled')
+      ->unsetValue('gateway_id')
+      ->cleanValues();
+    $gateway->submitConfigurationForm($form, $form_state);
+    $this->gatewayManager->saveGateway($gateway);
     drupal_set_message($this->t('The gateway settings have been saved.'));
     $form_state->setRedirect('sms.gateway_admin');
   }
@@ -81,8 +119,7 @@ class GatewayConfigForm extends ConfigFormBase {
    * Title callback fo the menu
    */
   public function getTitle($gateway_id) {
-    $gateway = sms_gateways('gateway', $gateway_id);
-    return sprintf('%s gateway', $gateway['name']);
+    return $this->t('@name gateway', ['@name' => $this->gatewayManager->getGateway($gateway_id)->getLabel()]);
   }
 
   /**

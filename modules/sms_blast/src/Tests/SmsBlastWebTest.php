@@ -7,23 +7,23 @@
 
 namespace Drupal\sms_blast\Tests;
 
-use \Drupal\simpletest\WebTestBase;
+use Drupal\sms\Tests\SmsFrameworkWebTestBase;
 
 /**
  * Integration tests for the sms_blast module.
  *
  * @group SMS Framework
  */
-class SmsBlastWebTest extends WebTestBase {
+class SmsBlastWebTest extends SmsFrameworkWebTestBase {
 
-  public static $modules = ['sms', 'sms_test_gateway', 'sms_user', 'sms_blast'];
+  public static $modules = ['sms_user', 'sms_blast'];
 
   /**
    * Tests sending sms blast.
    */
   function testSendBlast() {
     // Set up test default gateway and test user.
-    $this->container->get('config.factory')->getEditable('sms.settings')->set('default_gateway', 'test')->save();
+    $this->setDefaultGateway('test');
     $user = $this->drupalCreateUser(array('receive sms', 'Send SMS Blast'));
     $this->drupalLogin($user);
     $data = array(

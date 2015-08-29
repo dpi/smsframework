@@ -1,0 +1,3 @@
+# Default configuration for log gateway.
+enabled: true
+plugin_id: log

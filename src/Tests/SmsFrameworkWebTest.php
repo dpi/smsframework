@@ -7,22 +7,59 @@
 
 namespace Drupal\sms\Tests;
 
-use \Drupal\simpletest\WebTestBase;
-
 /**
  * Integration tests for the SMS Framework.
  *
  * @group SMS Framework
  */
-class SmsFrameworkWebTest extends WebTestBase {
+class SmsFrameworkWebTest extends SmsFrameworkWebTestBase {
 
-  public static $modules = ['sms', 'sms_test_gateway'];
+  /**
+   * Tests the HookGateway implementation.
+   */
+  public function testHookGatewayIntegration() {
+    // Test that hook gateway plugins are correctly discovered.
+    $gateway_plugins = $this->gatewayManager->getGatewayPlugins();
+    $this->assertEqual(array_keys($gateway_plugins), ['log', 'test'], 'Hook-based gateway discovered.');
+    $this->assertEqual($gateway_plugins['test']['hook_info'], sms_test_gateway_gateway_info()['test'], 'sms_test_gateway hooks correct.');
+
+    // Confirm the existence of the test gateway.
+    $test_gateway = $this->gatewayManager->getGateway('test');
+    $this->assertNotNull($test_gateway, 'Test gateway not null');
+
+    // Add an instance and confirm that it exists
+    $this->gatewayManager->addGateway('test', ['name' => 'test_instance', 'label' => 'Test gateway instance']);
+    $test_gateway = $this->gatewayManager->getGateway('test_instance');
+    $this->assertEqual(get_class($test_gateway), 'Drupal\sms\Gateway\HookGateway');
+    $this->assertEqual($test_gateway->getLabel(), 'Test gateway instance');
+  }
 
   /**
    * Tests that the correct gateways list is obtained.
    */
   public function testGatewaysList() {
-    $this->assertEqual(array('log' => t('Log only'), 'test' => t('For testing')), sms_gateways('names'));
+    $test_gateways = [
+      'log' => 'Log only',
+      'test' => 'For testing',
+    ];
+    $this->assertEqual($test_gateways, sms_gateways('names'));
+  }
+
+  /**
+   * Tests the add gateway functionality.
+   */
+  public function testAddGateways() {
+    $gateways = ['log', 'test'];
+    $this->assertEqual($gateways, array_keys($this->gatewayManager->getAvailableGateways()));
+    for ($i = 0; $i < 3; $i++) {
+      $name = $this->randomMachineName();
+      $this->gatewayManager->addGateway('test', ['name' => $name]);
+      // GatewayManagerInterface::getAvailableGateways() sorts by the names
+      // before adding, so we need to simulate in the expected result.
+      sort($gateways);
+      $gateways[] = $name;
+      $this->assertEqual($gateways, array_keys($this->gatewayManager->getAvailableGateways()));
+    }
   }
 
   /**
@@ -31,20 +68,21 @@ class SmsFrameworkWebTest extends WebTestBase {
   public function testDefaultGateway() {
     // Test initial default gateway.
     $gw = sms_default_gateway();
-    $this->assertEqual($gw['identifier'], 'log', 'Initial default gateway is "log".');
+    $this->assertEqual($gw->getIdentifier(), 'log', 'Initial default gateway is "log".');
 
     $this->drupalLogin($this->drupalCreateUser(['administer smsframework']));
     // Set up default log gateway.
-    $this->drupalPostForm('admin/config/smsframework/gateways', ['default' => 'log'], t('Set default gateway'));
+    $this->drupalPostForm('admin/config/smsframework/gateways', ['default' => 'log'], 'Save settings');
     $this->assertResponse(200);
     $gw = sms_default_gateway();
-    $this->assertEqual($gw['identifier'], 'log', 'Default gateway set to log.');
+    $this->assertEqual($gw->getIdentifier(), 'log', 'Default gateway set to log.');
 
     // Set up default test gateway.
-    $this->drupalPostForm('admin/config/smsframework/gateways', ['default' => 'test'], t('Set default gateway'));
+    $this->drupalPostForm('admin/config/smsframework/gateways', ['default' => 'test'], 'Save settings');
     $this->assertResponse(200);
+    $this->resetAll();
     $gw = sms_default_gateway();
-    $this->assertEqual($gw['identifier'], 'test', 'Default gateway set to test.');
+    $this->assertEqual($gw->getIdentifier(), 'test', 'Default gateway set to test.');
   }
 
   /**
@@ -59,10 +97,10 @@ class SmsFrameworkWebTest extends WebTestBase {
       'method' => 0,
       'ssl' => false,
     );
-    $this->drupalPostForm('admin/config/smsframework/gateways/test', $edit, t('Save'));
+    $this->drupalPostForm('admin/config/smsframework/gateways/test', $edit, 'Save configuration');
     $this->assertResponse(200);
-    $gateway = sms_gateways('gateway', 'test');
-    $this->assertEqual($edit, $gateway['configuration'], 'SMS Test gateway successfully configured.');
+    $gateway = $this->gatewayManager->getGateway('test');
+    $this->assertEqual($edit, $gateway->getCustomConfiguration(), 'SMS Test gateway successfully configured.');
   }
 
   /**

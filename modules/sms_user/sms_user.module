@@ -8,6 +8,7 @@
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\sms\Gateway\GatewayInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
@@ -98,8 +99,10 @@ function sms_user_get_uid($number, $status = NULL) {
 
 /**
  * Implements hook_sms_send_process().
+ *
+ * Aborts sending if the user has opted out or is in sleep mode.
  */
-function sms_user_sms_send_process($step, SmsMessageInterface $sms, array $options, $gateway) {
+function sms_user_sms_send_process($step, SmsMessageInterface $sms, array $options, GatewayInterface $gateway) {
   if ($step == 'pre process') {
     if (\Drupal::config('sms_user.settings')->get('enable_sleep', 1) && $uid = sms_user_get_uid($sms->getRecipients()[0])) {
       $account = User::load($uid);

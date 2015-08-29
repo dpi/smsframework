@@ -14,6 +14,14 @@ sms.gateway_admin:
   requirements:
     _permission: 'administer smsframework'
 
+sms.gateway_add:
+  path: '/admin/config/smsframework/gateways/add'
+  defaults:
+    _form: '\Drupal\sms\Form\GatewayAddForm'
+    _title: 'Add new gateway configuration'
+  requirements:
+    _permission: 'administer smsframework'
+
 sms.gateway_config:
   path: '/admin/config/smsframework/gateways/{gateway_id}'
   defaults:
@@ -62,3 +70,10 @@ sms.bootstrap_admin:
     _title: 'Incoming SMS bootstrap'
   requirements:
     _permission: 'administer smsframework'
+
+sms.delivery_report:
+  path: '/sms/deliveryreport/{gateway_id}'
+  defaults:
+    _controller: '\Drupal\sms\DeliveryReportController::acknowledgeDelivery'
+  requirements:
+    _access: 'TRUE'
