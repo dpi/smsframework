@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\sms_courier\Plugin\IdentityChannel\SMS\User.
+ * Contains \Drupal\sms_user\Plugin\IdentityChannel\SMS\User.
  */
 
-namespace Drupal\sms_courier\Plugin\IdentityChannel\SMS;
+namespace Drupal\sms_user\Plugin\IdentityChannel\SMS;
 
 
 use Drupal\courier\Plugin\IdentityChannel\IdentityChannelPluginInterface;
@@ -33,12 +33,11 @@ class User implements IdentityChannelPluginInterface {
     /** @var \Drupal\user\UserInterface $identity */
     /** @var \Drupal\sms_courier\Entity\SmsMessage $message */
 
-    // @todo: use field defined by administrator.
-    if (empty($identity->{'field_phone_number'}->value)) {
+    if (empty($identity->sms_user['number'])) {
       throw new IdentityException('User does not have a phone number.');
     }
 
-    $message->setRecipient($identity->{'field_phone_number'}->value);
+    $message->setRecipient($identity->sms_user['number']);
   }
 
 }
