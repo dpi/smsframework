@@ -19,28 +19,28 @@ define('SMS_DIR_IN',    2);
 define('SMS_DIR_ALL',   4);
 
 // Message status codes.
-define('SMS_MSG_STATUS_UNKNOWN',    SmsMessageInterface::STATUS_UNKNOWN);
-define('SMS_MSG_STATUS_OK',         SmsMessageInterface::STATUS_OK);
-define('SMS_MSG_STATUS_DELIVERED',  SmsMessageInterface::STATUS_DELIVERED);
-define('SMS_MSG_STATUS_QUEUED',     SmsMessageInterface::STATUS_QUEUED);
-define('SMS_MSG_STATUS_ERROR',      SmsMessageInterface::STATUS_ERROR);
-define('SMS_MSG_STATUS_NOCREDIT',   SmsMessageInterface::STATUS_NO_CREDIT);
-define('SMS_MSG_STATUS_EXPIRED',    SmsMessageInterface::STATUS_EXPIRED);
-
-// Gateway response codes.
-define('SMS_GW_UNKNOWN_STATUS',    GatewayInterface::STATUS_UNKNOWN);
-define('SMS_GW_OK',                GatewayInterface::STATUS_OK);
-define('SMS_GW_ERR_AUTH',          GatewayInterface::STATUS_ERR_AUTH);
-define('SMS_GW_ERR_INVALID_CALL',  GatewayInterface::STATUS_ERR_INVALID_CALL);
-define('SMS_GW_ERR_NOT_FOUND',     GatewayInterface::STATUS_ERR_NOT_FOUND);
-define('SMS_GW_ERR_MSG_LIMITS',    GatewayInterface::STATUS_ERR_MSG_LIMITS);
-define('SMS_GW_ERR_MSG_ROUTING',   GatewayInterface::STATUS_ERR_MSG_ROUTING);
-define('SMS_GW_ERR_MSG_QUEUING',   GatewayInterface::STATUS_ERR_MSG_QUEUING);
-define('SMS_GW_ERR_MSG_OTHER',     GatewayInterface::STATUS_ERR_MSG_OTHER);
-define('SMS_GW_ERR_SRC_NUMBER',    GatewayInterface::STATUS_ERR_SRC_NUMBER);
-define('SMS_GW_ERR_DEST_NUMBER',   GatewayInterface::STATUS_ERR_DEST_NUMBER);
-define('SMS_GW_ERR_CREDIT',        GatewayInterface::STATUS_ERR_CREDIT);
-define('SMS_GW_ERR_OTHER',         GatewayInterface::STATUS_ERR_OTHER);
+//define('SMS_MSG_STATUS_UNKNOWN',    SmsMessageInterface::STATUS_UNKNOWN);
+//define('SMS_MSG_STATUS_OK',         SmsMessageInterface::STATUS_OK);
+//define('SMS_MSG_STATUS_DELIVERED',  SmsMessageInterface::STATUS_DELIVERED);
+//define('SMS_MSG_STATUS_QUEUED',     SmsMessageInterface::STATUS_QUEUED);
+//define('SMS_MSG_STATUS_ERROR',      SmsMessageInterface::STATUS_ERROR);
+//define('SMS_MSG_STATUS_NOCREDIT',   SmsMessageInterface::STATUS_NO_CREDIT);
+//define('SMS_MSG_STATUS_EXPIRED',    SmsMessageInterface::STATUS_EXPIRED);
+//
+//// Gateway response codes.
+//define('SMS_GW_UNKNOWN_STATUS',    GatewayInterface::STATUS_UNKNOWN);
+//define('SMS_GW_OK',                GatewayInterface::STATUS_OK);
+//define('SMS_GW_ERR_AUTH',          GatewayInterface::STATUS_ERR_AUTH);
+//define('SMS_GW_ERR_INVALID_CALL',  GatewayInterface::STATUS_ERR_INVALID_CALL);
+//define('SMS_GW_ERR_NOT_FOUND',     GatewayInterface::STATUS_ERR_NOT_FOUND);
+//define('SMS_GW_ERR_MSG_LIMITS',    GatewayInterface::STATUS_ERR_MSG_LIMITS);
+//define('SMS_GW_ERR_MSG_ROUTING',   GatewayInterface::STATUS_ERR_MSG_ROUTING);
+//define('SMS_GW_ERR_MSG_QUEUING',   GatewayInterface::STATUS_ERR_MSG_QUEUING);
+//define('SMS_GW_ERR_MSG_OTHER',     GatewayInterface::STATUS_ERR_MSG_OTHER);
+//define('SMS_GW_ERR_SRC_NUMBER',    GatewayInterface::STATUS_ERR_SRC_NUMBER);
+//define('SMS_GW_ERR_DEST_NUMBER',   GatewayInterface::STATUS_ERR_DEST_NUMBER);
+//define('SMS_GW_ERR_CREDIT',        GatewayInterface::STATUS_ERR_CREDIT);
+//define('SMS_GW_ERR_OTHER',         GatewayInterface::STATUS_ERR_OTHER);
 
 // Carrier status.
 define('SMS_CARRIER_DEFAULT', 0);

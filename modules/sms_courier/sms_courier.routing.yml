@@ -1,0 +1,15 @@
+entity.sms.canonical:
+  path: '/sms/{sms}/edit'
+  defaults:
+    _entity_form: 'sms.edit'
+    _title: 'Edit SMS'
+  requirements:
+    _entity_access: 'sms.update'
+
+entity.sms.edit_form:
+  path: '/sms/{sms}/edit'
+  defaults:
+    _entity_form: 'sms.edit'
+    _title: 'Edit SMS'
+  requirements:
+    _entity_access: 'sms.update'
