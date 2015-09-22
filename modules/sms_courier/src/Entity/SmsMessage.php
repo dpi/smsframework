@@ -11,8 +11,6 @@ use Drupal\courier\ChannelBase;
 use Drupal\sms_courier\SmsMessageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Component\Serialization\Json;
-use Drupal\courier\Exception\ChannelFailure;
 
 /**
  * Defines storage for a SMS.

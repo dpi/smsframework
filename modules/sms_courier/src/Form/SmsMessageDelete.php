@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Contains \Drupal\telstrasms\Form\TelstraSMSDelete.
+ * Contains \Drupal\sms_courier\Form\SmsMessageDelete.
  */
 
-namespace Drupal\telstrasms\Form;
+namespace Drupal\sms_courier\Form;
 
-class TelstraSMSDelete {
+class SmsMessageDelete {
 
 }
