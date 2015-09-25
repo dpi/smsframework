@@ -8,8 +8,6 @@
  * @subpackage sms_valid
  */
 
-use \Drupal\Component\Utility\String;
-
 /**
  * Implements hook_install().
  *
@@ -119,6 +117,5 @@ function sms_valid_create_example_ruleset(&$ret = array()) {
 
   $ret[] = array(
     'success' => !empty($ruleset),
-//    'query' => String::checkPlain($sql),
   );
 }

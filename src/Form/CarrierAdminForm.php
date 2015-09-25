@@ -8,8 +8,8 @@
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
-use Drupal\Component\Utility\String;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Provides a configuration form for sms carriers.
@@ -50,23 +50,23 @@ class CarrierAdminForm extends ConfigFormBase {
       }
       $form['status'][$css_safe_id] = array(
         '#type' => 'checkbox',
-        '#title' => String::checkPlain($carrier['name']),
-        '#description' => String::checkPlain($storage),
+        '#title' => $carrier['name'],
+        '#description' => $storage,
         '#default_value' => $carrier['status'] == 1,
       );
   
       $form['domain'][$css_safe_id] = array(
         '#type' => 'markup',
-        '#markup' => String::checkPlain($id),
+        '#markup' => $id,
       );
   
-      $actions[] = l($this->t('Edit'), "admin/config/smsframework/carriers/edit/{$id}");
+      $actions[] = \Drupal::l($this->t('Edit'), Url::fromRoute('sms.carrier_edit', ['domain' => $id]));
   
       if ($carrier['type'] == SMS_CARRIER_OVERRIDDEN) {
-        $actions[] = l($this->t('Revert'), "admin/config/smsframework/carriers/delete/{$id}");
+        $actions[] = \Drupal::l($this->t('Revert'), Url::fromRoute('sms.carrier_delete', ['domain' => $id]));
       }
       elseif ($carrier['type'] == SMS_CARRIER_NORMAL) {
-        $actions[] = l($this->t('Delete'), "admin/config/smsframework/carriers/delete/{$id}");
+        $actions[] = \Drupal::l($this->t('Delete'), Url::fromRoute('sms.carrier_delete', ['domain' => $id]));
       }
   
       $form['actions'][$css_safe_id] = array(

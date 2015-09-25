@@ -6,9 +6,9 @@
 
 namespace Drupal\sms_valid;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Form\FormBase;
-use Drupal\Component\Utility\String;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -80,7 +80,7 @@ class RulesetTestFormController extends FormBase {
         $result = sms_valid_validate($number, $options);
         $pass = $result['pass'];
         $log_msg = implode("<br />", $result['log']);
-        drupal_set_message(String::checkPlain($log_msg));
+        drupal_set_message(Html::escape($log_msg));
         break;
       // Test main validation function.
       case 1:
