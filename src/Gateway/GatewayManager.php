@@ -11,7 +11,6 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Drupal\Core\StringTranslation\TranslationWrapper;
 
 /**
  * Manages SMS gateways implemented using AnnotatedClassDiscovery
@@ -235,7 +234,7 @@ class GatewayManager extends DefaultPluginManager implements GatewayManagerInter
       // @todo Is that acceptable?
       $definitions[$id] = [
         'id' => $id,
-        'label' => new TranslationWrapper($hook_info['name']),
+        'label' => $hook_info['name'],
         'configurable' => is_callable($hook_info['configure form']),
         'class' => '\Drupal\sms\Gateway\HookGateway',
         'provider' => 'sms',

@@ -309,8 +309,7 @@ function sms_user_user_update($account) {
 /**
  * Implements hook_user_view().
  */
-//function sms_user_user_view(AccountInterface $account, $display, $view_mode, $langcode) {
-function sms_user_user_view(array &$build, UserInterface $account, EntityViewDisplayInterface $display, $view_mode, $langcode) {
+function sms_user_user_view(array &$build, UserInterface $account, EntityViewDisplayInterface $display, $view_mode) {
   $account = \Drupal::currentUser();
   if ($account->hasPermission('receive sms') && ($account->id() == $account->id() || $account->hasPermission('administer smsframework'))) {
     if (isset($account->sms_user['status']) && $account->sms_user['status'] == SMS_USER_PENDING) {
