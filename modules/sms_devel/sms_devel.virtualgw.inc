@@ -14,6 +14,9 @@
  "in_number" to simply "gw_number".
  */
 
+use Drupal\sms\Gateway\GatewayInterface;
+use Drupal\sms\Message\SmsMessageInterface;
+
 define('SMS_DEVEL_VIRTUALGW_TYPE_OUT',      0);
 define('SMS_DEVEL_VIRTUALGW_TYPE_IN',       1);
 define('SMS_DEVEL_VIRTUALGW_TYPE_RECEIPT', 2);
@@ -59,7 +62,7 @@ function sms_devel_virtualgw_send($number, $message, $options) {
   // Always return success
   return array(
     'status' => TRUE,
-    'status_code' => SMS_GW_OK,
+    'status_code' => GatewayInterface::STATUS_OK,
     'gateway_status_code' => 'OK',
     'gateway_status_text' => 'sms_devel_virtualgw: send: OK',
   );
@@ -153,7 +156,7 @@ function sms_devel_virtualgw_sendlogic($number, $message, $options) {
 
   if ($receipts_enabled) {
     // Trigger a message delivery receipt
-    $status = SMS_MSG_STATUS_DELIVERED;
+    $status = SmsMessageInterface::STATUS_DELIVERED;
     $reference = $options['reference'];
     $options['gateway_message_status'] = 'DELIVERED';
     $options['gateway_message_status_text'] = 'Message delivered OK';
