@@ -102,4 +102,17 @@ interface SmsMessageInterface {
    */
   public function getMessage();
 
+  /**
+   * Gets the UUID of the SMS object.
+   *
+   * @return string
+   */
+  public function getUuid();
+
+  /**
+   * Gets the user who created the SMS message.
+   *
+   * @return int
+   */
+  public function getUid();
 }

@@ -45,22 +45,33 @@ class SmsMessage implements SmsMessageInterface {
   protected $options = array();
 
   /**
+   * The UID of the creator of the SMS message.
+   *
+   * @var int
+   */
+  protected $uid;
+
+  /**
    * Creates a new instance of an SMS message.
    *
-   * @param string
+   * @param string $sender
    *   The sender of the message.
-   * @param array
+   * @param array $recipients
    *   The list of recipient phone numbers for the message.
-   * @param string
+   * @param string $message
    *   The actual SMS message to be sent.
-   * @param array
+   * @param array $options
    *   Additional options to be considered in building the SMS message
+   * @param int $uid
+   *   The user who created the SMS message.
    */
-  public function __construct($sender, array $recipients, $message, array $options) {
+  public function __construct($sender, array $recipients, $message, array $options, $uid) {
     $this->sender = $sender;
     $this->recipients = $recipients;
     $this->message = $message;
     $this->options = $options;
+    $this->uid = $uid;
+    $this->uuid = $this->uuidGenerator()->generate();
   }
 
   /**
@@ -99,6 +110,29 @@ class SmsMessage implements SmsMessageInterface {
       return $this->options[$name];
     }
     return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUuid() {
+    return $this->uuid;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUid() {
+    return $this->uid;
+  }
+
+  /**
+   * Gets the UUID generator.
+   *
+   * @return \Drupal\Component\Uuid\UuidInterface
+   */
+  protected function uuidGenerator() {
+    return \Drupal::service('uuid');
   }
 
 }
