@@ -1,8 +1,9 @@
 services:
+  sms_provider:
+    alias: sms_provider.default
   sms_provider.default:
     class: Drupal\sms\Provider\DefaultSmsProvider
     arguments: ['@plugin.manager.sms_gateway', '@module_handler']
-
   plugin.manager.sms_gateway:
     class: Drupal\sms\Gateway\GatewayManager
     arguments: ['@container.namespaces', '@config.factory', '@cache.discovery', '@module_handler']

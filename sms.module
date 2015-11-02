@@ -63,7 +63,7 @@ function sms_cron_queue_info() {
 function sms_send($number, $message, array $options = array()) {
   $sender = isset($options['sender']) ? $options['sender'] : '';
   $sms = new SmsMessage($sender, explode(',', $number), $message, $options, \Drupal::currentUser()->id());
-  return \Drupal::service('sms_provider.default')->send($sms, $options);
+  return \Drupal::service('sms_provider')->send($sms, $options);
 }
 
 /**
@@ -99,7 +99,7 @@ function sms_incoming_queue_worker(array $item) {
 function sms_incoming($number, $message, array $options = array()) {
   $sender = isset($options['sender']) ? $options['sender'] : '';
   $sms = new SmsMessage($sender, explode(',', $number), $message, $options, \Drupal::currentUser()->id());
-  \Drupal::service('sms_provider.default')->incoming($sms, $options);
+  \Drupal::service('sms_provider')->incoming($sms, $options);
 }
 
 /**
@@ -110,7 +110,7 @@ function sms_incoming($number, $message, array $options = array()) {
  * @deprecated use \Drupal\sms\Provider\SmsProviderInterface::receipt() instead.
  */
 function sms_receipt($number, $reference, $message_status = GatewayInterface::STATUS_UNKNOWN, $options = array()) {
-  \Drupal::service('sms_provider.default')->receipt($number, $reference, $message_status, $options);
+  \Drupal::service('sms_provider')->receipt($number, $reference, $message_status, $options);
 }
 
 /**
