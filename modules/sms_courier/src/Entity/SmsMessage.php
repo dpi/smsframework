@@ -17,7 +17,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *
  * @ContentEntityType(
  *   id = "sms",
- *   label = @Translation("SMS Message"),
+ *   label = @Translation("SMS"),
  *   handlers = {
  *     "form" = {
  *       "default" = "Drupal\sms_courier\Form\SmsMessage",
