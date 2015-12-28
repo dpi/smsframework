@@ -11,6 +11,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\sms\Gateway\GatewayInterface;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Message\SmsMessageResultInterface;
+use Drupal\sms\SmsException;
 
 // Direction codes.
 define('SMS_DIR_NONE',  0);
@@ -63,7 +65,25 @@ function sms_cron_queue_info() {
 function sms_send($number, $message, array $options = array()) {
   $sender = isset($options['sender']) ? $options['sender'] : '';
   $sms = new SmsMessage($sender, explode(',', $number), $message, $options, \Drupal::currentUser()->id());
-  return \Drupal::service('sms_provider')->send($sms, $options);
+  /** @var \Drupal\sms\Message\SmsMessageResultInterface $result */
+  $result = \Drupal::service('sms_provider')->send($sms, $options);
+  if ($result instanceof SmsMessageResultInterface) {
+    if ($result->getStatus()) {
+      return TRUE;
+    }
+    else {
+      // @todo Review all of this.
+      $error_message = t('Sending SMS to %number failed.', ['%number' => implode(',', $sms->getRecipients())]);
+      if ($message = $result->getErrorMessage()) {
+        $error_message .= t(' The gateway said %message.', ['%message' => $message]);
+      }
+      \Drupal::logger('sms')->error($message);
+      throw new SmsException($error_message);
+    }
+  }
+  else {
+    return FALSE;
+  }
 }
 
 /**

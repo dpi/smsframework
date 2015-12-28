@@ -22,6 +22,10 @@ interface SmsProviderInterface {
    *   The message to be sent.
    * @param array
    *   Additional options to be passed to the SMS gateway.
+   *
+   * @return \Drupal\sms\Message\SmsMessageResultInterface|false
+   *   The result of the message sending operation or false if the process was
+   *   aborted by a pre-process hook.
    */
   public function send(SmsMessageInterface $sms, array $options);
 

@@ -48,9 +48,6 @@ class DefaultSmsProvider implements SmsProviderInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * @TODO An effective method of cascading messages and errors back up from the
-   *   gateways.
    */
   public function send(SmsMessageInterface $sms, array $options = array()) {
     // Check if a preferred gateway is specified in the $options.
@@ -74,7 +71,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   }
 
   /**
-   * Processes the SMS message and handles the response from the gateway.
+   * Processes the SMS message and returns the response from the gateway.
    *
    * @param \Drupal\sms\Message\SmsMessageInterface $sms
    *   The SMS to be sent.
@@ -83,13 +80,11 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * @param \Drupal\sms\Gateway\GatewayInterface $gateway
    *   The default gateway for sending this message.
    *
-   * @return bool
-   *   TRUE if the message was successfully sent.
+   * @return \Drupal\sms\Message\SmsMessageResultInterface
+   *   The message result from the gateway.
    */
   protected function process(SmsMessageInterface $sms, array $options, GatewayInterface $gateway) {
-    $response = $gateway->send($sms, $options);
-    $result = $this->handleResult($response, $sms);
-    return $result;
+    return $gateway->send($sms, $options);
   }
 
   /**
@@ -102,7 +97,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * @param \Drupal\sms\Gateway\GatewayInterface $gateway
    *   The default gateway for sending this message.
    *
-   * @return bool
+   * @return bool|null
    *   Whether to continue sending or not.
    */
   protected function preProcess(SmsMessageInterface $sms, array $options, GatewayInterface $gateway) {
@@ -121,41 +116,12 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *   Additional options that were passed to the SMS gateway.
    * @param \Drupal\sms\Gateway\GatewayInterface $gateway
    *   The default gateway for sending this message.
-   * @param bool|array $result
-   *   The result from the gateway response handler.
+   * @param \Drupal\sms\Message\SmsMessageResultInterface $result
+   *   The message result from the gateway.
    */
-  protected function postProcess(SmsMessageInterface $sms, array $options, GatewayInterface $gateway, $result) {
+  protected function postProcess(SmsMessageInterface $sms, array $options, GatewayInterface $gateway, SmsMessageResultInterface $result) {
     // Call the send post process hooks.
     $this->moduleHandler->invokeAll('sms_send_process', ['post process', $sms, $options, $gateway, $result]);
-  }
-
-  /**
-   * Handles the response back from the SMS gateway.
-   *
-   * @param \Drupal\sms\Message\SmsMessageResultInterface $result
-   *   The message result to be handled.
-   * @param \Drupal\sms\Message\SmsMessageInterface $sms
-   *   The message that was sent.
-   *
-   * @return bool
-   *   True if message was sent successfully. Throws an SmsException if message
-   *   sending failed.
-   *
-   * @throws \Drupal\sms\SmsException
-   */
-  protected function handleResult(SmsMessageResultInterface $result, SmsMessageInterface $sms) {
-    if ($result->getStatus()) {
-      return TRUE;
-    }
-    else {
-      // @todo Review all of this.
-      $error_message = t('Sending SMS to %number failed.', ['%number' => implode(',', $sms->getRecipients())]);
-      if ($message = $result->getErrorMessage()) {
-        $error_message .= t(' The gateway said %message.', ['%message' => $message]);
-      }
-      \Drupal::logger('sms')->error($message);
-      throw new SmsException($error_message);
-    }
   }
 
   /**
