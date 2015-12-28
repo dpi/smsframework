@@ -26,7 +26,9 @@ class LogGateway extends GatewayBase {
     // Log sms message to drupal logger.
     $this->logger()->notice('SMS message sent to %number with the text: @message',
       ['%number' => implode(', ', $sms->getRecipients()), '@message' => $sms->getMessage()]);
-    return new SmsMessageResult(['status' => TRUE]);
+    $return = ['status' => TRUE];
+    $return['report'] = array_fill_keys($sms->getRecipients(), ['status' => TRUE, 'message_id' => rand(1, 999999)]);
+    return new SmsMessageResult($return);
   }
 
 }
