@@ -23,9 +23,21 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
   public static $modules = ['sms_user', 'syslog', 'sms_devel'];
 
   /**
+   * Tests that the sms_user field type is attached by default to the user 
+   * entity type.
+   */
+  public function testSmsUserFieldAttachment() {
+    // Confirm that the SMS user field is properly attached by default.
+//    debug($this->rootUser);
+    $user = User::load($this->rootUser->id());
+//    print($user->sms_user);
+    $this->assertTrue($user->sms_user);
+  }
+
+  /**
    * Tests user adding phone number.
    */
-  public function testNumberConfirmationAndSmsUserSend() {
+  public function _testNumberConfirmationAndSmsUserSend() {
     // Set up test default gateway.
     $this->setDefaultGateway('test');
     $user = $this->drupalCreateUser(array('receive sms', 'edit own sms number'));
@@ -84,7 +96,7 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
   /**
    * Tests sms_user admin options.
    */
-  public function testSmsUserOptions() {
+  public function _testSmsUserOptions() {
     $user = $this->drupalCreateUser(array('administer smsframework', 'receive sms', 'edit own sms number'));
     $this->drupalLogin($user);
 
@@ -151,7 +163,7 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
   /**
    * Tests whether a user can opt out and in for sms messages from the site.
    */
-  public function testSmsUserOptOut() {
+  public function _testSmsUserOptOut() {
 
     // Create Excluded User
     $excluded_user = $this->drupalCreateUser(array('administer smsframework', 'receive sms', 'edit own sms number'));

@@ -5,6 +5,8 @@
  * Provides integration between the SMS Framework and Drupal users.
  */
 
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
@@ -295,21 +297,21 @@ function sms_user_validate_number_element($element, FormStateInterface $form_sta
 /**
  * Implements hook_user_insert().
  */
-function sms_user_user_insert($account) {
+function _sms_user_user_insert($account) {
   return sms_user_save($account);
 }
 
 /**
  * Implements hook_user_update().
  */
-function sms_user_user_update($account) {
+function _sms_user_user_update($account) {
   return sms_user_save($account);
 }
 
 /**
  * Implements hook_user_view().
  */
-function sms_user_user_view(array &$build, UserInterface $account, EntityViewDisplayInterface $display, $view_mode) {
+function _sms_user_user_view(array &$build, UserInterface $account, EntityViewDisplayInterface $display, $view_mode) {
   $account = \Drupal::currentUser();
   if ($account->hasPermission('receive sms') && ($account->id() == $account->id() || $account->hasPermission('administer smsframework'))) {
     if (isset($account->sms_user['status']) && $account->sms_user['status'] == SMS_USER_PENDING) {
@@ -344,7 +346,7 @@ function sms_user_user_view(array &$build, UserInterface $account, EntityViewDis
 /**
  * Implements hook_form_alter().
  */
-function sms_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function _sms_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   if ($form_id == "user_register_form") {
     $config = \Drupal::config('sms_user.settings');
     if ($config->get('registration_form')) {
@@ -373,7 +375,7 @@ function sms_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
 /**
  * Implements hook_user_cancel().
  */
-function sms_user_user_cancel($edit, $account, $method) {
+function _sms_user_user_cancel($edit, $account, $method) {
   return sms_user_delete($account->id());
 }
 
@@ -390,7 +392,7 @@ function sms_user_user_login(AccountInterface $account) {
 
 /**
  * Implements hook_user_categories().
-function sms_user_user_categories() {
+function _sms_user_user_categories() {
   $categories['mobile'] = array(
     'name' => 'mobile',
     'title' => 'Mobile',
@@ -411,7 +413,7 @@ function sms_user_user_categories() {
  *
  * @todo the sms_user appendage to $account object can be implemented as extra data.
  */
-function sms_user_user_load(array $accounts) {
+function _sms_user_user_load(array $accounts) {
   $result = db_select('sms_user', 'u')
     ->fields('u', array('uid', 'number', 'status', 'code', 'gateway', 'sleep_enabled', 'sleep_start_time', 'sleep_end_time', 'opted_out'))
     ->condition('uid', array_keys($accounts), 'IN')
@@ -459,7 +461,7 @@ function sms_user_user_load(array $accounts) {
  * @return bool
  *   true if the operation is successful.
  */
-function sms_user_save(AccountInterface $account) {
+function _sms_user_save(AccountInterface $account) {
   if (isset($account->sms_user) && $account->sms_user['number'] && $account->id() != 0) {
     $info = (array) $account->sms_user;
     $info['uid'] = $account->id();
@@ -491,7 +493,7 @@ function sms_user_save(AccountInterface $account) {
  *
  * @see sms_user_user_cancel()
  */
-function sms_user_delete($uid, $number = FALSE) {
+function _sms_user_delete($uid, $number = FALSE) {
   if (is_object($uid)) {
     $uid = $uid->uid;
   }
@@ -866,38 +868,6 @@ function _sms_user_feedsprocess_set_value($source, $target_item, $target, $value
 }
 
 /**
- * Implements hook_entity_property_info_alter().
- */
-function sms_user_entity_property_info_alter(&$info) {
-  $properties = &$info['user']['properties'];
-  $properties['sms_user_phone_number'] = array(
-      'label' => t("Phone Number"),
-      'description' => t("The users mobile phone number."),
-      'type' => 'text',
-      'getter callback' => 'entity_property_sms_user_get_properties',
-      'computed' => TRUE,
-      'required' => FALSE,
-  );
-  $properties['sms_user_status'] = array(
-      'label' => t("SMS Status"),
-      'description' => t("The users status of the Mobile Phone number."),
-      'type' => 'text',
-      'getter callback' => 'entity_property_sms_user_get_properties',
-      'computed' => TRUE,
-      'required' => TRUE,
-  );
-  $properties['sms_user_gateway'] = array(
-      'label' => t("SMS Gateway"),
-      'description' => t("The SMS Gateway for this user."),
-      'type' => 'text',
-      'getter callback' => 'entity_property_sms_user_get_properties',
-      'computed' => TRUE,
-      'required' => FALSE,
-  );
-
-}
-
-/**
  * Gets properties for the sms_user_entity_property_info_alter() function.
  *
  * @param array $data
@@ -917,7 +887,7 @@ function sms_user_entity_property_info_alter(&$info) {
  * @todo the sms_user appendage to $account object needs to be implemented in a
  * data table in D8
  */
-function entity_property_sms_user_get_properties($data, array $options, $name, $type, $info) {
+function _entity_property_sms_user_get_properties($data, array $options, $name, $type, $info) {
   if (isset($data->uid) && ($data->uid > 0)) {
     $account = User::load($data->uid);
     if (isset($account->sms_user)) {
@@ -952,3 +922,19 @@ function entity_property_sms_user_get_properties($data, array $options, $name, $
   }
   return NULL;
 }
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function sms_user_entity_base_field_info(EntityTypeInterface $entity_type) {
+  $fields = [];
+  if ($entity_type->id() == 'user') {
+    $fields['sms_user'] = BaseFieldDefinition::create('sms_user')
+      ->setLabel(t('SMS User Info'))
+      ->setDescription(t('SMS Information for the user.'))
+      ->setCardinality(1)
+      ->setComputed(TRUE);
+  }
+  return $fields;
+}
+
