@@ -6,7 +6,7 @@ sms.settings:
   mapping:
     default_gateway:
       type: string
-      label: 'Default gateway for sending sms'
+      label: 'Plugin ID of default SMS Gateway'
     bootstrap_queue:
       type: sequence
       label: 'Bootstrap Queue'
@@ -19,25 +19,22 @@ sms.settings:
       sequence:
         - type: string
 
-# Configuration for sms gateways.
+# Configuration for SMS Gateways.
 sms.gateway.*:
-  type: config_object
+  type: config_entity
   label: 'SMS Gateway configuration'
   mapping:
-    label:
-      type: label
-      label: 'Human readable gateway label'
-    name:
+    id:
       type: string
       label: 'Gateway machine name'
-    plugin_id:
+    label:
+      type: label
+      label: 'Gateway label'
+    plugin:
       type: string
       label: 'Gateway plugin type'
-    enabled:
-      type: boolean
-      label: 'Gateway enabled status'
-    custom:
-      type: sequence
-      label: 'Additional gateway-specific configuration'
-      sequence:
-        - type: string
+    settings:
+      type: sms_gateway.settings.[%parent.plugin]
+
+sms_gateway.settings.*:
+  type: sms_gateway_settings

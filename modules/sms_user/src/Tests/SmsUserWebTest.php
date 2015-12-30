@@ -27,7 +27,7 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
    */
   public function testNumberConfirmationAndSmsUserSend() {
     // Set up test default gateway.
-    $this->setDefaultGateway('test');
+    $this->gatewayManager->setDefaultGateway($this->test_gateway);
     $user = $this->drupalCreateUser(array('receive sms', 'edit own sms number'));
     $this->drupalLogin($user);
 

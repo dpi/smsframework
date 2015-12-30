@@ -6,30 +6,41 @@ sms.admin:
   requirements:
     _permission: 'administer smsframework'
 
-sms.gateway_admin:
+# Gateways
+sms.gateway.list:
   path: '/admin/config/smsframework/gateways'
   defaults:
-    _form: '\Drupal\sms\Form\GatewayDefaultForm'
-    _title: 'Gateway configuration'
+    _controller: '\Drupal\Core\Entity\Controller\EntityListController::listing'
+    entity_type: 'sms_gateway'
+    _title: 'Gateways'
   requirements:
     _permission: 'administer smsframework'
 
-sms.gateway_add:
+entity.sms_gateway.add:
   path: '/admin/config/smsframework/gateways/add'
   defaults:
-    _form: '\Drupal\sms\Form\GatewayAddForm'
-    _title: 'Add new gateway configuration'
+    _entity_form: 'sms_gateway.add'
+    _title: 'Add gateway'
   requirements:
     _permission: 'administer smsframework'
 
-sms.gateway_config:
-  path: '/admin/config/smsframework/gateways/{gateway_id}'
+entity.sms_gateway.edit_form:
+  path: '/admin/config/smsframework/gateways/{sms_gateway}'
   defaults:
-    _form: '\Drupal\sms\Form\GatewayConfigForm'
-    _title_callback: '\Drupal\sms\Form\GatewayConfigForm::getTitle'
+    _entity_form: 'sms_gateway.edit'
+    _title: 'Edit gateway'
   requirements:
     _permission: 'administer smsframework'
 
+entity.sms_gateway.delete_form:
+  path: '/admin/config/smsframework/gateways/{sms_gateway}/delete'
+  defaults:
+    _entity_form: 'sms_gateway.delete'
+    _title: 'Delete gateway'
+  requirements:
+    _permission: 'administer smsframework'
+
+# Carriers
 sms.carrier_admin:
   path: '/admin/config/smsframework/carriers'
   defaults:

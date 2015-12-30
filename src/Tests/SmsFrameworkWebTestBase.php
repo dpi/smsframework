@@ -7,7 +7,9 @@
 
 namespace Drupal\sms\Tests;
 
-use \Drupal\simpletest\WebTestBase;
+use Drupal\simpletest\WebTestBase;
+use Drupal\sms\Entity\SmsGateway;
+use Drupal\Component\Utility\Unicode;
 
 /**
  * Provides commonly used functionality for tests.
@@ -24,25 +26,26 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
   protected $gatewayManager;
 
   /**
+   * Test gateway.
+   *
+   * @var \Drupal\sms\SmsGatewayInterface
+   */
+  protected $test_gateway;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp() {
     parent::setUp();
     $this->gatewayManager = $this->container->get('plugin.manager.sms_gateway');
     // Add an instance of test gateway.
-    $this->gatewayManager->addGateway('test', ['name' => 'test']);
-  }
-
-  /**
-   * Sets the specified gateway as the default.
-   *
-   * @param string $gateway_id
-   *   The ID of the gateway to be set as default.
-   */
-  public function setDefaultGateway($gateway_id) {
-    // Ensure gateway is enabled first.
-    $this->gatewayManager->setEnabledGateways([$gateway_id]);
-    $this->gatewayManager->setDefaultGateway($gateway_id);
+    $this->test_gateway = SmsGateway::create([
+      'plugin' => 'log',
+      'id' => Unicode::strtolower($this->randomMachineName(16)),
+      'label' => $this->randomString(),
+    ]);
+    $this->test_gateway->enable();
+    $this->test_gateway->save();
   }
 
 }

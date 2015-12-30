@@ -1,3 +1,9 @@
 # Default configuration for log gateway.
-enabled: true
-plugin_id: log
+uuid: 51fe9573-f6ff-4486-8e05-054bafb2e9b3
+langcode: en
+status: true
+dependencies: {  }
+id: log
+label: 'Logger'
+plugin: log
+settings: []

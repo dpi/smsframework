@@ -28,7 +28,7 @@ class SmsDevelWebTest extends SmsFrameworkWebTestBase {
     $this->drupalLogin($user);
 
     // Set up test default gateway.
-    $this->setDefaultGateway('test');
+    $this->gatewayManager->setDefaultGateway($this->test_gateway);
 
     $test_message1 = array(
       'number' => '1234567890',

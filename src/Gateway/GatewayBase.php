@@ -41,27 +41,6 @@ abstract class GatewayBase extends PluginBase implements GatewayInterface {
   /**
    * {@inheritdoc}
    */
-  public function getIdentifier() {
-    return $this->configuration['name'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getName() {
-    return $this->configuration['name'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getLabel() {
-    return $this->configuration['label'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getConfiguration() {
     return $this->configuration;
   }
@@ -76,35 +55,8 @@ abstract class GatewayBase extends PluginBase implements GatewayInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCustomConfiguration() {
-    return $this->configuration['custom'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setCustomConfiguration($configuration) {
-    $this->configuration['custom'] = $configuration;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function defaultConfiguration() {
-    return [
-      'plugin_id' => $this->pluginDefinition['id'],
-      'name' => $this->pluginDefinition['id'],
-      'label' => (string) $this->pluginDefinition['label'],
-      'enabled' => FALSE,
-      'custom' => [],
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isConfigurable() {
-    return $this->pluginDefinition['configurable'];
+    return [];
   }
 
   /**
@@ -133,20 +85,6 @@ abstract class GatewayBase extends PluginBase implements GatewayInterface {
    */
   public function sendForm(array &$form, FormStateInterface $form_state) {
     return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isEnabled() {
-    return isset($this->configuration['enabled']) ? $this->configuration['enabled'] : FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setEnabled($enabled = TRUE) {
-    $this->configuration['enabled'] = (bool) $enabled;
   }
 
   /**
@@ -189,7 +127,8 @@ abstract class GatewayBase extends PluginBase implements GatewayInterface {
    */
   protected function logger() {
     if (!isset($this->logger)) {
-      $this->logger = \Drupal::logger($this->getName());
+      $definition = $this->getPluginDefinition();
+      $this->logger = \Drupal::logger($definition['provider'] . '.' . $definition['id'] );
     }
     return $this->logger;
   }

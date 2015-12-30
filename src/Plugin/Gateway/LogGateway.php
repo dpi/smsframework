@@ -13,7 +13,7 @@ use Drupal\sms\Message\SmsMessageResult;
 /**
  * @SmsGateway(
  *   id = "log",
- *   label = @Translation("Log only"),
+ *   label = @Translation("Drupal log"),
  *   configurable = false,
  * )
  */

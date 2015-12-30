@@ -4,10 +4,10 @@ sms.admin:
   route_name: sms.admin
   parent: system.admin_config
 
-sms.gateway_admin:
-  title: 'Gateway configuration'
-  description: 'Configure gateways and choose the default gateway.'
-  route_name: sms.gateway_admin
+sms.gateway.list:
+  title: 'Gateways'
+  description: 'Configure gateways and select default gateway.'
+  route_name: sms.gateway.list
   parent: sms.admin
   weight: -10
 

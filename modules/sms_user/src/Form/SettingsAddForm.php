@@ -34,8 +34,12 @@ class SettingsAddForm extends ConfigFormBase {
     if (!isset($account)) {
       $account = $this->currentUser();
     }
+
     // Use SMS Send form for 'number' and 'gateway' fields.
-    $form = parent::buildForm(sms_send_form(TRUE), $form_state);
+    if ($send_form = sms_send_form(TRUE)) {
+      $form = parent::buildForm($send_form, $form_state);
+    }
+
     // Add element validation for number.
     $form['number']['#element_validate'][] = 'sms_user_validate_number_element';
     $form['uid'] = array(

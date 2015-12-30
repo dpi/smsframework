@@ -5,9 +5,9 @@ sms.carrier_add:
   appears_on:
     - sms.carrier_admin
 
-sms.gateway_add:
-  title: 'Add Configurable Gateway'
-  route_name: sms.gateway_add
+entity.sms_gateway.add:
+  title: 'Add gateway'
+  route_name: entity.sms_gateway.add
   weight: 1
   appears_on:
-    - sms.gateway_admin
+    - sms.gateway.list
