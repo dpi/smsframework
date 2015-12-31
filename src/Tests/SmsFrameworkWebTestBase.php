@@ -48,4 +48,22 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
     $this->test_gateway->save();
   }
 
+  /**
+   * Get the last SMS message sent to 'Memory' gateway.
+   *
+   * @return \Drupal\sms\Message\SmsMessageInterface|NULL
+   *   The last SMS message, or FALSE if no messages have been sent.
+   */
+  public function getLastTestMessage() {
+    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
+    return end($sms_messages);
+  }
+
+  /**
+   * Resets SMS messages stored in memory by 'Memory' gateway.
+   */
+  public function resetTestMessages() {
+    \Drupal::state()->set('sms_test_gateway.memory.send', []);
+  }
+
 }

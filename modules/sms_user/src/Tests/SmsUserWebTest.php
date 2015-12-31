@@ -40,10 +40,7 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
     $this->assertNoFieldByXPath('//input[@name="sleep_enabled"]', null, 'SMS User sleep enable settings not available for unconfirmed user.');
 
     // Get the code that was sent.
-
-    /** @var \Drupal\sms\Message\SmsMessageInterface $sms_message */
-    $sms_message = array_pop(\Drupal::state()->get('sms_test_gateway.memory.send', []));
-
+    $sms_message = $this->getLastTestMessage();
     preg_match('/\b([0-9]{4})\b/', $sms_message->getMessage(), $matches);
     $code = $matches[1];
     // Post the code for confirmation.
@@ -60,7 +57,7 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
     $message = 'Test user message';
     $this->assertTrue(sms_user_send($user->id(), $message), 'Successfully sent message to user with permission');
 
-    $sms_message = array_pop(\Drupal::state()->get('sms_test_gateway.memory.send', []));
+    $sms_message = $this->getLastTestMessage();
     $this->assertEqual($sms_message->getMessage(), $message, 'Message sent through the correct gateway.');
 
     // Test sms_user_authenticate() on this user.
@@ -186,7 +183,7 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
       'message' => 'Test opting out of messages',
     );
 
-    \Drupal::state()->set('sms_test_gateway.memory.send', []);
+    $this->resetTestMessages();
     $this->drupalPostForm('admin/config/smsframework/devel', $test_message1, t('Send Message'));
     $this->assertResponse(200);
     // Test if the message was not sent by checking the cached sms_test message
@@ -216,7 +213,7 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
       'message' => 'Test opting in for messages.',
     );
 
-    \Drupal::state()->set('sms_test_gateway.memory.send', []);
+    $this->resetTestMessages();
     $this->drupalPostForm('admin/config/smsframework/devel', $test_message2, t('Send Message'));
     $this->assertResponse(200);
     $this->assertText('Form submitted ok for number ' . $test_message2['number'] . ' and message: ' . $test_message2['message'], 'Successfully sent message to recipient with registered number');
@@ -224,8 +221,7 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
     // Test if the message was not sent by checking the cached sms_test message
     // result.
 
-    /** @var \Drupal\sms\Message\SmsMessageInterface $sms_message */
-    $sms_message = array_pop(\Drupal::state()->get('sms_test_gateway.memory.send', []));
+    $sms_message = $this->getLastTestMessage();
     $this->assertTrue(in_array($test_message2['number'], $sms_message->getRecipients()),  t('Message was sent to user that did not opt out.'));
 
     // Disable Opt Out for this site.
@@ -239,12 +235,12 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
     $this->assertNoText(t('Opt out of sms messages from this site.'), t('Opt out checkbox not visible in UI.'));
 
     // Ensure opt out doesn't work when message is sent.
-    \Drupal::state()->set('sms_test_gateway.memory.send', []);
+    $this->resetTestMessages();
     $this->drupalPostForm('admin/config/smsframework/devel', $test_message1, t('Send Message'));
     $this->assertResponse(200);
     $this->assertText('Form submitted ok for number ' . $test_message1['number'] . ' and message: ' . $test_message1['message'], 'Successfully sent message to recipient with registered number');
 
-    $sms_message = array_pop(\Drupal::state()->get('sms_test_gateway.memory.send', []));
+    $sms_message = $this->getLastTestMessage();
     $this->assertTrue(in_array($test_message1['number'], $sms_message->getRecipients()),  t('Message was sent to user who opted out due to global override.'));
   }
 
