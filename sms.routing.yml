@@ -10,8 +10,7 @@ sms.admin:
 sms.gateway.list:
   path: '/admin/config/smsframework/gateways'
   defaults:
-    _controller: '\Drupal\Core\Entity\Controller\EntityListController::listing'
-    entity_type: 'sms_gateway'
+    _entity_list: 'sms_gateway'
     _title: 'Gateways'
   requirements:
     _permission: 'administer smsframework'

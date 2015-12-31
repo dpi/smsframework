@@ -74,7 +74,7 @@ class SmsGatewayForm extends EntityForm {
 
     $form['gateway']['label'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Labelx'),
+      '#title' => $this->t('Label'),
       '#maxlength' => 255,
       '#default_value' => $sms_gateway->label(),
       '#required' => TRUE,
@@ -144,8 +144,8 @@ class SmsGatewayForm extends EntityForm {
       $this->setEntity($sms_gateway);
     }
     else {
-      $instance = $sms_gateway->getPlugin();
-      $instance->validateConfigurationForm($form, $form_state);
+      $sms_gateway->getPlugin()
+        ->validateConfigurationForm($form, $form_state);
     }
   }
 
@@ -159,8 +159,8 @@ class SmsGatewayForm extends EntityForm {
     $sms_gateway = $this->getEntity();
 
     if (!$sms_gateway->isNew()) {
-      $instance = $sms_gateway->getPlugin();
-      $instance->submitConfigurationForm($form, $form_state);
+      $sms_gateway->getPlugin()
+        ->submitConfigurationForm($form, $form_state);
     }
   }
 

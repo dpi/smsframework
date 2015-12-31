@@ -6,7 +6,7 @@ sms.settings:
   mapping:
     default_gateway:
       type: string
-      label: 'Plugin ID of default SMS Gateway'
+      label: 'Entity ID of default SMS Gateway'
     bootstrap_queue:
       type: sequence
       label: 'Bootstrap Queue'

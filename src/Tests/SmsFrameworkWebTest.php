@@ -20,11 +20,25 @@ class SmsFrameworkWebTest extends SmsFrameworkWebTestBase {
    * Tests the HookGateway implementation.
    */
   public function testGatewayConfigIntegration() {
-    // Test that gateway plugins are correctly discovered.
-    $gateway_plugins = SmsGateway::loadMultiple();
-
+    // Test that gateways are correctly discovered.
     // 'log' from module install. 'test_gateway' from test setup.
-    $this->assertEqual(array_keys($gateway_plugins), ['log', $this->test_gateway->id()]);
+    $this->assertEqual(
+      array_keys(SmsGateway::loadMultiple()),
+      ['log', $this->testGateway->id()]
+    );
+  }
+
+  /**
+   * Tests the Gateway list implementation.
+   */
+  public function testGatewayList() {
+    $this->drupalLogin($this->drupalCreateUser(['administer smsframework']));
+
+    $this->drupalGet('admin/config/smsframework/gateways');
+    $this->assertResponse(200);
+
+    $this->assertRaw('<td>Drupal log</td>');
+    $this->assertRaw('<td>Memory</td>');
   }
 
   /**
@@ -54,13 +68,13 @@ class SmsFrameworkWebTest extends SmsFrameworkWebTestBase {
     $this->drupalLogin($this->drupalCreateUser(['administer smsframework']));
 
     // Change default gateway.
-    $this->drupalPostForm('admin/config/smsframework/gateways/' . $this->test_gateway->id(), [
+    $this->drupalPostForm('admin/config/smsframework/gateways/' . $this->testGateway->id(), [
       'site_default' => TRUE,
     ], 'Save');
     $this->assertResponse(200);
 
     $sms_gateway_default = $this->gatewayManager->getDefaultGateway();
-    $this->assertEqual($sms_gateway_default->id(), $this->test_gateway->id(), 'Default gateway changed.');
+    $this->assertEqual($sms_gateway_default->id(), $this->testGateway->id(), 'Default gateway changed.');
   }
 
   /**
@@ -69,20 +83,20 @@ class SmsFrameworkWebTest extends SmsFrameworkWebTestBase {
   public function testGatewayConfiguration() {
     $this->drupalLogin($this->drupalCreateUser(['administer smsframework']));
 
-    $this->drupalGet('admin/config/smsframework/gateways/' . $this->test_gateway->id());
+    $this->drupalGet('admin/config/smsframework/gateways/' . $this->testGateway->id());
     $this->assertResponse(200);
 
 
     $edit = array(
       'widget' => 'FooBar',
     );
-    $this->drupalPostForm('admin/config/smsframework/gateways/' . $this->test_gateway->id(), $edit, 'Save');
+    $this->drupalPostForm('admin/config/smsframework/gateways/' . $this->testGateway->id(), $edit, 'Save');
     $this->assertResponse(200);
 
     // Reload the gateway.
-    $this->test_gateway = SmsGateway::load($this->test_gateway->id());
+    $this->testGateway = SmsGateway::load($this->testGateway->id());
     // Check the entity that config was changed.
-    $config = $this->test_gateway->getPlugin()->getConfiguration();
+    $config = $this->testGateway->getPlugin()->getConfiguration();
     $this->assertEqual($edit, $config, 'Config changed.');
   }
 
@@ -91,24 +105,23 @@ class SmsFrameworkWebTest extends SmsFrameworkWebTestBase {
    */
   public function testSendSms() {
     $this->drupalLogin($this->drupalCreateUser(['administer smsframework']));
+
+    // Ensure default gateway is different to test_gateway.
+    $this->assertNotEqual($this->gatewayManager->getDefaultGateway(), $this->testGateway->id());
+
     $message = 'This is a test message';
     $number = '23412345678';
     $options = [
       'sender' => 'Sender',
-      'gateway' => $this->test_gateway->id()
+      'gateway' => $this->testGateway->id()
     ];
 
     // Send sms to test gateway.
+    $pre_count = count($this->getTestMessages());
     $result = sms_send($number, $message, $options);
     $this->assertTrue($result, 'Message successfully sent.');
 
-    /** @var \Drupal\sms\Message\SmsMessageInterface[] $sms_messages */
-    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
-
-    $this->assertEqual(
-      $sms_messages[0]->getMessage(),
-      $message,
-      'Message sent to the correct gateway.'
+    $this->assertTrue(count($this->getTestMessages()) > $pre_count, 'Message sent to the correct gateway.'
     );
   }
 

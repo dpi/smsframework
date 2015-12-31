@@ -27,7 +27,7 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
    */
   public function testNumberConfirmationAndSmsUserSend() {
     // Set up test default gateway.
-    $this->gatewayManager->setDefaultGateway($this->test_gateway);
+    $this->gatewayManager->setDefaultGateway($this->testGateway);
     $user = $this->drupalCreateUser(array('receive sms', 'edit own sms number'));
     $this->drupalLogin($user);
 
@@ -58,7 +58,7 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
     $this->assertTrue(sms_user_send($user->id(), $message), 'Successfully sent message to user with permission');
 
     $sms_message = $this->getLastTestMessage();
-    $this->assertEqual($sms_message->getMessage(), $message, 'Message sent through the correct gateway.');
+    $this->assertTrue(in_array($edit['number'], $sms_message->getRecipients()), 'Message sent through the correct gateway.');
 
     // Test sms_user_authenticate() on this user.
     $account = sms_user_authenticate($user->sms_user['number']);
@@ -159,7 +159,7 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
     $this->drupalLogin($excluded_user);
 
     // Set up test default gateway.
-    $this->gatewayManager->setDefaultGateway($this->test_gateway);
+    $this->gatewayManager->setDefaultGateway($this->testGateway);
     $sms_user_settings = array(
       'registration_enabled' => TRUE,
       'allow_password' => TRUE,

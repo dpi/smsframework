@@ -26,11 +26,11 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
   protected $gatewayManager;
 
   /**
-   * Test gateway.
+   * 'Memory' test gateway instance.
    *
    * @var \Drupal\sms\SmsGatewayInterface
    */
-  protected $test_gateway;
+  protected $testGateway;
 
   /**
    * {@inheritdoc}
@@ -39,13 +39,22 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
     parent::setUp();
     $this->gatewayManager = $this->container->get('plugin.manager.sms_gateway');
     // Add an instance of test gateway.
-    $this->test_gateway = SmsGateway::create([
+    $this->testGateway = SmsGateway::create([
       'plugin' => 'memory',
       'id' => Unicode::strtolower($this->randomMachineName(16)),
       'label' => $this->randomString(),
     ]);
-    $this->test_gateway->enable();
-    $this->test_gateway->save();
+    $this->testGateway->enable();
+    $this->testGateway->save();
+  }
+
+  /**
+   * Get all SMS messages sent to 'Memory' gateway.
+   *
+   * @return \Drupal\sms\Message\SmsMessageInterface[]
+   */
+  function getTestMessages() {
+    return \Drupal::state()->get('sms_test_gateway.memory.send', []);
   }
 
   /**

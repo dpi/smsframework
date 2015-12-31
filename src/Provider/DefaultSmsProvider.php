@@ -86,8 +86,8 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *   The message result from the gateway.
    */
   protected function process(SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway) {
-    $instance = $sms_gateway->getPlugin();
-    return $instance->send($sms, $options);
+    return $sms_gateway->getPlugin()
+      ->send($sms, $options);
   }
 
   /**
