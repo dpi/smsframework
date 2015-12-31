@@ -75,7 +75,11 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
    */
   protected $plugin;
 
-  // @todo document
+  /**
+   * The plugin collection that holds the plugin for this entity.
+   *
+   * @var \Drupal\sms\Plugin\SmsGatewayPluginCollection
+   */
   protected $pluginCollection;
 
   /**

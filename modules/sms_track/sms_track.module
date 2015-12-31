@@ -7,11 +7,11 @@
  * @subpackage sms_track
  */
 
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\sms\Gateway\GatewayInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
-use \Drupal\views\ViewExecutable;
+use Drupal\views\ViewExecutable;
+use Drupal\sms\SmsGatewayInterface;
 
 /**
  * Implements hook_help().
@@ -44,7 +44,7 @@ function sms_track_cron() {
 /**
  * Implements hook_sms_send().
  */
-function sms_track_sms_send(SmsMessageInterface $sms, array $options, GatewayInterface $gateway) {
+function sms_track_sms_send(SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway) {
   // Tracking.
   // Place a tracking reference on a sent message if we need to.
   if (!empty($options) && !array_key_exists('reference', $options)) {
@@ -61,17 +61,17 @@ function sms_track_sms_send(SmsMessageInterface $sms, array $options, GatewayInt
  *   The SMS message object.
  * @param array $options
  *   Additional options array including sender.
- * @param \Drupal\sms\Gateway\GatewayInterface $gateway
+ * @param \Drupal\sms\SmsGatewayInterface $sms_gateway
  *   Gateway array for the active gateway.
  * @param bool|array $result
  *   The result from the gateway response handler.
  */
-function sms_track_sms_send_process($op, SmsMessageInterface $sms, array $options, GatewayInterface $gateway, $result) {
+function sms_track_sms_send_process($op, SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway, $result) {
   if ($op == 'post process') {
     // Archiving (outgoing == 0)
     $dir = 0;
     $options = (isset($options) && is_array($options))? $options : array();
-    $options['gateway_id'] = $gateway->getIdentifier();
+    $options['gateway_id'] = $sms_gateway->id();
     $options['result']  = $result;
     sms_track_archive_write($dir, implode(',', $sms->getRecipients()), $sms->getMessage(), $options);
   }

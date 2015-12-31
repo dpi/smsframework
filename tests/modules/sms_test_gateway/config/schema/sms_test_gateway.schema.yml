@@ -1,0 +1,7 @@
+sms_gateway.settings.memory:
+  type: sms_gateway_settings
+  label: 'Memory'
+  mapping:
+    widget:
+      type: string
+      label: 'Widget'

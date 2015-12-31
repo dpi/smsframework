@@ -40,7 +40,7 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
     $this->gatewayManager = $this->container->get('plugin.manager.sms_gateway');
     // Add an instance of test gateway.
     $this->test_gateway = SmsGateway::create([
-      'plugin' => 'log',
+      'plugin' => 'memory',
       'id' => Unicode::strtolower($this->randomMachineName(16)),
       'label' => $this->randomString(),
     ]);
