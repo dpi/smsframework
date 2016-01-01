@@ -107,7 +107,7 @@ class SmsFrameworkWebTest extends SmsFrameworkWebTestBase {
     $this->drupalLogin($this->drupalCreateUser(['administer smsframework']));
 
     // Ensure default gateway is different to test_gateway.
-    $this->assertNotEqual($this->gatewayManager->getDefaultGateway(), $this->testGateway->id());
+    $this->assertNotEqual($this->gatewayManager->getDefaultGateway()->id(), $this->testGateway->id());
 
     $message = 'This is a test message';
     $number = '23412345678';
