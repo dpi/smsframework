@@ -8,11 +8,13 @@
 namespace Drupal\sms\Provider;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Gateway\GatewayInterface;
 use Drupal\sms\Gateway\GatewayManagerInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\SmsException;
+use Drupal\sms\SmsGatewayInterface;
 
 /**
  * The SMS provider that provides default messaging functionality.
@@ -52,7 +54,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   public function send(SmsMessageInterface $sms, array $options = array()) {
     // Check if a preferred gateway is specified in the $options.
     if (isset($options['gateway'])) {
-      $gateway = $this->gatewayManager->getGateway($options['gateway']);
+      $gateway = SmsGateway::load($options['gateway']);
     }
     if (empty($gateway)) {
       $gateway = $this->gatewayManager->getDefaultGateway();
@@ -83,8 +85,9 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * @return \Drupal\sms\Message\SmsMessageResultInterface
    *   The message result from the gateway.
    */
-  protected function process(SmsMessageInterface $sms, array $options, GatewayInterface $gateway) {
-    return $gateway->send($sms, $options);
+  protected function process(SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway) {
+    return $sms_gateway->getPlugin()
+      ->send($sms, $options);
   }
 
   /**
@@ -100,9 +103,9 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * @return bool|null
    *   Whether to continue sending or not.
    */
-  protected function preProcess(SmsMessageInterface $sms, array $options, GatewayInterface $gateway) {
+  protected function preProcess(SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway) {
     // Call the send pre process hooks.
-    $return = $this->moduleHandler->invokeAll('sms_send_process', ['pre process', $sms, $options, $gateway, NULL]);
+    $return = $this->moduleHandler->invokeAll('sms_send_process', ['pre process', $sms, $options, $sms_gateway, NULL]);
     // Return FALSE if any of the hooks returned FALSE.
     return !in_array(FALSE, $return, TRUE);
   }
@@ -119,7 +122,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * @param \Drupal\sms\Message\SmsMessageResultInterface $result
    *   The message result from the gateway.
    */
-  protected function postProcess(SmsMessageInterface $sms, array $options, GatewayInterface $gateway, SmsMessageResultInterface $result) {
+  protected function postProcess(SmsMessageInterface $sms, array $options, SmsGatewayInterface $gateway, SmsMessageResultInterface $result) {
     // Call the send post process hooks.
     $this->moduleHandler->invokeAll('sms_send_process', ['post process', $sms, $options, $gateway, $result]);
   }

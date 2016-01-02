@@ -7,7 +7,9 @@
 
 namespace Drupal\sms\Tests;
 
-use \Drupal\simpletest\WebTestBase;
+use Drupal\simpletest\WebTestBase;
+use Drupal\sms\Entity\SmsGateway;
+use Drupal\Component\Utility\Unicode;
 
 /**
  * Provides commonly used functionality for tests.
@@ -24,25 +26,53 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
   protected $gatewayManager;
 
   /**
+   * 'Memory' test gateway instance.
+   *
+   * @var \Drupal\sms\SmsGatewayInterface
+   */
+  protected $testGateway;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp() {
     parent::setUp();
     $this->gatewayManager = $this->container->get('plugin.manager.sms_gateway');
     // Add an instance of test gateway.
-    $this->gatewayManager->addGateway('test', ['name' => 'test']);
+    $this->testGateway = SmsGateway::create([
+      'plugin' => 'memory',
+      'id' => Unicode::strtolower($this->randomMachineName(16)),
+      'label' => $this->randomString(),
+    ]);
+    $this->testGateway->enable();
+    $this->testGateway->save();
   }
 
   /**
-   * Sets the specified gateway as the default.
+   * Get all SMS messages sent to 'Memory' gateway.
    *
-   * @param string $gateway_id
-   *   The ID of the gateway to be set as default.
+   * @return \Drupal\sms\Message\SmsMessageInterface[]
    */
-  public function setDefaultGateway($gateway_id) {
-    // Ensure gateway is enabled first.
-    $this->gatewayManager->setEnabledGateways([$gateway_id]);
-    $this->gatewayManager->setDefaultGateway($gateway_id);
+  function getTestMessages() {
+    return \Drupal::state()->get('sms_test_gateway.memory.send', []);
+  }
+
+  /**
+   * Get the last SMS message sent to 'Memory' gateway.
+   *
+   * @return \Drupal\sms\Message\SmsMessageInterface|NULL
+   *   The last SMS message, or FALSE if no messages have been sent.
+   */
+  public function getLastTestMessage() {
+    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
+    return end($sms_messages);
+  }
+
+  /**
+   * Resets SMS messages stored in memory by 'Memory' gateway.
+   */
+  public function resetTestMessages() {
+    \Drupal::state()->set('sms_test_gateway.memory.send', []);
   }
 
 }

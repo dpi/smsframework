@@ -28,7 +28,7 @@ class SmsDevelWebTest extends SmsFrameworkWebTestBase {
     $this->drupalLogin($user);
 
     // Set up test default gateway.
-    $this->setDefaultGateway('test');
+    $this->gatewayManager->setDefaultGateway($this->testGateway);
 
     $test_message1 = array(
       'number' => '1234567890',
@@ -37,12 +37,15 @@ class SmsDevelWebTest extends SmsFrameworkWebTestBase {
 
     $this->drupalPostForm('admin/config/smsframework/devel', $test_message1, t('Send Message'));
     $this->assertResponse(200);
-    $this->assertText('Form submitted ok for number ' . $test_message1['number'] . ' and message: ' . $test_message1['message'], 'Successfully sent message using form.');
+    $this->assertRaw('Form submitted ok for number ' . $test_message1['number'] . ' and message: ' . $test_message1['message'], 'Successfully sent message using form.');
 
     // Check from gateway that the sms got sent. Use array_intersect_assoc() to
     // remove other array elements not needed.
-    $result = array_intersect_assoc(sms_test_gateway_result(), $test_message1);
-    $this->assertEqual($result, $test_message1, 'Message was sent correctly using sms_devel.');
+
+    /** @var \Drupal\sms\Message\SmsMessageInterface[] $sms_messages */
+    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
+
+    $this->assertEqual($sms_messages[0]->getMessage(), $test_message1['message'], 'Message was sent correctly using sms_devel.');
 
     $test_message2 = array(
       'number' => '0987654321',

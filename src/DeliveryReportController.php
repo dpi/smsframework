@@ -8,6 +8,7 @@
 namespace Drupal\sms;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\sms\Entity\SmsGateway;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\sms\Gateway\GatewayManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -54,7 +55,11 @@ class DeliveryReportController implements ContainerInjectionInterface {
    * @return \Symfony\Component\HttpFoundation\Response
    */
   public function acknowledgeDelivery($gateway_id) {
-    $acknowledgement = $this->gatewayManager->getGateway($gateway_id)->deliveryReport($this->requestStack->getCurrentRequest());
+    /** @var \Drupal\sms\Entity\SmsGateway $sms_gateway */
+    $sms_gateway = SmsGateway::load($gateway_id);
+    $acknowledgement = $sms_gateway
+      ->getPlugin()
+      ->deliveryReport($this->requestStack->getCurrentRequest());
     return new Response($acknowledgement);
   }
 

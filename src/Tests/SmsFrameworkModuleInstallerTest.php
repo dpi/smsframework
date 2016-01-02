@@ -12,7 +12,7 @@ use Drupal\simpletest\WebTestBase;
 /**
  * Tests the UI module installation of smsframework.
  *
- * @group SMS Frawework
+ * @group SMS Framework
  */
 class SmsFrameworkModuleInstallerTest extends WebTestBase {
 

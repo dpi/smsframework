@@ -22,8 +22,10 @@ class SmsBlastWebTest extends SmsFrameworkWebTestBase {
    * Tests sending sms blast.
    */
   function testSendBlast() {
+    $pre_count = count($this->getTestMessages());
+
     // Set up test default gateway and test user.
-    $this->setDefaultGateway('test');
+    $this->gatewayManager->setDefaultGateway($this->testGateway);
     $user = $this->drupalCreateUser(array('receive sms', 'Send SMS Blast'));
     $this->drupalLogin($user);
     $data = array(
@@ -42,7 +44,7 @@ class SmsBlastWebTest extends SmsFrameworkWebTestBase {
     $this->assertText('The message was sent to 1 users.', 'Message sent to 1 user.');
 
     // Get the resulting message that was sent and confirm.
-    $this->assertEqual(sms_test_gateway_result()['message'], $message, 'Successfully sent sms blast message');
+    $this->assertTrue(count($this->getTestMessages()) > $pre_count, 'Successfully sent message');
   }
 
 }

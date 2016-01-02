@@ -29,11 +29,4 @@ class SmsGateway extends Plugin {
    */
   protected $label;
 
-  /**
-   * A boolean flag to determine if the gateway is configurable.
-   *
-   * @var bool
-   */
-  protected $configurable;
-
 }

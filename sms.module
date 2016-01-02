@@ -134,69 +134,6 @@ function sms_receipt($number, $reference, $message_status = GatewayInterface::ST
 }
 
 /**
- * Returns the current default gateway.
- *
- * @return \Drupal\sms\Gateway\GatewayInterface
- */
-function sms_default_gateway() {
-  return \Drupal::service('plugin.manager.sms_gateway')->getDefaultGateway();
-}
-
-/**
- * Returns the identifier for the current default gateway.
- *
- * @return string
- */
-function sms_default_gateway_id() {
-  return \Drupal::config('sms.settings')->get('default_gateway');
-}
-
-/**
- * Gets a list of all gateways.
- *
- * @param string $op
- *   (optional) The format in which to return the list. When set to 'gateway' or
- *   'name', only the specified gateway is returned. When set to 'gateways' or
- *   'names', all gateways are returned. Defaults to 'gateways'.
- *
- * @param string $gateway
- *   (optional) A gateway identifier string that indicates the gateway to return.
- *   Leave at default value (NULL) to return all gateways.
- *
- * @return array|\Drupal\sms\Gateway\GatewayInterface
- *   Either an array of all gateways or a single gateway, in a variable format.
- *
- * @deprecated as of 8.x-1.x. Use @code GatewayManager @endcode methods instead.
- * @code
- *   Drupal::service('plugin.manager.sms_gateway')->getAvailableGateways();
- *   Drupal::service('plugin.manager.sms_gateway')->getEnabledGateways();
- *   Drupal::service('plugin.manager.sms_gateway')->getDefaultGateway();
- *   Drupal::service('plugin.manager.sms_gateway')->getGateway($name);
- * @endcode
- */
-function sms_gateways($op = 'gateways', $gateway_id = NULL) {
-  /** @var \Drupal\sms\Gateway\GatewayManagerInterface $gateway_manager */
-  $gateway_manager = \Drupal::service('plugin.manager.sms_gateway');
-
-  switch ($op) {
-    case 'gateway':
-      return $gateway_manager->getGateway($gateway_id) ? : array();
-    case 'names':
-      $_names = array();
-      foreach ($gateway_manager->getAvailableGateways() as $id => $gateway) {
-        $_names[$id] = $gateway->getLabel();
-      }
-      return $_names;
-    case 'name':
-      $gateway = $gateway_manager->getGateway($gateway_id);
-      return ($gateway) ? $gateway->getLabel() : '';
-    case 'gateways':
-    default:
-      return $gateway_manager->getAvailableGateways();
-  }
-}
-
-/**
  * Form builder for send sms form.
  *
  * Generates a SMS sending form and adds gateway defined elements. The form
@@ -210,21 +147,29 @@ function sms_gateways($op = 'gateways', $gateway_id = NULL) {
  * @see sms_send_form_submit_submit()
  */
 function sms_send_form($required = FALSE) {
-  $gateway = sms_default_gateway();
-  $form['number'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Phone number'),
-    '#size' => 40,
-    '#maxlength' => 16,
-    '#required' => $required,
-  );
+  /** @var \Drupal\sms\Gateway\GatewayManagerInterface $manager */
+  $manager = \Drupal::service('plugin.manager.sms_gateway');
 
-  // Add gateway defined fields
-  $form_state = new FormState();
-  $form['gateway']['#tree'] = TRUE;
-  $form['gateway'] = array_merge($gateway->sendForm($form, $form_state), $form['gateway']);
+  if ($gateway = $manager->getDefaultGateway()) {
+    $instance = $gateway->getPlugin();
 
-  return $form;
+    $form['number'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Phone number'),
+      '#size' => 40,
+      '#maxlength' => 16,
+      '#required' => $required,
+    );
+
+    // Add gateway defined fields
+    $form_state = new FormState();
+    $form['gateway']['#tree'] = TRUE;
+    $form['gateway'] = array_merge($instance->sendForm($form, $form_state), $form['gateway']);
+
+    return $form;
+  }
+
+  return NULL;
 }
 
 /**
@@ -393,6 +338,8 @@ function carrier_delete($domain) {
 /**
  * Formats a number for display using the gateway's formatting functionality.
  *
+ * @todo this function has no first party implementations.
+ *
  * @param string $number
  *   The number to be formatted.
  * @param array $options
@@ -401,15 +348,19 @@ function carrier_delete($domain) {
  * @return string
  *   The formatted number.
  */
-function sms_format_number(&$number, array $options = array()) {
-  $gateway = sms_default_gateway();
+function sms_format_number($number, array $options = []) {
+  /** @var \Drupal\sms\Gateway\GatewayManagerInterface $manager */
+  $manager = \Drupal::service('plugin.manager.sms_gateway');
 
-  if (!empty($gateway['format number']) && function_exists($gateway['format number'])) {
-    return $gateway['format number']($number, $options);
+  if ($gateway = $manager->getDefaultGateway()) {
+    $instance = $gateway->getPlugin();
+    $definition = $instance->getPluginDefinition();
+    if (!empty($definition['format number']) && function_exists($definition['format number'])) {
+      return $definition['format number']($number, $options);
+    }
   }
-  else {
-    return $number;
-  }
+
+  return $number;
 }
 
 /**
@@ -481,13 +432,18 @@ function sms_validate_number(&$number, array $options = array()) {
   // Allow the default (or the specified in $options) gateway to provide number
   // validation.
   if (isset($options['gateway'])) {
-    $gateway = sms_gateways('gateway', $options['gateway']);
+    $gateway = \Drupal\sms\Entity\SmsGateway::load($options['gateway']);
   }
   else {
-    $gateway = sms_default_gateway();
+    /** @var \Drupal\sms\Gateway\GatewayManagerInterface $manager */
+    $manager = \Drupal::service('plugin.manager.sms_gateway');
+    $gateway = $manager->getDefaultGateway();
   }
-  if ($error = $gateway->validateNumbers([$number], $options)) {
-    $errors += (array) $error;
+
+  if ($gateway && $instance = $gateway->getPlugin()) {
+    if ($error = $instance->validateNumbers([$number], $options)) {
+      $errors += (array) $error;
+    }
   }
 
   return $errors;

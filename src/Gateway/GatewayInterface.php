@@ -8,15 +8,16 @@
 namespace Drupal\sms\Gateway;
 
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
+use Drupal\Component\Plugin\PluginInspectionInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Default implementation of sms gateway plugin
  */
-interface GatewayInterface extends ConfigurablePluginInterface, PluginFormInterface {
+interface GatewayInterface extends ConfigurablePluginInterface, PluginFormInterface, PluginInspectionInterface {
 
   /**
    * Status Unknown.
@@ -149,35 +150,6 @@ interface GatewayInterface extends ConfigurablePluginInterface, PluginFormInterf
   public function getError();
 
   /**
-   * Gets the machine  name of the gateway.
-   *
-   * @return string
-   */
-  public function getIdentifier();
-
-  /**
-   * Gets the readable name of the gateway.
-   *
-   * @return string
-   */
-  public function getName();
-
-  /**
-   * Gets the user-readable translated name of the gateway.
-   *
-   * @return string
-   */
-  public function getLabel();
-
-  /**
-   * Returns a boolean to show if the gateway is configurable.
-   *
-   * @return bool
-   *   TRUE if the form is configurable, FALSE if not.
-   */
-  public function isConfigurable();
-
-  /**
    * Returns a form to be appended to the send form.
    *
    * @param array $form
@@ -190,31 +162,6 @@ interface GatewayInterface extends ConfigurablePluginInterface, PluginFormInterf
   public function sendForm(array &$form, FormStateInterface $form_state);
 
   /**
-   * Gets the enabled status of the gateway.
-   *
-   * @return bool
-   */
-  public function isEnabled();
-
-  /**
-   * Sets the enabled status of the gateway.
-   *
-   * @param bool $status
-   *   The enabled status.
-   */
-  public function setEnabled($status = TRUE);
-
-  /**
-   * Gets the plugin-specific configuration for this gateway.
-   */
-  public function getCustomConfiguration();
-
-  /**
-   * Sets the plugin-specific configuration for this gateway.
-   */
-  public function setCustomConfiguration($configuration);
-
-  /**
    * Carry out gateway-specific number validation.
    *
    * @param array $numbers
@@ -225,6 +172,6 @@ interface GatewayInterface extends ConfigurablePluginInterface, PluginFormInterf
    * @return array
    *   An array containing an error message for each validation failure.
    */
-  public function validateNumbers(array $numbers, array $options = array());
+  public function validateNumbers(array $numbers, array $options = []);
 
 }
