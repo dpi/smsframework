@@ -4,9 +4,16 @@ sms.admin:
   route_name: sms.admin
   parent: system.admin_config
 
+sms.settings:
+  title: 'Settings'
+  description: 'Specific settings for SMS Framework.'
+  route_name: sms.settings
+  parent: sms.admin
+  weight: -11
+
 sms.gateway.list:
   title: 'Gateways'
-  description: 'Configure gateways and select default gateway.'
+  description: 'Add, edit, delete and configure SMS gateway instances.'
   route_name: sms.gateway.list
   parent: sms.admin
   weight: -10
@@ -17,4 +24,3 @@ sms.carrier_admin:
   route_name: sms.carrier_admin
   parent: sms.admin
   weight: -9
-

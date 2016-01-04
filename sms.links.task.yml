@@ -1,3 +1,10 @@
+sms.gateway.list:
+  title: 'Gateways'
+  description: 'Available SMS gateways.'
+  route_name: sms.gateway.list
+  base_route: sms.gateway.list
+  weight: -10
+
 sms.carrier_admin:
   title: 'Manage'
   route_name: sms.carrier_admin

@@ -7,13 +7,12 @@
 
 namespace Drupal\sms\Provider;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Gateway\GatewayInterface;
-use Drupal\sms\Gateway\GatewayManagerInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
-use Drupal\sms\SmsException;
 use Drupal\sms\SmsGatewayInterface;
 
 /**
@@ -22,11 +21,11 @@ use Drupal\sms\SmsGatewayInterface;
 class DefaultSmsProvider implements SmsProviderInterface {
 
   /**
-   * The SMS gateway manager.
+   * Configuration factory for this SMS provider.
    *
-   * @var \Drupal\sms\Gateway\GatewayManager
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected $gatewayManager;
+  protected $configFactory;
 
   /**
    * The module handler.
@@ -43,8 +42,8 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface
    *   The module handler.
    */
-  public function __construct(GatewayManagerInterface $gateway_manager, ModuleHandlerInterface $module_handler) {
-    $this->gatewayManager = $gateway_manager;
+  public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler) {
+    $this->configFactory = $config_factory;
     $this->moduleHandler = $module_handler;
   }
 
@@ -57,7 +56,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
       $gateway = SmsGateway::load($options['gateway']);
     }
     if (empty($gateway)) {
-      $gateway = $this->gatewayManager->getDefaultGateway();
+      $gateway = $this->getDefaultGateway();
     }
 
     if ($this->preProcess($sms, $options, $gateway)) {
@@ -147,6 +146,33 @@ class DefaultSmsProvider implements SmsProviderInterface {
     $this->moduleHandler->invokeAll('sms_receipt', array('pre process', $number, $reference, $message_status, $options));
     $this->moduleHandler->invokeAll('sms_receipt', array('process', $number, $reference, $message_status, $options));
     $this->moduleHandler->invokeAll('sms_receipt', array('post process', $number, $reference, $message_status, $options));
+  }
+
+  /**
+   * Gets the gateway that will be used by default for sending SMS.
+   *
+   * @return \Drupal\sms\SmsGatewayInterface|null
+   *   A SmsGateway config entity, or NULL if default gateway is not set or
+   *   invalid.
+   */
+  public function getDefaultGateway() {
+    $gateway_id = $this->configFactory
+      ->get('sms.settings')
+      ->get('default_gateway');
+    return SmsGateway::load($gateway_id);
+  }
+
+  /**
+   * Sets the Gateway that will be used by default to send SMS.
+   *
+   * @param \Drupal\sms\SmsGatewayInterface $sms_gateway
+   *   The new site default SMS Gateway.
+   */
+  public function setDefaultGateway(SmsGatewayInterface $sms_gateway) {
+    $this->configFactory
+      ->getEditable('sms.settings')
+      ->set('default_gateway', $sms_gateway->id())
+      ->save();
   }
 
 }

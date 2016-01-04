@@ -100,14 +100,6 @@ class SmsGatewayForm extends EntityForm {
       '#default_value' => $sms_gateway->status(),
     ];
 
-    $default_gateway = $this->gatewayManager->getDefaultGateway();
-    $form['gateway']['site_default'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Site default'),
-      '#description' => $this->t('Set this gateway as the site default? One gateway can be site default at a time.'),
-      '#default_value' => $default_gateway && !$sms_gateway->isNew() && ($default_gateway->id() == $sms_gateway->id()),
-    ];
-
     $plugins = [];
     foreach ($this->gatewayManager->getDefinitions() as $plugin_id => $definition) {
       $plugins[$plugin_id] = $definition['label'];
@@ -179,10 +171,6 @@ class SmsGatewayForm extends EntityForm {
     }
     else {
       drupal_set_message($this->t('Gateway saved.'));
-    }
-
-    if (!empty($form_state->getValue('site_default'))) {
-      $this->gatewayManager->setDefaultGateway($sms_gateway);
     }
 
     if ($saved == SAVED_NEW) {
