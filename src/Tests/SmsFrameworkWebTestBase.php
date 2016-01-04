@@ -21,7 +21,7 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
   /**
    * The gateway manager.
    *
-   * @var \Drupal\sms\Gateway\GatewayManagerInterface
+   * @var \Drupal\sms\Plugin\SmsGatewayPluginManagerInterface
    */
   protected $gatewayManager;
 
@@ -35,7 +35,7 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
   /**
    * 'Memory' test gateway instance.
    *
-   * @var \Drupal\sms\SmsGatewayInterface
+   * @var \Drupal\sms\Entity\SmsGatewayInterface
    */
   protected $testGateway;
 

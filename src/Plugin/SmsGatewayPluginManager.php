@@ -2,25 +2,22 @@
 
 /**
  * @file
- * Contains \Drupal\sms\Gateway\GatewayManager
+ * Contains \Drupal\sms\Plugin\SmsGatewayPluginManager
  */
 
-namespace Drupal\sms\Gateway;
+namespace Drupal\sms\Plugin;
 
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Drupal\sms\Entity\SmsGateway;
-use Drupal\sms\SmsGatewayInterface;
 
 /**
- * Manages SMS gateways implemented using AnnotatedClassDiscovery
+ * Manages SMS gateways implemented using AnnotatedClassDiscovery.
  */
-class GatewayManager extends DefaultPluginManager implements GatewayManagerInterface {
+class SmsGatewayPluginManager extends DefaultPluginManager implements SmsGatewayPluginManagerInterface {
 
   /**
-   * Creates a new GatewayManager instance.
+   * Creates a new SmsGatewayPluginManager instance.
    *
    * @param \Traversable $namespaces
    *   The namespaces to search for the gateway plugins.
@@ -30,7 +27,7 @@ class GatewayManager extends DefaultPluginManager implements GatewayManagerInter
    *   Module handler for calling module hooks.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/Gateway', $namespaces, $module_handler, 'Drupal\sms\Gateway\GatewayInterface', 'Drupal\sms\Annotation\SmsGateway');
+    parent::__construct('Plugin/SmsGateway', $namespaces, $module_handler, 'Drupal\sms\Plugin\SmsGatewayPluginInterface', 'Drupal\sms\Annotation\SmsGateway');
     $this->setCacheBackend($cache_backend, 'sms_gateways');
     $this->alterInfo('sms_gateway_info');
   }

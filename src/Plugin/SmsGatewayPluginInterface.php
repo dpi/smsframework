@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\sms\Gateway\GatewayInterface
+ * Contains \Drupal\sms\Plugin\SmsGatewayPluginInterface
  */
 
-namespace Drupal\sms\Gateway;
+namespace Drupal\sms\Plugin;
 
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Default implementation of sms gateway plugin
  */
-interface GatewayInterface extends ConfigurablePluginInterface, PluginFormInterface, PluginInspectionInterface {
+interface SmsGatewayPluginInterface extends ConfigurablePluginInterface, PluginFormInterface, PluginInspectionInterface {
 
   /**
    * Status Unknown.

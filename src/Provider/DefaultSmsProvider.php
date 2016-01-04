@@ -10,10 +10,10 @@ namespace Drupal\sms\Provider;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\sms\Entity\SmsGateway;
-use Drupal\sms\Gateway\GatewayInterface;
+use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Plugin\SmsGatewayPluginInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
-use Drupal\sms\SmsGatewayInterface;
 
 /**
  * The SMS provider that provides default messaging functionality.
@@ -37,7 +37,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * Creates a new instance of the default SMS provider.
    *
-   * @param \Drupal\sms\Gateway\GatewayManagerInterface
+   * @param \Drupal\Core\Config\ConfigFactoryInterface
    *   The gateway manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface
    *   The module handler.
@@ -78,7 +78,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *   The SMS to be sent.
    * @param array $options
    *   The gateway options.
-   * @param \Drupal\sms\Gateway\GatewayInterface $gateway
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
    *   The default gateway for sending this message.
    *
    * @return \Drupal\sms\Message\SmsMessageResultInterface
@@ -96,7 +96,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *   The SMS to be sent.
    * @param array $options
    *   Additional options to be passed to the SMS gateway.
-   * @param \Drupal\sms\Gateway\GatewayInterface $gateway
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
    *   The default gateway for sending this message.
    *
    * @return bool|null
@@ -116,14 +116,14 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *   The SMS that was sent.
    * @param array $options
    *   Additional options that were passed to the SMS gateway.
-   * @param \Drupal\sms\Gateway\GatewayInterface $gateway
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
    *   The default gateway for sending this message.
    * @param \Drupal\sms\Message\SmsMessageResultInterface $result
    *   The message result from the gateway.
    */
-  protected function postProcess(SmsMessageInterface $sms, array $options, SmsGatewayInterface $gateway, SmsMessageResultInterface $result) {
+  protected function postProcess(SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway, SmsMessageResultInterface $result) {
     // Call the send post process hooks.
-    $this->moduleHandler->invokeAll('sms_send_process', ['post process', $sms, $options, $gateway, $result]);
+    $this->moduleHandler->invokeAll('sms_send_process', ['post process', $sms, $options, $sms_gateway, $result]);
   }
 
   /**
@@ -140,7 +140,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function receipt($number, $reference, $message_status = GatewayInterface::STATUS_UNKNOWN, array $options = array()) {
+  public function receipt($number, $reference, $message_status = SmsGatewayPluginInterface::STATUS_UNKNOWN, array $options = array()) {
     // @todo Implement rules event integration here for incoming SMS.
     // Execute three phases.
     $this->moduleHandler->invokeAll('sms_receipt', array('pre process', $number, $reference, $message_status, $options));
@@ -151,7 +151,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * Gets the gateway that will be used by default for sending SMS.
    *
-   * @return \Drupal\sms\SmsGatewayInterface|null
+   * @return \Drupal\sms\Entity\SmsGatewayInterface|null
    *   A SmsGateway config entity, or NULL if default gateway is not set or
    *   invalid.
    */
@@ -165,7 +165,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * Sets the Gateway that will be used by default to send SMS.
    *
-   * @param \Drupal\sms\SmsGatewayInterface $sms_gateway
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
    *   The new site default SMS Gateway.
    */
   public function setDefaultGateway(SmsGatewayInterface $sms_gateway) {

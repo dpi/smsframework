@@ -5,5 +5,5 @@ services:
     class: Drupal\sms\Provider\DefaultSmsProvider
     arguments: ['@config.factory', '@module_handler']
   plugin.manager.sms_gateway:
-    class: Drupal\sms\Gateway\GatewayManager
+    class: Drupal\sms\Plugin\SmsGatewayPluginManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']

@@ -1,12 +1,13 @@
 <?php
+
 /**
  * @file
- * Contains \Drupal\sms_test_gateway\Plugin\Gateway\Memory
+ * Contains \Drupal\sms_test_gateway\Plugin\SmsGateway\Memory
  */
 
-namespace Drupal\sms_test_gateway\Plugin\Gateway;
+namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 
-use Drupal\sms\Gateway\GatewayBase;
+use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
 use Drupal\Core\Form\FormStateInterface;
@@ -19,7 +20,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   label = @Translation("Memory"),
  * )
  */
-class Memory extends GatewayBase {
+class Memory extends SmsGatewayPluginBase {
 
   /**
    * {@inheritdoc}

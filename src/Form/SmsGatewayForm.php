@@ -12,7 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\sms\Gateway\GatewayManagerInterface;
+use Drupal\sms\Plugin\SmsGatewayPluginManagerInterface;
 use Drupal\sms\Entity\SmsGateway;
 
 /**
@@ -28,15 +28,15 @@ class SmsGatewayForm extends EntityForm {
   /**
    * The gateway manager.
    *
-   * @var \Drupal\sms\Gateway\GatewayManagerInterface
+   * @var \Drupal\sms\Plugin\SmsGatewayPluginManagerInterface
    */
   protected $gatewayManager;
 
   /**
-   * @param \Drupal\sms\Gateway\GatewayManagerInterface $gateway_manager
+   * @param \Drupal\sms\Plugin\SmsGatewayPluginManagerInterface $gateway_manager
    *   The gateway manager service.
    */
-  public function __construct(QueryFactory $query_factory, GatewayManagerInterface $gateway_manager) {
+  public function __construct(QueryFactory $query_factory, SmsGatewayPluginManagerInterface $gateway_manager) {
     $this->entityQueryFactory = $query_factory;
     $this->gatewayManager = $gateway_manager;
   }
@@ -57,7 +57,7 @@ class SmsGatewayForm extends EntityForm {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
 
-    /** @var \Drupal\sms\SmsGatewayInterface $sms_gateway */
+    /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
     $sms_gateway = $this->getEntity();
 
     if (!$sms_gateway->isNew()) {
@@ -126,7 +126,7 @@ class SmsGatewayForm extends EntityForm {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    /** @var \Drupal\sms\SmsGatewayInterface $sms_gateway */
+    /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
     $sms_gateway = $this->getEntity();
 
     if ($sms_gateway->isNew()) {
@@ -147,7 +147,7 @@ class SmsGatewayForm extends EntityForm {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    /** @var \Drupal\sms\SmsGatewayInterface $sms_gateway */
+    /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
     $sms_gateway = $this->getEntity();
 
     if (!$sms_gateway->isNew()) {
@@ -160,7 +160,7 @@ class SmsGatewayForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    /** @var \Drupal\sms\SmsGatewayInterface $sms_gateway */
+    /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
     $sms_gateway = $this->getEntity();
 
     $sms_gateway->setStatus($form_state->getValue('status'));

@@ -1,12 +1,13 @@
 <?php
+
 /**
  * @file
- * Contains \Drupal\sms\Plugin\Gateway\LogGateway
+ * Contains \Drupal\sms\Plugin\SmsGateway\LogGateway
  */
 
-namespace Drupal\sms\Plugin\Gateway;
+namespace Drupal\sms\Plugin\SmsGateway;
 
-use Drupal\sms\Gateway\GatewayBase;
+use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
 
@@ -16,7 +17,7 @@ use Drupal\sms\Message\SmsMessageResult;
  *   label = @Translation("Drupal log"),
  * )
  */
-class LogGateway extends GatewayBase {
+class LogGateway extends SmsGatewayPluginBase {
 
   /**
    * {@inheritdoc}

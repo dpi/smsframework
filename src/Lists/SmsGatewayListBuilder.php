@@ -48,10 +48,9 @@ class SmsGatewayListBuilder extends ConfigEntityListBuilder {
 
   /**
    * {@inheritdoc}
-   *
-   * @param \Drupal\sms\SmsGatewayInterface $entity
    */
   public function buildRow(EntityInterface $entity) {
+    /** @var \Drupal\sms\Entity\SmsGatewayInterface $entity */
     $row['label'] = $entity->label();
     $row['gateway'] = $entity->getPlugin()->getPluginDefinition()['label'];
     $row['status'] = $entity->status() ? $this->t('Enabled') : $this->t('Disabled');

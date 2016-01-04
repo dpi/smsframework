@@ -8,9 +8,9 @@
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
-use Drupal\sms\Gateway\GatewayInterface;
+use Drupal\sms\Plugin\SmsGatewayPluginInterface;
 use Drupal\sms\Message\SmsMessageInterface;
-use Drupal\sms\SmsGatewayInterface;
+use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
