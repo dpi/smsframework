@@ -30,9 +30,9 @@ class SmsGatewayListBuilder extends ConfigEntityListBuilder {
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage) {
     parent::__construct($entity_type, $storage);
 
-    /** @var \Drupal\sms\Gateway\GatewayManagerInterface $manager */
-    $manager = \Drupal::service('plugin.manager.sms_gateway');
-    $this->defaultGatewayId = $manager->getDefaultGateway() ? $manager->getDefaultGateway()->id() : FALSE;
+    /** @var \Drupal\sms\Provider\DefaultSmsProvider $provider */
+    $provider = \Drupal::service('sms_provider.default');
+    $this->defaultGatewayId = $provider->getDefaultGateway() ? $provider->getDefaultGateway()->id() : FALSE;
   }
 
   /**

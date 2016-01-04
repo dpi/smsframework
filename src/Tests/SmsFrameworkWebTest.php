@@ -61,19 +61,19 @@ class SmsFrameworkWebTest extends SmsFrameworkWebTestBase {
    */
   public function testDefaultGateway() {
     // Test initial default gateway.
-    $sms_gateway_default = $this->gatewayManager->getDefaultGateway();
+    $sms_gateway_default = $this->defaultSmsProvider->getDefaultGateway();
 
     $this->assertEqual($sms_gateway_default->id(), 'log', 'Initial default gateway is "log".');
 
     $this->drupalLogin($this->drupalCreateUser(['administer smsframework']));
 
     // Change default gateway.
-    $this->drupalPostForm('admin/config/smsframework/gateways/' . $this->testGateway->id(), [
-      'site_default' => TRUE,
-    ], 'Save');
+    $this->drupalPostForm('admin/config/smsframework/default-gateway', [
+      'default_gateway' => $this->testGateway->id(),
+    ], 'Save configuration');
     $this->assertResponse(200);
 
-    $sms_gateway_default = $this->gatewayManager->getDefaultGateway();
+    $sms_gateway_default = $this->defaultSmsProvider->getDefaultGateway();
     $this->assertEqual($sms_gateway_default->id(), $this->testGateway->id(), 'Default gateway changed.');
   }
 
@@ -107,7 +107,7 @@ class SmsFrameworkWebTest extends SmsFrameworkWebTestBase {
     $this->drupalLogin($this->drupalCreateUser(['administer smsframework']));
 
     // Ensure default gateway is different to test_gateway.
-    $this->assertNotEqual($this->gatewayManager->getDefaultGateway(), $this->testGateway->id());
+    $this->assertNotEqual($this->defaultSmsProvider->getDefaultGateway(), $this->testGateway->id());
 
     $message = 'This is a test message';
     $number = '23412345678';

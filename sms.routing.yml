@@ -6,6 +6,15 @@ sms.admin:
   requirements:
     _permission: 'administer smsframework'
 
+# Default Gateway
+sms.default_gateway:
+  path: '/admin/config/smsframework/default-gateway'
+  defaults:
+    _form: '\Drupal\sms\Form\DefaultGatewayForm'
+    _title: 'Default Gateway'
+  requirements:
+    _permission: 'administer smsframework'
+
 # Gateways
 sms.gateway.list:
   path: '/admin/config/smsframework/gateways'

@@ -27,7 +27,7 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
    */
   public function testNumberConfirmationAndSmsUserSend() {
     // Set up test default gateway.
-    $this->gatewayManager->setDefaultGateway($this->testGateway);
+    $this->defaultSmsProvider->setDefaultGateway($this->testGateway);
     $user = $this->drupalCreateUser(array('receive sms', 'edit own sms number'));
     $this->drupalLogin($user);
 
@@ -159,7 +159,7 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
     $this->drupalLogin($excluded_user);
 
     // Set up test default gateway.
-    $this->gatewayManager->setDefaultGateway($this->testGateway);
+    $this->defaultSmsProvider->setDefaultGateway($this->testGateway);
     $sms_user_settings = array(
       'registration_enabled' => TRUE,
       'allow_password' => TRUE,

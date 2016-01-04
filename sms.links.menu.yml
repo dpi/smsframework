@@ -6,15 +6,22 @@ sms.admin:
 
 sms.gateway.list:
   title: 'Gateways'
-  description: 'Configure gateways and select default gateway.'
+  description: 'Add, edit, delete and configure SMS gateway instances.'
   route_name: sms.gateway.list
   parent: sms.admin
   weight: -10
+
+sms.default_gateway:
+  title: 'Default Gateway'
+  description: 'Select the default gateway for sending SMS using the DefaultSmsProvider.'
+  route_name: sms.default_gateway
+  parent: sms.admin
+  weight: -9
 
 sms.carrier_admin:
   title: 'Carrier configuration'
   description: 'Configure supported carriers.'
   route_name: sms.carrier_admin
   parent: sms.admin
-  weight: -9
+  weight: -8
 
