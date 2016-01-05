@@ -14,7 +14,7 @@
  "in_number" to simply "gw_number".
  */
 
-use Drupal\sms\Gateway\GatewayInterface;
+use Drupal\sms\Gateway\SmsGatewayPluginInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 
 define('SMS_DEVEL_VIRTUALGW_TYPE_OUT',      0);
@@ -62,7 +62,7 @@ function sms_devel_virtualgw_send($number, $message, $options) {
   // Always return success
   return array(
     'status' => TRUE,
-    'status_code' => GatewayInterface::STATUS_OK,
+    'status_code' => SmsGatewayPluginInterface::STATUS_OK,
     'gateway_status_code' => 'OK',
     'gateway_status_text' => 'sms_devel_virtualgw: send: OK',
   );

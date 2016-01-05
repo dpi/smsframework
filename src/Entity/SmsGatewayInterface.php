@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\sms\SmsGatewayInterface.
+ * Contains \Drupal\sms\Entity\SmsGatewayInterface.
  */
 
-namespace Drupal\sms;
+namespace Drupal\sms\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
@@ -17,7 +17,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   /**
    * Returns the plugin instance.
    *
-   * @return \Drupal\sms\Gateway\GatewayInterface
+   * @return \Drupal\sms\Gateway\SmsGatewayPluginInterface
    *   The plugin instance for this SMS Gateway.
    */
   public function getPlugin();

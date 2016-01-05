@@ -6,7 +6,7 @@
 
 namespace Drupal\sms\Plugin\Gateway;
 
-use Drupal\sms\Gateway\GatewayBase;
+use Drupal\sms\Gateway\SmsGatewayPluginBase;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
 
@@ -16,7 +16,7 @@ use Drupal\sms\Message\SmsMessageResult;
  *   label = @Translation("Drupal log"),
  * )
  */
-class LogGateway extends GatewayBase {
+class LogGateway extends SmsGatewayPluginBase {
 
   /**
    * {@inheritdoc}

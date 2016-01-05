@@ -2,22 +2,22 @@
 
 /**
  * @file
- * Contains \Drupal\sms\GatewayInterface
+ * Contains \Drupal\sms\SmsGatewayPluginInterface
  */
 namespace Drupal\sms\Gateway;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
-use Drupal\sms\SmsGatewayInterface;
+use Drupal\sms\Entity\SmsGatewayInterface;
 
 /**
  * Manages SMS Gateways.
  */
-interface GatewayManagerInterface extends PluginManagerInterface {
+interface SmsGatewayPluginManagerInterface extends PluginManagerInterface {
 
   /**
    * Get the default SMS gateway.
    *
-   * @return \Drupal\sms\SmsGatewayInterface|FALSE
+   * @return \Drupal\sms\Entity\SmsGatewayInterface|FALSE
    *   A SmsGateway config entity, or FALSE if default gateway is not set or
    *   invalid.
    */
@@ -26,7 +26,7 @@ interface GatewayManagerInterface extends PluginManagerInterface {
   /**
    * Sets the default site SMS Gateway.
    *
-   * @param \Drupal\sms\SmsGatewayInterface $sms_gateway
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
    *   The new site default SMS Gateway.
    */
   public function setDefaultGateway(SmsGatewayInterface $sms_gateway);

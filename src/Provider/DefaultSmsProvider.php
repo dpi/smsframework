@@ -9,12 +9,12 @@ namespace Drupal\sms\Provider;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\sms\Entity\SmsGateway;
-use Drupal\sms\Gateway\GatewayInterface;
-use Drupal\sms\Gateway\GatewayManagerInterface;
+use Drupal\sms\Gateway\SmsGatewayPluginInterface;
+use Drupal\sms\Gateway\SmsGatewayPluginManagerInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\SmsException;
-use Drupal\sms\SmsGatewayInterface;
+use Drupal\sms\Entity\SmsGatewayInterface;
 
 /**
  * The SMS provider that provides default messaging functionality.
@@ -24,7 +24,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * The SMS gateway manager.
    *
-   * @var \Drupal\sms\Gateway\GatewayManager
+   * @var \Drupal\sms\Gateway\SmsGatewayPluginManager
    */
   protected $gatewayManager;
 
@@ -38,12 +38,12 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * Creates a new instance of the default SMS provider.
    *
-   * @param \Drupal\sms\Gateway\GatewayManagerInterface
+   * @param \Drupal\sms\Gateway\SmsGatewayPluginManagerInterface
    *   The gateway manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface
    *   The module handler.
    */
-  public function __construct(GatewayManagerInterface $gateway_manager, ModuleHandlerInterface $module_handler) {
+  public function __construct(SmsGatewayPluginManagerInterface $gateway_manager, ModuleHandlerInterface $module_handler) {
     $this->gatewayManager = $gateway_manager;
     $this->moduleHandler = $module_handler;
   }
@@ -79,7 +79,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *   The SMS to be sent.
    * @param array $options
    *   The gateway options.
-   * @param \Drupal\sms\Gateway\GatewayInterface $gateway
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
    *   The default gateway for sending this message.
    *
    * @return \Drupal\sms\Message\SmsMessageResultInterface
@@ -97,7 +97,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *   The SMS to be sent.
    * @param array $options
    *   Additional options to be passed to the SMS gateway.
-   * @param \Drupal\sms\Gateway\GatewayInterface $gateway
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
    *   The default gateway for sending this message.
    *
    * @return bool|null
@@ -117,7 +117,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *   The SMS that was sent.
    * @param array $options
    *   Additional options that were passed to the SMS gateway.
-   * @param \Drupal\sms\Gateway\GatewayInterface $gateway
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
    *   The default gateway for sending this message.
    * @param \Drupal\sms\Message\SmsMessageResultInterface $result
    *   The message result from the gateway.
@@ -141,7 +141,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function receipt($number, $reference, $message_status = GatewayInterface::STATUS_UNKNOWN, array $options = array()) {
+  public function receipt($number, $reference, $message_status = SmsGatewayPluginInterface::STATUS_UNKNOWN, array $options = array()) {
     // @todo Implement rules event integration here for incoming SMS.
     // Execute three phases.
     $this->moduleHandler->invokeAll('sms_receipt', array('pre process', $number, $reference, $message_status, $options));

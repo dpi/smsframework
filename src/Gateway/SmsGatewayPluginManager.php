@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\sms\Gateway\GatewayManager
+ * Contains \Drupal\sms\Gateway\SmsGatewayPluginManager
  */
 
 namespace Drupal\sms\Gateway;
@@ -12,12 +12,12 @@ use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\sms\Entity\SmsGateway;
-use Drupal\sms\SmsGatewayInterface;
+use Drupal\sms\Entity\SmsGatewayInterface;
 
 /**
  * Manages SMS gateways implemented using AnnotatedClassDiscovery
  */
-class GatewayManager extends DefaultPluginManager implements GatewayManagerInterface {
+class SmsGatewayPluginManager extends DefaultPluginManager implements SmsGatewayPluginManagerInterface {
 
   /**
    * Configuration factory for this gateway manager.
@@ -29,7 +29,7 @@ class GatewayManager extends DefaultPluginManager implements GatewayManagerInter
   /**
    * List of gateways managed by this gateway manager.
    *
-   * @var \Drupal\sms\Gateway\GatewayInterface[]
+   * @var \Drupal\sms\Gateway\SmsGatewayPluginInterface[]
    */
   protected $gateways;
 
@@ -48,7 +48,7 @@ class GatewayManager extends DefaultPluginManager implements GatewayManagerInter
   protected $defaultGateway;
 
   /**
-   * Create new GatewayManager instance.
+   * Create new SmsGatewayPluginManager instance.
    *
    * @param \Traversable $namespaces
    *   The namespaces to search for the gateway plugins.
@@ -60,7 +60,7 @@ class GatewayManager extends DefaultPluginManager implements GatewayManagerInter
    *   Module handler for calling module hooks.
    */
   public function __construct(\Traversable $namespaces, ConfigFactory $config_factory, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/Gateway', $namespaces, $module_handler, 'Drupal\sms\Gateway\GatewayInterface', 'Drupal\sms\Annotation\SmsGateway');
+    parent::__construct('Plugin/Gateway', $namespaces, $module_handler, 'Drupal\sms\Gateway\SmsGatewayPluginInterface', 'Drupal\sms\Annotation\SmsGateway');
     $this->setCacheBackend($cache_backend, 'sms_gateways');
     $this->alterInfo('sms_gateway_info');
     $this->configFactory = $config_factory;

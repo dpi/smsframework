@@ -6,7 +6,7 @@
 
 namespace Drupal\sms_test_gateway\Plugin\Gateway;
 
-use Drupal\sms\Gateway\GatewayBase;
+use Drupal\sms\Gateway\SmsGatewayPluginBase;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
 use Drupal\Core\Form\FormStateInterface;
@@ -19,7 +19,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   label = @Translation("Memory"),
  * )
  */
-class Memory extends GatewayBase {
+class Memory extends SmsGatewayPluginBase {
 
   /**
    * {@inheritdoc}

@@ -8,11 +8,11 @@
  */
 
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\sms\Gateway\GatewayInterface;
+use Drupal\sms\Gateway\SmsGatewayPluginInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
 use \Drupal\views\ViewExecutable;
-use Drupal\sms\SmsGatewayInterface;
+use Drupal\sms\Entity\SmsGatewayInterface;
 
 /**
  * Implements hook_help().
@@ -62,7 +62,7 @@ function sms_track_sms_send(SmsMessageInterface $sms, array $options, SmsGateway
  *   The SMS message object.
  * @param array $options
  *   Additional options array including sender.
- * @param \Drupal\sms\SmsGatewayInterface $sms_gateway
+ * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
  *   Gateway array for the active gateway.
  * @param bool|array $result
  *   The result from the gateway response handler.
@@ -157,10 +157,10 @@ function sms_track_archive_write($dir, $number, $message, array $options = array
       // Or render a status code from a simple true/false result
       if (! $status) {
         if ($options['result']) {
-          $status = GatewayInterface::STATUS_OK;
+          $status = SmsGatewayPluginInterface::STATUS_OK;
         }
         else {
-          $status = GatewayInterface::STATUS_ERR_OTHER;
+          $status = SmsGatewayPluginInterface::STATUS_ERR_OTHER;
         }
       }
       // Add the author and recipient

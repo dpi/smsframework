@@ -9,7 +9,6 @@ namespace Drupal\sms\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\sms\Plugin\SmsGatewayPluginCollection;
-use Drupal\sms\SmsGatewayInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 
 /**

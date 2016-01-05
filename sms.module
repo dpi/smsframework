@@ -8,7 +8,7 @@
 
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\sms\Gateway\GatewayInterface;
+use Drupal\sms\Gateway\SmsGatewayPluginInterface;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
@@ -129,7 +129,7 @@ function sms_incoming($number, $message, array $options = array()) {
  *
  * @deprecated use \Drupal\sms\Provider\SmsProviderInterface::receipt() instead.
  */
-function sms_receipt($number, $reference, $message_status = GatewayInterface::STATUS_UNKNOWN, $options = array()) {
+function sms_receipt($number, $reference, $message_status = SmsGatewayPluginInterface::STATUS_UNKNOWN, $options = array()) {
   \Drupal::service('sms_provider')->receipt($number, $reference, $message_status, $options);
 }
 
@@ -147,7 +147,7 @@ function sms_receipt($number, $reference, $message_status = GatewayInterface::ST
  * @see sms_send_form_submit_submit()
  */
 function sms_send_form($required = FALSE) {
-  /** @var \Drupal\sms\Gateway\GatewayManagerInterface $manager */
+  /** @var \Drupal\sms\Gateway\SmsGatewayPluginManagerInterface $manager */
   $manager = \Drupal::service('plugin.manager.sms_gateway');
 
   if ($gateway = $manager->getDefaultGateway()) {
@@ -349,7 +349,7 @@ function carrier_delete($domain) {
  *   The formatted number.
  */
 function sms_format_number($number, array $options = []) {
-  /** @var \Drupal\sms\Gateway\GatewayManagerInterface $manager */
+  /** @var \Drupal\sms\Gateway\SmsGatewayPluginManagerInterface $manager */
   $manager = \Drupal::service('plugin.manager.sms_gateway');
 
   if ($gateway = $manager->getDefaultGateway()) {
@@ -435,7 +435,7 @@ function sms_validate_number(&$number, array $options = array()) {
     $gateway = \Drupal\sms\Entity\SmsGateway::load($options['gateway']);
   }
   else {
-    /** @var \Drupal\sms\Gateway\GatewayManagerInterface $manager */
+    /** @var \Drupal\sms\Gateway\SmsGatewayPluginManagerInterface $manager */
     $manager = \Drupal::service('plugin.manager.sms_gateway');
     $gateway = $manager->getDefaultGateway();
   }

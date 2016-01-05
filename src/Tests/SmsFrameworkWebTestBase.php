@@ -21,14 +21,14 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
   /**
    * The gateway manager.
    *
-   * @var \Drupal\sms\Gateway\GatewayManagerInterface
+   * @var \Drupal\sms\Gateway\SmsGatewayPluginManagerInterface
    */
   protected $gatewayManager;
 
   /**
    * 'Memory' test gateway instance.
    *
-   * @var \Drupal\sms\SmsGatewayInterface
+   * @var \Drupal\sms\Entity\SmsGatewayInterface
    */
   protected $testGateway;
 

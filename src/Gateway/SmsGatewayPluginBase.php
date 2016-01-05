@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\sms\Gateway\GatewayBase
+ * Contains \Drupal\sms\Gateway\SmsGatewayPluginBase
  */
 
 namespace Drupal\sms\Gateway;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Base class for sms gateway plugins.
  */
-abstract class GatewayBase extends PluginBase implements GatewayInterface {
+abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPluginInterface {
 
   /**
    * The watchdog logger for this gateway.

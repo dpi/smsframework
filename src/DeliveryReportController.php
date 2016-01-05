@@ -10,7 +10,7 @@ namespace Drupal\sms;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\sms\Entity\SmsGateway;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\sms\Gateway\GatewayManagerInterface;
+use Drupal\sms\Gateway\SmsGatewayPluginManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,7 +22,7 @@ class DeliveryReportController implements ContainerInjectionInterface {
   /**
    * The gateway manager.
    *
-   * @var \Drupal\sms\Gateway\GatewayManagerInterface
+   * @var \Drupal\sms\Gateway\SmsGatewayPluginManagerInterface
    */
   protected $gatewayManager;
 
@@ -36,12 +36,12 @@ class DeliveryReportController implements ContainerInjectionInterface {
   /**
    * Creates an new delivery report controller.
    *
-   * @param \Drupal\sms\Gateway\GatewayManagerInterface $gateway_manager
+   * @param \Drupal\sms\Gateway\SmsGatewayPluginManagerInterface $gateway_manager
    *   The gateway manager service.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
    */
-  public function __construct(GatewayManagerInterface $gateway_manager, RequestStack $request_stack) {
+  public function __construct(SmsGatewayPluginManagerInterface $gateway_manager, RequestStack $request_stack) {
     $this->gatewayManager = $gateway_manager;
     $this->requestStack = $request_stack;
   }
