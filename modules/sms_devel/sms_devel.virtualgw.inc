@@ -14,60 +14,12 @@
  "in_number" to simply "gw_number".
  */
 
-use Drupal\sms\Plugin\SmsGatewayPluginInterface;
 use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Message\SmsMessage;
 
 define('SMS_DEVEL_VIRTUALGW_TYPE_OUT',      0);
 define('SMS_DEVEL_VIRTUALGW_TYPE_IN',       1);
 define('SMS_DEVEL_VIRTUALGW_TYPE_RECEIPT', 2);
-
-/**
- * Callback for sending messages.
- *
- * Options for this send function:
- *   gw_number - The sender of the message. MSISDN or text string. Min=3, max=11 chars.
- *   reference - Message reference tag (to appear on any receipt).
- *
- * @param string $number
- *   MSISDN of message recipient. Should include the country code prefix.
- * @param string $message
- *   Message body text.
- * @param array $options
- *   Options array from SMS Framework.
- *
- * @return array
- *   Gateway response array with the following keys:
- *   - status: true (successful) or false (failed).
- *   - status_code: standardized sms gateway status codes.
- *   - gateway_status_code: gateway-specific status code.
- *   - gateway_status_text: text describing the gateway-specific status code.
- */
-function sms_devel_virtualgw_send($number, $message, $options) {
-  // Set a default sender if it is not specified
-  if (! array_key_exists('gw_number', $options)) {
-    $options['gw_number'] = '99999';
-  }
-
-  // Set a default reference if it is not specified
-  if (! array_key_exists('reference', $options)) {
-    $options['reference'] = md5($number . $message);
-  }
-
-  // Write log record for outgoing message
-  sms_devel_virtualgw_log_insert(SMS_DEVEL_VIRTUALGW_TYPE_OUT, $number, $message, $options);
-
-  // Invoke additional virtual gateway features eg: autoreplies, receipts.
-  sms_devel_virtualgw_sendlogic($number, $message, $options);
-
-  // Always return success
-  return array(
-    'status' => TRUE,
-    'status_code' => SmsGatewayPluginInterface::STATUS_OK,
-    'gateway_status_code' => 'OK',
-    'gateway_status_text' => 'sms_devel_virtualgw: send: OK',
-  );
-}
-
 
 /**
  * Handles incoming messages.
@@ -88,8 +40,10 @@ function sms_devel_virtualgw_receiver($number = NULL, $message = NULL, $options 
     $options['reference'] = (array_key_exists('reference', $_REQUEST)) ? $_REQUEST['reference'] : 'NO_REFERENCE';
   }
 
+  $sms_message = new SmsMessage('', explode(',', $number), $message, $options, \Drupal::currentUser()->id());
+
   // Write log record for incoming message
-  sms_devel_virtualgw_log_insert(SMS_DEVEL_VIRTUALGW_TYPE_IN, $number, $message, $options);
+  sms_devel_virtualgw_log_insert(SMS_DEVEL_VIRTUALGW_TYPE_IN, $sms_message, $options);
 
   // Call SMS Framework incoming message handler
   sms_incoming($number, $message, $options);
@@ -101,26 +55,24 @@ function sms_devel_virtualgw_receiver($number = NULL, $message = NULL, $options 
  *
  * @param string $type
  *   The message type (incoming or outgoing).
- * @param string $number
- *   The sender numbers.
- * @param string $message
- *   The message received.
+ * @param \Drupal\sms\Message\SmsMessageInterface
+ *   The SMS message.
  * @param array $options
  *   Array of options.
  *
  * @return boolean
  *   true if logging was successful, false otherwise.
  */
-function sms_devel_virtualgw_log_insert($type, $number = '', $message = '', $options = array()) {
+function sms_devel_virtualgw_log_insert($type, SmsMessageInterface $sms_message, $options = array()) {
   $options_z = serialize($options);
   $result = $id = db_insert('sms_devel_virtualgw')
-    ->fields(array(
+    ->fields([
       'created' => REQUEST_TIME,
       'type' => $type,
-      'number' => $number,
-      'message' => $message,
+      'number' => reset($sms_message->getRecipients()),
+      'message' => $sms_message->getMessage(),
       'options' => $options_z,
-    ))
+    ])
     ->execute();
   return $result;
 }
@@ -129,14 +81,12 @@ function sms_devel_virtualgw_log_insert($type, $number = '', $message = '', $opt
 /**
  * Invokes additional virtual gateway features eg: autoreplies, receipts.
  *
- * @param string $number
- *   The recipient numbers.
- * @param string $message
- *   The message being sent.
+ * @param \Drupal\sms\Message\SmsMessageInterface
+ *   The SMS message.
  * @param array $options
  *   An array of options.
  */
-function sms_devel_virtualgw_sendlogic($number, $message, $options) {
+function sms_devel_virtualgw_sendlogic(SmsMessageInterface $sms_message, $options) {
   $autoreply_enabled = variable_get('sms_devel_virtualgw_autoreply_enabled', FALSE);
   $autoreply_format  = variable_get('sms_devel_virtualgw_autoreply_format',   '');
   $receipts_enabled  = variable_get('sms_devel_virtualgw_receipts_enabled',   FALSE);

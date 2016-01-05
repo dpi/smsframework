@@ -8,17 +8,4 @@
  * @subpackage sms_devel
  */
 
-/**
- * Implements hook_gateway_info().
- */
-function sms_devel_gateway_info() {
-  require_once 'sms_devel.virtualgw.inc';
-  require_once 'sms_devel.virtualgw.admin.inc';
-  return array(
-    'virtualgw' => array(
-      'name' => 'Devel virtual gateway',
-      'send' => 'sms_devel_virtualgw_send',
-      'configure form' => 'sms_devel_virtualgw_settings_form',
-    ),
-  );
-}
+require_once 'sms_devel.virtualgw.inc';

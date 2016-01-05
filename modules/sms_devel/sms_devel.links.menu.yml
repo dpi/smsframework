@@ -1,5 +1,5 @@
 sms_devel.admin:
+  title: 'SMS'
+  description: 'Send a test SMS.'
   route_name: sms_devel.admin
-  title: Devel
-  description: 'Development and testing tools.'
-  parent: sms.admin
+  parent: 'system.admin_config_development'
