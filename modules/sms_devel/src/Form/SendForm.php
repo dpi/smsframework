@@ -66,25 +66,22 @@ class SendForm extends FormBase {
    * {@inheritdoc}
    */
   function submitForm(array &$form, FormStateInterface $form_state) {
+    $t_args = [
+      '@number'  => $form_state->getValue('number'),
+      '@message' => $form_state->getValue('message')
+    ];
+
     if ($form_state->getTriggeringElement()['#value'] === $form_state->getValue('submit')) {
       sms_send_form_submit($form, $form_state);
       // Display a message to the user.
-      drupal_set_message($this->t("Form submitted ok for number @number and message: @message",
-        [
-          '@number'  => $form_state->getValue('number'),
-          '@message' => $form_state->getValue('message')
-        ]));
+      drupal_set_message($this->t('SMS sent to @number with message: "@message".', $t_args));
     }
     elseif ($form_state->getTriggeringElement()['#value'] === $form_state->getValue('receive')) {
       // Display a message to the user.
       $number = $form_state->getValue('number');
       $message = $form_state->getValue('message');
       sms_incoming($number, $message);
-      drupal_set_message($this->t("Message received from number @number and message: @message",
-        [
-          '@number'  => $form_state->getValue('number'),
-          '@message' => $form_state->getValue('message')
-        ]));
+      drupal_set_message($this->t("Message received from number @number and message: @message", $t_args));
     }
   }
 

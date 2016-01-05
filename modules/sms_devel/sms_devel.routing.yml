@@ -1,16 +1,8 @@
 sms_devel.admin:
-  path: '/admin/config/smsframework/devel'
+  path: '/admin/config/development/sms'
   defaults:
     _title: Devel
     _form: '\Drupal\sms_devel\Form\SendForm'
-  requirements:
-    _permission: 'administer smsframework'
-
-sms_devel.virtualgw:
-  path: '/admin/config/smsframework/devel/virtualgw'
-  defaults:
-    _title: 'Virtual gateway'
-    _form: 'sms_devel_virtualgw_form'
   requirements:
     _permission: 'administer smsframework'
 
