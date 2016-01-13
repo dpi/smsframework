@@ -36,5 +36,34 @@ sms.gateway.*:
     settings:
       type: sms_gateway.settings.[%parent.plugin]
 
+sms.phone.*.*:
+  type: config_entity
+  label: 'phone number config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    entity_type:
+      type: string
+      label: 'Entity type'
+    bundle:
+      type: string
+      label: 'Bundle'
+    automated_optout:
+      type: boolean
+    verification_message:
+      type: string
+    duration_verification_code_expire:
+      type: int
+      label: 'Time in seconds, before verification codes expire.'
+    fields:
+      mapping:
+        phone_number:
+          type: string
+          label: 'Name of field.'
+        automated_opt_out:
+          type: string
+          label: 'Name of field. Indicates if this bundle is allowed to control automated messages.'
+
 sms_gateway.settings.*:
   type: sms_gateway_settings

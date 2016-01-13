@@ -5,4 +5,6 @@ core: 8.x
 type: module
 project: smsframework
 configure: admin/config/smsframework
-
+dependencies:
+  - telephone
+  - dynamic_entity_reference
