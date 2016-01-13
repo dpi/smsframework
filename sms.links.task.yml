@@ -1,3 +1,7 @@
+sms.local_tasks:
+  class: \Drupal\Core\Menu\LocalTaskDefault
+  deriver: \Drupal\sms\Plugin\Derivative\LocalTasks
+
 sms.gateway.list:
   title: 'Gateways'
   description: 'Available SMS gateways.'

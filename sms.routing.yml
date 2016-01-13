@@ -6,6 +6,39 @@ sms.admin:
   requirements:
     _permission: 'administer smsframework'
 
+# Phone numbers
+sms.bundle_phone_number.list:
+  path: '/admin/config/smsframework/phone'
+  defaults:
+    _entity_list: 'bundle_phone_number'
+    _title: 'Phone number configs'
+  requirements:
+    _permission: 'administer smsframework'
+
+entity.bundle_phone_number.add:
+  path: '/admin/config/smsframework/phone/add'
+  defaults:
+    _entity_form: 'bundle_phone_number.add'
+    _title: 'Add phonenumber config'
+  requirements:
+    _permission: 'administer smsframework'
+
+entity.bundle_phone_number.edit_form:
+  path: '/admin/config/smsframework/phone/{bundle_phone_number}'
+  defaults:
+    _entity_form: 'bundle_phone_number.edit'
+    _title: 'Edit pphnumber'
+  requirements:
+    _permission: 'administer smsframework'
+
+entity.bundle_phone_number.delete_form:
+  path: '/admin/config/smsframework/phone/{bundle_phone_number}/delete'
+  defaults:
+    _entity_form: 'bundle_phone_number.delete'
+    _title: 'Delete pphnumber'
+  requirements:
+    _permission: 'administer smsframework'
+
 # Settings
 sms.settings:
   path: '/admin/config/smsframework/settings'

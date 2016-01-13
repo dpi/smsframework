@@ -11,6 +11,13 @@ sms.settings:
   parent: sms.admin
   weight: -11
 
+sms.bundle_phone_number.list:
+  title: 'phoncfg'
+  description: 'djnasdknaks.'
+  route_name: sms.bundle_phone_number.list
+  parent: sms.admin
+  weight: -10
+
 sms.gateway.list:
   title: 'Gateways'
   description: 'Add, edit, delete and configure SMS gateway instances.'

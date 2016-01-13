@@ -1,3 +1,10 @@
+entity.bundle_phone_number.add:
+  title: 'Add bundle_phone_number'
+  route_name: entity.bundle_phone_number.add
+  weight: 1
+  appears_on:
+    - sms.bundle_phone_number.list
+
 entity.sms_gateway.add:
   title: 'Add gateway'
   route_name: entity.sms_gateway.add
