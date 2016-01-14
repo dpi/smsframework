@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\sms\Form\PhoneNumberForm.
+ * Contains \Drupal\sms\Form\PhoneNumberSettingsForm.
  */
 
 namespace Drupal\sms\Form;
@@ -13,7 +13,7 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Form controller for Phone Number config.
  */
-class PhoneNumberForm extends EntityForm {
+class PhoneNumberSettingsForm extends EntityForm {
 
   /**
    * {@inheritdoc}

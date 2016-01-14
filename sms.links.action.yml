@@ -5,12 +5,12 @@ sms.carrier_add:
   appears_on:
     - sms.carrier_admin
 
-entity.bundle_phone_number.add:
-  title: 'Add bundle_phone_number'
-  route_name: entity.bundle_phone_number.add
+entity.phone_number_settings.add:
+  title: 'Add phone number settings'
+  route_name: entity.phone_number_settings.add
   weight: 1
   appears_on:
-    - sms.bundle_phone_number.list
+    - sms.phone_number_settings.list
 
 entity.sms_gateway.add:
   title: 'Add gateway'

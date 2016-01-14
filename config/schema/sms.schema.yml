@@ -38,7 +38,7 @@ sms.gateway.*:
 
 sms.phone.*.*:
   type: config_entity
-  label: 'phone number config'
+  label: 'Phone number configuration'
   mapping:
     id:
       type: string

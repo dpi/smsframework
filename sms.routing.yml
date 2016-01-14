@@ -13,37 +13,37 @@ sms.phone.verify:
     _form: '\Drupal\sms\Form\VerifyPhoneNumberForm'
     _title: 'Verify a phone number'
   requirements:
-    _permission: 'administer smsframework'
+    _permission: 'sms verify phone number'
 
-sms.bundle_phone_number.list:
-  path: '/admin/config/smsframework/phone'
+sms.phone_number_settings.list:
+  path: '/admin/config/smsframework/phone_number'
   defaults:
-    _entity_list: 'bundle_phone_number'
-    _title: 'Phone number configs'
+    _entity_list: 'phone_number_settings'
+    _title: 'Phone number settings'
   requirements:
     _permission: 'administer smsframework'
 
-entity.bundle_phone_number.add:
-  path: '/admin/config/smsframework/phone/add'
+entity.phone_number_settings.add:
+  path: '/admin/config/smsframework/phone_number/add'
   defaults:
-    _entity_form: 'bundle_phone_number.add'
-    _title: 'Add phonenumber config'
+    _entity_form: 'phone_number_settings.add'
+    _title: 'Add phone number settings'
   requirements:
     _permission: 'administer smsframework'
 
-entity.bundle_phone_number.edit_form:
-  path: '/admin/config/smsframework/phone/{bundle_phone_number}'
+entity.phone_number_settings.edit_form:
+  path: '/admin/config/smsframework/phone_number/{phone_number_settings}'
   defaults:
-    _entity_form: 'bundle_phone_number.edit'
-    _title: 'Edit pphnumber'
+    _entity_form: 'phone_number_settings.edit'
+    _title: 'Edit phone number settings'
   requirements:
     _permission: 'administer smsframework'
 
-entity.bundle_phone_number.delete_form:
-  path: '/admin/config/smsframework/phone/{bundle_phone_number}/delete'
+entity.phone_number_settings.delete_form:
+  path: '/admin/config/smsframework/phone_number/{phone_number_settings}/delete'
   defaults:
-    _entity_form: 'bundle_phone_number.delete'
-    _title: 'Delete pphnumber'
+    _entity_form: 'phone_number_settings.delete'
+    _title: 'Delete phone numebr settings'
   requirements:
     _permission: 'administer smsframework'
 
