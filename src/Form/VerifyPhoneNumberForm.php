@@ -69,7 +69,14 @@ class VerifyPhoneNumberForm extends FormBase {
     $code = $form_state->getValue('code');
     $phone_verification = $this->phoneNumberProvider
       ->getPhoneVerificationCode($code);
-    if (!$phone_verification) {
+
+    if ($phone_verification && !$phone_verification->getStatus()) {
+      $expiration_seconds = 3600;
+      if ((time() - ($phone_verification->getCreatedTime() + $expiration_seconds)) > 0) {
+        $form_state->setError($form['code'], $this->t('Verification code is expired.'));
+      }
+    }
+    else {
       $form_state->setError($form['code'], $this->t('Invalid verification code.'));
     }
   }
@@ -80,6 +87,7 @@ class VerifyPhoneNumberForm extends FormBase {
       ->getPhoneVerificationCode($code);
     $phone_verification
       ->setStatus(TRUE)
+      ->setCode('')
       ->save();
     drupal_set_message($this->t('Phone number is now verified.'));
   }

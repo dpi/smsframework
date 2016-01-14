@@ -34,31 +34,31 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
 
       if ($phone_verification) {
         if ($phone_verification->getStatus()) {
-          $element['#description'] = $this->t('<strong>Phone number is verified.</strong> Modifying this phone number will remove verification.');
+          $element['value']['#description'] = $this->t('<strong>Phone number is verified.</strong> Modifying this phone number will remove verification.');
         }
         else {
+          $element['value']['#disabled'] = TRUE;
           $expiration_seconds = 3600; // @fixme: hook up to config
-          $seconds = ($phone_verification->getCreatedTime() + $expiration_seconds) - time();
-          $t_args = [
-            '@minutes' => floor($seconds / 60)
-          ];
+          $expiration_date = $phone_verification->getCreatedTime() + $expiration_seconds;
 
-          if ($seconds > 0) {
-            $element['#description'] = $this->t('A validation code has been sent to this phone number. Go here to enter the code www.example.com. The code will expire if it is not verified within the next @minutes minutes', $t_args);
-            $element['#disabled'] = TRUE;
+          if (time() < $expiration_date) {
+            /** @var \Drupal\Core\Datetime\DateFormatter $date_formatter */
+            $date_formatter = \Drupal::service('date.formatter');
+            $t_args = [
+              '@time' => $date_formatter->formatTimeDiffUntil($expiration_date, [
+                'granularity' => 2,
+              ]),
+            ];
+            $element['value']['#description'] = $this->t('A validation code has been sent to this phone number. Go here to enter the code www.example.com. The code will expire if it is not verified in @time.', $t_args);
           }
           else {
-            $element['#description'] = $this->t('Verification code has expired.');
+            // This message displays if we are waiting for cron to delete
+            // expired verification codes.
+            $element['value']['#description'] = $this->t('Verification code expired. Try again later.');
           }
         }
       }
     }
-
-    $element['value'] = $element + array(
-        '#type' => 'tel',
-        '#default_value' => isset($items[$delta]->value) ? $items[$delta]->value : NULL,
-        '#placeholder' => $this->getSetting('placeholder'),
-      );
 
     return $element;
   }
