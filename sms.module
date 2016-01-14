@@ -13,6 +13,7 @@ use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\SmsException;
+use Drupal\Core\Entity\EntityInterface;
 
 // Direction codes.
 define('SMS_DIR_NONE',  0);
@@ -45,6 +46,41 @@ function sms_cron_queue_info() {
       'worker callback' => 'sms_incoming_queue_worker',
     ),
   );
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+function sms_entity_insert(EntityInterface $entity) {
+  _sms_entity_postsave($entity);
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function sms_entity_update(EntityInterface $entity) {
+  _sms_entity_postsave($entity);
+}
+
+/**
+ * Respond to saving entities after they have been written to storage.
+ *
+ * @see sms_entity_insert().
+ * @see sms_entity_update().
+ */
+function _sms_entity_postsave(EntityInterface $entity) {
+  $field_name = 'field_usertphonenumber';// fixme: temporary
+  if ($entity->getEntityTypeId() == 'user') {// fixme: temporary
+    foreach ($entity->{$field_name} as $v) {
+      $phone_number = $v->value;
+
+      /** @var \Drupal\sms\EntityPhoneNumberProviderInterface $phone_number_service */
+      $phone_number_service = \Drupal::service('entity.phone_number');
+      if (!$phone_number_service->getPhoneVerification($entity, $phone_number)) {
+        $phone_number_service->newPhoneVerification($entity, $phone_number);
+      }
+    }
+  }
 }
 
 /**

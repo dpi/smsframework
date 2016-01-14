@@ -39,4 +39,7 @@ interface EntityPhoneNumberProviderInterface {
    */
   function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message);
 
+  function getPhoneVerification(EntityInterface $entity, $phone_number);
+  function newPhoneVerification(EntityInterface $entity, $phone_number);
+
 }
