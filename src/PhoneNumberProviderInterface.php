@@ -42,7 +42,7 @@ interface PhoneNumberProviderInterface {
   function getPhoneVerificationCode($code);
 
   /**
-   * @return \Drupal\sms\Entity\EntityPhoneVerificationInterface|NULL
+   * @return \Drupal\sms\Entity\PhoneVerificationInterface|NULL
    */
   function getPhoneVerification(EntityInterface $entity, $phone_number);
   function newPhoneVerification(EntityInterface $entity, $phone_number);

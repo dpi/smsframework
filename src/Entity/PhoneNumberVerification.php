@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\sms\Entity\EntityPhoneVerification.
+ * Contains \Drupal\sms\Entity\PhoneNumberVerification.
  */
 
 namespace Drupal\sms\Entity;
@@ -12,18 +12,18 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
- * Defines the entity phone verification entity.
+ * Defines the phone number verification entity.
  *
  * @ContentEntityType(
- *   id = "sms_entity_phone_verification",
- *   label = @Translation("Entity Phone Verification"),
- *   base_table = "sms_entity_phone_verification",
+ *   id = "sms_phone_number_verification",
+ *   label = @Translation("Phone Number Verification"),
+ *   base_table = "sms_phone_number_verification",
  *   entity_keys = {
  *     "id" = "id",
  *   },
  * )
  */
-class EntityPhoneVerification extends ContentEntityBase implements EntityPhoneVerificationInterface {
+class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVerificationInterface {
 
   /**
    * {@inheritdoc}

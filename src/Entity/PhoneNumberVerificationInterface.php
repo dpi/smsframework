@@ -3,10 +3,9 @@
 
 namespace Drupal\sms\Entity;
 
-interface EntityPhoneVerificationInterface {
+interface PhoneNumberVerificationInterface {
 
   public function getCreatedTime();
-
   public function getStatus();
   public function setStatus($status);
 
