@@ -13,7 +13,7 @@ sms.settings:
 
 sms.phone_number_settings.list:
   title: 'Phone Numbers'
-  description: 'Configure how SMS Framework determines phone numbers for an entity.'
+  description: 'Configure phone numbers for entities.'
   route_name: sms.phone_number_settings.list
   parent: sms.admin
   weight: -10
