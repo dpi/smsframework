@@ -30,11 +30,11 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   protected $smsProvider;
 
   /**
-   * Storage for Phone Verification entities.
+   * Storage for Phone Number Verification entities.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $phoneVerificationStorage;
+  protected $phoneNumberVerificationStorage;
 
   /**
    * Constructs a new PhoneNumberProvider object.
@@ -46,8 +46,8 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
    */
   function __construct(EntityTypeManagerInterface $entity_type_manager, SmsProviderInterface $sms_provider) {
     $this->smsProvider = $sms_provider;
-    $this->phoneVerificationStorage = $entity_type_manager
-      ->getStorage('sms_entity_phone_verification');
+    $this->phoneNumberVerificationStorage = $entity_type_manager
+      ->getStorage('sms_phone_number_verification');
   }
 
   /**
@@ -94,7 +94,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
    * {@inheritdoc}
    */
   function getPhoneVerificationCode($code) {
-    $entities = $this->phoneVerificationStorage
+    $entities = $this->phoneNumberVerificationStorage
       ->loadByProperties([
         'code' => $code,
       ]);
@@ -105,7 +105,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
    * {@inheritdoc}
    */
   function getPhoneVerification(EntityInterface $entity, $phone_number) {
-    $entities = $this->phoneVerificationStorage
+    $entities = $this->phoneNumberVerificationStorage
       ->loadByProperties([
         'entity__target_id' => $entity->id(),
         'entity__target_type' => $entity->getEntityTypeId(),
@@ -118,7 +118,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
    * {@inheritdoc}
    */
   function newPhoneVerification(EntityInterface $entity, $phone_number) {
-    $verification = $this->phoneVerificationStorage->create([
+    $verification = $this->phoneNumberVerificationStorage->create([
       'entity' => $entity,
       'phone' => $phone_number,
       'code' => mt_rand(1000, 9999),
