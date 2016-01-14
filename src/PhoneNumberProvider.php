@@ -139,6 +139,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
         [],
         0
       );
+      $sms_message->setIsAutomated(FALSE);
 
       $this->smsProvider
         ->send($sms_message, []);
