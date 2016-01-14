@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\sms\EntityPhoneNumberProviderInterface.
+ * Contains \Drupal\sms\PhoneNumberProviderInterface.
  */
 
 namespace Drupal\sms;
@@ -10,7 +10,7 @@ namespace Drupal\sms;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 
-interface EntityPhoneNumberProviderInterface {
+interface PhoneNumberProviderInterface {
 
   /**
    * x

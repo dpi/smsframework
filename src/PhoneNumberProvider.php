@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\sms\EntityPhoneNumberProvider.
+ * Contains \Drupal\sms\PhoneNumberProvider.
  */
 
 namespace Drupal\sms;
@@ -11,14 +11,13 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Exception\PhoneNumberConfiguration;
-use Drupal\field\Entity\FieldConfig;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessage;
 
 /**
- * Event phone number provider.
+ * Entity phone number provider.
  */
-class EntityPhoneNumberProvider implements EntityPhoneNumberProviderInterface {
+class PhoneNumberProvider implements PhoneNumberProviderInterface {
 
   use ContainerAwareTrait;
 
@@ -30,7 +29,7 @@ class EntityPhoneNumberProvider implements EntityPhoneNumberProviderInterface {
   protected $entityFieldManager;
 
   /**
-   * Constructs a new EntityPhoneNumberProvider object.
+   * Constructs a new PhoneNumberProvider object.
    *
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
