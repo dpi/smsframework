@@ -15,6 +15,11 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
   public function getEntity();
 
   /**
+   * @return string
+   */
+  public function getPhoneNumber();
+
+  /**
    * @param string $code
    *
    * @return $this

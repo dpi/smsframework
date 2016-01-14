@@ -25,18 +25,32 @@ define('SMS_DIR_ALL',   4);
  * Implements hook_cron().
  */
 function sms_cron() {
+  $storage = \Drupal::entityTypeManager()
+    ->getStorage('sms_phone_number_verification');
+
+  $field_name = 'field_usertphonenumber';// fixme: temporary
   $expiration_seconds = 3600; // @fixme: hook up to config
 
   // Delete expired phone number verifications.
-  $storage = \Drupal::entityTypeManager()
-    ->getStorage('sms_phone_number_verification');
   $ids = $storage->getQuery()
     ->condition('status', 0)
     ->condition('created', (time() - $expiration_seconds), '<')
     ->execute();
-  $storage->delete($storage->loadMultiple($ids));
 
-  // @todo remove phone number from entity' field.
+  /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $phone_number_verification */
+  foreach ($storage->loadMultiple($ids) as $phone_number_verification) {
+    // Purge phone number from entity.
+    if ($entity = $phone_number_verification->getEntity()) {
+      $entity->{$field_name}->filter(function ($item) use ($phone_number_verification) {
+        return $item->value != $phone_number_verification->getPhoneNumber();
+      });
+      try {
+        $entity->save();
+      }
+      catch (\Exception $e) {}
+    }
+    $storage->delete([$phone_number_verification]);
+  }
 }
 
 /**

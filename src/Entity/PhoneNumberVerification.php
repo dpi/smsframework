@@ -44,6 +44,13 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
   /**
    * {@inheritdoc}
    */
+  public function getPhoneNumber() {
+    return $this->get('phone')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setCode($code) {
     $this->set('code', $code);
     return $this;
