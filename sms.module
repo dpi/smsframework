@@ -90,7 +90,7 @@ function sms_entity_update(EntityInterface $entity) {
 function _sms_entity_postsave(EntityInterface $entity) {
   $field_name = 'field_usertphonenumber';// fixme: temporary
   if ($entity->getEntityTypeId() == 'user') {// fixme: temporary
-    if (!$entity->{$field_name}->equals($entity->original->{$field_name})) {
+    if (!isset($entity->original->{$field_name}) || !$entity->{$field_name}->equals($entity->original->{$field_name})) {
       /** @var \Drupal\sms\PhoneNumberProviderInterface $phone_number_provider */
       $phone_number_provider = \Drupal::service('sms.phone_number');
 
