@@ -13,7 +13,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Cache\Cache;
-use Drupal\sms\Entity\PhoneNumberBundle;
 
 /**
  * Provides dynamic tasks for SMS Framework.
@@ -75,7 +74,9 @@ class LocalTasks extends DeriverBase implements ContainerDeriverInterface {
 
           // Get cache tags for all phone configs for this entity type.
           foreach ($entity_types[$entity_type_id] as $config) {
-            $phone_config = PhoneNumberBundle::load($config['id']);
+            $phone_config = $this->entityManager
+              ->getStorage('phone_number_settings')
+              ->load($config['id']);
             $cache_tags = Cache::mergeTags($cache_tags, $phone_config->getCacheTags());
           }
 

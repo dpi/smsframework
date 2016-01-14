@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\sms\Form\PhoneNumberDeleteForm.
+ * Contains \Drupal\sms\Form\PhoneNumberSettingsDeleteForm.
  */
 
 namespace Drupal\sms\Form;
@@ -14,7 +14,7 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Form controller to delete phone number.
  */
-class PhoneNumberDeleteForm extends EntityConfirmFormBase {
+class PhoneNumberSettingsDeleteForm extends EntityConfirmFormBase {
 
   /**
    * {@inheritdoc}
