@@ -79,4 +79,30 @@ class EntityPhoneNumberProvider implements EntityPhoneNumberProviderInterface {
     return $sms_provider->send($sms_message_new);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  function getPhoneVerification(EntityInterface $entity, $phone_number) {
+    $entities = \Drupal::entityManager()->getStorage('sms_entity_phone_verification')
+      ->loadByProperties([
+        'entity__target_id' => $entity->id(),
+        'entity__target_type' => $entity->getEntityTypeId(),
+        'phone' => $phone_number,
+      ]);
+    return reset($entities);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function newPhoneVerification(EntityInterface $entity, $phone_number) {
+    $verification = \Drupal\sms\Entity\EntityPhoneVerification::create([
+      'entity' => $entity,
+      'phone' => $phone_number,
+      'code' => mt_rand(1000, 9999),
+      'status' => FALSE,
+    ]);
+    $verification->save();
+  }
+
 }

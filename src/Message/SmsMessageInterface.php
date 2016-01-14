@@ -115,4 +115,25 @@ interface SmsMessageInterface {
    * @return int
    */
   public function getUid();
+
+  /**
+   * Sets whether this SMS message was generated automatically.
+   *
+   * @param bool $is_automated
+   *   Whether this SMS message was generated automatically. Set to FALSE if the
+   *   message is created due to direct action.
+   *
+   * @return \Drupal\sms\Message\SmsMessageInterface
+   *   Return called object for chaining.
+   */
+  public function setIsAutomated($is_automated);
+
+  /**
+   * Gets whether this SMS message was generated automatically.
+   *
+   * @return bool
+   *   Whether this SMS message was generated automatically.
+   */
+  public function getIsAutomated();
+
 }
