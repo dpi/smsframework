@@ -7,6 +7,14 @@ sms.admin:
     _permission: 'administer smsframework'
 
 # Phone numbers
+sms.phone.verify:
+  path: '/verify'
+  defaults:
+    _form: '\Drupal\sms\Form\VerifyPhoneNumberForm'
+    _title: 'Verify a phone number'
+  requirements:
+    _permission: 'administer smsframework'
+
 sms.bundle_phone_number.list:
   path: '/admin/config/smsframework/phone'
   defaults:

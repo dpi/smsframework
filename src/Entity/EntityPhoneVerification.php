@@ -35,6 +35,21 @@ class EntityPhoneVerification extends ContentEntityBase implements EntityPhoneVe
   /**
    * {@inheritdoc}
    */
+  public function getStatus() {
+    return $this->get('status')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setStatus($status) {
+    $this->set('status', (bool) $status);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Phone verification ID'))

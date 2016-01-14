@@ -8,7 +8,8 @@
 namespace Drupal\sms;
 
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Exception\PhoneNumberConfiguration;
 use Drupal\sms\Message\SmsMessageInterface;
@@ -22,20 +23,31 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   use ContainerAwareTrait;
 
   /**
-   * The entity field manager.
+   * The SMS provider.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
-  protected $entityFieldManager;
+  protected $smsProvider;
+
+  /**
+   * Storage for Phone Verification entities.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $phoneVerificationStorage;
 
   /**
    * Constructs a new PhoneNumberProvider object.
    *
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
+   *   The SMS provider.
    */
-  function __construct(EntityFieldManagerInterface $entity_field_manager) {
-    $this->entityFieldManager = $entity_field_manager;
+  function __construct(EntityTypeManagerInterface $entity_type_manager, SmsProviderInterface $sms_provider) {
+    $this->smsProvider = $sms_provider;
+    $this->phoneVerificationStorage = $entity_type_manager
+      ->getStorage('sms_entity_phone_verification');
   }
 
   /**
@@ -73,16 +85,27 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       0 // @todo: Remove UID.
     );
 
-    /** @var \Drupal\sms\Provider\DefaultSmsProvider $sms_provider */
-    $sms_provider = \Drupal::service('sms_provider');
-    return $sms_provider->send($sms_message_new);
+    $this->smsProvider
+      // @todo: Remove $options.
+      ->send($sms_message_new, []);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function getPhoneVerificationCode($code) {
+    $entities = $this->phoneVerificationStorage
+      ->loadByProperties([
+        'code' => $code,
+      ]);
+    return reset($entities);
   }
 
   /**
    * {@inheritdoc}
    */
   function getPhoneVerification(EntityInterface $entity, $phone_number) {
-    $entities = \Drupal::entityManager()->getStorage('sms_entity_phone_verification')
+    $entities = $this->phoneVerificationStorage
       ->loadByProperties([
         'entity__target_id' => $entity->id(),
         'entity__target_type' => $entity->getEntityTypeId(),
@@ -95,7 +118,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
    * {@inheritdoc}
    */
   function newPhoneVerification(EntityInterface $entity, $phone_number) {
-    $verification = \Drupal\sms\Entity\EntityPhoneVerification::create([
+    $verification = $this->phoneVerificationStorage->create([
       'entity' => $entity,
       'phone' => $phone_number,
       'code' => mt_rand(1000, 9999),
