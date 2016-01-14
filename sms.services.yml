@@ -7,16 +7,6 @@ services:
   plugin.manager.sms_gateway:
     class: Drupal\sms\Plugin\SmsGatewayPluginManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
-  sms.route_subscriber:
-    class: Drupal\sms\Routing\RouteSubscriber
-    arguments: ['@entity.manager', '@sms.phone_number']
-    tags:
-      - { name: event_subscriber }
   sms.phone_number:
     class: Drupal\sms\PhoneNumberProvider
     arguments: ['@entity_type.manager', '@sms_provider']
-  access_check.sms.entity_is_phone_number_bundle:
-    class: Drupal\sms\Access\EntityIsPhoneNumberBundleCheck
-    arguments: ['@sms.phone_number']
-    tags:
-      - { name: access_check, applies_to: _entity_is_phone_number_bundle }
