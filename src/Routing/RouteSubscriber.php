@@ -9,7 +9,7 @@ namespace Drupal\sms\Routing;
 
 use Drupal\Core\Routing\RouteSubscriberBase;
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\sms\EntityPhoneNumberProviderInterface;
+use Drupal\sms\PhoneNumberProviderInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -28,10 +28,9 @@ class RouteSubscriber extends RouteSubscriberBase {
   /**
    * Entity phone number provider.
    *
-   * @var \Drupal\sms\EntityPhoneNumberProviderInterface
+   * @var \Drupal\sms\PhoneNumberProviderInterface
    */
-  protected $entityPhoneNumber;
-
+  protected $phoneNumberProvider;
 
   /**
    * Constructs a RouteSubscriber object.
@@ -39,9 +38,9 @@ class RouteSubscriber extends RouteSubscriberBase {
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
    */
-  public function __construct(EntityManagerInterface $entity_manager, EntityPhoneNumberProviderInterface $entity_phone_number) {
+  public function __construct(EntityManagerInterface $entity_manager, PhoneNumberProviderInterface $entity_phone_number) {
     $this->entityManager = $entity_manager;
-    $this->entityPhoneNumber = $entity_phone_number;
+    $this->phoneNumberProvider = $entity_phone_number;
   }
 
   /**

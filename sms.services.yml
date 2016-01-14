@@ -9,14 +9,14 @@ services:
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
   sms.route_subscriber:
     class: Drupal\sms\Routing\RouteSubscriber
-    arguments: ['@entity.manager', '@entity.phone_number']
+    arguments: ['@entity.manager', '@sms.phone_number']
     tags:
       - { name: event_subscriber }
-  entity.phone_number:
-    class: Drupal\sms\EntityPhoneNumberProvider
+  sms.phone_number:
+    class: Drupal\sms\PhoneNumberProvider
     arguments: ['@entity_field.manager']
   access_check.sms.entity_is_phone_number_bundle:
     class: Drupal\sms\Access\EntityIsPhoneNumberBundleCheck
-    arguments: ['@entity.phone_number']
+    arguments: ['@sms.phone_number']
     tags:
       - { name: access_check, applies_to: _entity_is_phone_number_bundle }
