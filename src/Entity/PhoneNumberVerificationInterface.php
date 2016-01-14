@@ -8,7 +8,26 @@ use Drupal\Core\Entity\ContentEntityInterface;
 interface PhoneNumberVerificationInterface extends ContentEntityInterface {
 
   public function getCreatedTime();
-  public function getStatus();
+
+  /**
+   * @return \Drupal\Core\Entity\EntityInterface
+   */
+  public function getEntity();
+
+  /**
+   * @param string $code
+   *
+   * @return $this
+   */
+  public function setCode($code);
+  public function getCode();
+
+  /**
+   * @param bool $status
+   *
+   * @return $this
+   */
   public function setStatus($status);
+  public function getStatus();
 
 }

@@ -39,10 +39,13 @@ interface PhoneNumberProviderInterface {
    */
   function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message);
 
+  /**
+   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|NULL
+   */
   function getPhoneVerificationCode($code);
 
   /**
-   * @return \Drupal\sms\Entity\PhoneVerificationInterface|NULL
+   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|NULL
    */
   function getPhoneVerification(EntityInterface $entity, $phone_number);
   function newPhoneVerification(EntityInterface $entity, $phone_number);

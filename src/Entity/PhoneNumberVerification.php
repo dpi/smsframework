@@ -10,6 +10,8 @@ namespace Drupal\sms\Entity;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Defines the phone number verification entity.
@@ -35,8 +37,23 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
   /**
    * {@inheritdoc}
    */
-  public function getStatus() {
-    return $this->get('status')->value;
+  public function getEntity() {
+    return $this->get('entity')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCode($code) {
+    $this->set('code', $code);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCode() {
+    return $this->get('code')->value;
   }
 
   /**
@@ -45,6 +62,13 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
   public function setStatus($status) {
     $this->set('status', (bool) $status);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getStatus() {
+    return $this->get('status')->value;
   }
 
   /**
@@ -60,6 +84,13 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
     $fields['entity'] = BaseFieldDefinition::create('dynamic_entity_reference')
       ->setLabel(t('Entity'))
       ->setDescription(t('The entity for this verification code.'))
+      ->setRequired(TRUE)
+      ->setReadOnly(TRUE);
+
+    // Bundle is only used for statistics, and bulk cleanup.
+    $fields['bundle'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Bundle'))
+      ->setDescription(t('The bundle of the entity.'))
       ->setRequired(TRUE)
       ->setReadOnly(TRUE);
 
@@ -89,6 +120,16 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
       ->setRequired(TRUE);
 
     return $fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+    if ($this->getEntity() instanceof EntityInterface) {
+      $this->set('bundle', $this->getEntity()->bundle());
+    }
   }
 
 }

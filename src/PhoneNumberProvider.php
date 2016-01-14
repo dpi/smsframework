@@ -76,6 +76,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message) {
     $phone_numbers = $this->getPhoneNumbers($entity);
 
+    // @todo: remove this re-creation of SmsMessage when it adds setters.
     $sms_message_new = new SmsMessage(
       $sms_message->getSender(),
       // @todo: Improve multiple number handling:
@@ -118,13 +119,30 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
    * {@inheritdoc}
    */
   function newPhoneVerification(EntityInterface $entity, $phone_number) {
+    /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $verification */
     $verification = $this->phoneNumberVerificationStorage->create([
+      // @todo: transition to setters.
       'entity' => $entity,
       'phone' => $phone_number,
-      'code' => mt_rand(1000, 9999),
-      'status' => FALSE,
     ]);
-    $verification->save();
+
+    $verification
+      ->setCode(mt_rand(1000, 9999))
+      ->setStatus(FALSE)
+      ->save();
+
+    if ($verification) {
+      $sms_message = new SmsMessage(
+        '',
+        [$phone_number],
+        'your code is ' . $verification->getCode(),
+        [],
+        0
+      );
+
+      $this->smsProvider
+        ->send($sms_message, []);
+    }
   }
 
 }

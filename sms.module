@@ -38,7 +38,28 @@ function sms_theme() {
 }
 
 /**
+ * Implements hook_cron().
+ */
+function sms_cron() {
+  $expiration_seconds = 3600; // @fixme: hook up to config
+
+  // Delete expired phone number verifications.
+  $storage = \Drupal::entityTypeManager()
+    ->getStorage('sms_phone_number_verification');
+  $ids = $storage->getQuery()
+    ->condition('status', 0)
+    ->condition('created', (time() - $expiration_seconds), '<')
+    ->execute();
+  $storage->delete($storage->loadMultiple($ids));
+
+  // @todo remove phone number from entity' field.
+}
+
+/**
  * Implements hook_cron_queue_info().
+ *
+ * @deprecated
+ *   Drupal 8 does not call this hook.
  */
 function sms_cron_queue_info() {
   return array(
@@ -71,13 +92,28 @@ function sms_entity_update(EntityInterface $entity) {
 function _sms_entity_postsave(EntityInterface $entity) {
   $field_name = 'field_usertphonenumber';// fixme: temporary
   if ($entity->getEntityTypeId() == 'user') {// fixme: temporary
-    foreach ($entity->{$field_name} as $v) {
-      $phone_number = $v->value;
-
+    if (!$entity->{$field_name}->equals($entity->original->{$field_name})) {
       /** @var \Drupal\sms\PhoneNumberProviderInterface $phone_number_provider */
       $phone_number_provider = \Drupal::service('sms.phone_number');
-      if (!$phone_number_provider->getPhoneVerification($entity, $phone_number)) {
-        $phone_number_provider->newPhoneVerification($entity, $phone_number);
+
+      $new_numbers = [];
+      foreach ($entity->{$field_name} as $value) {
+        $phone_number = $value->value;
+        $new_numbers[] = $phone_number;
+
+        if (!$phone_number_provider->getPhoneVerification($entity, $phone_number)) {
+          $phone_number_provider->newPhoneVerification($entity, $phone_number);
+        }
+      }
+
+      foreach ($entity->original->{$field_name} as $value) {
+        $phone_number = $value->value;
+        // A phone number was deleted.
+        if (!in_array($phone_number, $new_numbers)) {
+          if ($phone_verification = $phone_number_provider->getPhoneVerification($entity, $phone_number)) {
+            $phone_verification->delete();
+          }
+        }
       }
     }
   }
