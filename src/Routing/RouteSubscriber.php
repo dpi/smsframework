@@ -26,7 +26,7 @@ class RouteSubscriber extends RouteSubscriberBase {
   protected $entityManager;
 
   /**
-   * Entity phone number provider.
+   * Phone number provider.
    *
    * @var \Drupal\sms\PhoneNumberProviderInterface
    */
@@ -37,10 +37,12 @@ class RouteSubscriber extends RouteSubscriberBase {
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
+   * @param \Drupal\sms\PhoneNumberProviderInterface $phone_number_provider
+   *   The phone number provider.
    */
-  public function __construct(EntityManagerInterface $entity_manager, PhoneNumberProviderInterface $entity_phone_number) {
+  public function __construct(EntityManagerInterface $entity_manager, PhoneNumberProviderInterface $phone_number_provider) {
     $this->entityManager = $entity_manager;
-    $this->phoneNumberProvider = $entity_phone_number;
+    $this->phoneNumberProvider = $phone_number_provider;
   }
 
   /**
