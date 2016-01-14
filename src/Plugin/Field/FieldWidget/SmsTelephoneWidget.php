@@ -7,8 +7,9 @@
 
 namespace Drupal\sms\Plugin\Field\FieldWidget;
 
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\telephone\Plugin\Field\FieldWidget\TelephoneDefaultWidget;
+use Drupal\Core\Routing\UrlGeneratorTrait;
+use Drupal\Core\Field\FieldItemListInterface;
 
 /**
  * Plugin implementation of the 'sms_telephone' widget.
@@ -23,8 +24,16 @@ use Drupal\telephone\Plugin\Field\FieldWidget\TelephoneDefaultWidget;
  */
 class SmsTelephoneWidget extends TelephoneDefaultWidget {
 
+  use UrlGeneratorTrait;
+
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, \Drupal\Core\Form\FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
+
+    /** @var \Drupal\Core\Datetime\DateFormatter $date_formatter */
+    $date_formatter = \Drupal::service('date.formatter');
+
+    $expiration_seconds = 3600; // @fixme: hook up to config
+    $t_args['@url'] = $this->url('sms.phone.verify');
 
     if (isset($items[$delta]->value)) {
       /** @var \Drupal\sms\PhoneNumberProviderInterface $phone_number_provider */
@@ -34,22 +43,17 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
 
       if ($phone_verification) {
         if ($phone_verification->getStatus()) {
-          $element['value']['#description'] = $this->t('<strong>Phone number is verified.</strong> Modifying this phone number will remove verification.');
+          $element['value']['#description'] = $this->t('This phone number is verified. <strong>Warning:</strong> Modifying this phone number will remove verification.');
         }
         else {
           $element['value']['#disabled'] = TRUE;
-          $expiration_seconds = 3600; // @fixme: hook up to config
           $expiration_date = $phone_verification->getCreatedTime() + $expiration_seconds;
 
           if (time() < $expiration_date) {
-            /** @var \Drupal\Core\Datetime\DateFormatter $date_formatter */
-            $date_formatter = \Drupal::service('date.formatter');
-            $t_args = [
-              '@time' => $date_formatter->formatTimeDiffUntil($expiration_date, [
-                'granularity' => 2,
-              ]),
-            ];
-            $element['value']['#description'] = $this->t('A validation code has been sent to this phone number. Go here to enter the code www.example.com. The code will expire if it is not verified in @time.', $t_args);
+            $t_args['@time'] = $date_formatter->formatTimeDiffUntil($expiration_date, [
+              'granularity' => 2,
+            ]);
+            $element['value']['#description'] = $this->t('A verification code has been sent to this phone number. Go to the <a href="@url">verification form</a> and enter the code. The code will expire if it is not verified in @time.', $t_args);
           }
           else {
             // This message displays if we are waiting for cron to delete
@@ -58,6 +62,10 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
           }
         }
       }
+    }
+    else {
+      $t_args['@time'] = $date_formatter->formatInterval($expiration_seconds, 2);
+      $element['value']['#description'] = $this->t('Enter a phone number. A verification code will be sent as an SMS message, you must enter the code into the <a href="@url">verification form</a> within @time.', $t_args);
     }
 
     return $element;
