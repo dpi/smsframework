@@ -54,7 +54,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
    * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
    *   The SMS provider.
    */
-  function __construct(EntityTypeManagerInterface $entity_type_manager, ConfigFactoryInterface $config_factory, SmsProviderInterface $sms_provider) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, ConfigFactoryInterface $config_factory, SmsProviderInterface $sms_provider) {
     $this->smsProvider = $sms_provider;
     $this->phoneNumberVerificationStorage = $entity_type_manager
       ->getStorage('sms_phone_number_verification');
@@ -64,7 +64,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   /**
    * {@inheritdoc}
    */
-  function getPhoneNumbers(EntityInterface $entity) {
+  public function getPhoneNumbers(EntityInterface $entity) {
     $phone_number_settings = $this->getPhoneNumberSettingsForEntity($entity);
     if (!$field_name = $phone_number_settings->get('fields.phone_number')) {
       throw new PhoneNumberConfiguration(sprintf('Entity phone number config field mapping not set for bundle %s:%s', $entity->getEntityTypeId(), $entity->bundle()));
@@ -80,7 +80,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   /**
    * {@inheritdoc}
    */
-  function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message) {
+  public function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message) {
     $phone_numbers = $this->getPhoneNumbers($entity);
 
     // @todo: remove this re-creation of SmsMessage when it adds setters.
@@ -101,14 +101,14 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   /**
    * {@inheritdoc}
    */
-  function getPhoneNumberSettings($entity_type_id, $bundle) {
+  public function getPhoneNumberSettings($entity_type_id, $bundle) {
     return $this->configFactory->get('sms.phone.' . $entity_type_id . '.' . $bundle);
   }
 
   /**
    * {@inheritdoc}
    */
-  function getPhoneNumberSettingsForEntity(EntityInterface $entity) {
+  public function getPhoneNumberSettingsForEntity(EntityInterface $entity) {
     $config = $this->getPhoneNumberSettings($entity->getEntityTypeId(), $entity->bundle());
 
     if (!$config->get()) {
@@ -121,7 +121,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   /**
    * {@inheritdoc}
    */
-  function getPhoneVerificationCode($code) {
+  public function getPhoneVerificationCode($code) {
     $entities = $this->phoneNumberVerificationStorage
       ->loadByProperties([
         'code' => $code,
@@ -132,7 +132,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   /**
    * {@inheritdoc}
    */
-  function getPhoneVerification(EntityInterface $entity, $phone_number) {
+  public function getPhoneVerification(EntityInterface $entity, $phone_number) {
     $entities = $this->phoneNumberVerificationStorage
       ->loadByProperties([
         'entity__target_id' => $entity->id(),
@@ -145,7 +145,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   /**
    * {@inheritdoc}
    */
-  function newPhoneVerification(EntityInterface $entity, $phone_number) {
+  public function newPhoneVerification(EntityInterface $entity, $phone_number) {
     /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $verification */
     $verification = $this->phoneNumberVerificationStorage->create([
       // @todo: transition to setters.
