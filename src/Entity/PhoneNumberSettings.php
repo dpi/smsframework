@@ -45,6 +45,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
   var $bundle;
   var $verification_message;
   var $duration_verification_code_expire;
+  var $verification_phone_number_purge;
   var $fields = [];
 
   /**

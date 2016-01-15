@@ -50,23 +50,46 @@ class PhoneNumberSettingsForm extends EntityForm {
 
     $form['verification_message'] = [
       '#type' => 'textarea',
-      '#title' => $this->t('verification message'),
+      '#title' => $this->t('Verification message'),
+      '#description' => $this->t('SMS message sent to verify a phone number. The message should contain the verification code and a link to the verification page.'),
+      '#default_value' => isset($phone_number_config->verification_message) ? $phone_number_config->verification_message : "Your verification code is '[sms:verification-code]'. \nGo to [sms:verification-url] to verify your phone number. \n - [site:name]",
     ];
+
+    $tokens = ['sms'];
+    $form['tokens'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Tokens'),
+    ];
+    if ($this->moduleHandler->moduleExists('token')) {
+      $form['tokens']['list'] = [
+        '#theme' => 'token_tree',
+        '#token_types' => $tokens,
+      ];
+    }
+    else {
+      foreach ($tokens as &$token) {
+        $token = "[$token:*]";
+      }
+      $form['tokens']['list'] = [
+        '#markup' => $this->t('Available tokens include: @token_types', ['@token_types' => implode(' ', $tokens)]),
+      ];
+    }
 
     $form['code_lifetime'] = [
       '#type' => 'number',
-      '#title' => $this->t('verification code expiration'),
+      '#title' => $this->t('Verification code lifetime'),
+      '#description' => $this->t('How long a verification code is valid, before it expires.'),
       '#field_suffix' => $this->t('seconds'),
       '#required' => TRUE,
       '#min' => 60,
-      '#default_value' => $phone_number_config->duration_verification_code_expire,
+      '#default_value' => isset($phone_number_config->duration_verification_code_expire) ? $phone_number_config->duration_verification_code_expire : 3600,
     ];
 
     $form['phone_number_purge'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Purge phone numbers'),
       '#description' => $this->t('Remove phone number if verification code expires.'),
-      '#default_value' => $phone_number_config->verification_phone_number_purge,
+      '#default_value' => isset($phone_number_config->verification_phone_number_purge) ? $phone_number_config->verification_phone_number_purge : TRUE,
     ];
 
     /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $mgr */
@@ -133,6 +156,8 @@ class PhoneNumberSettingsForm extends EntityForm {
       $phone_number_config->entity_type = $entity_type;
       $phone_number_config->bundle = $bundle;
     }
+
+    $phone_number_config->verification_message = $form_state->getValue('verification_message');
     $phone_number_config->duration_verification_code_expire = $form_state->getValue('code_lifetime');
     $phone_number_config->verification_phone_number_purge = (bool) $form_state->getValue('phone_number_purge');
 
