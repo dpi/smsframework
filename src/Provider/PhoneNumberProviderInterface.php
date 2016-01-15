@@ -18,7 +18,7 @@ interface PhoneNumberProviderInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   x
    *
-   * @throws \Drupal\sms\Exception\PhoneNumberConfiguration
+   * @throws \Drupal\sms\Exception\PhoneNumberSettingsException
    *   Thrown if entity is not configured with a phone number.
    *
    * @return int[]
@@ -46,7 +46,7 @@ interface PhoneNumberProviderInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @return mixed
    *
-   * @throws PhoneNumberConfiguration
+   * @throws PhoneNumberSettingsException
    */
   public function getPhoneNumberSettingsForEntity(EntityInterface $entity);
 

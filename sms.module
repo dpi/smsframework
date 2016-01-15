@@ -7,7 +7,7 @@
  */
 
 use Drupal\Core\Entity\EntityStorageException;
-use Drupal\sms\Exception\PhoneNumberConfiguration;
+use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\sms\Gateway\GatewayInterface;
@@ -128,7 +128,7 @@ function _sms_entity_postsave(EntityInterface $entity) {
       $items = &$entity->{$field_name};
     }
   }
-  catch (PhoneNumberConfiguration $e) {
+  catch (PhoneNumberSettingsException $e) {
     // Missing phone number configuration for this entity.
   }
 
