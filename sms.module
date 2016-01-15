@@ -101,6 +101,19 @@ function sms_entity_update(EntityInterface $entity) {
 }
 
 /**
+ * Implements hook_entity_delete().
+ */
+function sms_entity_delete(EntityInterface $entity) {
+  $verification_storage = \Drupal::entityTypeManager()
+    ->getStorage('sms_phone_number_verification');
+  $verification_entities = $verification_storage->loadByProperties([
+    'entity__target_id' => $entity->id(),
+    'entity__target_type' => $entity->getEntityTypeId(),
+  ]);
+  $verification_storage->delete($verification_entities);
+}
+
+/**
  * Respond to saving entities after they have been written to storage.
  *
  * @see sms_entity_insert().
