@@ -11,6 +11,7 @@ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Drupal\sms\Provider\PhoneNumberProviderInterface;
 use Drupal\Core\Entity\EntityInterface;
 
@@ -34,6 +35,13 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
   protected $phoneNumberProvider;
 
   /**
+   * Current request time.
+   *
+   * @var int
+   */
+  protected $requestTime;
+
+  /**
    * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
@@ -41,6 +49,7 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
       $entity_type,
       $container->get('entity.manager')->getStorage($entity_type->id()),
       $container->get('entity_type.manager')->getStorage('sms_phone_number_verification'),
+      $container->get('request_stack'),
       $container->get('sms.phone_number')
     );
   }
@@ -50,13 +59,19 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $phone_number_verification_storage
    *   Storage for Phone Number Verification entities.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   *   The request stack.
    * @param \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider
    *   The phone number provider.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, EntityStorageInterface $phone_number_verification_storage, PhoneNumberProviderInterface $phone_number_provider) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, EntityStorageInterface $phone_number_verification_storage, RequestStack $request_stack, PhoneNumberProviderInterface $phone_number_provider) {
     parent::__construct($entity_type, $storage);
     $this->phoneNumberVerificationStorage = $phone_number_verification_storage;
     $this->phoneNumberProvider = $phone_number_provider;
+    $this->requestTime = $request_stack
+      ->getCurrentRequest()
+      ->server
+      ->get('REQUEST_TIME');
   }
 
   /**
@@ -87,7 +102,7 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
 
     $row['count_expired'] = $this->buildPhoneNumberVerificationQuery($entity_type_id, $bundle)
       ->condition('status', 0)
-      ->condition('created', (time() - $lifetime), '<')
+      ->condition('created', ($this->requestTime - $lifetime), '<')
       ->count()
       ->execute();
 

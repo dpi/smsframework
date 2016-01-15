@@ -66,6 +66,7 @@ class VerifyPhoneNumberForm extends FormBase {
    * @inheritDoc
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
+    $current_time = $this->getRequest()->server->get('REQUEST_TIME');
     $code = $form_state->getValue('code');
     $phone_verification = $this->phoneNumberProvider
       ->getPhoneVerificationCode($code);
@@ -76,7 +77,7 @@ class VerifyPhoneNumberForm extends FormBase {
         ->getPhoneNumberSettingsForEntity($entity);
       $lifetime = $config->get('duration_verification_code_expire') ?: 0;
 
-      if (time() > $phone_verification->getCreatedTime() + $lifetime) {
+      if ($current_time > $phone_verification->getCreatedTime() + $lifetime) {
         $form_state->setError($form['code'], $this->t('Verification code is expired.'));
       }
     }
