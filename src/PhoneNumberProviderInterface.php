@@ -39,6 +39,17 @@ interface PhoneNumberProviderInterface {
    */
   function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message);
 
+  function getPhoneNumberSettings($entity_type_id, $bundle);
+
+  /**
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @return mixed
+   *
+   * @throws PhoneNumberConfiguration
+   */
+  function getPhoneNumberSettingsForEntity(EntityInterface $entity);
+
   /**
    * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|NULL
    */

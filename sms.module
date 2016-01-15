@@ -6,6 +6,8 @@
  * sending and receiving SMS messages.
  */
 
+use Drupal\Core\Entity\EntityStorageException;
+use Drupal\sms\Exception\PhoneNumberConfiguration;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\sms\Gateway\GatewayInterface;
@@ -25,31 +27,48 @@ define('SMS_DIR_ALL',   4);
  * Implements hook_cron().
  */
 function sms_cron() {
-  $storage = \Drupal::entityTypeManager()
+  /** @var \Drupal\sms\PhoneNumberProviderInterface $phone_number_provider */
+  $phone_number_provider = \Drupal::service('sms.phone_number');
+  $config_factory = \Drupal::configFactory();
+  $verification_storage = \Drupal::entityTypeManager()
     ->getStorage('sms_phone_number_verification');
 
-  $field_name = 'field_usertphonenumber';// fixme: temporary
-  $expiration_seconds = 3600; // @fixme: hook up to config
-
-  // Delete expired phone number verifications.
-  $ids = $storage->getQuery()
-    ->condition('status', 0)
-    ->condition('created', (time() - $expiration_seconds), '<')
-    ->execute();
+  $verification_ids = [];
+  foreach ($config_factory->listAll('sms.phone.') as $config_id) {
+    $config = $config_factory->get($config_id);
+    $lifetime = $config->get('duration_verification_code_expire');
+    if (!empty($lifetime)) {
+      $verification_ids += $verification_storage->getQuery()
+        ->condition('entity__target_type', $config->get('entity_type'))
+        ->condition('bundle', $config->get('bundle'))
+        ->condition('status', 0)
+        ->condition('created', (time() - $lifetime), '<')
+        ->execute();
+    }
+  }
 
   /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $phone_number_verification */
-  foreach ($storage->loadMultiple($ids) as $phone_number_verification) {
-    // Purge phone number from entity.
+  foreach ($verification_storage->loadMultiple($verification_ids) as $phone_number_verification) {
     if ($entity = $phone_number_verification->getEntity()) {
-      $entity->{$field_name}->filter(function ($item) use ($phone_number_verification) {
-        return $item->value != $phone_number_verification->getPhoneNumber();
-      });
       try {
-        $entity->save();
+        $config = $phone_number_provider->getPhoneNumberSettingsForEntity($entity);
+        $purge = $config->get('verification_phone_number_purge');
+        $field_name = $config->get('fields.phone_number');
+        if (!empty($purge) && isset($entity->{$field_name})) {
+          $entity->{$field_name}->filter(function ($item) use ($phone_number_verification) {
+            return $item->value != $phone_number_verification->getPhoneNumber();
+          });
+          $entity->save();
+        }
       }
-      catch (\Exception $e) {}
+      catch (PhoneNumberConfiguration $e) {
+        // Missing phone number configuration for this entity.
+      }
+      catch (EntityStorageException $e) {
+        // Failed to save entity.
+      }
     }
-    $storage->delete([$phone_number_verification]);
+    $verification_storage->delete([$phone_number_verification]);
   }
 }
 
@@ -88,26 +107,39 @@ function sms_entity_update(EntityInterface $entity) {
  * @see sms_entity_update().
  */
 function _sms_entity_postsave(EntityInterface $entity) {
-  $field_name = 'field_usertphonenumber';// fixme: temporary
-  if ($entity->getEntityTypeId() == 'user') {// fixme: temporary
-    if (!isset($entity->original->{$field_name}) || !$entity->{$field_name}->equals($entity->original->{$field_name})) {
-      /** @var \Drupal\sms\PhoneNumberProviderInterface $phone_number_provider */
-      $phone_number_provider = \Drupal::service('sms.phone_number');
+  /** @var \Drupal\sms\PhoneNumberProviderInterface $phone_number_provider */
+  $phone_number_provider = \Drupal::service('sms.phone_number');
 
-      $new_numbers = [];
-      foreach ($entity->{$field_name} as $value) {
-        $phone_number = $value->value;
-        $new_numbers[] = $phone_number;
+  try {
+    $phone_number_settings = $phone_number_provider->getPhoneNumberSettingsForEntity($entity);
+    $field_name = $phone_number_settings->get('fields.phone_number');
+    if (!empty($field_name)) {
+      $items_original = &$entity->original->{$field_name};
+      $items = &$entity->{$field_name};
+    }
+  }
+  catch (PhoneNumberConfiguration $e) {
+    // Missing phone number configuration for this entity.
+  }
 
-        if (!$phone_number_provider->getPhoneVerification($entity, $phone_number)) {
-          $phone_number_provider->newPhoneVerification($entity, $phone_number);
-        }
+  // $items can be unassigned because field_name is not configured, or is NULL
+  // because there is no items.
+  if (isset($items)) {
+    $numbers = [];
+    foreach ($items as $item) {
+      $phone_number = $item->value;
+      $numbers[] = $phone_number;
+
+      if (!$phone_number_provider->getPhoneVerification($entity, $phone_number)) {
+        $phone_number_provider->newPhoneVerification($entity, $phone_number);
       }
+    }
 
-      foreach ($entity->original->{$field_name} as $value) {
-        $phone_number = $value->value;
+    if (isset($items_original) || !$items->equals($items_original)) {
+      foreach ($items_original as $item) {
+        $phone_number = $item->value;
         // A phone number was deleted.
-        if (!in_array($phone_number, $new_numbers)) {
+        if (!in_array($phone_number, $numbers)) {
           if ($phone_verification = $phone_number_provider->getPhoneVerification($entity, $phone_number)) {
             $phone_verification->delete();
           }

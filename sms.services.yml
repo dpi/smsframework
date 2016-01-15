@@ -9,4 +9,4 @@ services:
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
   sms.phone_number:
     class: Drupal\sms\PhoneNumberProvider
-    arguments: ['@entity_type.manager', '@sms_provider']
+    arguments: ['@entity_type.manager', '@config.factory', '@sms_provider']

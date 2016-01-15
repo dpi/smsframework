@@ -53,6 +53,9 @@ sms.phone.*.*:
     duration_verification_code_expire:
       type: int
       label: 'Time in seconds, before verification codes expire.'
+    verification_phone_number_purge:
+      type: boolean
+      label: 'Remove phone number field value if verification code expires.'
     fields:
       mapping:
         phone_number:
