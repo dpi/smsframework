@@ -11,6 +11,7 @@ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\sms\PhoneNumberProviderInterface;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -26,22 +27,36 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
   protected $phoneNumberVerificationStorage;
 
   /**
+   * Phone number provider.
+   *
+   * @var \Drupal\sms\PhoneNumberProviderInterface
+   */
+  protected $phoneNumberProvider;
+
+  /**
    * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $entity_type,
       $container->get('entity.manager')->getStorage($entity_type->id()),
-      $container->get('entity_type.manager')->getStorage('sms_phone_number_verification')
+      $container->get('entity_type.manager')->getStorage('sms_phone_number_verification'),
+      $container->get('sms.phone_number')
     );
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @param \Drupal\Core\Entity\EntityStorageInterface $phone_number_verification_storage
+   *   Storage for Phone Number Verification entities.
+   * @param \Drupal\sms\PhoneNumberProviderInterface $phone_number_provider
+   *   The phone number provider.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, EntityStorageInterface $phone_number_verification_storage) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, EntityStorageInterface $phone_number_verification_storage, PhoneNumberProviderInterface $phone_number_provider) {
     parent::__construct($entity_type, $storage);
     $this->phoneNumberVerificationStorage = $phone_number_verification_storage;
+    $this->phoneNumberProvider = $phone_number_provider;
   }
 
   /**
@@ -62,27 +77,31 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     /** @var \Drupal\sms\Entity\PhoneNumberSettingsInterface $entity */
-    $row['entity_type'] = $entity->getPhoneNumberEntityTypeId();
-    $row['bundle'] = $entity->getPhoneNumberBundle();
+    $entity_type_id = $entity->getPhoneNumberEntityTypeId();
+    $bundle = $entity->getPhoneNumberBundle();
+    $row['entity_type'] = $entity_type_id;
+    $row['bundle'] = $bundle;
 
-    $expiration_seconds = 3600; // @fixme: hook up to config
-    $row['count_expired'] = $this->buildPhoneNumberVerificationQuery($entity->getPhoneNumberEntityTypeId(), $entity->getPhoneNumberBundle())
+    $config = $this->phoneNumberProvider->getPhoneNumberSettings($entity_type_id, $bundle);
+    $lifetime = $config->get('duration_verification_code_expire') ?: 0;
+
+    $row['count_expired'] = $this->buildPhoneNumberVerificationQuery($entity_type_id, $bundle)
       ->condition('status', 0)
-      ->condition('created', (time() - $expiration_seconds), '<')
+      ->condition('created', (time() - $lifetime), '<')
       ->count()
       ->execute();
 
-    $row['count_verified'] = $this->buildPhoneNumberVerificationQuery($entity->getPhoneNumberEntityTypeId(), $entity->getPhoneNumberBundle())
+    $row['count_verified'] = $this->buildPhoneNumberVerificationQuery($entity_type_id, $bundle)
       ->condition('status', 1)
       ->count()
       ->execute();
 
-    $row['count_unverified'] = $this->buildPhoneNumberVerificationQuery($entity->getPhoneNumberEntityTypeId(), $entity->getPhoneNumberBundle())
+    $row['count_unverified'] = $this->buildPhoneNumberVerificationQuery($entity_type_id, $bundle)
       ->condition('status', 0)
       ->count()
       ->execute();
 
-    $row['count_total'] = $this->buildPhoneNumberVerificationQuery($entity->getPhoneNumberEntityTypeId(), $entity->getPhoneNumberBundle())
+    $row['count_total'] = $this->buildPhoneNumberVerificationQuery($entity_type_id, $bundle)
       ->count()
       ->execute();
 

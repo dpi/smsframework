@@ -19,12 +19,12 @@ class PhoneNumberSettingsForm extends EntityForm {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $entity = $this->getEntity();
+    $phone_number_config = $this->getEntity();
     $form = parent::buildForm($form, $form_state);
 
     $this->entityManager = \Drupal::entityManager();
 
-    if ($entity->isNew()) {
+    if ($phone_number_config->isNew()) {
       $bundle_options = [];
       // Generate a list of fieldable bundles which are not events.
       foreach ($this->entityManager->getDefinitions() as $entity_type) {
@@ -53,20 +53,29 @@ class PhoneNumberSettingsForm extends EntityForm {
       '#title' => $this->t('verification message'),
     ];
 
-    $form['duration_verification_code_expire'] = [
+    $form['code_lifetime'] = [
       '#type' => 'number',
       '#title' => $this->t('verification code expiration'),
       '#field_suffix' => $this->t('seconds'),
+      '#required' => TRUE,
+      '#min' => 60,
+      '#default_value' => $phone_number_config->duration_verification_code_expire,
     ];
 
+    $form['phone_number_purge'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Purge phone numbers'),
+      '#description' => $this->t('Remove phone number if verification code expires.'),
+      '#default_value' => $phone_number_config->verification_phone_number_purge,
+    ];
 
     /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $mgr */
     $mgr = \Drupal::service('entity_field.manager');
 
     $field_phone_options = [];
     $field_optout_options = [];
-    if (!empty($entity->entity_type) && !empty($entity->bundle)) {
-      $defs = $mgr->getFieldDefinitions($entity->entity_type, $entity->bundle);
+    if (!empty($phone_number_config->entity_type) && !empty($phone_number_config->bundle)) {
+      $defs = $mgr->getFieldDefinitions($phone_number_config->entity_type, $phone_number_config->bundle);
       foreach ($defs as $def) {
         if ($def->getType() == 'telephone') {
           $field_phone_options[$def->getName()] = $def->getLabel();
@@ -77,14 +86,14 @@ class PhoneNumberSettingsForm extends EntityForm {
       }
     }
 
-    if (!$entity->isNew()) {
+    if (!$phone_number_config->isNew()) {
       $form['phone_field'] = [
         '#type' => 'select',
         '#title' => $this->t('Phone number field'),
         '#description' => $this->t('telephone field'),
         '#options' => $field_phone_options,
         '#empty_option' => $this->t('- None -'),
-        '#default_value' => !empty($entity->fields['phone_number']) ? $entity->fields['phone_number'] : '',
+        '#default_value' => !empty($phone_number_config->fields['phone_number']) ? $phone_number_config->fields['phone_number'] : '',
       ];
     }
 
@@ -94,7 +103,7 @@ class PhoneNumberSettingsForm extends EntityForm {
       '#description' => $this->t('Checkbox field'),
       '#options' => $field_optout_options,
       '#empty_option' => $this->t('- None -'),
-      '#default_value' => !empty($entity->fields['automated_opt_out']) ? $entity->fields['automated_opt_out'] : '',
+      '#default_value' => !empty($phone_number_config->fields['automated_opt_out']) ? $phone_number_config->fields['automated_opt_out'] : '',
     ];
 
     return $form;
@@ -124,6 +133,8 @@ class PhoneNumberSettingsForm extends EntityForm {
       $phone_number_config->entity_type = $entity_type;
       $phone_number_config->bundle = $bundle;
     }
+    $phone_number_config->duration_verification_code_expire = $form_state->getValue('code_lifetime');
+    $phone_number_config->verification_phone_number_purge = (bool) $form_state->getValue('phone_number_purge');
 
     $phone_number_config->fields['phone_number'] = $form_state->getValue('phone_field') ?: '';
     $phone_number_config->fields['automated_opt_out'] = $form_state->getValue('optout_field') ?: '';

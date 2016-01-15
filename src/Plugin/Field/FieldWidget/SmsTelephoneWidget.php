@@ -29,15 +29,16 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, \Drupal\Core\Form\FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
+    /** @var \Drupal\sms\PhoneNumberProviderInterface $phone_number_provider */
+    $phone_number_provider = \Drupal::service('sms.phone_number');
     /** @var \Drupal\Core\Datetime\DateFormatter $date_formatter */
     $date_formatter = \Drupal::service('date.formatter');
 
-    $expiration_seconds = 3600; // @fixme: hook up to config
     $t_args['@url'] = $this->url('sms.phone.verify');
+    $config = $phone_number_provider->getPhoneNumberSettingsForEntity($items->getEntity());
+    $lifetime = $config->get('duration_verification_code_expire') ?: 0;
 
     if (isset($items[$delta]->value)) {
-      /** @var \Drupal\sms\PhoneNumberProviderInterface $phone_number_provider */
-      $phone_number_provider = \Drupal::service('sms.phone_number');
       $phone_verification = $phone_number_provider
         ->getPhoneVerification($items->getEntity(), $items[$delta]->value);
 
@@ -47,7 +48,7 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
         }
         else {
           $element['value']['#disabled'] = TRUE;
-          $expiration_date = $phone_verification->getCreatedTime() + $expiration_seconds;
+          $expiration_date = $phone_verification->getCreatedTime() + $lifetime;
 
           if (time() < $expiration_date) {
             $t_args['@time'] = $date_formatter->formatTimeDiffUntil($expiration_date, [
@@ -62,9 +63,15 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
           }
         }
       }
+      else {
+        // This message will display if there is a field value, but the
+        // verification expired.
+        $t_args['@time'] = $date_formatter->formatInterval($lifetime, 2);
+        $element['value']['#description'] = $this->t('Save this form to send a new verification code as an SMS message, you must enter the code into the <a href="@url">verification form</a> within @time.', $t_args);
+      }
     }
     else {
-      $t_args['@time'] = $date_formatter->formatInterval($expiration_seconds, 2);
+      $t_args['@time'] = $date_formatter->formatInterval($lifetime, 2);
       $element['value']['#description'] = $this->t('Enter a phone number. A verification code will be sent as an SMS message, you must enter the code into the <a href="@url">verification form</a> within @time.', $t_args);
     }
 
