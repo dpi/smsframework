@@ -33,6 +33,7 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
     $phone_number_provider = \Drupal::service('sms.phone_number');
     /** @var \Drupal\Core\Datetime\DateFormatter $date_formatter */
     $date_formatter = \Drupal::service('date.formatter');
+    $current_time = \Drupal::request()->server->get('REQUEST_TIME');
 
     $t_args['@url'] = $this->url('sms.phone.verify');
     $config = $phone_number_provider->getPhoneNumberSettingsForEntity($items->getEntity());
@@ -50,7 +51,7 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
           $element['value']['#disabled'] = TRUE;
           $expiration_date = $phone_verification->getCreatedTime() + $lifetime;
 
-          if (time() < $expiration_date) {
+          if ($current_time < $expiration_date) {
             $t_args['@time'] = $date_formatter->formatTimeDiffUntil($expiration_date, [
               'granularity' => 2,
             ]);

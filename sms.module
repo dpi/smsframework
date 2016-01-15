@@ -32,6 +32,7 @@ function sms_cron() {
   $config_factory = \Drupal::configFactory();
   $verification_storage = \Drupal::entityTypeManager()
     ->getStorage('sms_phone_number_verification');
+  $current_time = \Drupal::request()->server->get('REQUEST_TIME');
 
   $verification_ids = [];
   foreach ($config_factory->listAll('sms.phone.') as $config_id) {
@@ -42,7 +43,7 @@ function sms_cron() {
         ->condition('entity__target_type', $config->get('entity_type'))
         ->condition('bundle', $config->get('bundle'))
         ->condition('status', 0)
-        ->condition('created', (time() - $lifetime), '<')
+        ->condition('created', ($current_time - $lifetime), '<')
         ->execute();
     }
   }
