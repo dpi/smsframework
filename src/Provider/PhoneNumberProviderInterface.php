@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\sms\PhoneNumberProviderInterface.
+ * Contains \Drupal\sms\Provider\PhoneNumberProviderInterface.
  */
 
-namespace Drupal\sms;
+namespace Drupal\sms\Provider;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Message\SmsMessageInterface;

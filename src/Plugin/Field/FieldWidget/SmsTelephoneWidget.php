@@ -29,7 +29,7 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, \Drupal\Core\Form\FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
-    /** @var \Drupal\sms\PhoneNumberProviderInterface $phone_number_provider */
+    /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
     $phone_number_provider = \Drupal::service('sms.phone_number');
     /** @var \Drupal\Core\Datetime\DateFormatter $date_formatter */
     $date_formatter = \Drupal::service('date.formatter');
