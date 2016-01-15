@@ -10,9 +10,8 @@ namespace Drupal\sms\Provider;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\sms\Exception\PhoneNumberConfiguration;
+use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessage;
 
@@ -67,7 +66,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   public function getPhoneNumbers(EntityInterface $entity) {
     $phone_number_settings = $this->getPhoneNumberSettingsForEntity($entity);
     if (!$field_name = $phone_number_settings->get('fields.phone_number')) {
-      throw new PhoneNumberConfiguration(sprintf('Entity phone number config field mapping not set for bundle %s:%s', $entity->getEntityTypeId(), $entity->bundle()));
+      throw new PhoneNumberSettingsException(sprintf('Entity phone number config field mapping not set for bundle %s:%s', $entity->getEntityTypeId(), $entity->bundle()));
     }
 
     $numbers = [];
@@ -112,7 +111,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
     $config = $this->getPhoneNumberSettings($entity->getEntityTypeId(), $entity->bundle());
 
     if (!$config->get()) {
-      throw new PhoneNumberConfiguration(sprintf('Entity phone number config does not exist for bundle %s:%s', $entity->getEntityTypeId(), $entity->bundle()));
+      throw new PhoneNumberSettingsException(sprintf('Entity phone number config does not exist for bundle %s:%s', $entity->getEntityTypeId(), $entity->bundle()));
     }
 
     return $config;
