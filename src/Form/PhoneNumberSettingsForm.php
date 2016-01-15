@@ -9,6 +9,7 @@ namespace Drupal\sms\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Form controller for Phone Number config.
@@ -48,7 +49,11 @@ class PhoneNumberSettingsForm extends EntityForm {
       ];
     }
 
-    $form['verification_message'] = [
+    $form['message'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Messages'),
+    ];
+    $form['message']['verification_message'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Verification message'),
       '#description' => $this->t('SMS message sent to verify a phone number. The message should contain the verification code and a link to the verification page.'),
@@ -56,12 +61,8 @@ class PhoneNumberSettingsForm extends EntityForm {
     ];
 
     $tokens = ['sms'];
-    $form['tokens'] = [
-      '#type' => 'fieldset',
-      '#title' => $this->t('Tokens'),
-    ];
     if ($this->moduleHandler->moduleExists('token')) {
-      $form['tokens']['list'] = [
+      $form['message']['tokens']['list'] = [
         '#theme' => 'token_tree',
         '#token_types' => $tokens,
       ];
@@ -70,12 +71,16 @@ class PhoneNumberSettingsForm extends EntityForm {
       foreach ($tokens as &$token) {
         $token = "[$token:*]";
       }
-      $form['tokens']['list'] = [
+      $form['message']['tokens']['list'] = [
         '#markup' => $this->t('Available tokens include: @token_types', ['@token_types' => implode(' ', $tokens)]),
       ];
     }
 
-    $form['code_lifetime'] = [
+    $form['expiration'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Verification expiration'),
+    ];
+    $form['expiration']['code_lifetime'] = [
       '#type' => 'number',
       '#title' => $this->t('Verification code lifetime'),
       '#description' => $this->t('How long a verification code is valid, before it expires.'),
@@ -85,7 +90,7 @@ class PhoneNumberSettingsForm extends EntityForm {
       '#default_value' => isset($phone_number_config->duration_verification_code_expire) ? $phone_number_config->duration_verification_code_expire : 3600,
     ];
 
-    $form['phone_number_purge'] = [
+    $form['expiration']['phone_number_purge'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Purge phone numbers'),
       '#description' => $this->t('Remove phone number if verification code expires.'),
@@ -110,39 +115,31 @@ class PhoneNumberSettingsForm extends EntityForm {
     }
 
     if (!$phone_number_config->isNew()) {
-      $form['phone_field'] = [
+      $form['field_mapping'] = [
+        '#type' => 'fieldset',
+        '#title' => $this->t('Field mapping'),
+      ];
+
+      $form['field_mapping']['phone_field'] = [
         '#type' => 'select',
-        '#title' => $this->t('Phone number field'),
-        '#description' => $this->t('telephone field'),
+        '#title' => $this->t('Phone number'),
+        '#description' => $this->t('Select the field storing phone numbers.'),
         '#options' => $field_phone_options,
         '#empty_option' => $this->t('- None -'),
         '#default_value' => !empty($phone_number_config->fields['phone_number']) ? $phone_number_config->fields['phone_number'] : '',
       ];
+
+      $form['field_mapping']['optout_field'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Automated messages opt out'),
+        '#description' => $this->t('Select the field storing preference to opt out of automated messages.'),
+        '#options' => $field_optout_options,
+        '#empty_option' => $this->t('- None -'),
+        '#default_value' => !empty($phone_number_config->fields['automated_opt_out']) ? $phone_number_config->fields['automated_opt_out'] : '',
+      ];
     }
 
-    $form['optout_field'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Opt out of automated messages field'),
-      '#description' => $this->t('Checkbox field'),
-      '#options' => $field_optout_options,
-      '#empty_option' => $this->t('- None -'),
-      '#default_value' => !empty($phone_number_config->fields['automated_opt_out']) ? $phone_number_config->fields['automated_opt_out'] : '',
-    ];
-
     return $form;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-
   }
 
   /**
@@ -165,16 +162,15 @@ class PhoneNumberSettingsForm extends EntityForm {
     $phone_number_config->fields['automated_opt_out'] = $form_state->getValue('optout_field') ?: '';
 
     $saved = $phone_number_config->save();
-  }
+    $t_args['%id'] = $phone_number_config->id();
+    if ($saved == SAVED_NEW) {
+      drupal_set_message($this->t('Phone number settings %id created.', $t_args));
+    }
+    else {
+      drupal_set_message($this->t('Phone number settings %id saved.', $t_args));
+    }
 
-  /**
-   * {@inheritdoc}
-   *
-   * Callback for `id` form element in SmsGatewayForm->buildForm.
-   */
-  public function exists($entity_id, array $element, FormStateInterface $form_state) {
-//    $query = $this->entityQueryFactory->get('sms_gateway');
-//    return (bool) $query->condition('id', $entity_id)->execute();
+    $form_state->setRedirectUrl(Url::fromRoute('sms.phone_number_settings.list'));
   }
 
 }
