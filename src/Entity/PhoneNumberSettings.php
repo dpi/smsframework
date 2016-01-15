@@ -88,15 +88,24 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
   /**
    * {@inheritdoc}
    */
-  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
-    parent::postSave($storage, $update);
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
 
-//    $storage = FieldStorageConfig::create([
-//      'field_name' => $field_name,
-//      'entity_type' => $this->entity_type,
-//    ]);
-    //$storage->save();
+    // Delete associated phone number verifications.
+    // Does not remove phone number field values.
+    $verification_storage = \Drupal::entityTypeManager()
+      ->getStorage('sms_phone_number_verification');
+
+    $verification_ids = [];
+    /** @var static $phone_number_settings */
+    foreach ($entities as $phone_number_settings) {
+      $verification_ids += $verification_storage->getQuery()
+        ->condition('entity__target_type', $phone_number_settings->getPhoneNumberEntityTypeId())
+        ->condition('bundle', $phone_number_settings->getPhoneNumberBundle())
+        ->execute();
+    }
+
+    $verification_storage->delete($verification_storage->loadMultiple($verification_ids));
   }
-
 
 }
