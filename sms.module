@@ -135,7 +135,7 @@ function _sms_entity_postsave(EntityInterface $entity) {
       }
     }
 
-    if (isset($items_original) || !$items->equals($items_original)) {
+    if (isset($items_original) && !$items->equals($items_original)) {
       foreach ($items_original as $item) {
         $phone_number = $item->value;
         // A phone number was deleted.
