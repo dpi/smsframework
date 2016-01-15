@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\sms\PhoneNumberProvider.
+ * Contains \Drupal\sms\Provider\PhoneNumberProvider.
  */
 
-namespace Drupal\sms;
+namespace Drupal\sms\Provider;
 
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;

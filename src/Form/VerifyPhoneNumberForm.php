@@ -9,7 +9,7 @@ namespace Drupal\sms\Form;
 
 use Drupal\Core\Form\FormBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\sms\PhoneNumberProviderInterface;
+use Drupal\sms\Provider\PhoneNumberProviderInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 class VerifyPhoneNumberForm extends FormBase {
@@ -17,14 +17,14 @@ class VerifyPhoneNumberForm extends FormBase {
   /**
    * Phone number provider.
    *
-   * @var \Drupal\sms\PhoneNumberProviderInterface
+   * @var \Drupal\sms\Provider\PhoneNumberProviderInterface
    */
   protected $phoneNumberProvider;
 
   /**
    * Constructs a VerifyPhoneNumberForm object.
    *
-   * @param \Drupal\sms\PhoneNumberProviderInterface $phone_number_provider
+   * @param \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider
    *   The phone number provider.
    */
   public function __construct(PhoneNumberProviderInterface $phone_number_provider) {

@@ -27,7 +27,7 @@ define('SMS_DIR_ALL',   4);
  * Implements hook_cron().
  */
 function sms_cron() {
-  /** @var \Drupal\sms\PhoneNumberProviderInterface $phone_number_provider */
+  /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
   $phone_number_provider = \Drupal::service('sms.phone_number');
   $config_factory = \Drupal::configFactory();
   $verification_storage = \Drupal::entityTypeManager()
@@ -107,7 +107,7 @@ function sms_entity_update(EntityInterface $entity) {
  * @see sms_entity_update().
  */
 function _sms_entity_postsave(EntityInterface $entity) {
-  /** @var \Drupal\sms\PhoneNumberProviderInterface $phone_number_provider */
+  /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
   $phone_number_provider = \Drupal::service('sms.phone_number');
 
   try {

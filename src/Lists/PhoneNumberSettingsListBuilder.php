@@ -11,7 +11,7 @@ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\sms\PhoneNumberProviderInterface;
+use Drupal\sms\Provider\PhoneNumberProviderInterface;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -29,7 +29,7 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
   /**
    * Phone number provider.
    *
-   * @var \Drupal\sms\PhoneNumberProviderInterface
+   * @var \Drupal\sms\Provider\PhoneNumberProviderInterface
    */
   protected $phoneNumberProvider;
 
@@ -50,7 +50,7 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $phone_number_verification_storage
    *   Storage for Phone Number Verification entities.
-   * @param \Drupal\sms\PhoneNumberProviderInterface $phone_number_provider
+   * @param \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider
    *   The phone number provider.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, EntityStorageInterface $phone_number_verification_storage, PhoneNumberProviderInterface $phone_number_provider) {
