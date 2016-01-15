@@ -24,7 +24,7 @@ interface PhoneNumberProviderInterface {
    * @return int[]
    *   x
    */
-  function getPhoneNumbers(EntityInterface $entity);
+  public function getPhoneNumbers(EntityInterface $entity);
 
   /**
    * x
@@ -37,9 +37,9 @@ interface PhoneNumberProviderInterface {
    * @return mixed
    *   x
    */
-  function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message);
+  public function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message);
 
-  function getPhoneNumberSettings($entity_type_id, $bundle);
+  public function getPhoneNumberSettings($entity_type_id, $bundle);
 
   /**
    *
@@ -48,17 +48,17 @@ interface PhoneNumberProviderInterface {
    *
    * @throws PhoneNumberConfiguration
    */
-  function getPhoneNumberSettingsForEntity(EntityInterface $entity);
+  public function getPhoneNumberSettingsForEntity(EntityInterface $entity);
 
   /**
    * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|NULL
    */
-  function getPhoneVerificationCode($code);
+  public function getPhoneVerificationCode($code);
 
   /**
    * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|NULL
    */
-  function getPhoneVerification(EntityInterface $entity, $phone_number);
-  function newPhoneVerification(EntityInterface $entity, $phone_number);
+  public function getPhoneVerification(EntityInterface $entity, $phone_number);
+  public function newPhoneVerification(EntityInterface $entity, $phone_number);
 
 }
