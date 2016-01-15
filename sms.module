@@ -77,9 +77,6 @@ function sms_cron() {
           $entity->save();
         }
       }
-      catch (PhoneNumberConfiguration $e) {
-        // Missing phone number configuration for this entity.
-      }
       catch (EntityStorageException $e) {
         // Failed to save entity.
       }
