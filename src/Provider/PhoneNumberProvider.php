@@ -146,23 +146,28 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
    * {@inheritdoc}
    */
   public function newPhoneVerification(EntityInterface $entity, $phone_number) {
-    /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $verification */
-    $verification = $this->phoneNumberVerificationStorage->create([
+    $config = $this->getPhoneNumberSettingsForEntity($entity);
+    $message = $config->get('verification_message') ?: '';
+
+    /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $phone_verification */
+    $phone_verification = $this->phoneNumberVerificationStorage->create([
       // @todo: transition to setters.
       'entity' => $entity,
       'phone' => $phone_number,
     ]);
 
-    $verification
+    $phone_verification
       ->setCode(mt_rand(1000, 9999))
       ->setStatus(FALSE)
       ->save();
 
-    if ($verification) {
+    if ($phone_verification) {
+      $data['sms_verification_code'] = $phone_verification->getCode();
+      $message = \Drupal::token()->replace($message, $data);
       $sms_message = new SmsMessage(
         '',
         [$phone_number],
-        'your code is ' . $verification->getCode(),
+        $message,
         [],
         0
       );
