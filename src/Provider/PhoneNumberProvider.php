@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessage;
+use Drupal\Component\Utility\Random;
 
 /**
  * Entity phone number provider.
@@ -155,8 +156,12 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       'phone' => $phone_number,
     ]);
 
+    // @todo Replace with code generator.
+    $random = new Random;
+    $code = strtoupper($random->name(6));
+
     $phone_verification
-      ->setCode(mt_rand(1000, 9999))
+      ->setCode($code)
       ->setStatus(FALSE)
       ->save();
 
