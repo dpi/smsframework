@@ -83,7 +83,7 @@ class PhoneNumberSettingsForm extends EntityForm {
     $form['expiration']['code_lifetime'] = [
       '#type' => 'number',
       '#title' => $this->t('Verification code lifetime'),
-      '#description' => $this->t('How long a verification code is valid, before it expires.'),
+      '#description' => $this->t('How long a verification code is valid, before it expires. Existing verification codes are retroactively updated if this setting changes.'),
       '#field_suffix' => $this->t('seconds'),
       '#required' => TRUE,
       '#min' => 60,

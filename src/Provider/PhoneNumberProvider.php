@@ -160,20 +160,17 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
     $config = $this->getPhoneNumberSettingsForEntity($entity);
     $message = $config->get('verification_message') ?: '';
 
-    /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $phone_verification */
-    $phone_verification = $this->phoneNumberVerificationStorage->create([
-      // @todo: transition to setters.
-      'entity' => $entity,
-      'phone' => $phone_number,
-    ]);
-
     // @todo Replace with code generator.
     $random = new Random;
     $code = strtoupper($random->name(6));
 
+    /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $phone_verification */
+    $phone_verification = $this->phoneNumberVerificationStorage->create();
     $phone_verification
       ->setCode($code)
       ->setStatus(FALSE)
+      ->setPhoneNumber($phone_number)
+      ->setEntity($entity)
       ->save();
 
     if ($phone_verification) {
