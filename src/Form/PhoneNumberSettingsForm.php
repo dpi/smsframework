@@ -83,44 +83,43 @@ class PhoneNumberSettingsForm extends EntityForm {
     $config = &$this->entity;
     $form = parent::buildForm($form, $form_state);
 
-    // @todo fix indentation in next commit
-      $bundles = [];
-      $storage = $this->entityTypeManager
-        ->getStorage('phone_number_settings');
+    $bundles = [];
+    $storage = $this->entityTypeManager
+      ->getStorage('phone_number_settings');
 
-      // Generate a list of field-able bundles.
-      foreach ($this->entityTypeManager->getDefinitions() as $entity_type) {
-        if ($entity_type->isSubclassOf(ContentEntityInterface::class)) {
-          foreach ($this->entityTypeBundleInfo->getBundleInfo($entity_type->id()) as $bundle => $bundle_info) {
-            // Do not show combinations with pre-existing phone number settings.
-            // But, make sure all options are available on existing phone
-            // number settings. They are hidden + read only from user anyway.
-            if (!$storage->load($entity_type->id() . '.' . $bundle) || !$config->isNew()) {
-              $bundles[(string) $entity_type->getLabel()][$entity_type->id() . '|' . $bundle] = $bundle_info['label'];
-            }
+    // Generate a list of field-able bundles.
+    foreach ($this->entityTypeManager->getDefinitions() as $entity_type) {
+      if ($entity_type->isSubclassOf(ContentEntityInterface::class)) {
+        foreach ($this->entityTypeBundleInfo->getBundleInfo($entity_type->id()) as $bundle => $bundle_info) {
+          // Do not show combinations with pre-existing phone number settings.
+          // But, make sure all options are available on existing phone
+          // number settings. They are hidden + read only from user anyway.
+          if (!$storage->load($entity_type->id() . '.' . $bundle) || !$config->isNew()) {
+            $bundles[(string) $entity_type->getLabel()][$entity_type->id() . '|' . $bundle] = $bundle_info['label'];
           }
         }
       }
+    }
 
     $bundle_default_value = !$config->isNew() ? $config->getPhoneNumberEntityTypeId() . '|' . $config->getPhoneNumberBundle() : NULL;
 
     // Field cannot be called 'bundle' or odd behaviour will happen on re-saves.
-      $form['entity_bundle'] = [
-        '#type' => 'select',
-        '#title' => $this->t('Bundle'),
-        '#options' => $bundles,
-        '#default_value' => $bundle_default_value,
-        '#required' => TRUE,
-        '#access' => $config->isNew(),
-        '#ajax' => array(
-          'callback' => '::updateFieldMapping',
-          'wrapper' => 'edit-field-mapping-wrapper',
-        ),
-      ];
+    $form['entity_bundle'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Bundle'),
+      '#options' => $bundles,
+      '#default_value' => $bundle_default_value,
+      '#required' => TRUE,
+      '#access' => $config->isNew(),
+      '#ajax' => array(
+        'callback' => '::updateFieldMapping',
+        'wrapper' => 'edit-field-mapping-wrapper',
+      ),
+    ];
 
-      if (!$bundles) {
-        $form['entity_bundle']['#empty_option'] = $this->t('No Bundles Available');
-      }
+    if (!$bundles) {
+      $form['entity_bundle']['#empty_option'] = $this->t('No Bundles Available');
+    }
 
     $field_options = [];
     $field_options['telephone']['!create'] = $this->t('- Create a new telephone field -');
