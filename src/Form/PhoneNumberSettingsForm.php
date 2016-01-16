@@ -83,7 +83,7 @@ class PhoneNumberSettingsForm extends EntityForm {
     $config = &$this->entity;
     $form = parent::buildForm($form, $form_state);
 
-    if ($config->isNew()) {
+    // @todo fix indentation in next commit
       $bundles = [];
       $storage = $this->entityTypeManager
         ->getStorage('phone_number_settings');
@@ -93,24 +93,77 @@ class PhoneNumberSettingsForm extends EntityForm {
         if ($entity_type->isSubclassOf(ContentEntityInterface::class)) {
           foreach ($this->entityTypeBundleInfo->getBundleInfo($entity_type->id()) as $bundle => $bundle_info) {
             // Do not show combinations with pre-existing phone number settings.
-            if (!$storage->load($entity_type->id() . '.' . $bundle)) {
+            // But, make sure all options are available on existing phone
+            // number settings. They are hidden + read only from user anyway.
+            if (!$storage->load($entity_type->id() . '.' . $bundle) || !$config->isNew()) {
               $bundles[(string) $entity_type->getLabel()][$entity_type->id() . '|' . $bundle] = $bundle_info['label'];
             }
           }
         }
       }
 
-      $form['bundle'] = [
+    $bundle_default_value = !$config->isNew() ? $config->getPhoneNumberEntityTypeId() . '|' . $config->getPhoneNumberBundle() : NULL;
+
+    // Field cannot be called 'bundle' or odd behaviour will happen on re-saves.
+      $form['entity_bundle'] = [
         '#type' => 'select',
         '#title' => $this->t('Bundle'),
         '#options' => $bundles,
+        '#default_value' => $bundle_default_value,
         '#required' => TRUE,
+        '#access' => $config->isNew(),
+        '#ajax' => array(
+          'callback' => '::updateFieldMapping',
+          'wrapper' => 'edit-field-mapping-wrapper',
+        ),
       ];
 
       if (!$bundles) {
-        $form['bundle']['#empty_option'] = $this->t('No Bundles Available');
+        $form['entity_bundle']['#empty_option'] = $this->t('No Bundles Available');
+      }
+
+    $field_options = [];
+    $field_options['telephone']['!create'] = $this->t('- Create a new telephone field -');
+    $field_options['boolean']['!create'] = $this->t('- Create a new boolean field -');
+
+    if ($entity_bundle = $form_state->getValue('entity_bundle', $bundle_default_value ?: NULL)) {
+      list($entity_type_id, $bundle) = explode('|', $entity_bundle);
+      if (!empty($entity_type_id) && !empty($bundle)) {
+        $field_definitions = $this->entityFieldManager
+          ->getFieldDefinitions($entity_type_id, $bundle);
+        foreach ($field_definitions as $field_definition) {
+          $field_type = $field_definition->getType();
+          if (isset($field_options[$field_type])) {
+            $field_options[$field_type][$field_definition->getName()] = $field_definition->getLabel();
+          }
+        }
       }
     }
+
+    $form['field_mapping'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Field mapping'),
+      '#prefix' => '<div id="edit-field-mapping-wrapper">',
+      '#suffix' => '</div>',
+    ];
+    $form['field_mapping']['phone_field'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Phone number'),
+      '#description' => $this->t('Select the field storing phone numbers.'),
+      '#options' => $field_options['telephone'],
+      '#required' => TRUE,
+      '#empty_option' => $this->t('- Select -'),
+      '#default_value' => $config->getFieldName('phone_number'),
+    ];
+    $form['field_mapping']['optout_field'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Automated messages opt out'),
+      '#description' => $this->t('Select the field storing preference to opt out of automated messages.'),
+      '#options' => $field_options['boolean'],
+      '#empty_option' => $this->t('- None -'),
+      '#default_value' => $config->getFieldName('automated_opt_out'),
+    ];
+
 
     $form['message'] = [
       '#type' => 'fieldset',
@@ -146,7 +199,7 @@ class PhoneNumberSettingsForm extends EntityForm {
     $form['expiration']['code_lifetime'] = [
       '#type' => 'number',
       '#title' => $this->t('Verification code lifetime'),
-      '#description' => $this->t('How long a verification code is valid, before it expires. Existing verification codes are retroactively updated if this setting changes.'),
+      '#description' => $this->t('How long a verification code is valid, before it expires. Existing verification codes are retroactively updated.'),
       '#field_suffix' => $this->t('seconds'),
       '#required' => TRUE,
       '#min' => 60,
@@ -160,42 +213,14 @@ class PhoneNumberSettingsForm extends EntityForm {
       '#default_value' => $config->isNew() ?: $config->isVerificationPhoneNumberPurge(),
     ];
 
-    $field_options = ['telephone' => [], 'boolean' => []];
-    if (!$config->isNew()) {
-      $field_definitions = $this->entityFieldManager
-        ->getFieldDefinitions($config->getPhoneNumberEntityTypeId(), $config->getPhoneNumberBundle());
-      foreach ($field_definitions as $field_definition) {
-        $field_type = $field_definition->getType();
-        if (isset($field_options[$field_type])) {
-          $field_options[$field_type][$field_definition->getName()] = $field_definition->getLabel();
-        }
-      }
-    }
-
-    if (!$config->isNew()) {
-      $form['field_mapping'] = [
-        '#type' => 'fieldset',
-        '#title' => $this->t('Field mapping'),
-      ];
-      $form['field_mapping']['phone_field'] = [
-        '#type' => 'select',
-        '#title' => $this->t('Phone number'),
-        '#description' => $this->t('Select the field storing phone numbers.'),
-        '#options' => $field_options['telephone'],
-        '#empty_option' => $this->t('- None -'),
-        '#default_value' => $config->getFieldName('phone_number'),
-      ];
-      $form['field_mapping']['optout_field'] = [
-        '#type' => 'select',
-        '#title' => $this->t('Automated messages opt out'),
-        '#description' => $this->t('Select the field storing preference to opt out of automated messages.'),
-        '#options' => $field_options['boolean'],
-        '#empty_option' => $this->t('- None -'),
-        '#default_value' => $config->getFieldName('automated_opt_out'),
-      ];
-    }
-
     return $form;
+  }
+
+  /**
+   * Handles AJAX callback for bundle field on new phone number settings.
+   */
+  public function updateFieldMapping($form, FormStateInterface $form_state) {
+    return $form['field_mapping'];
   }
 
   /**
@@ -205,7 +230,7 @@ class PhoneNumberSettingsForm extends EntityForm {
     $config = &$this->entity;
 
     if ($config->isNew()) {
-      list($entity_type, $bundle) = explode('|', $form_state->getValue('bundle'));
+      list($entity_type, $bundle) = explode('|', $form_state->getValue('entity_bundle'));
       $config
         ->setPhoneNumberEntityTypeId($entity_type)
         ->setPhoneNumberBundle($bundle);
