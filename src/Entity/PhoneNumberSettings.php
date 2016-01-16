@@ -69,14 +69,14 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    *
    * @var string
    */
-  protected $verification_message;
+  protected $verification_message = '';
 
   /**
    * Number of seconds before phone number verifications expire.
    *
    * @var int
    */
-  protected $duration_verification_code_expire;
+  protected $duration_verification_code_expire = 0;
 
   /**
    * Whether to remove phone number field values when phone number
@@ -84,7 +84,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    *
    * @var bool
    */
-  protected $verification_phone_number_purge;
+  protected $verification_phone_number_purge = TRUE;
 
   /**
    * Field name mapping.
