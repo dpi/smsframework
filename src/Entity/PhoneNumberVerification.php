@@ -28,6 +28,15 @@ use Drupal\Core\Entity\EntityInterface;
 class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVerificationInterface {
 
   /**
+   * The bundle of the associated entity.
+   *
+   * This value is read on a database level.
+   *
+   * @var string
+   */
+  protected $bundle;
+
+  /**
    * {@inheritdoc}
    */
   public function getCreatedTime() {
@@ -44,6 +53,14 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
   /**
    * {@inheritdoc}
    */
+  public function setEntity($entity) {
+    $this->set('entity', $entity);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPhoneNumber() {
     return $this->get('phone')->value;
   }
@@ -51,8 +68,8 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
   /**
    * {@inheritdoc}
    */
-  public function setCode($code) {
-    $this->set('code', $code);
+  public function setPhoneNumber($phone_number) {
+    $this->set('phone', $phone_number);
     return $this;
   }
 
@@ -66,8 +83,8 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
   /**
    * {@inheritdoc}
    */
-  public function setStatus($status) {
-    $this->set('status', (bool) $status);
+  public function setCode($code) {
+    $this->set('code', $code);
     return $this;
   }
 
@@ -75,7 +92,15 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
    * {@inheritdoc}
    */
   public function getStatus() {
-    return $this->get('status')->value;
+    return (bool) $this->get('status')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setStatus($status) {
+    $this->set('status', (bool) $status);
+    return $this;
   }
 
   /**
@@ -94,7 +119,7 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
       ->setRequired(TRUE)
       ->setReadOnly(TRUE);
 
-    // Bundle is only used for statistics, and bulk cleanup.
+    // Bundle field is required for statistics and bulk cleanup.
     $fields['bundle'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Bundle'))
       ->setDescription(t('The bundle of the entity.'))
@@ -134,6 +159,7 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
    */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
+    // Update bundle field with bundle of entity.
     if ($this->getEntity() instanceof EntityInterface) {
       $this->set('bundle', $this->getEntity()->bundle());
     }
