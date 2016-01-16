@@ -40,19 +40,73 @@ use Drupal\Core\Entity\EntityStorageInterface;
  */
 class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSettingsInterface {
 
+  /**
+   * Phone number settings entity ID.
+   *
+   * ID is a concatenation of entity type ID and bundle
+   * "{entity_type_id}.{bundle}" suitable as config ID "sms.phone.*.*".
+   *
+   * @var string
+   */
   protected $id;
-  var $entity_type;
-  var $bundle;
-  var $verification_message;
-  var $duration_verification_code_expire;
-  var $verification_phone_number_purge;
-  var $fields = [];
+
+  /**
+   * Entity type ID of phone number settings.
+   *
+   * @var string
+   */
+  protected $entity_type;
+
+  /**
+   * Bundle of phone number settings.
+   *
+   * @var string
+   */
+  protected $bundle;
+
+  /**
+   * Message template to send for phone number verification.
+   *
+   * @var string
+   */
+  protected $verification_message;
+
+  /**
+   * Number of seconds before phone number verifications expire.
+   *
+   * @var int
+   */
+  protected $duration_verification_code_expire;
+
+  /**
+   * Whether to remove phone number field values when phone number
+   * verifications expire.
+   *
+   * @var bool
+   */
+  protected $verification_phone_number_purge;
+
+  /**
+   * Field name mapping.
+   *
+   * Keys are sms.phone.*.*.fields.$key, values are field names.
+   *
+   * @var string[string]
+   */
+  protected $fields = [];
 
   /**
    * {@inheritdoc}
    */
   public function id() {
     return $this->entity_type . '.' . $this->bundle;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPhoneNumberEntityTypeId() {
+    return $this->entity_type;
   }
 
   /**
@@ -66,8 +120,8 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
   /**
    * {@inheritdoc}
    */
-  public function getPhoneNumberEntityTypeId() {
-    return $this->entity_type;
+  public function getPhoneNumberBundle() {
+    return $this->bundle;
   }
 
   /**
@@ -81,8 +135,61 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
   /**
    * {@inheritdoc}
    */
-  public function getPhoneNumberBundle() {
-    return $this->bundle;
+  public function getVerificationMessage() {
+    return $this->verification_message;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setVerificationMessage($message) {
+    $this->verification_message = $message;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getVerificationLifetime() {
+    return $this->duration_verification_code_expire;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setVerificationLifetime($lifetime) {
+    $this->duration_verification_code_expire = $lifetime;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isVerificationPhoneNumberPurge() {
+    return $this->verification_phone_number_purge;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setVerificationPhoneNumberPurge($purge) {
+    $this->verification_phone_number_purge = $purge;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFieldName($map) {
+    return isset($this->fields[$map]) ? $this->fields[$map] : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setFieldName($map, $field_name) {
+    $this->fields[$map] = $field_name;
+    return $this;
   }
 
   /**
