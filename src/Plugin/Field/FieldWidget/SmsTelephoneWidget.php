@@ -26,6 +26,9 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
 
   use UrlGeneratorTrait;
 
+  /**
+   * {@inheritdoc}
+   */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, \Drupal\Core\Form\FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 

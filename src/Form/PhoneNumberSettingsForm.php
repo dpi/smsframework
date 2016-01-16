@@ -12,7 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
 /**
- * Form controller for Phone Number config.
+ * Form controller for phone number settings.
  */
 class PhoneNumberSettingsForm extends EntityForm {
 
