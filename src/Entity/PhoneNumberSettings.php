@@ -9,6 +9,7 @@ namespace Drupal\sms\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\field\Entity\FieldConfig;
 
 /**
  * Defines storage for an SMS Gateway instance.
@@ -91,7 +92,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    *
    * Keys are sms.phone.*.*.fields.$key, values are field names.
    *
-   * @var string[string]
+   * @var array
    */
   protected $fields = [];
 
@@ -213,6 +214,26 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
     }
 
     $verification_storage->delete($verification_storage->loadMultiple($verification_ids));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateDependencies() {
+    parent::calculateDependencies();
+
+    foreach ($this->fields as $map => $field_name) {
+      $field_config = FieldConfig::loadByName(
+        $this->getPhoneNumberEntityTypeId(),
+        $this->getPhoneNumberBundle(),
+        $field_name
+      );
+      if ($field_config) {
+        $this->addDependency('config', $field_config->getConfigDependencyName());
+      }
+    }
+
+    return $this->dependencies;
   }
 
 }
