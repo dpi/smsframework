@@ -20,6 +20,7 @@ class PhoneNumberSettingsForm extends EntityForm {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    /** @var \Drupal\sms\Entity\PhoneNumberSettingsInterface $phone_number_config */
     $phone_number_config = $this->getEntity();
     $form = parent::buildForm($form, $form_state);
 
@@ -126,7 +127,7 @@ class PhoneNumberSettingsForm extends EntityForm {
         '#description' => $this->t('Select the field storing phone numbers.'),
         '#options' => $field_phone_options,
         '#empty_option' => $this->t('- None -'),
-        '#default_value' => !empty($phone_number_config->fields['phone_number']) ? $phone_number_config->fields['phone_number'] : '',
+        '#default_value' => $phone_number_config->getFieldName('phone_number'),
       ];
 
       $form['field_mapping']['optout_field'] = [
@@ -135,7 +136,7 @@ class PhoneNumberSettingsForm extends EntityForm {
         '#description' => $this->t('Select the field storing preference to opt out of automated messages.'),
         '#options' => $field_optout_options,
         '#empty_option' => $this->t('- None -'),
-        '#default_value' => !empty($phone_number_config->fields['automated_opt_out']) ? $phone_number_config->fields['automated_opt_out'] : '',
+        '#default_value' => $phone_number_config->getFieldName('automated_opt_out'),
       ];
     }
 
@@ -146,22 +147,24 @@ class PhoneNumberSettingsForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    /** @var \Drupal\sms\Entity\PhoneNumberSettingsInterface $phone_number_config */
     $phone_number_config = $this->getEntity();
 
     if ($phone_number_config->isNew()) {
       list($entity_type, $bundle) = explode('|', $form_state->getValue('bundle'));
-      $phone_number_config->entity_type = $entity_type;
-      $phone_number_config->bundle = $bundle;
+      $phone_number_config
+        ->setPhoneNumberEntityTypeId($entity_type)
+        ->setPhoneNumberBundle($bundle);
     }
 
-    $phone_number_config->verification_message = $form_state->getValue('verification_message');
-    $phone_number_config->duration_verification_code_expire = $form_state->getValue('code_lifetime');
-    $phone_number_config->verification_phone_number_purge = (bool) $form_state->getValue('phone_number_purge');
+    $saved = $phone_number_config
+      ->setVerificationMessage($form_state->getValue('verification_message'))
+      ->setVerificationLifetime($form_state->getValue('code_lifetime'))
+      ->setVerificationPhoneNumberPurge((bool) $form_state->getValue('phone_number_purge'))
+      ->setFieldName('phone_number', $form_state->getValue('phone_field'))
+      ->setFieldName('automated_opt_out', $form_state->getValue('optout_field'))
+      ->save();
 
-    $phone_number_config->fields['phone_number'] = $form_state->getValue('phone_field') ?: '';
-    $phone_number_config->fields['automated_opt_out'] = $form_state->getValue('optout_field') ?: '';
-
-    $saved = $phone_number_config->save();
     $t_args['%id'] = $phone_number_config->id();
     if ($saved == SAVED_NEW) {
       drupal_set_message($this->t('Phone number settings %id created.', $t_args));
