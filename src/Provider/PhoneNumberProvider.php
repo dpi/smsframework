@@ -9,6 +9,7 @@ namespace Drupal\sms\Provider;
 
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Utility\Token;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
@@ -17,7 +18,7 @@ use Drupal\sms\Message\SmsMessage;
 use Drupal\Component\Utility\Random;
 
 /**
- * Entity phone number provider.
+ * Phone number provider.
  */
 class PhoneNumberProvider implements PhoneNumberProviderInterface {
 
@@ -38,6 +39,13 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   protected $phoneNumberVerificationStorage;
 
   /**
+   * The token service.
+   *
+   * @var \Drupal\Core\Utility\Token
+   */
+  protected $token;
+
+  /**
    * The config factory.
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
@@ -54,10 +62,11 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
    * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
    *   The SMS provider.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, ConfigFactoryInterface $config_factory, SmsProviderInterface $sms_provider) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, ConfigFactoryInterface $config_factory, Token $token, SmsProviderInterface $sms_provider) {
     $this->smsProvider = $sms_provider;
     $this->phoneNumberVerificationStorage = $entity_type_manager
       ->getStorage('sms_phone_number_verification');
+    $this->token = $token;
     $this->configFactory = $config_factory;
   }
 
@@ -71,8 +80,10 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
     }
 
     $numbers = [];
-    foreach ($entity->{$field_name} as $value) {
-      $numbers[] = $value->value;
+    if (isset($entity->{$field_name})) {
+      foreach ($entity->{$field_name} as $index => &$item) {
+        $numbers[$index] = $item->value;
+      }
     }
     return $numbers;
   }
@@ -121,7 +132,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPhoneVerificationCode($code) {
+  public function getPhoneVerificationByCode($code) {
     $entities = $this->phoneNumberVerificationStorage
       ->loadByProperties([
         'code' => $code,
@@ -132,7 +143,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPhoneVerification(EntityInterface $entity, $phone_number) {
+  public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number) {
     $entities = $this->phoneNumberVerificationStorage
       ->loadByProperties([
         'entity__target_id' => $entity->id(),
@@ -167,7 +178,8 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
 
     if ($phone_verification) {
       $data['sms_verification_code'] = $phone_verification->getCode();
-      $message = \Drupal::token()->replace($message, $data);
+      $message = $this->token
+        ->replace($message, $data);
       $sms_message = new SmsMessage(
         '',
         [$phone_number],
@@ -180,6 +192,8 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       $this->smsProvider
         ->send($sms_message, []);
     }
+
+    return $phone_verification;
   }
 
 }

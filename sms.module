@@ -153,11 +153,11 @@ function _sms_entity_postsave(EntityInterface $entity) {
   // because there is no items.
   if (isset($items)) {
     $numbers = [];
-    foreach ($items as $item) {
+    foreach ($items as &$item) {
       $phone_number = $item->value;
       $numbers[] = $phone_number;
 
-      if (!$phone_number_provider->getPhoneVerification($entity, $phone_number)) {
+      if (!$phone_number_provider->getPhoneVerificationByEntity($entity, $phone_number)) {
         $phone_number_provider->newPhoneVerification($entity, $phone_number);
       }
     }
@@ -167,7 +167,7 @@ function _sms_entity_postsave(EntityInterface $entity) {
         $phone_number = $item->value;
         // A phone number was deleted.
         if (!in_array($phone_number, $numbers)) {
-          if ($phone_verification = $phone_number_provider->getPhoneVerification($entity, $phone_number)) {
+          if ($phone_verification = $phone_number_provider->getPhoneVerificationByEntity($entity, $phone_number)) {
             $phone_verification->delete();
           }
         }

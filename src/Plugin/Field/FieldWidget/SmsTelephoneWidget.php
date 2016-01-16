@@ -41,7 +41,7 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
 
     if (isset($items[$delta]->value)) {
       $phone_verification = $phone_number_provider
-        ->getPhoneVerification($items->getEntity(), $items[$delta]->value);
+        ->getPhoneVerificationByEntity($items->getEntity(), $items[$delta]->value);
 
       if ($phone_verification) {
         if ($phone_verification->getStatus()) {
