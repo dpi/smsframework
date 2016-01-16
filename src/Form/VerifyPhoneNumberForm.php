@@ -69,7 +69,7 @@ class VerifyPhoneNumberForm extends FormBase {
     $current_time = $this->getRequest()->server->get('REQUEST_TIME');
     $code = $form_state->getValue('code');
     $phone_verification = $this->phoneNumberProvider
-      ->getPhoneVerificationCode($code);
+      ->getPhoneVerificationByCode($code);
 
     if ($phone_verification && !$phone_verification->getStatus()) {
       $entity = $phone_verification->getEntity();
@@ -89,7 +89,7 @@ class VerifyPhoneNumberForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $code = $form_state->getValue('code');
     $phone_verification = $this->phoneNumberProvider
-      ->getPhoneVerificationCode($code);
+      ->getPhoneVerificationByCode($code);
     $phone_verification
       ->setStatus(TRUE)
       ->setCode('')
