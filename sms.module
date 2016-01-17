@@ -14,7 +14,7 @@ use Drupal\sms\Gateway\GatewayInterface;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
-use Drupal\sms\SmsException;
+use Drupal\sms\Exception\SmsException;
 use Drupal\Core\Entity\EntityInterface;
 
 // Direction codes.
