@@ -87,7 +87,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       }
     }
 
-    if (!$validated) {
+    if ($validated) {
       return array_filter($phone_numbers, function($phone_number) use(&$entity) {
         $verification = $this->getPhoneVerificationByEntity($entity, $phone_number);
         return $verification && $verification->getStatus();
