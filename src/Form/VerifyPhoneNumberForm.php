@@ -8,11 +8,19 @@
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Form\FormBase;
+use Drupal\Core\Flood\FloodInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\sms\Provider\PhoneNumberProviderInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 class VerifyPhoneNumberForm extends FormBase {
+
+  /**
+   * The flood control mechanism.
+   *
+   * @var \Drupal\Core\Flood\FloodInterface
+   */
+  protected $flood;
 
   /**
    * Phone number provider.
@@ -24,10 +32,13 @@ class VerifyPhoneNumberForm extends FormBase {
   /**
    * Constructs a VerifyPhoneNumberForm object.
    *
+   * @param \Drupal\Core\Flood\FloodInterface $flood
+   *   The flood control mechanism.
    * @param \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider
    *   The phone number provider.
    */
-  public function __construct(PhoneNumberProviderInterface $phone_number_provider) {
+  public function __construct(FloodInterface $flood, PhoneNumberProviderInterface $phone_number_provider) {
+    $this->flood = $flood;
     $this->phoneNumberProvider = $phone_number_provider;
   }
 
@@ -36,6 +47,7 @@ class VerifyPhoneNumberForm extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
+      $container->get('flood'),
       $container->get('sms.phone_number')
     );
   }
@@ -66,6 +78,14 @@ class VerifyPhoneNumberForm extends FormBase {
    * @inheritDoc
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
+    $flood_window = $this->config('sms.settings')->get('flood.verify_window');
+    $flood_limit = $this->config('sms.settings')->get('flood.verify_limit');
+
+    if (!$this->flood->isAllowed('sms.verify_phone_number', $flood_limit, $flood_window)) {
+      $form_state->setError($form, $this->t('There has been too many failed verification attempts. Try again later.'));
+      return;
+    }
+
     $current_time = $this->getRequest()->server->get('REQUEST_TIME');
     $code = $form_state->getValue('code');
     $phone_verification = $this->phoneNumberProvider
@@ -84,6 +104,9 @@ class VerifyPhoneNumberForm extends FormBase {
     else {
       $form_state->setError($form['code'], $this->t('Invalid verification code.'));
     }
+
+    $this->flood
+      ->register('sms.verify_phone_number', $flood_window);
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
