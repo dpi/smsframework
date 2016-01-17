@@ -16,6 +16,7 @@ use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\Component\Utility\Random;
+use Drupal\sms\Exception\NoPhoneNumberException;
 
 /**
  * Phone number provider.
@@ -73,26 +74,36 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPhoneNumbers(EntityInterface $entity) {
+  public function getPhoneNumbers(EntityInterface $entity, $validated = TRUE) {
     $phone_number_settings = $this->getPhoneNumberSettingsForEntity($entity);
     if (!$field_name = $phone_number_settings->get('fields.phone_number')) {
       throw new PhoneNumberSettingsException(sprintf('Entity phone number config field mapping not set for bundle %s:%s', $entity->getEntityTypeId(), $entity->bundle()));
     }
 
-    $numbers = [];
+    $phone_numbers = [];
     if (isset($entity->{$field_name})) {
       foreach ($entity->{$field_name} as $index => &$item) {
-        $numbers[$index] = $item->value;
+        $phone_numbers[$index] = $item->value;
       }
     }
-    return $numbers;
+
+    if (!$validated) {
+      return array_filter($phone_numbers, function($phone_number) use(&$entity) {
+        $verification = $this->getPhoneVerificationByEntity($entity, $phone_number);
+        return $verification && $verification->getStatus();
+      });
+    }
+
+    return $phone_numbers;
   }
 
   /**
    * {@inheritdoc}
    */
   public function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message) {
-    $phone_numbers = $this->getPhoneNumbers($entity);
+    if (!$phone_numbers = $this->getPhoneNumbers($entity)) {
+      throw new NoPhoneNumberException('Attempted to send an SMS to entity without a phone number.');
+    }
 
     // @todo: remove this re-creation of SmsMessage when it adds setters.
     $sms_message_new = new SmsMessage(

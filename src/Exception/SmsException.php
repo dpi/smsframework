@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Contains \Drupal\sms\SmsException
+ * Contains \Drupal\sms\Exception\SmsException
  */
 
-namespace Drupal\sms;
+namespace Drupal\sms\Exception;
 
 /**
  * Base exception thrown for any SMS operations.
