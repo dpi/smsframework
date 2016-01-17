@@ -18,6 +18,16 @@ sms.settings:
       label: 'International Country Codes'
       sequence:
         - type: string
+    flood:
+      label: 'SMS Framework flood settings'
+      type: mapping
+      mapping:
+        verify_limit:
+          type: integer
+          label: 'Maximum failed phone number verifications per verify_window'
+        verify_window:
+          type: integer
+          label: 'Used to calculate window of failed phone number verifications.'
 
 # Configuration for SMS Gateways.
 sms.gateway.*:
@@ -54,12 +64,13 @@ sms.phone.*.*:
     verification_message:
       type: string
     duration_verification_code_expire:
-      type: int
+      type: integer
       label: 'Time in seconds, before verification codes expire.'
     verification_phone_number_purge:
       type: boolean
       label: 'Remove phone number field value if verification code expires.'
     fields:
+      type: mapping
       mapping:
         phone_number:
           type: string

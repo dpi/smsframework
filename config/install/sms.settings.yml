@@ -211,3 +211,6 @@ country_codes:
   260: "Zambia"
   255: "Zanzibar"
   263: "Zimbabwe"
+flood:
+  verify_limit: 5
+  verify_window: 21600
