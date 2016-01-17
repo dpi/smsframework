@@ -22,6 +22,11 @@ use Drupal\Core\Url;
 class PhoneNumberSettingsForm extends EntityForm {
 
   /**
+   * Form field value used to indicate to create a new attached field.
+   */
+  const createNewField = '!create';
+
+  /**
    * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
@@ -122,8 +127,8 @@ class PhoneNumberSettingsForm extends EntityForm {
     }
 
     $field_options = [];
-    $field_options['telephone']['!create'] = $this->t('- Create a new telephone field -');
-    $field_options['boolean']['!create'] = $this->t('- Create a new boolean field -');
+    $field_options['telephone'][self::createNewField] = $this->t('- Create a new telephone field -');
+    $field_options['boolean'][self::createNewField] = $this->t('- Create a new boolean field -');
 
     if ($entity_bundle = $form_state->getValue('entity_bundle', $bundle_default_value ?: NULL)) {
       list($entity_type_id, $bundle) = explode('|', $entity_bundle);
@@ -144,8 +149,12 @@ class PhoneNumberSettingsForm extends EntityForm {
       '#title' => $this->t('Field mapping'),
       '#prefix' => '<div id="edit-field-mapping-wrapper">',
       '#suffix' => '</div>',
+      '#tree' => TRUE,
     ];
-    $form['field_mapping']['phone_field'] = [
+
+    // Form ID must be the same as found in $config->getFieldName().
+    // $config->getFieldName($config_key) == $form['field_mapping'][$config_key]
+    $form['field_mapping']['phone_number'] = [
       '#type' => 'select',
       '#title' => $this->t('Phone number'),
       '#description' => $this->t('Select the field storing phone numbers.'),
@@ -154,7 +163,7 @@ class PhoneNumberSettingsForm extends EntityForm {
       '#empty_option' => $this->t('- Select -'),
       '#default_value' => $config->getFieldName('phone_number'),
     ];
-    $form['field_mapping']['optout_field'] = [
+    $form['field_mapping']['automated_opt_out'] = [
       '#type' => 'select',
       '#title' => $this->t('Automated messages opt out'),
       '#description' => $this->t('Select the field storing preference to opt out of automated messages.'),
@@ -228,22 +237,48 @@ class PhoneNumberSettingsForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $config = &$this->entity;
 
-    if ($config->isNew()) {
-      list($entity_type, $bundle) = explode('|', $form_state->getValue('entity_bundle'));
-      $config
-        ->setPhoneNumberEntityTypeId($entity_type)
-        ->setPhoneNumberBundle($bundle);
-    }
+    list($entity_type_id, $bundle) = explode('|', $form_state->getValue('entity_bundle'));
+    $config
+      ->setPhoneNumberEntityTypeId($entity_type_id)
+      ->setPhoneNumberBundle($bundle);
 
-    $saved = $config
+    $config
       ->setVerificationMessage($form_state->getValue('verification_message'))
       ->setVerificationLifetime($form_state->getValue('code_lifetime'))
-      ->setVerificationPhoneNumberPurge((bool) $form_state->getValue('phone_number_purge'))
-      ->setFieldName('phone_number', $form_state->getValue('phone_field'))
-      ->setFieldName('automated_opt_out', $form_state->getValue('optout_field'))
-      ->save();
+      ->setVerificationPhoneNumberPurge((bool) $form_state->getValue('phone_number_purge'));
 
+    foreach ($form_state->getValue('field_mapping') as $config_key => $field_name) {
+      if ($field_name == self::createNewField) {
+        $field_config = $this->createNewField($entity_type_id, $bundle, $config_key);
+        $field_name = $field_config->getName();
+      }
+      else {
+        // Use existing field.
+
+        /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
+        $entity_form_display = $field_storage_config = $this->entityTypeManager
+          ->getStorage('entity_form_display')
+          ->load($entity_type_id . '.' . $bundle . '.default');
+
+        if ($entity_form_display) {
+          $component = $entity_form_display->getComponent($field_name) ?: [];
+          // Only change existing form formatter if it is using default
+          // widget, or none at all.
+          if (!$component || ($component && $component['type'] == 'telephone_default')) {
+            $component['type'] = 'sms_telephone';
+            $entity_form_display
+              ->setComponent($field_name, $component)
+              ->save();
+          }
+        }
+      }
+
+      $config->setFieldName($config_key, $field_name);
+    }
+
+    $saved = $config->save();
     $t_args['%id'] = $config->id();
+
     if ($saved == SAVED_NEW) {
       drupal_set_message($this->t('Phone number settings %id created.', $t_args));
     }
@@ -252,6 +287,81 @@ class PhoneNumberSettingsForm extends EntityForm {
     }
 
     $form_state->setRedirectUrl(Url::fromRoute('sms.phone_number_settings.list'));
+  }
+
+  /**
+   * Create a new field storage and field, and modify form display.
+   *
+   * @param $entity_type_id
+   *   An entity type ID.
+   * @param $bundle
+   *   A bundle ID.
+   * @param $config_key
+   *   A config ID as found in sms.phone.*.*.fields.$config_key
+   *
+   * @return \Drupal\field\FieldConfigInterface
+   *   A field config entity.
+   */
+  static public function createNewField($entity_type_id, $bundle, $config_key) {
+    $entity_type_manager = \Drupal::entityTypeManager();
+
+    // Definitions for field_storage_config.
+    $definitions['field_storage']['phone_number']['type'] = 'telephone';
+    $definitions['field_storage']['automated_opt_out']['type'] = 'boolean';
+    // Definitions for field_config.
+    $definitions['field']['phone_number']['label'] = t('Phone number');
+    $definitions['field']['automated_opt_out'] = [
+      'label' => t('Opt out of SMS messages.'),
+      'description' => t('SMS messages requested by you are exempt.'),
+      'settings' => [
+        'on_label' => t('Do not receive SMS messages from this site.'),
+        'off_label' => t('Receive SMS messages from this site.'),
+      ],
+    ];
+    // Definitions for form displays.
+    $definitions['form_display']['phone_number']['type'] = 'sms_telephone';
+    $definitions['form_display']['automated_opt_out']['type'] = 'boolean_checkbox';
+
+    // Generate a unique field name.
+    $i = 1;
+    $field_name = $config_key;
+    while ($entity_type_manager->getStorage('field_storage_config')->load($entity_type_id . '.' . $field_name)) {
+      $i++;
+      $field_name = $config_key . '_' . $i;
+    }
+
+    /** @var \Drupal\field\FieldStorageConfigInterface $field_storage_config */
+    $field_storage_config = $entity_type_manager
+      ->getStorage('field_storage_config')
+      ->create([
+        'entity_type' => $entity_type_id,
+        'field_name' => $field_name,
+      ] + $definitions['field_storage'][$config_key]);
+    $field_storage_config->save();
+
+    $field_config = $entity_type_manager
+      ->getStorage('field_config')
+      ->create([
+        'entity_type' => $entity_type_id,
+        'bundle' => $bundle,
+        'field_name' => $field_name,
+      ] + $definitions['field'][$config_key]);
+    $field_config->save();
+
+    /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
+    $entity_form_display = $field_storage_config = $entity_type_manager
+      ->getStorage('entity_form_display')
+      ->load($entity_type_id . '.' . $bundle . '.default');
+    // Only modify display if it already exists. Don't attempt to create it.
+    if ($entity_form_display) {
+      $entity_form_display->setComponent(
+        $field_name,
+        $definitions['form_display'][$config_key]
+      );
+      $entity_form_display->save();
+    }
+
+    return $field_config;
   }
 
 }
