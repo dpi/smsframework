@@ -74,7 +74,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPhoneNumbers(EntityInterface $entity, $validated = TRUE) {
+  public function getPhoneNumbers(EntityInterface $entity, $verified = TRUE) {
     $phone_number_settings = $this->getPhoneNumberSettingsForEntity($entity);
     if (!$field_name = $phone_number_settings->get('fields.phone_number')) {
       throw new PhoneNumberSettingsException(sprintf('Entity phone number config field mapping not set for bundle %s:%s', $entity->getEntityTypeId(), $entity->bundle()));
@@ -87,7 +87,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       }
     }
 
-    if ($validated) {
+    if ($verified) {
       return array_filter($phone_numbers, function($phone_number) use(&$entity) {
         $verification = $this->getPhoneVerificationByEntity($entity, $phone_number);
         return $verification && $verification->getStatus();
