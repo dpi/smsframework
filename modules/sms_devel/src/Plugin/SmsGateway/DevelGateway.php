@@ -1,17 +1,17 @@
 <?php
 /**
  * @file
- * Contains \Drupal\sms_devel\Plugin\Gateway\DevelGateway
+ * Contains \Drupal\sms_devel\Plugin\SmsGateway\DevelGateway
  */
 
-namespace Drupal\sms_devel\Plugin\Gateway;
+namespace Drupal\sms_devel\Plugin\SmsGateway;
 
 use Drupal\Component\Utility\Random;
-use Drupal\sms\Gateway\GatewayBase;
+use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\sms\Gateway\GatewayInterface;
+use Drupal\sms\Plugin\SmsGatewayPluginInterface;
 
 /**
  * Defines a gateway storing transmitted SMS in database for debugging.
@@ -21,7 +21,7 @@ use Drupal\sms\Gateway\GatewayInterface;
  *   label = @Translation("Debug Gateway"),
  * )
  */
-class DevelGateway extends GatewayBase {
+class DevelGateway extends SmsGatewayPluginBase {
 
   /**
    * {@inheritdoc}
@@ -207,7 +207,7 @@ class DevelGateway extends GatewayBase {
     // Always return success.
     return new SmsMessageResult([
       'status' => TRUE,
-      'status_code' => GatewayInterface::STATUS_OK,
+      'status_code' => SmsGatewayPluginInterface::STATUS_OK,
       'gateway_status_code' => 'OK',
       'gateway_status_text' => 'sms_devel_virtualgw: send: OK',
     ]);
