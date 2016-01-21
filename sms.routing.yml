@@ -89,40 +89,6 @@ entity.sms_gateway.delete_form:
   requirements:
     _permission: 'administer smsframework'
 
-# Carriers
-sms.carrier_admin:
-  path: '/admin/config/smsframework/carriers'
-  defaults:
-    _form: '\Drupal\sms\Form\CarrierAdminForm'
-    _title: 'Carrier configuration'
-  requirements:
-    _permission: 'administer smsframework'
-
-sms.carrier_add:
-  path: '/admin/config/smsframework/carriers/add'
-  defaults:
-    domain: ''
-    _form: '\Drupal\sms\Form\CarrierEditForm'
-    _title: 'Add Carrier'
-  requirements:
-    _permission: 'administer smsframework'
-
-sms.carrier_edit:
-  path: '/admin/config/smsframework/carriers/edit/{domain}'
-  defaults:
-    _form: '\Drupal\sms\Form\CarrierEditForm'
-    _title: 'Edit carrier'
-  requirements:
-    _permission: 'administer smsframework'
-
-sms.carrier_delete:
-  path: '/admin/config/smsframework/carriers/delete/{domain}'
-  defaults:
-    _title: 'Delete carrier'
-    _form: '\Drupal\sms\Form\CarrierDeleteForm'
-  requirements:
-    _permission: 'administer smsframework'
-
 sms.bootstrap_admin:
   path: '/admin/config/smsframework/bootstrap'
   defaults:

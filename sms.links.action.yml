@@ -1,10 +1,3 @@
-sms.carrier_add:
-  title: 'Add Carrier'
-  route_name: sms.carrier_add
-  weight: 1
-  appears_on:
-    - sms.carrier_admin
-
 entity.phone_number_settings.add:
   title: 'Add phone number settings'
   route_name: entity.phone_number_settings.add

@@ -13,7 +13,7 @@ use Drupal\Core\Form\FormStateInterface;
 
 
 /**
- * Provides a configuration form for sms carriers.
+ * Provides a general settings form for SMS User.
  */
 class AdminSettingsForm extends ConfigFormBase {
   /**
