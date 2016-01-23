@@ -1,6 +1,5 @@
 default_gateway: log
 bootstrap_queue: { }
-enabled_carriers: { }
 country_codes:
   93: "Afghanistan"
   355: "Albania"

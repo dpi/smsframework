@@ -17,10 +17,3 @@ sms.gateway.list:
   route_name: sms.gateway.list
   parent: sms.admin
   weight: -10
-
-sms.carrier_admin:
-  title: 'Carrier configuration'
-  description: 'Configure supported carriers.'
-  route_name: sms.carrier_admin
-  parent: sms.admin
-  weight: -9

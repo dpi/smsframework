@@ -42,7 +42,6 @@ class SettingsResetForm extends ConfigFormBase {
       '#type' => 'item',
       '#title' => t('Your mobile phone number'),
       '#markup' => $account->sms_user['number'],
-  //    '#markup' => $account->sms_user['number'] . '@' . $account->sms_user['gateway']['carrier'],
       '#description' => t('Your mobile phone number has been confirmed.'),
     );
   
