@@ -78,3 +78,11 @@ sms.phone.*.*:
 
 sms_gateway.settings.*:
   type: sms_gateway_settings
+
+field.widget.settings.sms_telephone:
+  type: mapping
+  label: 'SMS Framework telephone widget settings'
+  mapping:
+    placeholder:
+      type: label
+      label: 'Placeholder'
