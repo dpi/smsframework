@@ -42,7 +42,7 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
     $this->gatewayManager = $this->container->get('plugin.manager.sms_gateway');
     $this->defaultSmsProvider = $this->container->get('sms_provider.default');
