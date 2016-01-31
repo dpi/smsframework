@@ -16,7 +16,7 @@ use Drupal\Component\Utility\Unicode;
  */
 abstract class SmsFrameworkWebTestBase extends WebTestBase {
 
-  public static $modules = ['sms', 'sms_test_gateway'];
+  public static $modules = ['sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference'];
 
   /**
    * The gateway manager.

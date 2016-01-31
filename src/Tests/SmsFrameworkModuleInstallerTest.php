@@ -16,6 +16,7 @@ use Drupal\simpletest\WebTestBase;
  */
 class SmsFrameworkModuleInstallerTest extends WebTestBase {
 
+  public static $modules = ['telephone', 'dynamic_entity_reference'];
 
   public function testUiInstallModule() {
     $edit = [
