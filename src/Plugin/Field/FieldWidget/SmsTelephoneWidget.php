@@ -10,6 +10,7 @@ namespace Drupal\sms\Plugin\Field\FieldWidget;
 use Drupal\telephone\Plugin\Field\FieldWidget\TelephoneDefaultWidget;
 use Drupal\Core\Routing\UrlGeneratorTrait;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\sms\Exception\PhoneNumberSettingsException;
 
 /**
  * Plugin implementation of the 'sms_telephone' widget.
@@ -34,12 +35,18 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
 
     /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
     $phone_number_provider = \Drupal::service('sms.phone_number');
+    try {
+      $config = $phone_number_provider->getPhoneNumberSettingsForEntity($items->getEntity());
+    }
+    catch (PhoneNumberSettingsException $e) {
+      return $element;
+    }
+
     /** @var \Drupal\Core\Datetime\DateFormatter $date_formatter */
     $date_formatter = \Drupal::service('date.formatter');
     $current_time = \Drupal::request()->server->get('REQUEST_TIME');
 
     $t_args['@url'] = $this->url('sms.phone.verify');
-    $config = $phone_number_provider->getPhoneNumberSettingsForEntity($items->getEntity());
     $lifetime = $config->get('duration_verification_code_expire') ?: 0;
 
     if (isset($items[$delta]->value)) {
