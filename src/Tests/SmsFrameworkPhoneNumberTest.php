@@ -7,6 +7,7 @@
 
 namespace Drupal\sms\Tests;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 
 /**
@@ -19,9 +20,29 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
   public static $modules = ['entity_test'];
 
   /**
+   * Test verification code creation on entity postsave.
+   *
+   * @see _sms_entity_postsave().
+   */
+  public function testPhoneNumberVerificationCreated() {
+    $phone_number_settings = $this->createPhoneNumberSettings();
+
+    $phone_numbers = ['+123123123', '+456456456', '+789789789'];
+    for ($quantity = 1; $quantity < 3; $quantity++) {
+      $test_entity = $this->createEntityWithPhoneNumber($phone_number_settings, array_slice($phone_numbers, 0, $quantity));
+
+      $this->assertEqual($quantity, $this->countVerificationCodes($test_entity), 'There is ' . $quantity . ' verification code.');
+
+      // Ensure postsave did not create verification codes if one already exists.
+      $test_entity->save();
+      $this->assertEqual($quantity, $this->countVerificationCodes($test_entity), 'Additional verification codes were not created.');
+    }
+  }
+
+  /**
    * Ensure phone number verification SMS sent.
    *
-   * Tests _sms_entity_postsave()
+   * @see _sms_entity_postsave().
    */
   public function testPhoneNumberVerificationMessage() {
     $this->defaultSmsProvider->setDefaultGateway($this->testGateway);
@@ -41,6 +62,48 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
       $data
     );
     $this->assertEqual($sms_message->getMessage(), $message, 'Sent correct message.');
+  }
+
+  /**
+   * Ensure phone number verification are deleted.
+   *
+   * @see sms_entity_delete().
+   */
+  public function testPhoneNumberVerificationDeleted() {
+    $phone_number_settings = $this->createPhoneNumberSettings();
+
+    $entities = [];
+    for ($i = 0; $i < 3; $i++) {
+      $phone_numbers = ['+123123123', '+456456456'];
+      $entities[] = $this->createEntityWithPhoneNumber($phone_number_settings, $phone_numbers);
+    }
+
+    $this->assertEqual(6, $this->countVerificationCodes());
+    $entities[1]->delete();
+    $this->assertEqual(4, $this->countVerificationCodes(), 'Verification codes deleted.');
+  }
+
+  /**
+   * Count verification codes in database.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface|NULL $entity
+   *   The entity to count verification codes for, or NULL to count all codes.
+   *
+   * @return int
+   *   Count number of verification codes.
+   */
+  protected function countVerificationCodes(EntityInterface $entity = NULL) {
+    $query = \Drupal::entityTypeManager()
+      ->getStorage('sms_phone_number_verification')
+      ->getQuery();
+
+    if ($entity) {
+      $query->condition('entity__target_type', $entity->getEntityTypeId());
+      $query->condition('entity__target_id', $entity->id());
+    }
+
+    return $query->count()
+      ->execute();
   }
 
 }
