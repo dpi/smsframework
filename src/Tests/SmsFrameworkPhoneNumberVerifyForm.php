@@ -73,4 +73,25 @@ class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkWebTestBase {
     $this->assertTrue($verification->getStatus(), 'Phone number is verified.');
   }
 
+  /**
+   * Test phone number verification form.
+   */
+  public function testVerifyFormFlood() {
+    // Reduce number of POST requests. Number isn't important.
+    \Drupal::configFactory()->getEditable('sms.settings')
+      ->set('flood.verify_limit', 1)
+      ->save();
+
+    $account = $this->drupalCreateUser([
+      'sms verify phone number',
+    ]);
+    $this->drupalLogin($account);
+
+    $edit['code'] = $this->randomMachineName();
+    $this->drupalPostForm(Url::fromRoute('sms.phone.verify'), $edit, t('Verify code'));
+    $this->assertNoText(t('There has been too many failed verification attempts. Try again later.'));
+    $this->drupalPostForm(Url::fromRoute('sms.phone.verify'), $edit, t('Verify code'));
+    $this->assertText(t('There has been too many failed verification attempts. Try again later.'));
+  }
+
 }
