@@ -49,7 +49,7 @@ interface PhoneNumberProviderInterface {
   public function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message);
 
   /**
-   * Get phone number settings for a bundle.
+   * Get read only phone number settings config object for a bundle.
    *
    * @param $entity_type_id
    *   The entity type ID of the bundle.
@@ -81,8 +81,8 @@ interface PhoneNumberProviderInterface {
    * @param string $code
    *   A string to check is a verification code.
    *
-   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|NULL
-   *   A phone number verification entity, or NULL if $code is not a valid
+   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|FALSE
+   *   A phone number verification entity, or FALSE if $code is not a valid
    *   verification code.
    */
   public function getPhoneVerificationByCode($code);
