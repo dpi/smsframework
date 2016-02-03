@@ -16,22 +16,26 @@ use Drupal\sms\Message\SmsMessageInterface;
 function sms_token_info() {
   $info['types']['sms'] = array(
     'name' => t('SMS'),
-    'needs-data' => 'sms',
-    'description' => t("SMS"),
-  );
-  $info['tokens']['sms']['phone_number'] = array(
-    'name' => t('Number'),
-    'description' => t("SMS Phone Number."),
-  );
-  $info['tokens']['sms']['message'] = array(
-    'name' => t('Message'),
-    'description' => t("SMS Message."),
+    'description' => t("SMS Framework tokens."),
   );
   $info['tokens']['sms']['verification-url'] = [
     'name' => t("Verification URL"),
     'description' => t("The URL of the site verification page."),
   ];
-  $info['tokens']['sms']['verification-code'] = [
+  $info['types']['sms-message'] = array(
+    'name' => t('SMS Message'),
+    'needs-data' => 'sms-message',
+    'description' => t("Tokens for an SMS Message."),
+  );
+  $info['tokens']['sms-message']['phone-number'] = array(
+    'name' => t('Phone number'),
+    'description' => t("Recipient phone number"),
+  );
+  $info['tokens']['sms-message']['message'] = array(
+    'name' => t('Message'),
+    'description' => t("Contents of the SMS message."),
+  );
+  $info['tokens']['sms-message']['verification-code'] = [
     'name' => t("Verification Code"),
     'description' => t("A verification code for a phone number."),
   ];
@@ -45,14 +49,27 @@ function sms_tokens($type, $tokens, array $data, array $options, BubbleableMetad
   $replacements = [];
 
   if ($type == 'sms') {
-    if (!empty($data['sms_message']) && ($data['sms_message'] instanceof SmsMessageInterface)) {
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'verification-url':
+          $url_options = ['absolute' => TRUE];
+          $result = \Drupal::url('sms.phone.verify', [], $url_options, TRUE);
+          $replacements[$original] = $result->getGeneratedUrl();
+          break;
+      }
+    }
+  }
+
+  if ($type == 'sms-message') {
+    if (!empty($data['sms-message']) && ($data['sms-message'] instanceof SmsMessageInterface)) {
       /** @var \Drupal\sms\Message\SmsMessageInterface $sms_message */
-      $sms_message = $data['sms']['sms_message'];
+      $sms_message = $data['sms-message'];
 
       foreach ($tokens as $name => $original) {
         switch ($name) {
-          case 'phone_number':
-            $replacements[$original] = reset($sms_message->getRecipients());
+          case 'phone-number':
+            $recipients = $sms_message->getRecipients();
+            $replacements[$original] = reset($recipients) ?: '';
             break;
           case 'message':
             $replacements[$original] = $sms_message->getMessage();
@@ -63,11 +80,6 @@ function sms_tokens($type, $tokens, array $data, array $options, BubbleableMetad
 
     foreach ($tokens as $name => $original) {
       switch ($name) {
-        case 'verification-url':
-          $url_options = ['absolute' => TRUE];
-          $result = \Drupal::url('sms.phone.verify', [], $url_options, TRUE);
-          $replacements[$original] = $result->getGeneratedUrl();
-          break;
         case 'verification-code':
           if (!empty($data['sms_verification_code'])) {
             $replacements[$original] = $data['sms_verification_code'];

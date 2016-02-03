@@ -187,9 +187,19 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       ->save();
 
     if ($phone_verification) {
+      $sms_message = new SmsMessage(
+        '',
+        [$phone_number],
+        $message,
+        [],
+        0
+      );
+      $data['sms-message'] = $sms_message;
       $data['sms_verification_code'] = $phone_verification->getCode();
       $message = $this->token
         ->replace($message, $data);
+
+      // @todo replace with setMesssage().
       $sms_message = new SmsMessage(
         '',
         [$phone_number],

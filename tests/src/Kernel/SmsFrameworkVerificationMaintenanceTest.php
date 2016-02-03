@@ -26,7 +26,7 @@ class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
    *
    * @var array
    */
-  public static $modules = ['sms', 'entity_test', 'user', 'field', 'telephone', 'dynamic_entity_reference', 'sms_test_gateway'];
+  public static $modules = ['sms', 'entity_test', 'user', 'field', 'telephone', 'dynamic_entity_reference'];
 
   /**
    * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface

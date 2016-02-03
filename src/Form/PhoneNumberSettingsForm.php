@@ -181,10 +181,10 @@ class PhoneNumberSettingsForm extends EntityForm {
       '#type' => 'textarea',
       '#title' => $this->t('Verification message'),
       '#description' => $this->t('SMS message sent to verify a phone number. The message should contain the verification code and a link to the verification page.'),
-      '#default_value' => $config->isNew() ? "Your verification code is '[sms:verification-code]'.\nGo to [sms:verification-url] to verify your phone number.\n- [site:name]" : $config->getVerificationMessage(),
+      '#default_value' => $config->isNew() ? "Your verification code is '[sms-message:verification-code]'.\nGo to [sms:verification-url] to verify your phone number.\n- [site:name]" : $config->getVerificationMessage(),
     ];
 
-    $tokens = ['sms'];
+    $tokens = ['sms-message'];
     if ($this->moduleHandler->moduleExists('token')) {
       $form['message']['tokens']['list'] = [
         '#theme' => 'token_tree',
