@@ -39,7 +39,7 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
     /** @var \Drupal\Core\Datetime\DateFormatter $date_formatter */
     $date_formatter = \Drupal::service('date.formatter');
 
-    $phone_number_settings = $this->createPhoneNumberSettings();
+    $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $field_phone_number = $phone_number_settings->getFieldName('phone_number');
     $form_field_phone_number = $field_phone_number . '[0][value]';
 
@@ -91,7 +91,7 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
    * Test behavior of widget when verification code expires.
    */
   public function testPhoneNumberWidgetWithExpiredVerificationCode() {
-    $phone_number_settings = $this->createPhoneNumberSettings();
+    $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $test_entity = $this->createEntityWithPhoneNumber($phone_number_settings, ['+123123123']);
 
     // Force verification code to expire.
@@ -117,7 +117,7 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
    * Test behaviour of widget with phone number purge setting.
    */
   public function testPhoneNumberPurgedFieldValueOnExpiration() {
-    $phone_number_settings = $this->createPhoneNumberSettings();
+    $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $phone_number_settings
       ->setVerificationPhoneNumberPurge(TRUE)
       ->save();
@@ -139,7 +139,7 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
    * Test behaviour of widget with phone number purge setting.
    */
   public function testPhoneNumberNotPurgedFieldValueOnExpiration() {
-    $phone_number_settings = $this->createPhoneNumberSettings();
+    $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $phone_number_settings
       ->setVerificationPhoneNumberPurge(FALSE)
       ->save();

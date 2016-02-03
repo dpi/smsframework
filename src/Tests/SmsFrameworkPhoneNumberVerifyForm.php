@@ -47,7 +47,7 @@ class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkWebTestBase {
     $this->drupalLogin($account);
 
     $this->createEntityWithPhoneNumber(
-      $this->createPhoneNumberSettings(),
+      $this->createPhoneNumberSettings('entity_test', 'entity_test'),
       ['+123123123']
     );
 

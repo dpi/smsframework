@@ -63,13 +63,13 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
    * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface
    *   A phone number settings entity.
    */
-  protected function createPhoneNumberSettings() {
+  protected function createPhoneNumberSettings($entity_type_id, $bundle) {
     $entity_type_manager = \Drupal::entityTypeManager();
 
     /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */
     $field_storage = $entity_type_manager->getStorage('field_storage_config')
       ->create([
-        'entity_type' => 'entity_test',
+        'entity_type' => $entity_type_id,
         'field_name' => Unicode::strtolower($this->randomMachineName()),
         'type' => 'telephone',
       ]);
@@ -80,15 +80,15 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
 
     $entity_type_manager->getStorage('field_config')
       ->create([
-        'entity_type' => 'entity_test',
-        'bundle' => 'entity_test',
+        'entity_type' => $entity_type_id,
+        'bundle' => $bundle,
         'field_name' => $field_storage->getName(),
       ])->save();
 
     /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
     $entity_form_display = $entity_type_manager
       ->getStorage('entity_form_display')
-      ->load('entity_test.entity_test.default');
+      ->load($entity_type_id . '.' . $bundle . '.default');
     $entity_form_display
       ->setComponent($field_storage->getName(), ['type' => 'sms_telephone'])
       ->save();
@@ -100,8 +100,8 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
 
     $phone_number_settings
       ->setFieldName('phone_number', $field_storage->getName())
-      ->setPhoneNumberEntityTypeId('entity_test')
-      ->setPhoneNumberBundle('entity_test')
+      ->setPhoneNumberEntityTypeId($entity_type_id)
+      ->setPhoneNumberBundle($bundle)
       ->setVerificationLifetime(3601)
       ->setVerificationMessage('Verification code is [sms:verification-code]')
       ->setVerificationPhoneNumberPurge(TRUE)

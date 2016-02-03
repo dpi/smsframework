@@ -8,7 +8,9 @@
 namespace Drupal\sms\Tests;
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\FieldStorageConfigInterface;
+use Drupal\sms\Entity\PhoneNumberVerification;
 
 /**
  * Tests phone number administration user interface.
@@ -51,6 +53,45 @@ class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkWebTestBase {
     $this->drupalGet('admin/config/smsframework/phone_number');
     $this->assertRaw(t('No phone number settings found.'));
     $this->assertLinkByHref('admin/config/smsframework/phone_number/add');
+
+    // Ensure statistics are appearing on list.
+    $this->createPhoneNumberSettings('entity_test', 'entity_test');
+    $entity = EntityTest::create();
+    $quantity = [6, 2, 4];
+
+    /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $verification */
+    // Expired.
+    for ($j = 0; $j < $quantity[0]; $j++) {
+      $verification = PhoneNumberVerification::create();
+      $verification
+        ->setStatus(FALSE)
+        ->set('created', 0)
+        ->setEntity($entity)
+        ->save();
+    }
+    // Verified.
+    for ($j = 0; $j < $quantity[1]; $j++) {
+      $verification = PhoneNumberVerification::create();
+      $verification
+        ->setStatus(TRUE)
+        ->setEntity($entity)
+        ->save();
+    }
+    // Unverified.
+    for ($j = 0; $j < $quantity[2]; $j++) {
+      $verification = PhoneNumberVerification::create();
+      $verification
+        ->setStatus(FALSE)
+        ->setEntity($entity)
+        ->save();
+    }
+
+    $this->drupalGet('admin/config/smsframework/phone_number');
+    $this->assertRaw('<td>entity_test</td>
+                      <td>' . $quantity[0] . '</td>
+                      <td>' . $quantity[1] . '</td>
+                      <td>' . ($quantity[0] + $quantity[2]) . '</td>
+                      <td>' . array_sum($quantity) . '</td>');
   }
 
   /**

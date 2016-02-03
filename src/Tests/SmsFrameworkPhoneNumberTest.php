@@ -25,7 +25,7 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
    * @see _sms_entity_postsave().
    */
   public function testPhoneNumberVerificationCreated() {
-    $phone_number_settings = $this->createPhoneNumberSettings();
+    $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
 
     $phone_numbers = ['+123123123', '+456456456', '+789789789'];
     for ($quantity = 1; $quantity < 3; $quantity++) {
@@ -48,7 +48,7 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
     $this->defaultSmsProvider->setDefaultGateway($this->testGateway);
 
     $phone_numbers = ['+123123123'];
-    $phone_number_settings = $this->createPhoneNumberSettings();
+    $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $this->createEntityWithPhoneNumber($phone_number_settings, $phone_numbers);
 
     $sms_message = $this->getLastTestMessage();
@@ -70,7 +70,7 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
    * @see sms_entity_delete().
    */
   public function testPhoneNumberVerificationDeleted() {
-    $phone_number_settings = $this->createPhoneNumberSettings();
+    $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
 
     $entities = [];
     for ($i = 0; $i < 3; $i++) {
