@@ -20,8 +20,9 @@ interface PhoneNumberProviderInterface {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   An entity to get phone numbers.
-   * @param bool $verified
-   *   Whether the returned phone numbers must be verified.
+   * @param bool|NULL $verified
+   *   Whether the returned phone numbers must be verified, or NULL to get all
+   *   phone numbers regardless of status.
    *
    * @return string[int]
    *   An array of phone numbers, keyed by original field item index.
@@ -29,7 +30,7 @@ interface PhoneNumberProviderInterface {
    * @throws \Drupal\sms\Exception\PhoneNumberSettingsException
    *   Thrown if entity is not configured for phone numbers.
    */
-  public function getPhoneNumbers(EntityInterface $entity, $verified);
+  public function getPhoneNumbers(EntityInterface $entity, $verified = TRUE);
 
   /**
    * Send an SMS to an entity.

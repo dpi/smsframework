@@ -60,6 +60,8 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
    *   The entity type manager.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
+   * @param \Drupal\Core\Utility\Token $token
+   *   The token replacement system.
    * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
    *   The SMS provider.
    */
@@ -87,10 +89,10 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       }
     }
 
-    if ($verified) {
-      return array_filter($phone_numbers, function($phone_number) use(&$entity) {
+    if (isset($verified)) {
+      return array_filter($phone_numbers, function($phone_number) use(&$entity, $verified) {
         $verification = $this->getPhoneVerificationByEntity($entity, $phone_number);
-        return $verification && $verification->getStatus();
+        return $verification && ($verification->getStatus() == $verified);
       });
     }
 
@@ -133,7 +135,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   public function getPhoneNumberSettingsForEntity(EntityInterface $entity) {
     $config = $this->getPhoneNumberSettings($entity->getEntityTypeId(), $entity->bundle());
 
-    if (!$config->get()) {
+    if (!$config || !$config->get()) {
       throw new PhoneNumberSettingsException(sprintf('Entity phone number config does not exist for bundle %s:%s', $entity->getEntityTypeId(), $entity->bundle()));
     }
 
