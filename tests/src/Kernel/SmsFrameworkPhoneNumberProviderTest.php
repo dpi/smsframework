@@ -39,13 +39,6 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
   protected $phoneNumberSettings;
 
   /**
-   * Storage for Phone Number Verification entities.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $phoneNumberVerificationStorage;
-
-  /**
    * Modules to enable.
    *
    * @var array
@@ -65,8 +58,6 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $sms_provider->setDefaultGateway($this->createMemoryGateway());
 
     $this->phoneNumberProvider = $this->container->get('sms.phone_number');
-    $this->phoneNumberVerificationStorage = $this->container->get('entity_type.manager')
-      ->getStorage('sms_phone_number_verification');
 
     $this->phoneField = FieldStorageConfig::create([
       'entity_type' => 'entity_test',

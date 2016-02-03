@@ -110,7 +110,8 @@ trait SmsFrameworkTestTrait {
   /**
    * Get last verification code created.
    *
-   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|NULL
+   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|FALSE
+   *   The last verification code created, or FALSE if no verifications exist.
    */
   protected function getVerificationCodeLast() {
     $verification_storage = \Drupal::entityTypeManager()
