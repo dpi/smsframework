@@ -160,8 +160,9 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
     // Update bundle field with bundle of entity.
-    if ($this->getEntity() instanceof EntityInterface) {
-      $this->set('bundle', $this->getEntity()->bundle());
+    $entity = $this->getEntity();
+    if ($entity instanceof EntityInterface) {
+      $this->set('bundle', $entity->bundle());
     }
   }
 

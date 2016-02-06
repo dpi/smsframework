@@ -17,6 +17,7 @@ use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\Component\Utility\Random;
 use Drupal\sms\Exception\NoPhoneNumberException;
+use Drupal\Core\Entity\EntityStorageException;
 
 /**
  * Phone number provider.
@@ -214,6 +215,48 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
     }
 
     return $phone_verification;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function purgeExpiredVerifications() {
+    $current_time = \Drupal::request()->server->get('REQUEST_TIME');
+
+    $verification_ids = [];
+    foreach ($this->configFactory->listAll('sms.phone.') as $config_id) {
+      $config = $this->configFactory->get($config_id);
+      $lifetime = $config->get('duration_verification_code_expire');
+      if (!empty($lifetime)) {
+        $verification_ids += $this->phoneNumberVerificationStorage->getQuery()
+          ->condition('entity__target_type', $config->get('entity_type'))
+          ->condition('bundle', $config->get('bundle'))
+          ->condition('status', 0)
+          ->condition('created', ($current_time - $lifetime), '<')
+          ->execute();
+      }
+    }
+
+    /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $phone_number_verification */
+    foreach ($this->phoneNumberVerificationStorage->loadMultiple($verification_ids) as $phone_number_verification) {
+      if ($entity = $phone_number_verification->getEntity()) {
+        try {
+          $config = $this->getPhoneNumberSettingsForEntity($entity);
+          $purge = $config->get('verification_phone_number_purge');
+          $field_name = $config->get('fields.phone_number');
+          if (!empty($purge) && isset($entity->{$field_name})) {
+            $entity->{$field_name}->filter(function ($item) use ($phone_number_verification) {
+              return $item->value != $phone_number_verification->getPhoneNumber();
+            });
+            $entity->save();
+          }
+        }
+        catch (EntityStorageException $e) {
+          // Failed to save entity.
+        }
+      }
+      $this->phoneNumberVerificationStorage->delete([$phone_number_verification]);
+    }
   }
 
 }

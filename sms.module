@@ -6,13 +6,10 @@
  * sending and receiving SMS messages.
  */
 
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\sms\Gateway\GatewayInterface;
 use Drupal\sms\Message\SmsMessage;
-use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Exception\SmsException;
 use Drupal\Core\Entity\EntityInterface;
@@ -29,59 +26,7 @@ define('SMS_DIR_ALL',   4);
 function sms_cron() {
   /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
   $phone_number_provider = \Drupal::service('sms.phone_number');
-  $config_factory = \Drupal::configFactory();
-  $verification_storage = \Drupal::entityTypeManager()
-    ->getStorage('sms_phone_number_verification');
-  $current_time = \Drupal::request()->server->get('REQUEST_TIME');
-
-  $verification_ids = [];
-  foreach ($config_factory->listAll('sms.phone.') as $config_id) {
-    $config = $config_factory->get($config_id);
-    $lifetime = $config->get('duration_verification_code_expire');
-    if (!empty($lifetime)) {
-      $verification_ids += $verification_storage->getQuery()
-        ->condition('entity__target_type', $config->get('entity_type'))
-        ->condition('bundle', $config->get('bundle'))
-        ->condition('status', 0)
-        ->condition('created', ($current_time - $lifetime), '<')
-        ->execute();
-    }
-  }
-
-  /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $phone_number_verification */
-  foreach ($verification_storage->loadMultiple($verification_ids) as $phone_number_verification) {
-    if ($entity = $phone_number_verification->getEntity()) {
-      try {
-        $config = $phone_number_provider->getPhoneNumberSettingsForEntity($entity);
-        $purge = $config->get('verification_phone_number_purge');
-        $field_name = $config->get('fields.phone_number');
-        if (!empty($purge) && isset($entity->{$field_name})) {
-          $entity->{$field_name}->filter(function ($item) use ($phone_number_verification) {
-            return $item->value != $phone_number_verification->getPhoneNumber();
-          });
-          $entity->save();
-        }
-      }
-      catch (EntityStorageException $e) {
-        // Failed to save entity.
-      }
-    }
-    $verification_storage->delete([$phone_number_verification]);
-  }
-}
-
-/**
- * Implements hook_cron_queue_info().
- *
- * @deprecated
- *   Drupal 8 does not call this hook.
- */
-function sms_cron_queue_info() {
-  return array(
-    'sms_incoming' => array(
-      'worker callback' => 'sms_incoming_queue_worker',
-    ),
-  );
+  $phone_number_provider->purgeExpiredVerifications();
 }
 
 /**
@@ -100,6 +45,8 @@ function sms_entity_update(EntityInterface $entity) {
 
 /**
  * Implements hook_entity_delete().
+ *
+ * Deletes verifications for an entity if it is deleted.
  */
 function sms_entity_delete(EntityInterface $entity) {
   $verification_storage = \Drupal::entityTypeManager()
@@ -113,6 +60,10 @@ function sms_entity_delete(EntityInterface $entity) {
 
 /**
  * Respond to saving entities after they have been written to storage.
+ *
+ * Detects if phone numbers are modified to an entity. If new phone numbers are
+ * detected, new phone number verifications are created. If phone numbers are
+ * removed, the associated phone number verification is deleted.
  *
  * @see sms_entity_insert().
  * @see sms_entity_update().

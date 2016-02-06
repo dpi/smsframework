@@ -16,7 +16,7 @@ use Drupal\sms\Message\SmsMessageInterface;
 interface PhoneNumberProviderInterface {
 
   /**
-   * Get phone numbers for an entity.
+   * Gets phone numbers for an entity.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   An entity to get phone numbers.
@@ -33,7 +33,7 @@ interface PhoneNumberProviderInterface {
   public function getPhoneNumbers(EntityInterface $entity, $verified = TRUE);
 
   /**
-   * Send an SMS to an entity.
+   * Sends an SMS to an entity.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to send an SMS.
@@ -49,7 +49,7 @@ interface PhoneNumberProviderInterface {
   public function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message);
 
   /**
-   * Get read only phone number settings config object for a bundle.
+   * Gets read only phone number settings config object for a bundle.
    *
    * @param $entity_type_id
    *   The entity type ID of the bundle.
@@ -62,7 +62,7 @@ interface PhoneNumberProviderInterface {
   public function getPhoneNumberSettings($entity_type_id, $bundle);
 
   /**
-   * Get phone number settings for the bundle of an entity.
+   * Gets phone number settings for the bundle of an entity.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to get settings.
@@ -88,7 +88,7 @@ interface PhoneNumberProviderInterface {
   public function getPhoneVerificationByCode($code);
 
   /**
-   * Get a phone number verification for an entity and phone number pair.
+   * Gets a phone number verification for an entity and phone number pair.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   An entity to get phone number verification.
@@ -114,5 +114,13 @@ interface PhoneNumberProviderInterface {
    *   A phone number verification.
    */
   public function newPhoneVerification(EntityInterface $entity, $phone_number);
+
+  /**
+   * Cleans up expired phone number verifications
+   *
+   * Removes phone numbers from entities if setting is verification expires, and
+   * setting is enabled.
+   */
+  public function purgeExpiredVerifications();
 
 }

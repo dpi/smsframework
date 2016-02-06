@@ -18,7 +18,8 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
   /**
    * Get the entity for the phone number verification.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return \Drupal\Core\Entity\EntityInterface|NULL
+   *   The entity for the phone number verification, or NULL if it is missing.
    */
   public function getEntity();
 
