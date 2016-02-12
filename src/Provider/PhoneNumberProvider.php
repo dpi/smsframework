@@ -208,7 +208,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
         [],
         0
       );
-      $sms_message->setIsAutomated(FALSE);
+      $sms_message->setAutomated(FALSE);
 
       $this->smsProvider
         ->send($sms_message, []);
@@ -226,7 +226,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
     $verification_ids = [];
     foreach ($this->configFactory->listAll('sms.phone.') as $config_id) {
       $config = $this->configFactory->get($config_id);
-      $lifetime = $config->get('duration_verification_code_expire');
+      $lifetime = $config->get('verification_code_lifetime');
       if (!empty($lifetime)) {
         $verification_ids += $this->phoneNumberVerificationStorage->getQuery()
           ->condition('entity__target_type', $config->get('entity_type'))

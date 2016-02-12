@@ -12,7 +12,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
 
   /**
-   * Get phone number settings entity type.
+   * Gets the phone number settings entity type.
    *
    * @return string
    *   Entity type ID of phone number settings.
@@ -20,7 +20,7 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
   public function getPhoneNumberEntityTypeId();
 
   /**
-   * Set phone number settings entity type.
+   * Sets the phone number settings entity type.
    *
    * @param string $entity_type_id
    *   Entity type ID of phone number settings.
@@ -31,7 +31,7 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
   public function setPhoneNumberEntityTypeId($entity_type_id);
 
   /**
-   * Get phone number settings bundle.
+   * Gets the phone number settings bundle.
    *
    * @return string
    *   Bundle of phone number settings.
@@ -39,7 +39,7 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
   public function getPhoneNumberBundle();
 
   /**
-   * Set phone number settings bundle.
+   * Sets the phone number settings bundle.
    *
    * @param string $bundle
    *   Bundle of phone number settings.
@@ -50,7 +50,7 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
   public function setPhoneNumberBundle($bundle);
 
   /**
-   * Get message template to send for phone number verification.
+   * Gets the message template to send for phone number verification.
    *
    * @return string
    *   Message template to send for phone number verification.
@@ -58,7 +58,7 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
   public function getVerificationMessage();
 
   /**
-   * Set message template to send for phone number verification.
+   * Sets the message template to send for phone number verification.
    *
    * @param string $message
    *   Message template to send for phone number verification.
@@ -69,15 +69,15 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
   public function setVerificationMessage($message);
 
   /**
-   * Get number of seconds before phone number verifications expire.
+   * Gets the number of seconds before phone number verifications expire.
    *
    * @return int
    *   Number of seconds before phone number verifications expire.
    */
-  public function getVerificationLifetime();
+  public function getVerificationCodeLifetime();
 
   /**
-   * Set number of seconds before phone number verifications expire.
+   * Sets the number of seconds before phone number verifications expire.
    *
    * @param int $lifetime
    *   Number of seconds before phone number verifications expire.
@@ -85,33 +85,33 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
    * @return $this
    *   Return phone number settings for chaining.
    */
-  public function setVerificationLifetime($lifetime);
+  public function setVerificationCodeLifetime($lifetime);
 
   /**
-   * Determine if phone number field values are removed when phone number
+   * Determines if phone number field values are removed when phone number
    * verifications expire.
    *
    * @return bool
    *   Whether to remove phone number field values
    */
-  public function isVerificationPhoneNumberPurge();
+  public function canPurgeVerificationPhoneNumber();
 
   /**
-   * Set if phone number field values are removed when phone number
+   * Sets if phone number field values are removed when phone number
    * verifications expire.
    *
-   * @param $purge
+   * @param bool $purge
    *   Whether to remove phone number field values
    *
    * @return $this
    *   Return phone number settings for chaining.
    */
-  public function setVerificationPhoneNumberPurge($purge);
+  public function setPurgeVerificationPhoneNumber($purge);
 
   /**
-   * Get a field mapping.
+   * Gets a field mapping.
    *
-   * @param $map
+   * @param string $map
    *   ID to map field name, as found in sms.phone.*.*.fields.$map.
    *
    * @return string|NULL
@@ -120,7 +120,7 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
   public function getFieldName($map);
 
   /**
-   * Get a field mapping.
+   * Gets a field mapping.
    *
    * @param string $map
    *   ID to map field name, as found in sms.phone.*.*.fields.$map.

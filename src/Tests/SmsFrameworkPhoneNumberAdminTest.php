@@ -132,7 +132,7 @@ class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkWebTestBase {
     ];
     $this->drupalPostForm('admin/config/smsframework/phone_number/entity_test.entity_test', $edit, t('Save'));
     //
-    $this->assertEqual(7777, $this->config('sms.phone.entity_test.entity_test')->get('duration_verification_code_expire'));
+    $this->assertEqual(7777, $this->config('sms.phone.entity_test.entity_test')->get('verification_code_lifetime'));
 
     // Delete new phone number settings.
     $this->drupalGet('admin/config/smsframework/phone_number/entity_test.entity_test/delete');

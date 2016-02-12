@@ -53,7 +53,7 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
   /**
    * {@inheritdoc}
    */
-  public function setEntity($entity) {
+  public function setEntity(EntityInterface $entity) {
     $this->set('entity', $entity);
     return $this;
   }

@@ -51,7 +51,7 @@ class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkWebTestBase {
       ['+123123123']
     );
 
-    $verification = $this->getVerificationCodeLast();
+    $verification = $this->getLastVerification();
     $code = $verification->getCode();
 
     $this->assertFalse($verification->getStatus(), 'Phone number verification is not verified.');
@@ -69,7 +69,7 @@ class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkWebTestBase {
 
     // Reset verification code static cache.
     $this->resetAll();
-    $verification = $this->getVerificationCodeLast();
+    $verification = $this->getLastVerification();
     $this->assertTrue($verification->getStatus(), 'Phone number is verified.');
   }
 

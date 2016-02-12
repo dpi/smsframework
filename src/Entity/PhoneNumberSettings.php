@@ -56,7 +56,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    *
    * @var string
    */
-  protected $entity_type;
+  protected $entityType;
 
   /**
    * Bundle of phone number settings.
@@ -70,14 +70,14 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    *
    * @var string
    */
-  protected $verification_message = '';
+  protected $verificationMessage = '';
 
   /**
    * Number of seconds before phone number verifications expire.
    *
    * @var int
    */
-  protected $duration_verification_code_expire = 0;
+  protected $verificationCodeLifetime = 0;
 
   /**
    * Whether to remove phone number field values when phone number
@@ -85,7 +85,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    *
    * @var bool
    */
-  protected $verification_phone_number_purge = TRUE;
+  protected $purgeVerificationPhoneNumber = TRUE;
 
   /**
    * Field name mapping.
@@ -100,21 +100,21 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    * {@inheritdoc}
    */
   public function id() {
-    return $this->entity_type . '.' . $this->bundle;
+    return $this->entityType . '.' . $this->bundle;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getPhoneNumberEntityTypeId() {
-    return $this->entity_type;
+    return $this->entityType;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setPhoneNumberEntityTypeId($entity_type_id) {
-    $this->entity_type = $entity_type_id;
+    $this->entityType = $entity_type_id;
     return $this;
   }
 
@@ -137,44 +137,44 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    * {@inheritdoc}
    */
   public function getVerificationMessage() {
-    return $this->verification_message;
+    return $this->verificationMessage;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setVerificationMessage($message) {
-    $this->verification_message = $message;
+    $this->verificationMessage = $message;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getVerificationLifetime() {
-    return $this->duration_verification_code_expire;
+  public function getVerificationCodeLifetime() {
+    return $this->verificationCodeLifetime;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setVerificationLifetime($lifetime) {
-    $this->duration_verification_code_expire = $lifetime;
+  public function setVerificationCodeLifetime($lifetime) {
+    $this->verificationCodeLifetime = $lifetime;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isVerificationPhoneNumberPurge() {
-    return $this->verification_phone_number_purge;
+  public function canPurgeVerificationPhoneNumber() {
+    return $this->purgeVerificationPhoneNumber;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setVerificationPhoneNumberPurge($purge) {
-    $this->verification_phone_number_purge = $purge;
+  public function setPurgeVerificationPhoneNumber($purge) {
+    $this->purgeVerificationPhoneNumber = $purge;
     return $this;
   }
 

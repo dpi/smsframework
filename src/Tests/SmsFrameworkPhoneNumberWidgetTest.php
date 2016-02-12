@@ -60,10 +60,10 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
     ];
     $this->drupalPostForm($test_entity->toUrl('edit-form'), $edit, t('Save'));
 
-    $phone_verification = $this->getVerificationCodeLast();
+    $phone_verification = $this->getLastVerification();
 
     // Recalculate time.
-    $lifetime = $phone_number_settings->getVerificationLifetime();
+    $lifetime = $phone_number_settings->getVerificationCodeLifetime();
     $expiration_date = $phone_verification->getCreatedTime() + $lifetime;
     $t_args['@time'] = $date_formatter->formatTimeDiffUntil($expiration_date, [
       'granularity' => 2,
@@ -95,9 +95,9 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
     $test_entity = $this->createEntityWithPhoneNumber($phone_number_settings, ['+123123123']);
 
     // Force verification code to expire.
-    $phone_verification = $this->getVerificationCodeLast();
+    $phone_verification = $this->getLastVerification();
     $phone_verification
-      ->set('created', time() - ($phone_number_settings->getVerificationLifetime() + 1))
+      ->set('created', time() - ($phone_number_settings->getVerificationCodeLifetime() + 1))
       ->save();
 
     $this->drupalGet($test_entity->toUrl('edit-form'));
@@ -119,13 +119,13 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
   public function testPhoneNumberPurgedFieldValueOnExpiration() {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $phone_number_settings
-      ->setVerificationPhoneNumberPurge(TRUE)
+      ->setPurgeVerificationPhoneNumber(TRUE)
       ->save();
     $test_entity = $this->createEntityWithPhoneNumber($phone_number_settings, ['+123123123']);
 
     // Force verification code to expire.
-    $this->getVerificationCodeLast()
-      ->set('created', time() - ($phone_number_settings->getVerificationLifetime() + 1))
+    $this->getLastVerification()
+      ->set('created', time() - ($phone_number_settings->getVerificationCodeLifetime() + 1))
       ->save();
     $this->cronRun();
 
@@ -141,13 +141,13 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
   public function testPhoneNumberNotPurgedFieldValueOnExpiration() {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $phone_number_settings
-      ->setVerificationPhoneNumberPurge(FALSE)
+      ->setPurgeVerificationPhoneNumber(FALSE)
       ->save();
     $test_entity = $this->createEntityWithPhoneNumber($phone_number_settings, ['+123123123']);
 
     // Force verification code to expire.
-    $this->getVerificationCodeLast()
-      ->set('created', time() - ($phone_number_settings->getVerificationLifetime() + 1))
+    $this->getLastVerification()
+      ->set('created', time() - ($phone_number_settings->getVerificationCodeLifetime() + 1))
       ->save();
     $this->cronRun();
 

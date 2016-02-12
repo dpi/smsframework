@@ -60,7 +60,7 @@ sms.phone.*.*:
       type: boolean
     verification_message:
       type: string
-    duration_verification_code_expire:
+    verification_code_lifetime:
       type: integer
       label: 'Time in seconds, before verification codes expire.'
     verification_phone_number_purge:
