@@ -11,6 +11,13 @@ sms.settings:
   parent: sms.admin
   weight: -11
 
+sms.phone_number_settings.list:
+  title: 'Phone Numbers'
+  description: 'Configure phone numbers for entities.'
+  route_name: sms.phone_number_settings.list
+  parent: sms.admin
+  weight: -10
+
 sms.gateway.list:
   title: 'Gateways'
   description: 'Add, edit, delete and configure SMS gateway instances.'
