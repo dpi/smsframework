@@ -10,13 +10,17 @@ namespace Drupal\sms\Tests;
 use Drupal\simpletest\WebTestBase;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\sms\Entity\PhoneNumberSettingsInterface;
 
 /**
  * Provides commonly used functionality for tests.
  */
 abstract class SmsFrameworkWebTestBase extends WebTestBase {
 
-  public static $modules = ['sms', 'sms_test_gateway'];
+  use SmsFrameworkTestTrait;
+
+  public static $modules = ['sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference'];
 
   /**
    * The gateway manager.
@@ -42,46 +46,68 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
     $this->gatewayManager = $this->container->get('plugin.manager.sms_gateway');
     $this->defaultSmsProvider = $this->container->get('sms_provider.default');
 
     // Add an instance of test gateway.
-    $this->testGateway = SmsGateway::create([
-      'plugin' => 'memory',
-      'id' => Unicode::strtolower($this->randomMachineName(16)),
-      'label' => $this->randomString(),
-    ]);
-    $this->testGateway->enable();
-    $this->testGateway->save();
+    $this->testGateway = $this->createMemoryGateway();
   }
 
   /**
-   * Get all SMS messages sent to 'Memory' gateway.
+   * Utility to create phone number settings
    *
-   * @return \Drupal\sms\Message\SmsMessageInterface[]
-   */
-  function getTestMessages() {
-    return \Drupal::state()->get('sms_test_gateway.memory.send', []);
-  }
-
-  /**
-   * Get the last SMS message sent to 'Memory' gateway.
+   * Creates new field storage and field configs.
    *
-   * @return \Drupal\sms\Message\SmsMessageInterface|NULL
-   *   The last SMS message, or FALSE if no messages have been sent.
+   * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface
+   *   A phone number settings entity.
    */
-  public function getLastTestMessage() {
-    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
-    return end($sms_messages);
-  }
+  protected function createPhoneNumberSettings($entity_type_id, $bundle) {
+    $entity_type_manager = \Drupal::entityTypeManager();
 
-  /**
-   * Resets SMS messages stored in memory by 'Memory' gateway.
-   */
-  public function resetTestMessages() {
-    \Drupal::state()->set('sms_test_gateway.memory.send', []);
+    /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */
+    $field_storage = $entity_type_manager->getStorage('field_storage_config')
+      ->create([
+        'entity_type' => $entity_type_id,
+        'field_name' => Unicode::strtolower($this->randomMachineName()),
+        'type' => 'telephone',
+      ]);
+    $field_storage
+//      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
+      ->setCardinality(1)
+      ->save();
+
+    $entity_type_manager->getStorage('field_config')
+      ->create([
+        'entity_type' => $entity_type_id,
+        'bundle' => $bundle,
+        'field_name' => $field_storage->getName(),
+      ])->save();
+
+    /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
+    $entity_form_display = $entity_type_manager
+      ->getStorage('entity_form_display')
+      ->load($entity_type_id . '.' . $bundle . '.default');
+    $entity_form_display
+      ->setComponent($field_storage->getName(), ['type' => 'sms_telephone'])
+      ->save();
+
+    /** @var \Drupal\sms\Entity\PhoneNumberSettingsInterface $phone_number_settings */
+    $phone_number_settings = $entity_type_manager
+      ->getStorage('phone_number_settings')
+      ->create();
+
+    $phone_number_settings
+      ->setFieldName('phone_number', $field_storage->getName())
+      ->setPhoneNumberEntityTypeId($entity_type_id)
+      ->setPhoneNumberBundle($bundle)
+      ->setVerificationLifetime(3601)
+      ->setVerificationMessage('Verification code is [sms:verification-code]')
+      ->setVerificationPhoneNumberPurge(TRUE)
+      ->save();
+
+    return $phone_number_settings;
   }
 
 }

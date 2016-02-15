@@ -6,6 +6,47 @@ sms.admin:
   requirements:
     _permission: 'administer smsframework'
 
+# Phone numbers
+sms.phone.verify:
+  path: '/verify'
+  defaults:
+    _form: '\Drupal\sms\Form\VerifyPhoneNumberForm'
+    _title: 'Verify a phone number'
+  requirements:
+    _permission: 'sms verify phone number'
+
+sms.phone_number_settings.list:
+  path: '/admin/config/smsframework/phone_number'
+  defaults:
+    _entity_list: 'phone_number_settings'
+    _title: 'Phone number settings'
+  requirements:
+    _permission: 'administer smsframework'
+
+entity.phone_number_settings.add:
+  path: '/admin/config/smsframework/phone_number/add'
+  defaults:
+    _entity_form: 'phone_number_settings.add'
+    _title: 'Add phone number settings'
+  requirements:
+    _permission: 'administer smsframework'
+
+entity.phone_number_settings.edit_form:
+  path: '/admin/config/smsframework/phone_number/{phone_number_settings}'
+  defaults:
+    _entity_form: 'phone_number_settings.edit'
+    _title: 'Edit phone number settings'
+  requirements:
+    _permission: 'administer smsframework'
+
+entity.phone_number_settings.delete_form:
+  path: '/admin/config/smsframework/phone_number/{phone_number_settings}/delete'
+  defaults:
+    _entity_form: 'phone_number_settings.delete'
+    _title: 'Delete phone numebr settings'
+  requirements:
+    _permission: 'administer smsframework'
+
 # Settings
 sms.settings:
   path: '/admin/config/smsframework/settings'

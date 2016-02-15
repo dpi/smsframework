@@ -52,6 +52,13 @@ class SmsMessage implements SmsMessageInterface {
   protected $uid;
 
   /**
+   * Whether this message was generated automatically.
+   *
+   * @var bool
+   */
+  protected $is_automated = TRUE;
+
+  /**
    * Creates a new instance of an SMS message.
    *
    * @param string $sender
@@ -124,6 +131,21 @@ class SmsMessage implements SmsMessageInterface {
    */
   public function getUid() {
     return $this->uid;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setIsAutomated($is_automated) {
+    $this->is_automated = $is_automated;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getIsAutomated() {
+    return $this->is_automated;
   }
 
   /**
