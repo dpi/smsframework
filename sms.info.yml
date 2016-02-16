@@ -8,5 +8,3 @@ configure: admin/config/smsframework
 dependencies:
   - telephone
   - dynamic_entity_reference
-test_dependencies:
-  - dynamic_entity_reference
