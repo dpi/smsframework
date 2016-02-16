@@ -36,9 +36,6 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
    * Test telephone widget using entity form.
    */
   public function testPhoneNumberWidget() {
-    /** @var \Drupal\Core\Datetime\DateFormatter $date_formatter */
-    $date_formatter = \Drupal::service('date.formatter');
-
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $field_phone_number = $phone_number_settings->getFieldName('phone_number');
     $form_field_phone_number = $field_phone_number . '[0][value]';
@@ -60,21 +57,13 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
     ];
     $this->drupalPostForm($test_entity->toUrl('edit-form'), $edit, t('Save'));
 
-    $phone_verification = $this->getLastVerification();
-
-    // Recalculate time.
-    $lifetime = $phone_number_settings->getVerificationCodeLifetime();
-    $expiration_date = $phone_verification->getCreatedTime() + $lifetime;
-    $t_args['@time'] = $date_formatter->formatTimeDiffUntil($expiration_date, [
-      'granularity' => 2,
-    ]);
-
-    $this->assertRaw(t('A verification code has been sent to this phone number. Go to the <a href="@url">verification form</a> and enter the code. The code will expire if it is not verified in @time.', $t_args));
+    $this->assertRaw(t('A verification code has been sent to this phone number. Go to the <a href="@url">verification form</a> and enter the code. The code will expire if it is not verified in', $t_args));
 
     $input = $this->xpath('//input[@name="' . $form_field_phone_number . '" and @disabled="disabled"]');
     $this->assertTrue(count($input) === 1, 'The phone number text field is disabled.');
 
     // Verify the code.
+    $phone_verification = $this->getLastVerification();
     $phone_verification
       ->setStatus(TRUE)
       ->save();
