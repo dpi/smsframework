@@ -218,7 +218,7 @@ class PhoneNumberSettingsForm extends EntityForm {
       '#type' => 'checkbox',
       '#title' => $this->t('Purge phone numbers'),
       '#description' => $this->t('Remove phone number if verification code expires.'),
-      '#default_value' => $config->isNew() ?: $config->canPurgeVerificationPhoneNumber(),
+      '#default_value' => $config->isNew() ?: $config->getPurgeVerificationPhoneNumber(),
     ];
 
     return $form;

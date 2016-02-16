@@ -94,7 +94,7 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
    * @return bool
    *   Whether to remove phone number field values
    */
-  public function canPurgeVerificationPhoneNumber();
+  public function getPurgeVerificationPhoneNumber();
 
   /**
    * Sets if phone number field values are removed when phone number

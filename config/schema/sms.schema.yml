@@ -63,7 +63,7 @@ sms.phone.*.*:
     verification_code_lifetime:
       type: integer
       label: 'Time in seconds, before verification codes expire.'
-    verification_phone_number_purge:
+    purge_verification_phone_number:
       type: boolean
       label: 'Remove phone number field value if verification code expires.'
     fields:

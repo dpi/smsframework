@@ -56,7 +56,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    *
    * @var string
    */
-  protected $entityType;
+  protected $entity_type;
 
   /**
    * Bundle of phone number settings.
@@ -70,14 +70,14 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    *
    * @var string
    */
-  protected $verificationMessage = '';
+  protected $verification_message = '';
 
   /**
    * Number of seconds before phone number verifications expire.
    *
    * @var int
    */
-  protected $verificationCodeLifetime = 0;
+  protected $verification_code_lifetime = 0;
 
   /**
    * Whether to remove phone number field values when phone number
@@ -85,7 +85,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    *
    * @var bool
    */
-  protected $purgeVerificationPhoneNumber = TRUE;
+  protected $purge_verification_phone_number = TRUE;
 
   /**
    * Field name mapping.
@@ -100,21 +100,21 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    * {@inheritdoc}
    */
   public function id() {
-    return $this->entityType . '.' . $this->bundle;
+    return $this->entity_type . '.' . $this->bundle;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getPhoneNumberEntityTypeId() {
-    return $this->entityType;
+    return $this->entity_type;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setPhoneNumberEntityTypeId($entity_type_id) {
-    $this->entityType = $entity_type_id;
+    $this->entity_type = $entity_type_id;
     return $this;
   }
 
@@ -137,14 +137,14 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    * {@inheritdoc}
    */
   public function getVerificationMessage() {
-    return $this->verificationMessage;
+    return $this->verification_message;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setVerificationMessage($message) {
-    $this->verificationMessage = $message;
+    $this->verification_message = $message;
     return $this;
   }
 
@@ -152,29 +152,29 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    * {@inheritdoc}
    */
   public function getVerificationCodeLifetime() {
-    return $this->verificationCodeLifetime;
+    return $this->verification_code_lifetime;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setVerificationCodeLifetime($lifetime) {
-    $this->verificationCodeLifetime = $lifetime;
+    $this->verification_code_lifetime = $lifetime;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function canPurgeVerificationPhoneNumber() {
-    return $this->purgeVerificationPhoneNumber;
+  public function getPurgeVerificationPhoneNumber() {
+    return $this->purge_verification_phone_number;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setPurgeVerificationPhoneNumber($purge) {
-    $this->purgeVerificationPhoneNumber = $purge;
+    $this->purge_verification_phone_number = $purge;
     return $this;
   }
 

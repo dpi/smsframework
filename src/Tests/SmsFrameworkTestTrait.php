@@ -109,7 +109,7 @@ trait SmsFrameworkTestTrait {
   }
 
   /**
-   * Get last phone number verification that was created.
+   * Gets the last phone number verification that was created.
    *
    * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|FALSE
    *   The last verification created, or FALSE if no verifications exist.
