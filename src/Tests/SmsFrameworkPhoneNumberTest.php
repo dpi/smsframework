@@ -55,7 +55,7 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
     $this->assertTrue($sms_message instanceof SmsMessageInterface, 'SMS verification message sent.');
     $this->assertEqual($sms_message->getRecipients(), $phone_numbers, 'Sent to correct phone number.');
 
-    $phone_verification = $this->getVerificationCodeLast();
+    $phone_verification = $this->getLastVerification();
     $data['sms_verification_code'] = $phone_verification->getCode();
     $message = \Drupal::token()->replace(
       $phone_number_settings->getVerificationMessage(),

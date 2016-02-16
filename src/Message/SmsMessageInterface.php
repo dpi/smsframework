@@ -119,14 +119,14 @@ interface SmsMessageInterface {
   /**
    * Sets whether this SMS message was generated automatically.
    *
-   * @param bool $is_automated
+   * @param bool $automated
    *   Whether this SMS message was generated automatically. Set to FALSE if the
    *   message is created due to direct action.
    *
    * @return \Drupal\sms\Message\SmsMessageInterface
    *   Return called object for chaining.
    */
-  public function setIsAutomated($is_automated);
+  public function setAutomated($automated);
 
   /**
    * Gets whether this SMS message was generated automatically.
@@ -134,6 +134,6 @@ interface SmsMessageInterface {
    * @return bool
    *   Whether this SMS message was generated automatically.
    */
-  public function getIsAutomated();
+  public function isAutomated();
 
 }

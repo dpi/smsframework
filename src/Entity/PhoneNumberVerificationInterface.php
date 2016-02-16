@@ -4,6 +4,7 @@
 namespace Drupal\sms\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityInterface;
 
 interface PhoneNumberVerificationInterface extends ContentEntityInterface {
 
@@ -16,7 +17,7 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
   public function getCreatedTime();
 
   /**
-   * Get the entity for the phone number verification.
+   * Gets the entity for the phone number verification.
    *
    * @return \Drupal\Core\Entity\EntityInterface|NULL
    *   The entity for the phone number verification, or NULL if it is missing.
@@ -24,18 +25,18 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
   public function getEntity();
 
   /**
-   * Set the entity for the phone number verification.
+   * Sets the entity for the phone number verification.
    *
-   * @param $entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity for the phone number verification.
    *
    * @return $this
    *   Return phone number verification for chaining.
    */
-  public function setEntity($entity);
+  public function setEntity(EntityInterface $entity);
 
   /**
-   * Get the phone number for the phone number verification.
+   * Gets the phone number for the phone number verification.
    *
    * @return string
    *   The phone number for the phone number verification.
@@ -43,7 +44,7 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
   public function getPhoneNumber();
 
   /**
-   * Set the phone number for the phone number verification.
+   * Sets the phone number for the phone number verification.
    *
    * @param string $phone_number
    *   The phone number for the phone number verification.
@@ -54,18 +55,18 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
   public function setPhoneNumber($phone_number);
 
   /**
-   * Get the verification code for the phone number verification.
+   * Gets the code for the phone number verification.
    *
    * @return string
-   *   The verification code for the phone number verification.
+   *   The code for the phone number verification.
    */
   public function getCode();
 
   /**
-   * Set the verification code for the phone number verification.
+   * Sets the code for the phone number verification.
    *
-   * @param string
-   *   Set the verification code for the phone number verification.
+   * @param string $code
+   *   The code for the phone number verification.
    *
    * @return $this
    *   Return phone number verification for chaining.
@@ -73,7 +74,7 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
   public function setCode($code);
 
   /**
-   * Get the status for the phone number verification.
+   * Gets the status for the phone number verification.
    *
    * Default value is FALSE (not verified).
    *
@@ -83,9 +84,9 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
   public function getStatus();
 
   /**
-   * Set the status for the phone number verification.
+   * Sets the status for the phone number verification.
    *
-   * @param bool
+   * @param bool $status
    *   Whether the phone number is verified.
    *
    * @return $this

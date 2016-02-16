@@ -102,9 +102,9 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
       ->setFieldName('phone_number', $field_storage->getName())
       ->setPhoneNumberEntityTypeId($entity_type_id)
       ->setPhoneNumberBundle($bundle)
-      ->setVerificationLifetime(3601)
+      ->setVerificationCodeLifetime(3601)
       ->setVerificationMessage('Verification code is [sms:verification-code]')
-      ->setVerificationPhoneNumberPurge(TRUE)
+      ->setPurgeVerificationPhoneNumber(TRUE)
       ->save();
 
     return $phone_number_settings;

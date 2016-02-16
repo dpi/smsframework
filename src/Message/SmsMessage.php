@@ -56,7 +56,7 @@ class SmsMessage implements SmsMessageInterface {
    *
    * @var bool
    */
-  protected $is_automated = TRUE;
+  protected $automated = TRUE;
 
   /**
    * Creates a new instance of an SMS message.
@@ -136,16 +136,16 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function setIsAutomated($is_automated) {
-    $this->is_automated = $is_automated;
+  public function setAutomated($automated) {
+    $this->automated = $automated;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getIsAutomated() {
-    return $this->is_automated;
+  public function isAutomated() {
+    return $this->automated;
   }
 
   /**

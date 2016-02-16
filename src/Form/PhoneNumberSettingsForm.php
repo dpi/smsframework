@@ -211,14 +211,14 @@ class PhoneNumberSettingsForm extends EntityForm {
       '#field_suffix' => $this->t('seconds'),
       '#required' => TRUE,
       '#min' => 60,
-      '#default_value' => $config->isNew() ? 3600 : $config->getVerificationLifetime(),
+      '#default_value' => $config->isNew() ? 3600 : $config->getVerificationCodeLifetime(),
     ];
 
     $form['expiration']['phone_number_purge'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Purge phone numbers'),
       '#description' => $this->t('Remove phone number if verification code expires.'),
-      '#default_value' => $config->isNew() ?: $config->isVerificationPhoneNumberPurge(),
+      '#default_value' => $config->isNew() ?: $config->getPurgeVerificationPhoneNumber(),
     ];
 
     return $form;
@@ -244,8 +244,8 @@ class PhoneNumberSettingsForm extends EntityForm {
 
     $config
       ->setVerificationMessage($form_state->getValue('verification_message'))
-      ->setVerificationLifetime($form_state->getValue('code_lifetime'))
-      ->setVerificationPhoneNumberPurge((bool) $form_state->getValue('phone_number_purge'));
+      ->setVerificationCodeLifetime($form_state->getValue('code_lifetime'))
+      ->setPurgeVerificationPhoneNumber((bool) $form_state->getValue('phone_number_purge'));
 
     foreach ($form_state->getValue('field_mapping') as $config_key => $field_name) {
       if ($field_name == self::createNewField) {

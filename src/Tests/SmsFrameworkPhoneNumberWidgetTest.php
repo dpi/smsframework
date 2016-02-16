@@ -36,9 +36,6 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
    * Test telephone widget using entity form.
    */
   public function testPhoneNumberWidget() {
-    /** @var \Drupal\Core\Datetime\DateFormatter $date_formatter */
-    $date_formatter = \Drupal::service('date.formatter');
-
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $field_phone_number = $phone_number_settings->getFieldName('phone_number');
     $form_field_phone_number = $field_phone_number . '[0][value]';
@@ -60,21 +57,13 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
     ];
     $this->drupalPostForm($test_entity->toUrl('edit-form'), $edit, t('Save'));
 
-    $phone_verification = $this->getVerificationCodeLast();
-
-    // Recalculate time.
-    $lifetime = $phone_number_settings->getVerificationLifetime();
-    $expiration_date = $phone_verification->getCreatedTime() + $lifetime;
-    $t_args['@time'] = $date_formatter->formatTimeDiffUntil($expiration_date, [
-      'granularity' => 2,
-    ]);
-
-    $this->assertRaw(t('A verification code has been sent to this phone number. Go to the <a href="@url">verification form</a> and enter the code. The code will expire if it is not verified in @time.', $t_args));
+    $this->assertRaw(t('A verification code has been sent to this phone number. Go to the <a href="@url">verification form</a> and enter the code. The code will expire if it is not verified in', $t_args));
 
     $input = $this->xpath('//input[@name="' . $form_field_phone_number . '" and @disabled="disabled"]');
     $this->assertTrue(count($input) === 1, 'The phone number text field is disabled.');
 
     // Verify the code.
+    $phone_verification = $this->getLastVerification();
     $phone_verification
       ->setStatus(TRUE)
       ->save();
@@ -95,9 +84,9 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
     $test_entity = $this->createEntityWithPhoneNumber($phone_number_settings, ['+123123123']);
 
     // Force verification code to expire.
-    $phone_verification = $this->getVerificationCodeLast();
+    $phone_verification = $this->getLastVerification();
     $phone_verification
-      ->set('created', time() - ($phone_number_settings->getVerificationLifetime() + 1))
+      ->set('created', time() - ($phone_number_settings->getVerificationCodeLifetime() + 1))
       ->save();
 
     $this->drupalGet($test_entity->toUrl('edit-form'));
@@ -110,6 +99,10 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
       '@url' => Url::fromRoute('sms.phone.verify')->toString(),
       '@time' => '1 hour',
     ];
+
+    // Ensure phone number was purged.
+    $field_phone_number = $phone_number_settings->getFieldName('phone_number');
+    $this->assertFieldByName($field_phone_number . '[0][value]', '');
     $this->assertRaw(t('Enter a phone number. A verification code will be sent as an SMS message, you must enter the code into the <a href="@url">verification form</a> within @time.', $t_args));
   }
 
@@ -119,13 +112,13 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
   public function testPhoneNumberPurgedFieldValueOnExpiration() {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $phone_number_settings
-      ->setVerificationPhoneNumberPurge(TRUE)
+      ->setPurgeVerificationPhoneNumber(TRUE)
       ->save();
     $test_entity = $this->createEntityWithPhoneNumber($phone_number_settings, ['+123123123']);
 
     // Force verification code to expire.
-    $this->getVerificationCodeLast()
-      ->set('created', time() - ($phone_number_settings->getVerificationLifetime() + 1))
+    $this->getLastVerification()
+      ->set('created', time() - ($phone_number_settings->getVerificationCodeLifetime() + 1))
       ->save();
     $this->cronRun();
 
@@ -141,13 +134,13 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
   public function testPhoneNumberNotPurgedFieldValueOnExpiration() {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $phone_number_settings
-      ->setVerificationPhoneNumberPurge(FALSE)
+      ->setPurgeVerificationPhoneNumber(FALSE)
       ->save();
     $test_entity = $this->createEntityWithPhoneNumber($phone_number_settings, ['+123123123']);
 
     // Force verification code to expire.
-    $this->getVerificationCodeLast()
-      ->set('created', time() - ($phone_number_settings->getVerificationLifetime() + 1))
+    $this->getLastVerification()
+      ->set('created', time() - ($phone_number_settings->getVerificationCodeLifetime() + 1))
       ->save();
     $this->cronRun();
 

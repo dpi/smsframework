@@ -7,6 +7,7 @@
 
 namespace Drupal\sms\Tests;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\Component\Utility\Unicode;
@@ -94,7 +95,7 @@ trait SmsFrameworkTestTrait {
    * @param $phone_number
    *   A phone number.
    */
-  protected function verifyPhoneNumber(\Drupal\Core\Entity\EntityInterface $entity, $phone_number) {
+  protected function verifyPhoneNumber(EntityInterface $entity, $phone_number) {
     $verifications = \Drupal::entityTypeManager()
       ->getStorage('sms_phone_number_verification')
       ->loadByProperties([
@@ -108,12 +109,12 @@ trait SmsFrameworkTestTrait {
   }
 
   /**
-   * Get last verification code created.
+   * Gets the last phone number verification that was created.
    *
    * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|FALSE
-   *   The last verification code created, or FALSE if no verifications exist.
+   *   The last verification created, or FALSE if no verifications exist.
    */
-  protected function getVerificationCodeLast() {
+  protected function getLastVerification() {
     $verification_storage = \Drupal::entityTypeManager()
       ->getStorage('sms_phone_number_verification');
 

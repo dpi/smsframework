@@ -230,7 +230,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
    */
   public function testGetPhoneVerificationByCode() {
     $this->createEntityWithPhoneNumber($this->phoneNumberSettings, ['+123123123']);
-    $verification = $this->getVerificationCodeLast();
+    $verification = $this->getLastVerification();
     $return = $this->phoneNumberProvider->getPhoneVerificationByCode($verification->getCode());
     $this->assertEquals($return->id(), $verification->id());
   }
@@ -284,7 +284,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     // Catch the phone verification message.
     $this->assertEquals(1, count($this->getTestMessages()));
 
-    $verification = $this->getVerificationCodeLast();
+    $verification = $this->getLastVerification();
     $this->assertEquals($entity->id(), $verification->getEntity()->id());
     $this->assertEquals($phone_number, $verification->getPhoneNumber());
   }

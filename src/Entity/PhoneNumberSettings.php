@@ -77,7 +77,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    *
    * @var int
    */
-  protected $duration_verification_code_expire = 0;
+  protected $verification_code_lifetime = 0;
 
   /**
    * Whether to remove phone number field values when phone number
@@ -85,7 +85,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    *
    * @var bool
    */
-  protected $verification_phone_number_purge = TRUE;
+  protected $purge_verification_phone_number = TRUE;
 
   /**
    * Field name mapping.
@@ -151,30 +151,30 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
   /**
    * {@inheritdoc}
    */
-  public function getVerificationLifetime() {
-    return $this->duration_verification_code_expire;
+  public function getVerificationCodeLifetime() {
+    return $this->verification_code_lifetime;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setVerificationLifetime($lifetime) {
-    $this->duration_verification_code_expire = $lifetime;
+  public function setVerificationCodeLifetime($lifetime) {
+    $this->verification_code_lifetime = $lifetime;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isVerificationPhoneNumberPurge() {
-    return $this->verification_phone_number_purge;
+  public function getPurgeVerificationPhoneNumber() {
+    return $this->purge_verification_phone_number;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setVerificationPhoneNumberPurge($purge) {
-    $this->verification_phone_number_purge = $purge;
+  public function setPurgeVerificationPhoneNumber($purge) {
+    $this->purge_verification_phone_number = $purge;
     return $this;
   }
 

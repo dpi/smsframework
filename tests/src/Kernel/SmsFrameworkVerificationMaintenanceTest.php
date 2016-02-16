@@ -65,8 +65,8 @@ class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
       ->setPhoneNumberEntityTypeId('entity_test')
       ->setPhoneNumberBundle('entity_test')
       ->setFieldName('phone_number', $this->phoneField->getName())
-      ->setVerificationPhoneNumberPurge(FALSE)
-      ->setVerificationLifetime(3600)
+      ->setPurgeVerificationPhoneNumber(FALSE)
+      ->setVerificationCodeLifetime(3600)
       ->save();
 
     $this->testEntity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, ['+123123123']);
@@ -76,30 +76,30 @@ class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
    * Test unverified verification which have not expired.
    */
   public function testVerificationUnverifiedNotExpired() {
-    $this->getVerificationCodeLast()
+    $this->getLastVerification()
       ->setStatus(FALSE)
       ->save();
     $this->container->get('cron')->run();
-    $this->assertTrue($this->getVerificationCodeLast() instanceof PhoneNumberVerificationInterface);
+    $this->assertTrue($this->getLastVerification() instanceof PhoneNumberVerificationInterface);
   }
 
   /**
    * Test unverified verification which have expired are deleted.
    */
   public function testVerificationUnverifiedExpired() {
-    $this->getVerificationCodeLast()
+    $this->getLastVerification()
       ->setStatus(FALSE)
       ->set('created', 0)
       ->save();
     $this->container->get('cron')->run();
-    $this->assertFalse($this->getVerificationCodeLast());
+    $this->assertFalse($this->getLastVerification());
   }
 
   /**
    * Test unverified verification which have expired do not purge field data.
    */
   public function testVerificationUnverifiedExpiredNoPurgeFieldData() {
-    $this->getVerificationCodeLast()
+    $this->getLastVerification()
       ->setStatus(FALSE)
       ->set('created', 0)
       ->save();
@@ -113,9 +113,9 @@ class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
    */
   public function testVerificationUnverifiedExpiredPurgeFieldData() {
     $this->phoneNumberSettings
-      ->setVerificationPhoneNumberPurge(TRUE)
+      ->setPurgeVerificationPhoneNumber(TRUE)
       ->save();
-    $this->getVerificationCodeLast()
+    $this->getLastVerification()
       ->setStatus(FALSE)
       ->set('created', 0)
       ->save();
@@ -128,12 +128,12 @@ class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
    * Test verified verification.
    */
   public function testVerificationVerifiedExpired() {
-    $this->getVerificationCodeLast()
+    $this->getLastVerification()
       ->setStatus(TRUE)
       ->set('created', 0)
       ->save();
     $this->container->get('cron')->run();
-    $this->assertTrue($this->getVerificationCodeLast() instanceof PhoneNumberVerificationInterface);
+    $this->assertTrue($this->getLastVerification() instanceof PhoneNumberVerificationInterface);
   }
 
 }
