@@ -110,6 +110,10 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
       '@url' => Url::fromRoute('sms.phone.verify')->toString(),
       '@time' => '1 hour',
     ];
+
+    // Ensure phone number was purged.
+    $field_phone_number = $phone_number_settings->getFieldName('phone_number');
+    $this->assertFieldByName($field_phone_number . '[0][value]', '');
     $this->assertRaw(t('Enter a phone number. A verification code will be sent as an SMS message, you must enter the code into the <a href="@url">verification form</a> within @time.', $t_args));
   }
 

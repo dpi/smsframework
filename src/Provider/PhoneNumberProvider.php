@@ -242,7 +242,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       if ($entity = $phone_number_verification->getEntity()) {
         try {
           $config = $this->getPhoneNumberSettingsForEntity($entity);
-          $purge = $config->get('verification_phone_number_purge');
+          $purge = $config->get('purge_verification_phone_number');
           $field_name = $config->get('fields.phone_number');
           if (!empty($purge) && isset($entity->{$field_name})) {
             $entity->{$field_name}->filter(function ($item) use ($phone_number_verification) {
