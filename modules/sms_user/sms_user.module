@@ -34,6 +34,9 @@ define('SMS_USER_MAX_CHARS', 140);
  *
  * @return bool
  *   true if the message was successfully sent, false otherwise.
+ *
+ * @deprecated in 8.x-dev, will be removed before 8.x-1.0. Use
+ *   \Drupal::service('sms.phone_number')->sendMessage() instead.
  */
 function sms_user_send($uid, $message) {
   $account = User::load($uid);
@@ -61,6 +64,9 @@ function sms_user_send($uid, $message) {
  *
  * @return string|bool
  *   The user's verified number, or false if the user does not have access.
+ *
+ * @deprecated
+ *   See \Drupal::service('sms.phone_number')->getPhoneNumbers()
  */
 function sms_user_get_number(AccountInterface $account) {
   // Check if the user is enabled to receive SMS.

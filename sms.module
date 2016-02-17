@@ -6,13 +6,13 @@
  * sending and receiving SMS messages.
  */
 
+use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\sms\Gateway\GatewayInterface;
 use Drupal\sms\Message\SmsMessage;
-use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
-use Drupal\sms\SmsException;
+use Drupal\sms\Exception\SmsException;
+use Drupal\Core\Entity\EntityInterface;
 
 // Direction codes.
 define('SMS_DIR_NONE',  0);
@@ -21,14 +21,94 @@ define('SMS_DIR_IN',    2);
 define('SMS_DIR_ALL',   4);
 
 /**
- * Implements hook_cron_queue_info().
+ * Implements hook_cron().
  */
-function sms_cron_queue_info() {
-  return array(
-    'sms_incoming' => array(
-      'worker callback' => 'sms_incoming_queue_worker',
-    ),
-  );
+function sms_cron() {
+  /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
+  $phone_number_provider = \Drupal::service('sms.phone_number');
+  $phone_number_provider->purgeExpiredVerifications();
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+function sms_entity_insert(EntityInterface $entity) {
+  _sms_entity_postsave($entity);
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function sms_entity_update(EntityInterface $entity) {
+  _sms_entity_postsave($entity);
+}
+
+/**
+ * Implements hook_entity_delete().
+ *
+ * Deletes verifications for an entity if it is deleted.
+ */
+function sms_entity_delete(EntityInterface $entity) {
+  $verification_storage = \Drupal::entityTypeManager()
+    ->getStorage('sms_phone_number_verification');
+  $verification_entities = $verification_storage->loadByProperties([
+    'entity__target_id' => $entity->id(),
+    'entity__target_type' => $entity->getEntityTypeId(),
+  ]);
+  $verification_storage->delete($verification_entities);
+}
+
+/**
+ * Respond to saving entities after they have been written to storage.
+ *
+ * Detects if phone numbers are modified to an entity. If new phone numbers are
+ * detected, new phone number verifications are created. If phone numbers are
+ * removed, the associated phone number verification is deleted.
+ *
+ * @see sms_entity_insert().
+ * @see sms_entity_update().
+ */
+function _sms_entity_postsave(EntityInterface $entity) {
+  /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
+  $phone_number_provider = \Drupal::service('sms.phone_number');
+
+  try {
+    $phone_number_settings = $phone_number_provider->getPhoneNumberSettingsForEntity($entity);
+    $field_name = $phone_number_settings->get('fields.phone_number');
+    if (!empty($field_name)) {
+      $items_original = &$entity->original->{$field_name};
+      $items = &$entity->{$field_name};
+    }
+  }
+  catch (PhoneNumberSettingsException $e) {
+    // Missing phone number configuration for this entity.
+  }
+
+  // $items can be unassigned because field_name is not configured, or is NULL
+  // because there is no items.
+  if (isset($items)) {
+    $numbers = [];
+    foreach ($items as &$item) {
+      $phone_number = $item->value;
+      $numbers[] = $phone_number;
+
+      if (!$phone_number_provider->getPhoneVerificationByEntity($entity, $phone_number)) {
+        $phone_number_provider->newPhoneVerification($entity, $phone_number);
+      }
+    }
+
+    if (isset($items_original) && !$items->equals($items_original)) {
+      foreach ($items_original as $item) {
+        $phone_number = $item->value;
+        // A phone number was deleted.
+        if (!in_array($phone_number, $numbers)) {
+          if ($phone_verification = $phone_number_provider->getPhoneVerificationByEntity($entity, $phone_number)) {
+            $phone_verification->delete();
+          }
+        }
+      }
+    }
+  }
 }
 
 /**

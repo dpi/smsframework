@@ -15,6 +15,16 @@ sms.settings:
       label: 'International Country Codes'
       sequence:
         - type: string
+    flood:
+      label: 'SMS Framework flood settings'
+      type: mapping
+      mapping:
+        verify_limit:
+          type: integer
+          label: 'Maximum failed phone number verifications per verify_window'
+        verify_window:
+          type: integer
+          label: 'Used to calculate window of failed phone number verifications.'
 
 # Configuration for SMS Gateways.
 sms.gateway.*:
@@ -33,5 +43,46 @@ sms.gateway.*:
     settings:
       type: sms_gateway.settings.[%parent.plugin]
 
+sms.phone.*.*:
+  type: config_entity
+  label: 'Phone number configuration'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    entity_type:
+      type: string
+      label: 'Entity type'
+    bundle:
+      type: string
+      label: 'Bundle'
+    automated_optout:
+      type: boolean
+    verification_message:
+      type: string
+    verification_code_lifetime:
+      type: integer
+      label: 'Time in seconds, before verification codes expire.'
+    purge_verification_phone_number:
+      type: boolean
+      label: 'Remove phone number field value if verification code expires.'
+    fields:
+      type: mapping
+      mapping:
+        phone_number:
+          type: string
+          label: 'Name of field.'
+        automated_opt_out:
+          type: string
+          label: 'Name of field. Indicates if this bundle is allowed to control automated messages.'
+
 sms_gateway.settings.*:
   type: sms_gateway_settings
+
+field.widget.settings.sms_telephone:
+  type: mapping
+  label: 'SMS Framework telephone widget settings'
+  mapping:
+    placeholder:
+      type: label
+      label: 'Placeholder'

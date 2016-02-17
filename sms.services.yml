@@ -7,3 +7,6 @@ services:
   plugin.manager.sms_gateway:
     class: Drupal\sms\Plugin\SmsGatewayPluginManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
+  sms.phone_number:
+    class: Drupal\sms\Provider\PhoneNumberProvider
+    arguments: ['@entity_type.manager', '@config.factory', '@token', '@sms_provider']
