@@ -8,10 +8,7 @@
 namespace Drupal\sms\Tests;
 
 use Drupal\simpletest\WebTestBase;
-use Drupal\sms\Entity\SmsGateway;
 use Drupal\Component\Utility\Unicode;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\sms\Entity\PhoneNumberSettingsInterface;
 
 /**
  * Provides commonly used functionality for tests.

@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\Component\Utility\Unicode;
+use Drupal\sms\Entity\SmsGatewayInterface;
 
 /**
  * Shared SMS Framework helpers for kernel and web tests.
@@ -23,10 +24,12 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Entity\SmsGatewayInterface
    */
   protected function createMemoryGateway() {
+    $id = Unicode::strtolower($this->randomMachineName(16));
     $gateway = SmsGateway::create([
       'plugin' => 'memory',
-      'id' => Unicode::strtolower($this->randomMachineName(16)),
+      'id' => $id,
       'label' => $this->randomString(),
+      'settings' => ['gateway_id' => $id],
     ]);
     $gateway->enable();
     $gateway->save();
@@ -36,28 +39,46 @@ trait SmsFrameworkTestTrait {
   /**
    * Get all SMS messages sent to 'Memory' gateway.
    *
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
+   *   A gateway plugin, or NULL to use gateway stored in $this->testGateway.
+   *
    * @return \Drupal\sms\Message\SmsMessageInterface[]
    */
-  function getTestMessages() {
-    return \Drupal::state()->get('sms_test_gateway.memory.send', []);
+  function getTestMessages(SmsGatewayInterface $sms_gateway = NULL) {
+    $gateway_id = $sms_gateway ? $sms_gateway->id() : $this->testGateway->id();
+    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
+    return isset($sms_messages[$gateway_id]) ? $sms_messages[$gateway_id] : [];
   }
 
   /**
    * Get the last SMS message sent to 'Memory' gateway.
    *
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
+   *   A gateway plugin, or NULL to use gateway stored in $this->testGateway.
+   *
    * @return \Drupal\sms\Message\SmsMessageInterface|NULL
    *   The last SMS message, or FALSE if no messages have been sent.
    */
-  public function getLastTestMessage() {
+  public function getLastTestMessage(SmsGatewayInterface $sms_gateway = NULL) {
+    $gateway_id = $sms_gateway ? $sms_gateway->id() : $this->testGateway->id();
     $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
-    return end($sms_messages);
+    return isset($sms_messages[$gateway_id]) ? end($sms_messages[$gateway_id]) : FALSE;
   }
 
   /**
    * Resets SMS messages stored in memory by 'Memory' gateway.
+   *
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
+   *   A gateway plugin, or NULL to reset all messages.
    */
-  public function resetTestMessages() {
-    \Drupal::state()->set('sms_test_gateway.memory.send', []);
+  public function resetTestMessages(SmsGatewayInterface $sms_gateway = NULL) {
+    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
+    if ($sms_gateway) {
+      $sms_messages[$sms_gateway->id()] = [];
+    } else {
+      $sms_messages = [];
+    }
+    \Drupal::state()->set('sms_test_gateway.memory.send', $sms_messages);
   }
 
   /**

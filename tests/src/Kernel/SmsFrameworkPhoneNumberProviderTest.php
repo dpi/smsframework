@@ -39,6 +39,13 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
   protected $phoneNumberSettings;
 
   /**
+   * The default gateway.
+   *
+   * @var \Drupal\sms\Entity\SmsGatewayInterface
+   */
+  protected $gateway;
+
+  /**
    * Modules to enable.
    *
    * @var array
@@ -55,7 +62,8 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $this->installConfig('sms');
 
     $sms_provider = $this->container->get('sms_provider.default');
-    $sms_provider->setDefaultGateway($this->createMemoryGateway());
+    $this->gateway = $this->createMemoryGateway();
+    $sms_provider->setDefaultGateway($this->gateway);
 
     $this->phoneNumberProvider = $this->container->get('sms.phone_number');
 
@@ -178,7 +186,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
       1
     );
     $this->phoneNumberProvider->sendMessage($entity, $sms_message);
-    $this->assertEquals(1, count($this->getTestMessages()));
+    $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
   }
 
   /**
@@ -282,7 +290,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $this->assertTrue($return instanceof PhoneNumberVerificationInterface);
 
     // Catch the phone verification message.
-    $this->assertEquals(1, count($this->getTestMessages()));
+    $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
 
     $verification = $this->getLastVerification();
     $this->assertEquals($entity->id(), $verification->getEntity()->id());

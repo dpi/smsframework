@@ -42,9 +42,7 @@ class SmsDevelWebTest extends SmsFrameworkWebTestBase {
     // Check from gateway that the sms got sent. Use array_intersect_assoc() to
     // remove other array elements not needed.
 
-    /** @var \Drupal\sms\Message\SmsMessageInterface[] $sms_messages */
-    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
-
+    $sms_messages = $this->getTestMessages();
     $this->assertEqual($sms_messages[0]->getMessage(), $test_message1['message'], 'Message was sent correctly using sms_devel.');
 
     $test_message2 = array(

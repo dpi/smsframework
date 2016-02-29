@@ -51,7 +51,7 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $this->createEntityWithPhoneNumber($phone_number_settings, $phone_numbers);
 
-    $sms_message = $this->getLastTestMessage();
+    $sms_message = $this->getLastTestMessage($this->testGateway);
     $this->assertTrue($sms_message instanceof SmsMessageInterface, 'SMS verification message sent.');
     $this->assertEqual($sms_message->getRecipients(), $phone_numbers, 'Sent to correct phone number.');
 

@@ -28,6 +28,8 @@ class Memory extends SmsGatewayPluginBase {
   public function defaultConfiguration() {
     return [
       'widget' => '',
+      // Store the ID of gateway config. See static::send().
+      'gateway_id' => '',
     ];
   }
 
@@ -60,8 +62,11 @@ class Memory extends SmsGatewayPluginBase {
    */
   public function send(SmsMessageInterface $sms_message, array $options) {
     $state = \Drupal::state()->get('sms_test_gateway.memory.send', []);
-    $state[] = $sms_message;
+
+    $gateway_id = $this->configuration['gateway_id'];
+    $state[$gateway_id][] = $sms_message;
     \Drupal::state()->set('sms_test_gateway.memory.send', $state);
+
     return new SmsMessageResult(['status' => TRUE]);
   }
 

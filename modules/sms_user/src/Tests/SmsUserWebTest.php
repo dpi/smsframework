@@ -189,8 +189,7 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
     // Test if the message was not sent by checking the cached sms_test message
     // result.
 
-    /** @var \Drupal\sms\Message\SmsMessageInterface[] $sms_messages */
-    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
+    $sms_messages = $this->getTestMessages();
     $this->assertTrue(empty($sms_messages),  t('Message was not sent to user that opted out.'));
 
     // Create Normal User
