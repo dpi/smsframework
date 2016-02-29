@@ -13,6 +13,7 @@ use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Exception\SmsException;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 
 // Direction codes.
 define('SMS_DIR_NONE',  0);
@@ -49,6 +50,10 @@ function sms_entity_update(EntityInterface $entity) {
  * Deletes verifications for an entity if it is deleted.
  */
 function sms_entity_delete(EntityInterface $entity) {
+  if (!$entity instanceof ContentEntityInterface) {
+    return;
+  }
+
   $verification_storage = \Drupal::entityTypeManager()
     ->getStorage('sms_phone_number_verification');
   $verification_entities = $verification_storage->loadByProperties([
