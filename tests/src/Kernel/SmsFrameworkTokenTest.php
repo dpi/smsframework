@@ -75,7 +75,8 @@ class SmsFrameworkTokenTest extends SmsFrameworkKernelBase {
     $sms_message = new SmsMessage();
     $sms_message
       ->setSender('+999888777')
-      ->setMessage($message);
+      ->setMessage($message)
+      ->addRecipients($phone_numbers);
     $data['sms-message'] = $sms_message;
 
     $this->assertEquals(

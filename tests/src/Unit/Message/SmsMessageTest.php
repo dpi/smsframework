@@ -72,6 +72,26 @@ class SmsMessageTest extends UnitTestCase {
       ->addRecipient($recipient1)
       ->addRecipient($recipient2);
     $this->assertEquals([$recipient1, $recipient2], $sms_message1->getRecipients());
+
+    // Check duplicate recipients are not added.
+    $sms_message2 = new TestSmsMessage();
+    $sms_message2
+      ->addRecipients([$recipient1, $recipient1, $recipient1, $recipient2]);
+    $this->assertEquals([$recipient1, $recipient2], $sms_message2->getRecipients());
+  }
+
+  /**
+   * Tests adding multiple recipients to SMS messages.
+   *
+   * @covers ::addRecipients
+   */
+  public function testRecipientsAdd() {
+    $recipient1 = '123123123';
+    $recipient2 = '456456456';
+    $sms_message2 = new TestSmsMessage();
+    $sms_message2
+      ->addRecipients([$recipient1, $recipient2]);
+    $this->assertEquals([$recipient1, $recipient2], $sms_message2->getRecipients());
   }
 
   /**

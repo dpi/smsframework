@@ -74,7 +74,7 @@ class SmsMessage implements SmsMessageInterface {
    */
   public function __construct($sender = '', array $recipients = [], $message = '', array $options = [], $uid = NULL) {
     $this->sender = $sender;
-    $this->recipients = $recipients;
+    $this->addRecipients($recipients);
     $this->message = $message;
     $this->options = $options;
     $this->uid = $uid;
@@ -122,7 +122,19 @@ class SmsMessage implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function addRecipient($recipient) {
-    $this->recipients[] = $recipient;
+    if (!in_array($recipient, $this->recipients)) {
+      $this->recipients[] = $recipient;
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addRecipients(array $recipients) {
+    foreach ($recipients as $recipient) {
+      $this->addRecipient($recipient);
+    }
     return $this;
   }
 
