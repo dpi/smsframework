@@ -72,7 +72,7 @@ class SmsMessage implements SmsMessageInterface {
    * @param int $uid
    *   The user who created the SMS message.
    */
-  public function __construct($sender, array $recipients, $message, array $options, $uid) {
+  public function __construct($sender = '', array $recipients = [], $message = '', array $options = [], $uid = NULL) {
     $this->sender = $sender;
     $this->recipients = $recipients;
     $this->message = $message;
@@ -91,6 +91,14 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
+  public function setSender($sender) {
+    $this->sender = $sender;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getMessage() {
     return $this->message;
   }
@@ -98,8 +106,32 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
+  public function setMessage($message) {
+    $this->message = $message;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getRecipients() {
     return $this->recipients;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addRecipient($recipient) {
+    $this->recipients[] = $recipient;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeRecipient($recipient) {
+    $this->recipients = array_values(array_diff($this->recipients, [$recipient]));
+    return $this;
   }
 
   /**
@@ -122,6 +154,22 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
+  public function setOption($name, $value) {
+    $this->options[$name] = $value;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeOption($name) {
+    unset($this->options[$name]);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getUuid() {
     return $this->uuid;
   }
@@ -131,6 +179,14 @@ class SmsMessage implements SmsMessageInterface {
    */
   public function getUid() {
     return $this->uid;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUid($uid) {
+    $this->uid = $uid;
+    return $this;
   }
 
   /**

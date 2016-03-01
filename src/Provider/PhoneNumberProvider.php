@@ -108,19 +108,13 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       throw new NoPhoneNumberException('Attempted to send an SMS to entity without a phone number.');
     }
 
-    // @todo: remove this re-creation of SmsMessage when it adds setters.
-    $sms_message_new = new SmsMessage(
-      $sms_message->getSender(),
-      // @todo: Improve multiple number handling:
-      [reset($phone_numbers)],
-      $sms_message->getMessage(),
-      $sms_message->getOptions(),
-      0 // @todo: Remove UID.
-    );
+    foreach ($phone_numbers as $phone_number) {
+      $sms_message->addRecipient($phone_number);
+    }
 
     $this->smsProvider
       // @todo: Remove $options.
-      ->send($sms_message_new, []);
+      ->send($sms_message, []);
   }
 
   /**
@@ -188,27 +182,17 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       ->save();
 
     if ($phone_verification) {
-      $sms_message = new SmsMessage(
-        '',
-        [$phone_number],
-        $message,
-        [],
-        0
-      );
+      $sms_message = new SmsMessage();
+      $sms_message
+        ->addRecipient($phone_number)
+        ->setMessage($message);
+
       $data['sms-message'] = $sms_message;
       $data['sms_verification_code'] = $phone_verification->getCode();
-      $message = $this->token
-        ->replace($message, $data);
 
-      // @todo replace with setMesssage().
-      $sms_message = new SmsMessage(
-        '',
-        [$phone_number],
-        $message,
-        [],
-        0
-      );
-      $sms_message->setAutomated(FALSE);
+      $sms_message
+        ->setMessage($this->token->replace($message, $data))
+        ->setAutomated(FALSE);
 
       $this->smsProvider
         ->send($sms_message, []);

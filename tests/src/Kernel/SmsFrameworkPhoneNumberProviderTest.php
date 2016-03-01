@@ -155,14 +155,10 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $phone_numbers = ['+123123123'];
     $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
     $this->resetTestMessages();
-
-    $sms_message = new SmsMessage(
-      '+999888777',
-      [],
-      $this->randomString(),
-      [],
-      1
-    );
+    $sms_message = new SmsMessage();
+    $sms_message
+      ->setSender('+999888777')
+      ->setMessage($this->randomString());
     $this->setExpectedException(\Drupal\sms\Exception\NoPhoneNumberException::class);
     $this->phoneNumberProvider->sendMessage($entity, $sms_message);
   }
@@ -178,13 +174,10 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $this->resetTestMessages();
     $this->verifyPhoneNumber($entity, $phone_numbers[0]);
 
-    $sms_message = new SmsMessage(
-      '+999888777',
-      [],
-      $this->randomString(),
-      [],
-      1
-    );
+    $sms_message = new SmsMessage();
+    $sms_message
+      ->setSender('+999888777')
+      ->setMessage($this->randomString());
     $this->phoneNumberProvider->sendMessage($entity, $sms_message);
     $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
   }

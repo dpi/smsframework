@@ -72,13 +72,10 @@ class SmsFrameworkTokenTest extends SmsFrameworkKernelBase {
   public function testSmsMessageTokens() {
     $phone_numbers = ['+123123123', '+456456456'];
     $message = $this->randomString();
-    $sms_message = new SmsMessage(
-      '+999888777',
-      $phone_numbers,
-      $message,
-      [],
-      1
-    );
+    $sms_message = new SmsMessage();
+    $sms_message
+      ->setSender('+999888777')
+      ->setMessage($message);
     $data['sms-message'] = $sms_message;
 
     $this->assertEquals(
