@@ -7,6 +7,8 @@
 
 namespace Drupal\sms\Plugin\SmsGateway;
 
+use Drupal\sms\Message\SmsDeliveryReport;
+use Drupal\sms\Message\SmsDeliveryReportInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
@@ -27,7 +29,14 @@ class LogGateway extends SmsGatewayPluginBase {
     $this->logger()->notice('SMS message sent to %number with the text: @message',
       ['%number' => implode(', ', $sms->getRecipients()), '@message' => $sms->getMessage()]);
     $return = ['status' => TRUE];
-    $return['report'] = array_fill_keys($sms->getRecipients(), ['status' => TRUE, 'message_id' => rand(1, 999999)]);
+    $return['reports'] = [];
+    foreach ($sms->getRecipients() as $number) {
+      $return['reports'][$number] = new SmsDeliveryReport([
+        'status' => SmsDeliveryReportInterface::STATUS_DELIVERED,
+        'recipient' => $number,
+        'gateway_status' => 'DELIVERED',
+      ]);
+    }
     return new SmsMessageResult($return);
   }
 
