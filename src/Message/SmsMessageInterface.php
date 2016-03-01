@@ -73,6 +73,39 @@ interface SmsMessageInterface {
   public function getRecipients();
 
   /**
+   * Add a recipient to the SMS message.
+   *
+   * @param string $recipient
+   *   The recipient to add.
+   *
+   * @return $this
+   *   The called SMS message object.
+   */
+  public function addRecipient($recipient);
+
+  /**
+   * Adds multiple recipients to the SMS message.
+   *
+   * @param array $recipients
+   *   An array of recipients to add.
+   *
+   * @return $this
+   *   The called SMS message object.
+   */
+  public function addRecipients(array $recipients);
+
+    /**
+   * Removes a recipient from the SMS message.
+   *
+   * @param string $recipient
+   *   The recipient to remove.
+   *
+   * @return $this
+   *   The called SMS message object.
+   */
+  public function removeRecipient($recipient);
+
+  /**
    * Gets the options for building or sending this SMS message.
    *
    * @return array
@@ -84,9 +117,35 @@ interface SmsMessageInterface {
    *
    * @param string
    *   The name of the option.
-   * @return array
+   *
+   * @return mixed
+   *   Get the value of the option.
    */
   public function getOption($name);
+
+  /**
+   * Sets an option for this SMS message.
+   *
+   * @param string $name
+   *   The name of the option
+   * @param mixed $value
+   *   The value of the option.
+   *
+   * @return $this
+   *   The called SMS message object.
+   */
+  public function setOption($name, $value);
+
+  /**
+   * Removes an option from this SMS message.
+   *
+   * @param string $name
+   *   The name of the option.
+   *
+   * @return $this
+   *   The called SMS message object.
+   */
+  public function removeOption($name);
 
   /**
    * Gets the name of the sender of this SMS message.
@@ -96,11 +155,33 @@ interface SmsMessageInterface {
   public function getSender();
 
   /**
+   * Set the name of the sender of this SMS message.
+   *
+   * @param string $sender
+   *   The name of the sender.
+   *
+   * @return $this
+   *   The called SMS message object.
+   */
+  public function setSender($sender);
+
+  /**
    * Gets the message to be sent.
    *
    * @return string
    */
   public function getMessage();
+
+  /**
+   * Set the message to be sent.
+   *
+   * @param string $message
+   *   The message to be sent.
+   *
+   * @return $this
+   *   The called SMS message object.
+   */
+  public function setMessage($message);
 
   /**
    * Gets the UUID of the SMS object.
@@ -117,14 +198,24 @@ interface SmsMessageInterface {
   public function getUid();
 
   /**
+   * Set the user who created the SMS message
+   * @param int $uid
+   *
+   *
+   * @return $this
+   *   The called SMS message object.
+   */
+  public function setUid($uid);
+
+  /**
    * Sets whether this SMS message was generated automatically.
    *
    * @param bool $automated
    *   Whether this SMS message was generated automatically. Set to FALSE if the
    *   message is created due to direct action.
    *
-   * @return \Drupal\sms\Message\SmsMessageInterface
-   *   Return called object for chaining.
+   * @return $this
+   *   The called SMS message object.
    */
   public function setAutomated($automated);
 
