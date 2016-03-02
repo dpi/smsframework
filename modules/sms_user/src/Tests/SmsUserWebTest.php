@@ -53,20 +53,9 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
     $this->assertFieldByXPath('//input[@name="opted_out"]', null, 'SMS User opt out settings available after number confirmed.');
     $this->assertFieldByXPath('//input[@name="sleep_enabled"]', null, 'SMS User sleep enable settings available after number confirmed.');
 
-    // Send sms to user with registered number.
-    $message = 'Test user message';
-    $this->assertTrue(sms_user_send($user->id(), $message), 'Successfully sent message to user with permission');
-
-    $sms_message = $this->getLastTestMessage();
-    $this->assertTrue(in_array($edit['number'], $sms_message->getRecipients()), 'Message sent through the correct gateway.');
-
     // Test sms_user_authenticate() on this user.
     $account = sms_user_authenticate($user->sms_user['number']);
     $this->assertEqual($user->id(), $account->id(), 'Correctly authenticated user by phone number.');
-
-    // Get a user with no permissions and test failed sending.
-    $user1 = $this->drupalCreateUser(array());
-    $this->assertFalse(sms_user_send($user1->id(), $message), 'Failed sending to user without permission');
 
     // Clear user confirmed number.
     $this->drupalPostForm('user/' . $user->id() . '/mobile', array(), t('Delete & start over'));
@@ -74,9 +63,6 @@ class SmsUserWebTest extends SmsFrameworkWebTestBase {
     $this->resetAll();
     $user = User::load($user->id());
     $this->assertTrue($user->sms_user['number'] == '' && $user->sms_user['status'] == 0, 'Successfully deleted user confirmed number');
-
-    // Test that sending fails when confirmed number is deleted.
-    $this->assertFalse(sms_user_send($user->id(), $message), 'Failed sending to user without confirmed number');
 
     // Test failure to authenticate a non-existent number.
     $this->assertFalse(sms_user_authenticate(rand(23400000000, 23499999999)), 'Failed to authenticate non-existent number.');
