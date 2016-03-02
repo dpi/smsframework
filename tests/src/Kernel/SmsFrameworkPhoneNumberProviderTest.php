@@ -183,6 +183,28 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Ensure default behaviour is to send one phone number per entity.
+   *
+   * @covers ::sendMessage
+   */
+  public function testSendMessageOneMessage() {
+    $phone_numbers = ['+123123123', '+456456456'];
+    $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
+    $this->resetTestMessages();
+    $this->verifyPhoneNumber($entity, $phone_numbers[0]);
+    $this->verifyPhoneNumber($entity, $phone_numbers[1]);
+
+    $sms_message = new SmsMessage();
+    $sms_message
+      ->setMessage($this->randomString());
+    $this->phoneNumberProvider->sendMessage($entity, $sms_message);
+
+    $message = $this->getLastTestMessage($this->gateway);
+    $this->assertEquals(1, count($message->getRecipients()), 'Entity has two phone numbers, one phone number was added.');
+    $this->assertEquals([$phone_numbers[0]], $message->getRecipients(), 'The SMS message is using the first phone number from the entity.');
+  }
+
+  /**
    * Tests read only phone number config helper.
    *
    * @covers ::getPhoneNumberSettings
