@@ -62,15 +62,15 @@ class SmsMessage implements SmsMessageInterface {
    * Creates a new instance of an SMS message.
    *
    * @param string $sender
-   *   The sender of the message.
+   *   (optional) The sender of the message.
    * @param array $recipients
-   *   The list of recipient phone numbers for the message.
+   *   (optional) The list of recipient phone numbers for the message.
    * @param string $message
-   *   The actual SMS message to be sent.
+   *   (optional) The actual SMS message to be sent.
    * @param array $options
-   *   Additional options to be considered in building the SMS message
+   *   (optional) Additional options to be considered in building the SMS message
    * @param int $uid
-   *   The user who created the SMS message.
+   *   (optional) The user who created the SMS message.
    */
   public function __construct($sender = '', array $recipients = [], $message = '', array $options = [], $uid = NULL) {
     $this->sender = $sender;
@@ -143,6 +143,14 @@ class SmsMessage implements SmsMessageInterface {
    */
   public function removeRecipient($recipient) {
     $this->recipients = array_values(array_diff($this->recipients, [$recipient]));
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeRecipients(array $recipients) {
+    $this->recipients = array_values(array_diff($this->recipients, $recipients));
     return $this;
   }
 

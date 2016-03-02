@@ -73,7 +73,7 @@ interface SmsMessageInterface {
   public function getRecipients();
 
   /**
-   * Add a recipient to the SMS message.
+   * Adds a single recipient to the SMS message.
    *
    * @param string $recipient
    *   The recipient to add.
@@ -95,7 +95,7 @@ interface SmsMessageInterface {
   public function addRecipients(array $recipients);
 
     /**
-   * Removes a recipient from the SMS message.
+   * Removes a single recipient from the SMS message.
    *
    * @param string $recipient
    *   The recipient to remove.
@@ -104,6 +104,17 @@ interface SmsMessageInterface {
    *   The called SMS message object.
    */
   public function removeRecipient($recipient);
+
+  /**
+   * Removes multiple recipients from the SMS message.
+   *
+   * @param array $recipients
+   *   An array of recipients to remove.
+   *
+   * @return $this
+   *   The called SMS message object.
+   */
+  public function removeRecipients(array $recipients);
 
   /**
    * Gets the options for building or sending this SMS message.
