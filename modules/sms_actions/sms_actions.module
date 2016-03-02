@@ -6,6 +6,8 @@
  * incoming messages.
  */
 
+use Drupal\sms\Message\SmsMessage;
+
 /**
  * Implementation of hook_sms_incoming()
  */
@@ -239,7 +241,11 @@ function sms_actions_send_action($object, $context) {
 
   $message = strtr($context['message'], $variables);
   if (isset($node) && $context['author']) {
-    sms_user_send($account->uid, $message);
+    /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
+    $phone_number_provider = \Drupal::service('sms.phone_number');
+    $sms_message = new SmsMessage();
+    $sms_message->setMessage($message);
+    $phone_number_provider->sendMessage($account, $sms_message);
   }
   else{
     sms_send($number, $message);

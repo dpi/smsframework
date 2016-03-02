@@ -5,6 +5,8 @@
  *
  */
 
+use Drupal\sms\Message\SmsMessage;
+
 /**
  * Implements hook_action_info().
  */
@@ -23,7 +25,11 @@ function sms_user_action_info() {
  */
 function sms_user_send_sms_action(&$user, $context) {
   $message = $context['sms_text'];
-  sms_user_send($user->uid, $message);
+  /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
+  $phone_number_provider = \Drupal::service('sms.phone_number');
+  $sms_message = new SmsMessage();
+  $sms_message->setMessage($message);
+  $phone_number_provider->sendMessage($user, $sms_message);
 }
 
 /**
