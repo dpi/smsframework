@@ -213,3 +213,5 @@ country_codes:
 flood:
   verify_limit: 5
   verify_window: 21600
+page:
+  verify: /verify
