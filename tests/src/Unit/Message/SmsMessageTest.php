@@ -108,15 +108,23 @@ class SmsMessageTest extends UnitTestCase {
       ->addRecipient($recipient2);
     $sms_message1->removeRecipient($recipient1);
     $this->assertEquals([$recipient2], $sms_message1->getRecipients());
+  }
 
+  /**
+   * Tests removing multiple recipients from SMS messages.
+   *
+   * @covers ::removeRecipients
+   */
+  public function testRecipientsRemove() {
     // Test multiple recipient remove.
-    $recipient3 = '234234234';
-    $sms_message1
-      ->addRecipients([$recipient1, $recipient3]);
-    $this->assertEquals([$recipient2, $recipient1, $recipient3], $sms_message1->getRecipients());
-    $sms_message1
-      ->removeRecipients([$recipient1, $recipient2]);
-    $this->assertEquals([$recipient3], $sms_message1->getRecipients());
+    $recipients = ['123123123', '456456456', '234234234'];
+    $sms_message = new TestSmsMessage();
+    $sms_message
+      ->addRecipients($recipients);
+    $this->assertEquals($recipients, $sms_message->getRecipients());
+    $sms_message
+      ->removeRecipients(['123123123', '234234234']);
+    $this->assertEquals(['456456456'], $sms_message->getRecipients());
   }
 
   /**
