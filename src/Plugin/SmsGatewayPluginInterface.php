@@ -13,6 +13,7 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Default implementation of sms gateway plugin
@@ -112,7 +113,7 @@ interface SmsGatewayPluginInterface extends ConfigurablePluginInterface, PluginF
   const STATUS_ERR_OTHER = 500;
 
   /**
-   * Sends an sms and invokes the corresponding sms receipt method.
+   * Sends an SMS and invokes the corresponding sms receipt method.
    *
    * @param \Drupal\sms\Message\SmsMessageInterface $sms
    *   The sms to be sent.
@@ -132,12 +133,29 @@ interface SmsGatewayPluginInterface extends ConfigurablePluginInterface, PluginF
   public function balance();
 
   /**
-   * Handles delivery reports and invokes the corresponding sms_receipt method.
+   * Parses incoming delivery reports and returns the DeliveryReport objects.
    *
-   * @param \Symfony\Component\HttpFoundation\Request
+   * @param \Symfony\Component\HttpFoundation\Request $request
    *   Request object containing the delivery report in raw format.
+   * @param \Symfony\Component\HttpFoundation\Response $response
+   *   A HTTP response that will be sent back to the SMSC. The plugin can alter
+   *   the content of the response by @code$response->setContent()@endcode.
+   *
+   * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
+   *   An array of the delivery reports which have been received.
    */
-  public function deliveryReport(Request $request);
+  public function parseDeliveryReports(Request $request, Response $response);
+
+  /**
+   * Pulls delivery reports from the SMS gateway server.
+   *
+   * @param string[]|null $message_ids
+   *   The list of specific message_ids to poll. NULL to pull all reports.
+   *
+   * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
+   *   An array of the delivery reports which have been pulled.
+   */
+  public function pullDeliveryReports(array $message_ids = NULL);
 
   /**
    * Gets the last error message from the gateway.
@@ -173,5 +191,25 @@ interface SmsGatewayPluginInterface extends ConfigurablePluginInterface, PluginF
    *   An array containing an error message for each validation failure.
    */
   public function validateNumbers(array $numbers, array $options = []);
+
+  /**
+   * Gets the path for the delivery reports for this gateway instance.
+   *
+   * @param bool $absolute
+   *   Whether to return a relative or absolute path.
+   *
+   * @return string
+   *   The absolute delivery report url if $absolute is true (default); returns
+   *   the domain-relative path if $absolute is false.
+   */
+  public function getDeliveryReportPath($absolute = TRUE);
+
+  /**
+   * Sets the machine name of the config entity that owns this plugin instance.
+   *
+   * @param string $machine_name
+   *   The machine name of the config entity.
+   */
+  public function setGatewayName($machine_name);
 
 }

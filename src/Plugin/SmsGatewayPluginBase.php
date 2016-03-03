@@ -9,7 +9,9 @@ namespace Drupal\sms\Plugin;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Base class for sms gateway plugins.
@@ -24,6 +26,13 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
   protected $logger;
 
   /**
+   * The machine name of the gateway config entity owning this plugin instance.
+   *
+   * @var string
+   */
+  protected $gatewayName;
+
+  /**
    * Construct a new SmsGateway plugin
    *
    * @param array $configuration
@@ -36,6 +45,13 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->configuration = array_merge($this->defaultConfiguration(), $this->configuration);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setGatewayName($machine_name) {
+    $this->gatewayName = $machine_name;
   }
 
   /**
@@ -111,8 +127,15 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
   /**
    * {@inheritdoc}
    */
-  public function deliveryReport(Request $request) {
-    return;
+  public function parseDeliveryReports(Request $request, Response $response) {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function pullDeliveryReports(array $message_ids = NULL) {
+    return [];
   }
 
   /**
@@ -120,6 +143,15 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
    */
   public function getError() {
     return [];
+  }
+
+  public function getDeliveryReportPath($absolute = TRUE) {
+    if (isset($this->gatewayName)) {
+      return Url::fromRoute('sms.delivery_report', ['gateway_name' => $this->gatewayName], ['absolute' => $absolute])->toString();
+    }
+    else {
+      return '';
+    }
   }
 
   /**

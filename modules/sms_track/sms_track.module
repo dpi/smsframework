@@ -8,6 +8,7 @@
  */
 
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
@@ -64,17 +65,21 @@ function sms_track_sms_send(SmsMessageInterface $sms, array $options, SmsGateway
  *   Additional options array including sender.
  * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
  *   Gateway array for the active gateway.
- * @param bool|array $result
- *   The result from the gateway response handler.
+ * @param \Drupal\sms\Message\SmsMessageResultInterface $result
+ *   (optional) The SMS message result from the gateway.
  */
-function sms_track_sms_send_process($op, SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway, $result) {
+function sms_track_sms_send_process($op, SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway, SmsMessageResultInterface $result = NULL) {
   if ($op == 'post process') {
     // Archiving (outgoing == 0)
     $dir = 0;
     $options = (isset($options) && is_array($options))? $options : array();
     $options['gateway_id'] = $sms_gateway->id();
     $options['result']  = $result;
-    sms_track_archive_write($dir, implode(',', $sms->getRecipients()), $sms->getMessage(), $options);
+    $message = $sms->getMessage();
+    foreach ($result->getReports() as $report) {
+      $options['reference'] = $report->getMessageId();
+      sms_track_archive_write($dir, $report->getRecipient(), $message, $options);
+    }
   }
 }
 
@@ -90,12 +95,13 @@ function sms_track_sms_send_process($op, SmsMessageInterface $sms, array $option
  *   Additional options including receiver MSISDN.
  */
 function sms_track_sms_incoming($op, SmsMessageInterface $sms, array $options) {
-  $number = $sms->getRecipients()[0];
   $message = $sms->getMessage();
-  if ($op == 'pre process' && isset($number)) {
+  if ($op == 'pre process') {
     // Archiving (incoming == 1)
     $dir = 1;
-    sms_track_archive_write($dir, $number, $message, $options);
+    foreach ($sms->getRecipients() as $number) {
+      sms_track_archive_write($dir, $number, $message, $options);
+    }
   }
 }
 
@@ -105,19 +111,15 @@ function sms_track_sms_incoming($op, SmsMessageInterface $sms, array $options) {
  *
  * @param string $op
  *   Operation string.
- * @param string $number
- *   MSISDN (number) of recipient.
- * @param string $reference
- *   Reference code of the message.
- * @param string $status
- *   Message status code. See sms constants.
+ * @param \Drupal\sms\Message\SmsDeliveryReportInterface[] $reports
+ *   Delivery reports received from the SMS gateway.
  * @param array $options
  *   Additional options array.
  */
-function sms_track_sms_receipt($op, $number, $reference, $status, array $options) {
+function sms_track_sms_receipt($op, array $reports, array $options) {
   if ($op == 'pre process') {
     // Tracking.
-    sms_track_update_message($reference, $status);
+    sms_track_update_message($reports);
   }
 }
 
@@ -213,30 +215,33 @@ function sms_track_archive_write($dir, $number, $message, array $options = array
 }
 
 /**
- * Updates a message with a new status code.
+ * Updates message reports with the new delivery status codes.
  *
- * @param string $reference
- *   Message reference code.
- * @param int $status
- *   Message status code. See sms constants.
+ * @param \Drupal\sms\Message\SmsDeliveryReportInterface[] $reports
+ *   The SMS delivery reports.
  *
  * @todo Log record handling.
  */
-function sms_track_update_message($reference, $status) {
+function sms_track_update_message(array $reports) {
   $updated = REQUEST_TIME;
+  $affected_rows = 0;
 
-  \Drupal::logger('sms_track')->notice($reference . ' ' . $status . ' ' . $updated);
+  foreach ($reports as $number => $report) {
+    \Drupal::logger('sms_track')
+      ->notice($report->getMessageId() . ' ' . $report->getStatus() . ' ' . $updated);
 
-  $result = db_update('sms_track')
-    ->fields(array(
-      'status' => $status,
-      'updated' => $updated,
-    ))
-    ->condition('reference', $reference)
-    ->execute();
+    $result = db_update('sms_track')
+      ->fields(array(
+        'status' => $report->getStatus(),
+        'updated' => $updated,
+      ))
+      ->condition('reference', $report->getMessageId())
+      ->execute();
+    $affected_rows += $result->rowCount();
+  }
 
-  if ($result) {
-    \Drupal::logger('sms_track')->notice('Affected rows: ' . $result->rowCount());
+  if ($affected_rows) {
+    \Drupal::logger('sms_track')->notice('Affected rows: ' . $affected_rows);
   }
 }
 

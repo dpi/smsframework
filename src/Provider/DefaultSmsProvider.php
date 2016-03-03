@@ -85,8 +85,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *   The message result from the gateway.
    */
   protected function process(SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway) {
-    return $sms_gateway->getPlugin()
-      ->send($sms, $options);
+    return $sms_gateway->getPlugin()->send($sms, $options);
   }
 
   /**
@@ -140,12 +139,12 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function receipt($number, $reference, $message_status = SmsGatewayPluginInterface::STATUS_UNKNOWN, array $options = array()) {
-    // @todo Implement rules event integration here for incoming SMS.
+  public function receipt(array $reports, array $options = []) {
+    // @todo Implement rules event integration here delivery report receipts.
     // Execute three phases.
-    $this->moduleHandler->invokeAll('sms_receipt', array('pre process', $number, $reference, $message_status, $options));
-    $this->moduleHandler->invokeAll('sms_receipt', array('process', $number, $reference, $message_status, $options));
-    $this->moduleHandler->invokeAll('sms_receipt', array('post process', $number, $reference, $message_status, $options));
+    $this->moduleHandler->invokeAll('sms_receipt', array('pre process', $reports, $options));
+    $this->moduleHandler->invokeAll('sms_receipt', array('process', $reports, $options));
+    $this->moduleHandler->invokeAll('sms_receipt', array('post process', $reports, $options));
   }
 
   /**

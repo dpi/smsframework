@@ -98,7 +98,7 @@ sms.bootstrap_admin:
     _permission: 'administer smsframework'
 
 sms.delivery_report:
-  path: '/sms/deliveryreport/{gateway_id}'
+  path: '/sms/deliveryreport/{gateway_name}'
   defaults:
     _controller: '\Drupal\sms\DeliveryReportController::acknowledgeDelivery'
   requirements:

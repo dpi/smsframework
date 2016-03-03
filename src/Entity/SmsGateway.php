@@ -92,6 +92,8 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
       $this->pluginCollection = new SmsGatewayPluginCollection(
         \Drupal::service('plugin.manager.sms_gateway'),
         $this->plugin,
+        $this->id,
+        // Add the configuration name so the plugin is aware of it.
         $this->settings
       );
     }

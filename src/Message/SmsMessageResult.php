@@ -41,11 +41,11 @@ class SmsMessageResult implements SmsMessageResultInterface {
   public $creditBalance;
 
   /**
-   * The message reports keyed by recipient number.
+   * The message delivery reports keyed by recipient number.
    *
-   * @var array
+   * @var \Drupal\sms\Message\SmsDeliveryReportInterface[]
    */
-  public $report;
+  public $reports;
 
   /**
    * Create a new message result based on data supplied in the array.
@@ -59,7 +59,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
     $this->creditBalance = $data['credit_balance'];
     $this->creditsUsed = $data['credits_used'];
     $this->errorMessage = $data['error_message'];
-    $this->report = $data['report'];
+    $this->reports = $data['reports'];
   }
 
   /**
@@ -72,8 +72,8 @@ class SmsMessageResult implements SmsMessageResultInterface {
   /**
    * {@inheritdoc}
    */
-  public function getReport() {
-    return $this->report;
+  public function getReports() {
+    return $this->reports;
   }
 
   /**
@@ -99,7 +99,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
       'error_message' => $this->errorMessage,
       'credits_used' => $this->creditsUsed,
       'credit_balance' => $this->creditBalance,
-      'report' => $this->report,
+      'reports' => $this->reports,
     );
   }
 
@@ -113,9 +113,9 @@ class SmsMessageResult implements SmsMessageResultInterface {
   /**
    * {@inheritdoc}
    */
-  public function getReportFor($recipient) {
-    if (isset($this->report[$recipient])) {
-      return $this->report[$recipient];
+  public function getReport($recipient) {
+    if (isset($this->reports[$recipient])) {
+      return $this->reports[$recipient];
     }
     else {
       return null;
@@ -131,7 +131,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
       'error_message' => '',
       'credits_used' => 0,
       'credit_balance' => 0,
-      'report' => array(),
+      'reports' => [],
     );
   }
 

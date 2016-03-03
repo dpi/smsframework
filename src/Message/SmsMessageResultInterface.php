@@ -32,18 +32,11 @@ interface SmsMessageResultInterface {
   /**
    * Gets the delivery report for all recipients.
    *
-   * @return array
-   *   The report for all recipients. This report is an array keyed by the
-   *   recipients' numbers. The value is also an array with the following keys:
-   *   - status: true if message was successfully sent, false otherwise.
-   *   - message_id: The message id if the message was successfully sent to that
-   *       recipient. Zero means message was not sent to that recipient.
-   *   - error_code: The error code number for a specific message.
-   *   - error_message: The description of the error message.
-   *   - gateway_error_code: The original error code from the SMS gateway.
-   *   - gateway_error_message: The original error message from the SMS gateway.
+   * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
+   *   An array of delivery reports for all recipients keyed by the recipients'
+   *   number.
    */
-  public function getReport();
+  public function getReports();
 
   /**
    * Gets the credit balance after the SMS was sent.
@@ -70,14 +63,16 @@ interface SmsMessageResultInterface {
   public function toArray();
 
   /**
-   * Gets the specific report for a particular recipient.
+   * Gets the delivery report for a particular recipient.
    *
    * @param string $recipient
    *   The number of the recipient for which the report is to be retrieved.
-   * @return array
-   *   An array containing the message report
-   *   @link see SmsMessageResultInterface::getReport() @endlink
+   *
+   * @return \Drupal\sms\Message\SmsDeliveryReportInterface
+   *   A delivery report object.
+   *
+   * @see SmsMessageResultInterface::getReports()
    */
-  public function getReportFor($recipient);
+  public function getReport($recipient);
 
 }

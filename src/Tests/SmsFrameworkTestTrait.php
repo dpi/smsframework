@@ -12,6 +12,7 @@ use Drupal\sms\Entity\PhoneNumberSettingsInterface;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Message\SmsMessage;
 
 /**
  * Shared SMS Framework helpers for kernel and web tests.
@@ -56,7 +57,7 @@ trait SmsFrameworkTestTrait {
    * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
    *   A gateway plugin, or NULL to use gateway stored in $this->testGateway.
    *
-   * @return \Drupal\sms\Message\SmsMessageInterface|NULL
+   * @return \Drupal\sms\Message\SmsMessageInterface|FALSE
    *   The last SMS message, or FALSE if no messages have been sent.
    */
   public function getLastTestMessage(SmsGatewayInterface $sms_gateway = NULL) {
@@ -79,6 +80,47 @@ trait SmsFrameworkTestTrait {
       $sms_messages = [];
     }
     \Drupal::state()->set('sms_test_gateway.memory.send', $sms_messages);
+  }
+
+  /**
+   * Gets all SMS reports for messages sent to 'Memory' gateway.
+   *
+   * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
+   */
+  protected function getTestMessageReports() {
+    return \Drupal::state()->get('sms_test_gateway.memory.report', []);
+  }
+
+  /**
+   * Gets the last SMS report for messages sent to 'Memory' gateway.
+   *
+   * @return \Drupal\sms\Message\SmsDeliveryReportInterface|false
+   *   The last SMS message, or FALSE if no messages have been sent.
+   */
+  protected function getLastTestMessageReport() {
+    $reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
+    return end($reports);
+  }
+
+  /**
+   * Gets an SMS report for message with message ID.
+   *
+   * @param string $message_id
+   *   The message ID.
+   *
+   * @return \Drupal\sms\Message\SmsDeliveryReportInterface
+   *   The last SMS message, or FALSE if no messages have been sent.
+   */
+  protected function getTestMessageReport($message_id) {
+    $reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
+    return $reports[$message_id];
+  }
+
+  /**
+   * Resets the SMS reports stored in memory by 'Memory' gateway.
+   */
+  protected function resetTestMessageReports() {
+    \Drupal::state()->set('sms_test_gateway.memory.report', []);
   }
 
   /**
@@ -146,6 +188,31 @@ trait SmsFrameworkTestTrait {
     $verifications = $verification_storage->loadMultiple($verification_ids);
 
     return reset($verifications);
+  }
+
+  /**
+   * Generates a random SMS message by the specified user.
+   *
+   * @param int $uid
+   *   (optional) The user ID to generate the message as. Defaults to 1.
+   *
+   * @return \Drupal\sms\Message\SmsMessageInterface
+   */
+  protected function randomSmsMessage($uid = 1) {
+    return new SmsMessage($this->randomString(), $this->randomPhoneNumbers(), $this->randomString(), [], $uid);
+  }
+
+  /**
+   * Generates random phone numbers for tests.
+   *
+   * @return array
+   */
+  protected function randomPhoneNumbers() {
+    $numbers =[];
+    for ($i = 0; $i < rand(0,20); $i++) {
+      $numbers[] = '234' . rand(1000000, 9999999);
+    }
+    return $numbers;
   }
 
 }
