@@ -117,6 +117,8 @@ class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkWebTestBase {
     // Ensure the route cache is rebuilt by getting the verify route.
     $this->drupalGet($path_verify);
     $this->assertResponse(200, 'Phone number verification route changed to ' . $path_verify);
+    $this->drupalGet('/verify');
+    $this->assertResponse(404, 'Previous route path was invalidated.');
   }
 
 }

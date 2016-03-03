@@ -35,7 +35,7 @@ class SmsSettingsForm extends ConfigFormBase {
   protected $requestContext;
 
   /**
-   * Constructs a SiteInformationForm object.
+   * Constructs a SmsSettingsForm object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.

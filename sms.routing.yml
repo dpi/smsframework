@@ -9,6 +9,7 @@ sms.admin:
   requirements:
     _permission: 'administer smsframework'
 
+# Phone numbers
 sms.phone_number_settings.list:
   path: '/admin/config/smsframework/phone_number'
   defaults:
