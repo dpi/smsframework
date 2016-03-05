@@ -200,7 +200,6 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $this->phoneNumberProvider->sendMessage($entity, $sms_message);
 
     $message = $this->getLastTestMessage($this->gateway);
-    $this->assertEquals(1, count($message->getRecipients()), 'Entity has two phone numbers, one phone number was added.');
     $this->assertEquals([$phone_numbers[0]], $message->getRecipients(), 'The SMS message is using the first phone number from the entity.');
   }
 
