@@ -99,7 +99,7 @@ class SmsBlastForm extends FormBase {
       if (($entity = $verification->getEntity()) && !in_array($entity->id(), $entity_ids)) {
         $entity_ids[] = $entity->id();
         $this->phoneNumberProvider
-          ->sendMessage($verification->getEntity(), $sms_message);
+          ->sendMessage($entity, $sms_message);
       }
     }
 
