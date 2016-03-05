@@ -93,9 +93,10 @@ trait SmsFrameworkTestTrait {
    *   An entity with phone numbers.
    */
   protected function createEntityWithPhoneNumber(PhoneNumberSettingsInterface $phone_number_settings, $phone_numbers = []) {
+    $entity_type = $phone_number_settings->getPhoneNumberEntityTypeId();
     $field_name = $phone_number_settings->getFieldName('phone_number');
     $entity_type_manager = \Drupal::entityTypeManager();
-    $test_entity = $entity_type_manager->getStorage('entity_test')
+    $test_entity = $entity_type_manager->getStorage($entity_type)
       ->create([
         'name' => $this->randomMachineName(),
       ]);
