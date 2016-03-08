@@ -10,6 +10,9 @@ namespace Drupal\sms\Entity;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
 
 /**
  * Defines the SMS message entity.
@@ -29,6 +32,222 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * )
  */
 class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
+
+  // From \Drupal\sms\Message\SmsMessageInterface.
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRecipients() {
+    $recipients = [];
+    foreach ($this->get('recipient') as $recipient) {
+      $recipients[] = $recipient->value;
+    }
+    return $recipients;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addRecipient($recipient) {
+    $this->recipient->appendItem($recipient);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addRecipients(array $recipients) {
+    foreach ($recipients as $recipient) {
+      $this->addRecipient($recipient);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeRecipient($recipient) {
+    $this->recipient->filter(function ($item) use ($recipient) {
+      return ($item->value != $recipient);
+    });
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeRecipients(array $recipients) {
+    $this->recipient->filter(function ($item) use ($recipients) {
+      return !in_array($item->value, $recipients);
+    });
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOptions() {
+    return ($first = $this->get('options')->first()) ? $first->getValue() : [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOption($name) {
+    $options = $this->getOptions();
+    return isset($options[$name]) ? $options[$name] : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOption($name, $value) {
+    $options = $this->getOptions();
+    $options[$name] = $value;
+    $this->set('options', $options);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeOption($name) {
+    $options = $this->getOptions();
+    unset($options[$name]);
+    $this->set('options', $options);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSender() {
+    return ($sender_entity = $this->getSenderEntity()) ? $sender_entity->label() : '';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSender($sender) {
+    // Send to the ether.
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMessage() {
+    return $this->get('message')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setMessage($message) {
+    $this->set('message', $message);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUuid() {
+    return $this->get('uuid')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUid() {
+    $sender = $this->getSenderEntity();
+    return ($sender instanceof UserInterface) ? $sender->id() : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUid($uid) {
+    $this->setSenderEntity(User::load($uid));
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isAutomated() {
+    return $this->get('automated')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAutomated($automated) {
+    $this->set('automated', $automated);
+    return $this;
+  }
+
+  // From \Drupal\sms\Entity\SmsMessageInterface.
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getGateway() {
+    $this->get('gateway');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setGateway($gateway) {
+    $this->set('gateway', $gateway);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSenderNumber() {
+    return $this->get('sender')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSenderNumber($number) {
+    $this->set('sender', $number);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSenderEntity() {
+    return $this->get('sender_entity')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSenderEntity(EntityInterface $entity) {
+    $this->set('sender_entity', $entity);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRecipientEntity() {
+    return $this->get('recipient_entity')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRecipientEntity(EntityInterface $entity) {
+    $this->set('recipient_entity', $entity);
+    return $this;
+  }
 
   /**
    * {@inheritdoc}
@@ -69,8 +288,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
       ->setLabel(t('Sender phone number'))
       ->setDescription(t('The phone number of the sender.'))
       ->setDefaultValue('')
-      ->setRequired(FALSE)
-      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED);
+      ->setRequired(FALSE);
 
     $fields['sender_entity'] = BaseFieldDefinition::create('dynamic_entity_reference')
       ->setLabel(t('Sender entity'))
@@ -112,7 +330,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
       ->setSetting('size', 'small')
       ->setSetting('unsigned', TRUE);
 
-    // Dates
+    // Dates.
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Creation date'))
       ->setDescription(t('The time the SMS message was created.'))
