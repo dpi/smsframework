@@ -13,6 +13,8 @@ use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginInterface;
 use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
+use Drupal\sms\Entity\SmsMessage as SmsMessageEntity;
 use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
@@ -50,7 +52,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms, array $options = array()) {
+  public function send(SmsMessageInterface $sms, array $options = []) {
     // Check if a preferred gateway is specified in the $options.
     if (isset($options['gateway'])) {
       $gateway = SmsGateway::load($options['gateway']);
@@ -58,6 +60,22 @@ class DefaultSmsProvider implements SmsProviderInterface {
     if (empty($gateway)) {
       $gateway = $this->getDefaultGateway();
     }
+
+    if (!$sms instanceof SmsMessageEntityInterface) {
+      $original = $sms;
+      /** @var \Drupal\sms\Entity\SmsMessageInterface $sms */
+      $sms = SmsMessageEntity::create();
+      $sms
+        ->setMessage($original->getMessage())
+        ->addRecipients($original->getRecipients())
+        ->setAutomated($original->isAutomated())
+        ->setGateway($gateway);
+      foreach ($original->getOptions() as $name => $value) {
+        $sms->setOption($name, $value);
+      }
+    }
+
+
 
     if ($this->preProcess($sms, $options, $gateway)) {
       $this->moduleHandler->invokeAll('sms_send', [$sms, $options, $gateway]);
@@ -84,9 +102,12 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * @return \Drupal\sms\Message\SmsMessageResultInterface
    *   The message result from the gateway.
    */
-  protected function process(SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway) {
-    return $sms_gateway->getPlugin()
-      ->send($sms, $options);
+  public function process(SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway) {
+    if ($this->preProcess($sms, $options, $gateway)) {
+      $result = $sms_gateway->getPlugin()
+        ->send($sms, $options);
+    }
+    return FALSE;
   }
 
   /**
