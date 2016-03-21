@@ -115,6 +115,11 @@ class SmsGatewayForm extends EntityForm {
     ];
 
     if (!$sms_gateway->isNew()) {
+      $form['delivery_report_path'] = [
+        '#type' => 'item',
+        '#title' => $this->t('Delivery report URL'),
+        '#markup' => Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $sms_gateway->id()], ['absolute' => TRUE])->toString(),
+      ];
       $instance = $sms_gateway->getPlugin();
       $form += $instance->buildConfigurationForm($form, $form_state);
     }

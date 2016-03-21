@@ -7,8 +7,9 @@
 
 namespace Drupal\sms\Provider;
 
-use Drupal\sms\Plugin\SmsGatewayPluginInterface;
+use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Message\SmsMessageInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Provides an interface for sending messages
@@ -58,17 +59,26 @@ interface SmsProviderInterface {
    * The original gateway code and string will often be provided in the $options
    * array as 'gateway_message_status' and 'gateway_message_status_text'.
    *
-   * @param string $number
-   *   The sender's mobile number.
-   * @param string $reference
-   *   Unique message reference code, as provided when message is sent.
-   * @param int $message_status
-   *   (optional) An SMS Framework message status code, according to the defined
-   *   constants.
-   *   Defaults to \Drupal\sms\Plugin\SmsGatewayPluginInterface::STATUS_UNKNOWN.
+   * @param \Drupal\sms\Message\SmsDeliveryReportInterface[] $reports
+   *   An array of the delivery reports that have been received.
    * @param array $options
    *   (optional) Extended options passed by the receipt receiver.
    */
-  public function receipt($number, $reference, $message_status = SmsGatewayPluginInterface::STATUS_UNKNOWN, array $options = array());
+  public function receipt(array $reports, array $options = []);
+
+  /**
+   * Handles delivery reports returning to the SMS provider from gateways.
+   *
+   * Allows gateways plugins to correctly parse delivery reports and return a
+   * standard format for processing and storage.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The HTTP request that contains the delivery report.
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $gateway
+   *   The SMS Gateway designated to process the delivery report.
+   * @param array $options
+   *   (optional) Additional options required for parsing the Delivery Report.
+   */
+  public function processDeliveryReport(Request $request, SmsGatewayInterface $gateway, array $options = []);
 
 }

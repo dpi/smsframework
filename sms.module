@@ -198,8 +198,8 @@ function sms_incoming($number, $message, array $options = array()) {
  *
  * @deprecated use \Drupal\sms\Provider\SmsProviderInterface::receipt() instead.
  */
-function sms_receipt($number, $reference, $message_status = GatewayInterface::STATUS_UNKNOWN, $options = array()) {
-  \Drupal::service('sms_provider')->receipt($number, $reference, $message_status, $options);
+function sms_receipt(array $reports, array $options = []) {
+  \Drupal::service('sms_provider')->receipt($reports, $options);
 }
 
 /**

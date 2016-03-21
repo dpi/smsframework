@@ -9,13 +9,15 @@ namespace Drupal\sms\Provider;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Url;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsGatewayInterface;
-use Drupal\sms\Plugin\SmsGatewayPluginInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
 use Drupal\sms\Entity\SmsMessage as SmsMessageEntity;
 use Drupal\sms\Message\SmsMessageResultInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * The SMS provider that provides default messaging functionality.
@@ -102,12 +104,13 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * @return \Drupal\sms\Message\SmsMessageResultInterface
    *   The message result from the gateway.
    */
-  public function process(SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway) {
-    if ($this->preProcess($sms, $options, $gateway)) {
-      $result = $sms_gateway->getPlugin()
-        ->send($sms, $options);
+  protected function process(SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway) {
+    // Ensure that the delivery report route is set here.
+    if (!isset($options['delivery_report_url'])) {
+      $options['delivery_report_url'] = Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $sms_gateway->id()], ['absolute' => TRUE])->toString();
     }
-    return FALSE;
+    return $sms_gateway->getPlugin()
+      ->send($sms, $options);
   }
 
   /**
@@ -161,12 +164,26 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function receipt($number, $reference, $message_status = SmsGatewayPluginInterface::STATUS_UNKNOWN, array $options = array()) {
-    // @todo Implement rules event integration here for incoming SMS.
+  public function receipt(array $reports, array $options = []) {
+    // @todo Implement rules event integration here delivery report receipts.
     // Execute three phases.
-    $this->moduleHandler->invokeAll('sms_receipt', array('pre process', $number, $reference, $message_status, $options));
-    $this->moduleHandler->invokeAll('sms_receipt', array('process', $number, $reference, $message_status, $options));
-    $this->moduleHandler->invokeAll('sms_receipt', array('post process', $number, $reference, $message_status, $options));
+    $this->moduleHandler->invokeAll('sms_receipt', array('pre process', $reports, $options));
+    $this->moduleHandler->invokeAll('sms_receipt', array('process', $reports, $options));
+    $this->moduleHandler->invokeAll('sms_receipt', array('post process', $reports, $options));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function processDeliveryReport(Request $request, SmsGatewayInterface $sms_gateway, array $options = []) {
+    // The response that will be sent back to the server API. The gateway plugin
+    // can alter this response as needed.
+    $response = new Response('');
+    $reports = $sms_gateway->getPlugin()
+      ->parseDeliveryReports($request, $response);
+    // Invoke the delivery report hook so other modules can alter the response.
+    $this->moduleHandler->invokeAll('sms_delivery_report', [$reports, $response]);
+    return $response;
   }
 
   /**
