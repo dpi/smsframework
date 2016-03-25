@@ -76,7 +76,7 @@ class Memory extends SmsGatewayPluginBase {
     $reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
     $latest_reports = $this->randomDeliveryReports($sms_message);
     // Update the delivery reports.
-    $reports = $latest_reports + $reports;
+    $reports[$gateway_id] = $latest_reports + $reports;
     \Drupal::state()->set('sms_test_gateway.memory.report', $reports);
     return new SmsMessageResult([
       'status' => TRUE,
@@ -104,8 +104,9 @@ class Memory extends SmsGatewayPluginBase {
     }
 
     // Update the latest delivery reports in \Drupal::state().
+    $gateway_id = $this->configuration['gateway_id'];
     $reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
-    $reports = $latest_reports + $reports;
+    $reports[$gateway_id] = $latest_reports + $reports;
     \Drupal::state()->set('sms_test_gateway.memory.report', $reports);
 
     // Set the response.
