@@ -272,10 +272,6 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
       ->setReadOnly(TRUE)
       ->setRequired(TRUE);
 
-    $fields['reference'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Reference number'))
-      ->setDescription(t('An optional tracking number provided by the gateway plugin.'));
-
     $fields['direction'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Transmission direction'))
       ->setDescription(t('Transmission direction, See SmsMessageInterface::DIRECTION_*.'))
@@ -322,13 +318,6 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
       ->setLabel(t('Queued'))
       ->setDescription(t('Whether the SMS message is in the queue to be processed.'))
       ->setRequired(FALSE);
-
-    $fields['delivery_status'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Delivery status'))
-      ->setDescription(t('Delivery status matching codes in SmsDeliveryReportInterface::STATUS_*'))
-      ->setRequired(FALSE)
-      ->setSetting('size', 'small')
-      ->setSetting('unsigned', TRUE);
 
     // Dates.
     $fields['created'] = BaseFieldDefinition::create('created')
