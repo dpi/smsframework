@@ -13,8 +13,6 @@ use Drupal\Core\Url;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Message\SmsMessageInterface;
-use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
-use Drupal\sms\Entity\SmsMessage as SmsMessageEntity;
 use Drupal\sms\Message\SmsMessageResultInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -54,7 +52,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms, array $options = []) {
+  public function send(SmsMessageInterface $sms, array $options = array()) {
     // Check if a preferred gateway is specified in the $options.
     if (isset($options['gateway'])) {
       $gateway = SmsGateway::load($options['gateway']);
@@ -62,22 +60,6 @@ class DefaultSmsProvider implements SmsProviderInterface {
     if (empty($gateway)) {
       $gateway = $this->getDefaultGateway();
     }
-
-    if (!$sms instanceof SmsMessageEntityInterface) {
-      $original = $sms;
-      /** @var \Drupal\sms\Entity\SmsMessageInterface $sms */
-      $sms = SmsMessageEntity::create();
-      $sms
-        ->setMessage($original->getMessage())
-        ->addRecipients($original->getRecipients())
-        ->setAutomated($original->isAutomated())
-        ->setGateway($gateway);
-      foreach ($original->getOptions() as $name => $value) {
-        $sms->setOption($name, $value);
-      }
-    }
-
-
 
     if ($this->preProcess($sms, $options, $gateway)) {
       $this->moduleHandler->invokeAll('sms_send', [$sms, $options, $gateway]);
