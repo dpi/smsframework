@@ -33,7 +33,11 @@ use Drupal\user\UserInterface;
  */
 class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
 
-  // From \Drupal\sms\Message\SmsMessageInterface.
+  /**
+   * Following are implementors of plain SmsMessage interface.
+   *
+   * @see \Drupal\sms\Entity\SmsMessageInterface
+   */
 
   /**
    * {@inheritdoc}
@@ -187,7 +191,11 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     return $this;
   }
 
-  // From \Drupal\sms\Entity\SmsMessageInterface.
+  /**
+   * Following are implementors of entity interface.
+   *
+   * @see \Drupal\sms\Entity\SmsMessageInterface
+   */
 
   /**
    * {@inheritdoc}
