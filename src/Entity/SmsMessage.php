@@ -197,11 +197,15 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * @see \Drupal\sms\Entity\SmsMessageInterface
    */
 
+  public function getDirection() {
+    return $this->get('direction');
+  }
+
   /**
    * {@inheritdoc}
    */
   public function getGateway() {
-    $this->get('gateway');
+    return $this->get('gateway');
   }
 
   /**
@@ -254,6 +258,57 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    */
   public function setRecipientEntity(EntityInterface $entity) {
     $this->set('recipient_entity', $entity);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getQueued() {
+    return $this->get('queued')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setQueued($is_queued) {
+    $this->set('queued', $is_queued);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCreatedTime() {
+    return $this->get('created')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSendTime() {
+    return $this->get('send_on')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSendTime($send_time) {
+    $this->set('send_on', $send_time);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getProcessedTime() {
+    return $this->get('processed')->value;
+  }
+  /**
+   * {@inheritdoc}
+   */
+  public function setProcessedTime($processed) {
+    $this->set('processed', $processed);
     return $this;
   }
 

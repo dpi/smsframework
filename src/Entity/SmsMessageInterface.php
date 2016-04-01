@@ -24,6 +24,15 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
   const DIRECTION_INCOMING = -1;
 
   /**
+   * Get direction of the message.
+   *
+   * @return int
+   *   See \Drupal\sms\Entity\SmsMessageInterface::DIRECTION_* constants for
+   *   potential values.
+   */
+  public function getDirection();
+
+  /**
    * Get the gateway for this message.
    *
    * @return string
@@ -42,8 +51,23 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    */
   public function setGateway($gateway);
 
+  /**
+   * Get phone number of the sender.
+   *
+   * @return string
+   *   The phone number of the sender.
+   */
   public function getSenderNumber();
 
+  /**
+   * Set the phone number of the sender.
+   *
+   * @param string $number
+   *   The phone number of the sender.
+   *
+   * @return $this
+   *   Return SMS message for chaining.
+   */
   public function setSenderNumber($number);
 
   /**
@@ -83,5 +107,73 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    *   Return SMS message for chaining.
    */
   public function setRecipientEntity(EntityInterface $entity);
+
+  /**
+   * Get whether the SMS message is in the queue to be processed.
+   *
+   * @return boolean
+   *   Whether the SMS message is in the queue to be processed.
+   */
+  public function getQueued();
+
+  /**
+   * Get whether the SMS message is in the queue to be processed.
+   *
+   * @param bool $is_queued
+   *   Whether the SMS message is in the queue to be processed.
+   *
+   * @return $this
+   *   Return SMS message for chaining.
+   */
+  public function setQueued($is_queued);
+
+  /**
+   * Get the creation timestamp of the SMS message.
+   *
+   * @return int
+   *   Creation timestamp of the SMS message.
+   */
+  public function getCreatedTime();
+
+  /**
+   * Get the time to send the SMS message.
+   *
+   * @return int
+   *   The timestamp after which the SMS message should be sent.
+   */
+  public function getSendTime();
+
+  /**
+   * Set the time to send the SMS message.
+   *
+   * @param int $send_time
+   *   The timestamp after which the SMS message should be sent.
+   *
+   * @return $this
+   *   Return SMS message for chaining.
+   */
+  public function setSendTime($send_time);
+
+  /**
+   * The time the SMS message was processed.
+   *
+   * This value does not indicate whether the message was sent, only that the
+   * gateway accepted the request.
+   *
+   * @return int
+   *   The timestamp when SMS message was processed.
+   */
+  public function getProcessedTime();
+
+  /**
+   * Set the time the SMS message was processed.
+   *
+   * @param int $processed
+   *   The timestamp when SMS message was processed.
+   *
+   * @return $this
+   *   Return SMS message for chaining.
+   */
+  public function setProcessedTime($processed);
 
 }
