@@ -44,7 +44,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    */
   public function getRecipients() {
     $recipients = [];
-    foreach ($this->get('recipient') as $recipient) {
+    foreach ($this->get('recipient_phone_number') as $recipient) {
       $recipients[] = $recipient->value;
     }
     return $recipients;
@@ -127,7 +127,12 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function getSender() {
-    return ($sender_entity = $this->getSenderEntity()) ? $sender_entity->label() : '';
+    $sender_name = $this->get('sender_name');
+    if (isset($sender_name)) {
+      return $sender_name;
+    } else {
+      return ($sender_entity = $this->getSenderEntity()) ? $sender_entity->label() : NULL;
+    }
   }
 
   /**
@@ -220,14 +225,14 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function getSenderNumber() {
-    return $this->get('sender')->value;
+    return $this->get('sender_phone_number')->value;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setSenderNumber($number) {
-    $this->set('sender', $number);
+    $this->set('sender_phone_number', $number);
     return $this;
   }
 
@@ -343,7 +348,12 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
       ->setSetting('size', 'tiny');
 
     // Sender and receivers.
-    $fields['sender'] = BaseFieldDefinition::create('telephone')
+    $fields['sender_name'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Sender name'))
+      ->setDescription(t('The name of the sender.'))
+      ->setRequired(FALSE);
+
+    $fields['sender_phone_number'] = BaseFieldDefinition::create('telephone')
       ->setLabel(t('Sender phone number'))
       ->setDescription(t('The phone number of the sender.'))
       ->setDefaultValue('')
@@ -354,9 +364,9 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
       ->setDescription(t('The entity who sent the SMS message.'))
       ->setRequired(FALSE);
 
-    $fields['recipient'] = BaseFieldDefinition::create('telephone')
-      ->setLabel(t('Sender phone number'))
-      ->setDescription(t('The phone number of the sender.'))
+    $fields['recipient_phone_number'] = BaseFieldDefinition::create('telephone')
+      ->setLabel(t('Recipient phone number'))
+      ->setDescription(t('The phone number of the recipient.'))
       ->setDefaultValue('')
       ->setRequired(FALSE)
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED);
