@@ -137,9 +137,15 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @param string $sender|NULL
+   *   The name of the sender. Or NULL to defer to the label of the sender
+   *   entity.
+   *
+   * @see ::getSender()
    */
   public function setSender($sender) {
-    // Send to the ether.
+    $this->set('sender', $sender);
     return $this;
   }
 
