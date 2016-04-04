@@ -108,7 +108,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       throw new NoPhoneNumberException('Attempted to send an SMS to entity without a phone number.');
     }
 
-    $sms_message->addRecipients($phone_numbers);
+    $sms_message->addRecipient(reset($phone_numbers));
     $this->smsProvider
       // @todo: Remove $options.
       ->send($sms_message, []);

@@ -10,6 +10,7 @@ namespace Drupal\sms\Plugin;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Base class for sms gateway plugins.
@@ -111,8 +112,15 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
   /**
    * {@inheritdoc}
    */
-  public function deliveryReport(Request $request) {
-    return;
+  public function parseDeliveryReports(Request $request, Response $response) {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDeliveryReports(array $message_ids = NULL) {
+    return [];
   }
 
   /**

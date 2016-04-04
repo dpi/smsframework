@@ -8,11 +8,10 @@
 namespace Drupal\sms;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\sms\Entity\SmsGateway;
+use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Provider\SmsProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\sms\Plugin\SmsGatewayPluginManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Provides delivery reports acknowledgement and passes to the correct gateway.
@@ -20,11 +19,11 @@ use Symfony\Component\HttpFoundation\Response;
 class DeliveryReportController implements ContainerInjectionInterface {
 
   /**
-   * The gateway manager.
+   * The SMS Provider.
    *
-   * @var \Drupal\sms\Plugin\SmsGatewayPluginManagerInterface
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
-  protected $gatewayManager;
+  protected $smsProvider;
 
   /**
    * The request stack.
@@ -36,31 +35,14 @@ class DeliveryReportController implements ContainerInjectionInterface {
   /**
    * Creates an new delivery report controller.
    *
-   * @param \Drupal\sms\Plugin\SmsGatewayPluginManagerInterface $gateway_manager
-   *   The gateway manager service.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
+   * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
+   *   The SMS service provider.
    */
-  public function __construct(SmsGatewayPluginManagerInterface $gateway_manager, RequestStack $request_stack) {
-    $this->gatewayManager = $gateway_manager;
+  public function __construct(RequestStack $request_stack, SmsProviderInterface $sms_provider) {
     $this->requestStack = $request_stack;
-  }
-
-  /**
-   * Acknowledges delivery reports and passes them to the correct gateway.
-   *
-   * @param string $gateway_id
-   *   The gateway id of the gateway that is to handle the delivery report.
-   *
-   * @return \Symfony\Component\HttpFoundation\Response
-   */
-  public function acknowledgeDelivery($gateway_id) {
-    /** @var \Drupal\sms\Entity\SmsGateway $sms_gateway */
-    $sms_gateway = SmsGateway::load($gateway_id);
-    $acknowledgement = $sms_gateway
-      ->getPlugin()
-      ->deliveryReport($this->requestStack->getCurrentRequest());
-    return new Response($acknowledgement);
+    $this->smsProvider = $sms_provider;
   }
 
   /**
@@ -68,9 +50,22 @@ class DeliveryReportController implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('plugin.manager.sms_gateway'),
-      $container->get('request_stack')
+      $container->get('request_stack'),
+      $container->get('sms_provider')
     );
+  }
+
+  /**
+   * Acknowledges delivery reports and passes them to the correct gateway.
+   *
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
+   *   The ID of the SMS Gateway that is to handle the delivery report. Will be
+   *   upcasted.
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   */
+  public function processDeliveryReport(SmsGatewayInterface $sms_gateway) {
+    return $this->smsProvider->processDeliveryReport($this->requestStack->getCurrentRequest(), $sms_gateway);
   }
 
 }
