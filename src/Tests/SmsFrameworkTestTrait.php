@@ -120,9 +120,10 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface
    *   The last SMS message, or FALSE if no messages have been sent.
    */
-  protected function getTestMessageReport($message_id) {
+  protected function getTestMessageReport($message_id, SmsGatewayInterface $sms_gateway = NULL) {
+    $gateway_id = $sms_gateway ? $sms_gateway->id() : $this->testGateway->id();
     $reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
-    return $reports[$message_id];
+    return $reports[$gateway_id][$message_id];
   }
 
   /**

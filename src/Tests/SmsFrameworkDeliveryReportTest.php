@@ -54,7 +54,7 @@ EOF;
     \Drupal::state()->resetCache();
 
     // Get the stored report and verify that it was properly parsed.
-    $second_report = $this->getTestMessageReport($first_report->getMessageId());
+    $second_report = $this->getTestMessageReport($first_report->getMessageId(), $this->testGateway);
     $this->assertEqual($first_report->getMessageId(), $second_report->getMessageId());
     $this->assertEqual("800", $second_report->getStatus());
     $this->assertEqual("THIS_HAS_BEEN_DELIVERED", $second_report->getGatewayStatus());

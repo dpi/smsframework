@@ -1,3 +1,6 @@
+route_callbacks:
+  - '\Drupal\sms\Routing\RouteSubscriber::routes'
+
 sms.admin:
   path: '/admin/config/smsframework'
   defaults:
@@ -7,14 +10,6 @@ sms.admin:
     _permission: 'administer smsframework'
 
 # Phone numbers
-sms.phone.verify:
-  path: '/verify'
-  defaults:
-    _form: '\Drupal\sms\Form\VerifyPhoneNumberForm'
-    _title: 'Verify a phone number'
-  requirements:
-    _permission: 'sms verify phone number'
-
 sms.phone_number_settings.list:
   path: '/admin/config/smsframework/phone_number'
   defaults:

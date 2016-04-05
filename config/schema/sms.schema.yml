@@ -25,6 +25,13 @@ sms.settings:
         verify_window:
           type: integer
           label: 'Used to calculate window of failed phone number verifications.'
+    page:
+      label: 'Pages'
+      type: mapping
+      mapping:
+        verify:
+          type: path
+          label: 'Phone number verification page.'
 
 # Configuration for SMS Gateways.
 sms.gateway.*:
