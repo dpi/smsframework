@@ -54,7 +54,13 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function addRecipient($recipient) {
-    $this->recipient->appendItem($recipient);
+    // Ensure duplicate recipients cannot be added.
+    foreach ($this->recipient_phone_number as $item) {
+      if ($item->value == $recipient) {
+        return $this;
+      }
+    }
+    $this->recipient_phone_number->appendItem($recipient);
     return $this;
   }
 
@@ -72,7 +78,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function removeRecipient($recipient) {
-    $this->recipient->filter(function ($item) use ($recipient) {
+    $this->recipient_phone_number->filter(function ($item) use ($recipient) {
       return ($item->value != $recipient);
     });
     return $this;
@@ -82,7 +88,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function removeRecipients(array $recipients) {
-    $this->recipient->filter(function ($item) use ($recipients) {
+    $this->recipient_phone_number->filter(function ($item) use ($recipients) {
       return !in_array($item->value, $recipients);
     });
     return $this;
@@ -129,7 +135,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   public function getSender() {
     $sender_name = $this->get('sender_name');
     if (isset($sender_name)) {
-      return $sender_name;
+      return $sender_name->value;
     } else {
       return ($sender_entity = $this->getSenderEntity()) ? $sender_entity->label() : NULL;
     }
@@ -145,7 +151,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * @see ::getSender()
    */
   public function setSender($sender) {
-    $this->set('sender', $sender);
+    $this->set('sender_name', $sender);
     return $this;
   }
 
@@ -373,7 +379,6 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     $fields['recipient_phone_number'] = BaseFieldDefinition::create('telephone')
       ->setLabel(t('Recipient phone number'))
       ->setDescription(t('The phone number of the recipient.'))
-      ->setDefaultValue('')
       ->setRequired(FALSE)
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED);
 
