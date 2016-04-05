@@ -22,7 +22,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   use SmsFrameworkMessageTestTrait {
     // Remove 'test' prefix so it will not be run by test runner, rename so we
     // can override.
-    SmsFrameworkMessageTestTrait::testUid as UidOriginal;
+    testUid as originalUid;
   }
 
   /**
@@ -54,9 +54,10 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    * @inheritdoc
    */
   public function testUid() {
+    // User must exist or setUid will throw an exception.
     User::create(['uid' => 22, 'name' => 'user'])
       ->save();
-    $this->UidOriginal();
+    $this->originalUid();
   }
 
 }

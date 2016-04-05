@@ -10,7 +10,7 @@ namespace Drupal\sms\Tests;
 /**
  * SMS Message object test trait.
  *
- * Covers methods as found in \Drupal\sms\Message\SmsMessage.
+ * Covers methods as found in \Drupal\sms\Message\SmsMessageInterface.
  */
 trait SmsFrameworkMessageTestTrait {
 
