@@ -24,10 +24,13 @@ trait SmsFrameworkMessageTestTrait {
    * @covers ::setSender
    */
   public function testSender() {
-    $sender = $this->randomMachineName();
     $sms_message1 = $this->createSmsMessage();
-    $sms_message1->setSender($sender);
-    $this->assertEquals($sender, $sms_message1->getSender());
+    $this->assertEquals(NULL, $sms_message1->getSender());
+
+    $sender = $this->randomMachineName();
+    $sms_message2 = $this->createSmsMessage();
+    $sms_message2->setSender($sender);
+    $this->assertEquals($sender, $sms_message2->getSender());
   }
 
   /**

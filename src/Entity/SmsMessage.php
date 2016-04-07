@@ -134,7 +134,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    */
   public function getSender() {
     $sender_name = $this->get('sender_name');
-    if (isset($sender_name)) {
+    if (isset($sender_name->value)) {
       return $sender_name->value;
     } else {
       return ($sender_entity = $this->getSenderEntity()) ? $sender_entity->label() : NULL;
@@ -214,21 +214,24 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * @see \Drupal\sms\Entity\SmsMessageInterface
    */
 
+  /**
+   * {@inheritdoc}
+   */
   public function getDirection() {
-    return $this->get('direction');
+    return $this->get('direction')->value;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getGateway() {
-    return $this->get('gateway');
+    return $this->get('gateway')->entity;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setGateway($gateway) {
+  public function setGateway(SmsGatewayInterface $gateway) {
     $this->set('gateway', $gateway);
     return $this;
   }
@@ -281,7 +284,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function getQueued() {
+  public function isQueued() {
     return $this->get('queued')->value;
   }
 
@@ -357,7 +360,8 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
       ->setDescription(t('Transmission direction, See SmsMessageInterface::DIRECTION_*.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', FALSE)
-      ->setSetting('size', 'tiny');
+      ->setSetting('size', 'tiny')
+      ->setRequired(TRUE);
 
     // Sender and receivers.
     $fields['sender_name'] = BaseFieldDefinition::create('string')
@@ -409,7 +413,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
       ->setDescription(t('The time the SMS message was created.'))
       ->setRequired(TRUE);
 
-    $fields['send_on'] = BaseFieldDefinition::create('timestamp')
+    $fields['send_on'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Send date'))
       ->setDescription(t('The time to send the SMS message.'))
       ->setRequired(TRUE);

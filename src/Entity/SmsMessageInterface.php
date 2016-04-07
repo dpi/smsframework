@@ -26,6 +26,8 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
   /**
    * Get direction of the message.
    *
+   * Direction is immutable so there is no setter. Set direction on creation.
+   *
    * @return int
    *   See \Drupal\sms\Entity\SmsMessageInterface::DIRECTION_* constants for
    *   potential values.
@@ -35,21 +37,21 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
   /**
    * Get the gateway for this message.
    *
-   * @return string
-   *   A gateway plugin ID.
+   * @return \Drupal\sms\Entity\SmsGatewayInterface
+   *   A gateway plugin instance.
    */
   public function getGateway();
 
   /**
    * Set the gateway for this message.
    *
-   * @param string $gateway
-   *   A gateway plugin ID.
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $gateway
+   *   A gateway plugin instance.
    *
    * @return $this
    *   Return SMS message for chaining.
    */
-  public function setGateway($gateway);
+  public function setGateway(SmsGatewayInterface $gateway);
 
   /**
    * Get phone number of the sender.
@@ -114,7 +116,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * @return boolean
    *   Whether the SMS message is in the queue to be processed.
    */
-  public function getQueued();
+  public function isQueued();
 
   /**
    * Get whether the SMS message is in the queue to be processed.
@@ -160,8 +162,8 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * This value does not indicate whether the message was sent, only that the
    * gateway accepted the request.
    *
-   * @return int
-   *   The timestamp when SMS message was processed.
+   * @return int|NULL
+   *   The timestamp when SMS message was processed, or NULL if not processed.
    */
   public function getProcessedTime();
 
