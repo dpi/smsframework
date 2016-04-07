@@ -161,7 +161,8 @@ interface SmsMessageInterface {
   /**
    * Gets the name of the sender of this SMS message.
    *
-   * @return string
+   * @return string|NULL
+   *   The name of the sender, or NULL if none is defined.
    */
   public function getSender();
 
