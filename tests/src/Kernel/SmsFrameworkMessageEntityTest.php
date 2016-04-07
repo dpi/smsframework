@@ -46,7 +46,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    *
    * @return \Drupal\sms\Entity\SmsMessageInterface
    */
-  private function createSmsMessage() {
+  protected function createSmsMessage() {
     return SmsMessage::create();
   }
 

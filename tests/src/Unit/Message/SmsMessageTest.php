@@ -27,7 +27,7 @@ class SmsMessageTest extends UnitTestCase {
    *
    * @return \Drupal\Tests\sms\Unit\Message\TestSmsMessage
    */
-  private function createSmsMessage() {
+  protected function createSmsMessage() {
     return new TestSmsMessage();
   }
 
