@@ -10,6 +10,7 @@ namespace Drupal\sms\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\sms\Plugin\SmsGatewayPluginCollection;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
+use Drupal\sms\Entity\SmsMessageInterface;
 
 /**
  * Defines storage for an SMS Gateway instance.
@@ -89,11 +90,18 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   protected $skip_queue;
 
   /**
+   * How many seconds to hold messages after they are received.
+   *
+   * @var integer
+   */
+  protected $retention_duration_incoming;
+
+  /**
    * How many seconds to hold messages after they are sent.
    *
    * @var integer
    */
-  protected $retention_duration;
+  protected $retention_duration_outgoing;
 
   /**
    * Encapsulates the creation of the action's LazyPluginCollection.
@@ -151,15 +159,27 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   /**
    * {@inheritdoc}
    */
-  public function getRetentionDuration() {
-    return (int)$this->retention_duration;
+  public function getRetentionDuration($direction) {
+    switch ($direction) {
+      case SmsMessageInterface::DIRECTION_INCOMING:
+        return (int)$this->retention_duration_incoming;
+      case SmsMessageInterface::DIRECTION_OUTGOING:
+        return (int)$this->retention_duration_outgoing;
+    }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setRetentionDuration($retention_duration) {
-    $this->retention_duration = (int)$retention_duration;
+  public function setRetentionDuration($direction, $retention_duration) {
+    switch ($direction) {
+      case SmsMessageInterface::DIRECTION_INCOMING:
+        $this->retention_duration_incoming = $retention_duration;
+        break;
+      case SmsMessageInterface::DIRECTION_OUTGOING:
+        $this->retention_duration_outgoing = $retention_duration;
+        break;
+    }
     return $this;
   }
 

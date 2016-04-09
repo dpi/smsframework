@@ -87,7 +87,7 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
 
         $duration = NULL;
         if ($gateway = $sms_message->getGateway()) {
-          $duration = $gateway->getRetentionDuration();
+          $duration = $gateway->getRetentionDuration($sms_message->getDirection());
         }
 
         // Clean up SMS message now if retention is set to delete immediately.

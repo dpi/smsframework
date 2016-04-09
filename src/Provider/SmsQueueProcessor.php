@@ -8,6 +8,7 @@
 namespace Drupal\sms\Provider;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\sms\Entity\SmsMessageInterface;
 
 /**
  * The SMS Queue Processor.
@@ -78,19 +79,31 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
    * @inheritdoc
    */
   public function garbageCollection() {
+    $directions = [
+      SmsMessageInterface::DIRECTION_INCOMING,
+      SmsMessageInterface::DIRECTION_OUTGOING,
+    ];
+
+    $ids = [];
     /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
     foreach ($this->smsGatewayStorage->loadMultiple() as $sms_gateway) {
-      $lifetime = $sms_gateway->getRetentionDuration();
-      if ($lifetime !== -1) {
-        $ids = $this->smsMessageStorage
-          ->getQuery()
-          ->condition('gateway', $sms_gateway->id(), '=')
-          ->condition('queued', 0)
-          ->condition('processed', NULL, 'IS NOT NULL')
-          ->condition('processed', REQUEST_TIME - $lifetime, '<=')
-          ->execute();
-        $this->smsMessageStorage->delete($this->smsMessageStorage->loadMultiple($ids));
+      foreach ($directions as $direction) {
+        $lifetime = $sms_gateway->getRetentionDuration($direction);
+        if ($lifetime !== -1) {
+          $ids += $this->smsMessageStorage
+            ->getQuery()
+            ->condition('gateway', $sms_gateway->id(), '=')
+            ->condition('queued', 0)
+            ->condition('direction', $direction)
+            ->condition('processed', NULL, 'IS NOT NULL')
+            ->condition('processed', REQUEST_TIME - $lifetime, '<=')
+            ->execute();
+        }
       }
+    }
+
+    if ($ids) {
+      $this->smsMessageStorage->delete($this->smsMessageStorage->loadMultiple($ids));
     }
   }
 
