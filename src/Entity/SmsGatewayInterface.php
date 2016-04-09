@@ -52,7 +52,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   /**
    * Get how many seconds to hold messages after they are sent.
    *
-   * Use zero to never expire.
+   * Use -1 to never expire.
    *
    * @return int
    *   How long messages should persist in seconds.
@@ -63,7 +63,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    * Set how many seconds to hold messages after they are sent.
    *
    * @param int $retention_duration
-   *   How many seconds to hold messages, or use zero to never expire.
+   *   How many seconds to hold messages, or use -1 to never expire.
    *
    * @return $this
    *   Return this gateway for chaining.

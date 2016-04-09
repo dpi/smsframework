@@ -130,10 +130,10 @@ class SmsGatewayForm extends EntityForm {
     $form['message_queue']['retention_duration'] = [
       '#type' => 'number',
       '#title' => $this->t('Retention'),
-      '#description' => $this->t('How many seconds to keep messages after they are sent. Use zero to never expire.'),
+      '#description' => $this->t('How many seconds to keep messages after they are sent. Use -1 to never expire.'),
       '#field_suffix' => $this->t('seconds'),
       '#default_value' => $sms_gateway->getRetentionDuration(),
-      '#min' => 0,
+      '#min' => -1,
     ];
 
     if (!$sms_gateway->isNew()) {

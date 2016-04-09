@@ -84,10 +84,22 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
       if ($sms_message = $this->smsMessageStorage->load($id)) {
         $this->smsProvider
           ->send($sms_message, []);
-        $sms_message
-          ->setProcessedTime(REQUEST_TIME)
-          ->setQueued(FALSE)
-          ->save();
+
+        $duration = NULL;
+        if ($gateway = $sms_message->getGateway()) {
+          $duration = $gateway->getRetentionDuration();
+        }
+
+        // Clean up SMS message now if retention is set to delete immediately.
+        if ($duration === 0) {
+          $sms_message->delete();
+        }
+        else {
+          $sms_message
+            ->setProcessedTime(REQUEST_TIME)
+            ->setQueued(FALSE)
+            ->save();
+        }
       }
     }
   }

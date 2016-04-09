@@ -81,7 +81,7 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
     /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
     foreach ($this->smsGatewayStorage->loadMultiple() as $sms_gateway) {
       $lifetime = $sms_gateway->getRetentionDuration();
-      if ($lifetime !== 0) {
+      if ($lifetime !== -1) {
         $ids = $this->smsMessageStorage
           ->getQuery()
           ->condition('gateway', $sms_gateway->id(), '=')

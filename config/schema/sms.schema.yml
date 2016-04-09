@@ -54,7 +54,7 @@ sms.gateway.*:
       label: 'Whether messages sent to this gateway should be sent immediately.'
     retention_duration:
       type: integer
-      label: 'How many seconds to hold messages after they are sent. Use zero to never expire.'
+      label: 'How many seconds to hold messages after they are sent. Use -1 to never expire.'
 
 sms.phone.*.*:
   type: config_entity
