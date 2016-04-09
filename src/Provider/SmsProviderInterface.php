@@ -17,6 +17,16 @@ use Symfony\Component\HttpFoundation\Request;
 interface SmsProviderInterface {
 
   /**
+   * Queue a SMS message to be sent.
+   *
+   * This message is preferred over directly invoking send().
+   *
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
+   *   A SMS message to send.
+   */
+  public function queue(SmsMessageInterface $sms_message);
+
+  /**
    * Sends an SMS using the active gateway.
    *
    * @param \Drupal\sms\Message\SmsMessageInterface

@@ -10,3 +10,6 @@ services:
   sms.phone_number:
     class: Drupal\sms\Provider\PhoneNumberProvider
     arguments: ['@entity_type.manager', '@config.factory', '@token', '@sms_provider']
+  sms.queue:
+    class: Drupal\sms\Provider\SmsQueueProcessor
+    arguments: ['@sms_provider']

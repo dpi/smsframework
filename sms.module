@@ -28,6 +28,10 @@ function sms_cron() {
   /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
   $phone_number_provider = \Drupal::service('sms.phone_number');
   $phone_number_provider->purgeExpiredVerifications();
+
+  /** @var \Drupal\sms\Provider\SmsQueueProcessorInterface $sms_queue_processor */
+  $sms_queue_processor = \Drupal::service('sms.queue');
+  $sms_queue_processor->processUnqueued();
 }
 
 /**

@@ -13,6 +13,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
+use Drupal\sms\Message\SmsMessageInterface as StdSmsMessageInterface;
 
 /**
  * Defines the SMS message entity.
@@ -405,7 +406,8 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     $fields['queued'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Queued'))
       ->setDescription(t('Whether the SMS message is in the queue to be processed.'))
-      ->setRequired(FALSE);
+      ->setDefaultValue(FALSE)
+      ->setRequired(TRUE);
 
     // Dates.
     $fields['created'] = BaseFieldDefinition::create('created')
@@ -431,6 +433,34 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
       ->setRequired(TRUE);
 
     return $fields;
+  }
+
+  /**
+   * Converts a standard SMS message object to a SMS message entity.
+   *
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
+   *   A standard SMS message.
+   *
+   * @return static
+   *   An unsaved SMS Message entity.
+   */
+  public static function convertFromSmsMessage(StdSmsMessageInterface $sms_message) {
+    $new = static::create();
+    $new
+      ->setAutomated($sms_message->isAutomated())
+      ->setSender($sms_message->getSender())
+      ->addRecipients($sms_message->getRecipients())
+      ->setMessage($sms_message->getMessage());
+
+    if ($uid = $sms_message->getUid()) {
+      $new->setUid($uid);
+    }
+
+    foreach ($sms_message->getOptions() as $k => $v) {
+      $new->setOption($k, $v);
+    }
+
+    return $new;
   }
 
 }

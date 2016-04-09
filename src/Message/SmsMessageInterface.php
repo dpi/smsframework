@@ -205,14 +205,17 @@ interface SmsMessageInterface {
   /**
    * Gets the user who created the SMS message.
    *
-   * @return int
+   * @return int|NULL
+   *   The ID of the user who created the message. Or NULL if no user entity is
+   *   associated as the sender.
    */
   public function getUid();
 
   /**
    * Set the user who created the SMS message
-   * @param int $uid
    *
+   * @param int $uid
+   *   The ID of a user entity.
    *
    * @return $this
    *   The called SMS message object.

@@ -10,12 +10,15 @@ namespace Drupal\sms\Provider;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Url;
+use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Drupal\sms\Exception\SmsException;
 
 /**
  * The SMS provider that provides default messaging functionality.
@@ -52,10 +55,38 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
+  public function queue(SmsMessageInterface $sms_message) {
+    if (!$sms_message instanceof SmsMessageEntityInterface) {
+      $sms_message = SmsMessage::convertFromSmsMessage($sms_message);
+    }
+
+    if (NULL == $sms_message->getDirection()) {
+      // @fixme add a direction method?
+      $sms_message->set('direction', SmsMessageEntityInterface::DIRECTION_OUTGOING);
+    }
+
+    if (!$sms_message->getGateway()) {
+      // @fixme getGateway being falsy is undocumented...
+      $sms_message->setGateway($this->getDefaultGateway());
+    }
+
+    if ($count = $sms_message->validate()->count()) {
+      throw new SmsException(sprintf('Can not queue SMS message because there are %s validation error(s).', $count));
+    }
+
+    return $sms_message->save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function send(SmsMessageInterface $sms, array $options = array()) {
     // Check if a preferred gateway is specified in the $options.
     if (isset($options['gateway'])) {
       $gateway = SmsGateway::load($options['gateway']);
+    }
+    else if ($sms instanceof SmsMessageEntityInterface) {
+      $gateway = $sms->getGateway();
     }
     if (empty($gateway)) {
       $gateway = $this->getDefaultGateway();
