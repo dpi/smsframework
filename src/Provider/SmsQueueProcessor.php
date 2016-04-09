@@ -59,6 +59,7 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
     $ids = $this->smsMessageStorage
       ->getQuery()
       ->condition('queued', 0, '=')
+      ->condition('processed', NULL, 'IS NULL')
       ->condition('send_on', REQUEST_TIME, '<=')
       ->execute();
 
@@ -81,9 +82,10 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
     foreach ($this->smsGatewayStorage->loadMultiple() as $sms_gateway) {
       $lifetime = $sms_gateway->getRetentionDuration();
       if ($lifetime !== 0) {
-        $ids = $this->smsMessageStorage->getQuery()
+        $ids = $this->smsMessageStorage
+          ->getQuery()
           ->condition('gateway', $sms_gateway->id(), '=')
-          ->condition('queued', 0, '=')
+          ->condition('queued', 0)
           ->condition('processed', NULL, 'IS NOT NULL')
           ->condition('processed', REQUEST_TIME - $lifetime, '<=')
           ->execute();
