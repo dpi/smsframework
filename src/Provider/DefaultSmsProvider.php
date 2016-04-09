@@ -84,26 +84,6 @@ class DefaultSmsProvider implements SmsProviderInterface {
   }
 
   /**
-   * Get the gateway for a SMS message.
-   *
-   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
-   *   A SMS message.
-   *
-   * @return \Drupal\sms\Entity\SmsGatewayInterface
-   *   A SMS Gateway config entity.
-   */
-  protected function getGateway(SmsMessageInterface $sms_message) {
-    if (isset($options['gateway'])) {
-      $gateway = SmsGateway::load($options['gateway']);
-    }
-    else if ($sms_message instanceof SmsMessageEntityInterface) {
-      $gateway = $sms_message->getGateway();
-    }
-
-    return !empty($gateway) ? $gateway : $this->getDefaultGateway();
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function send(SmsMessageInterface $sms, array $options = array()) {
@@ -240,6 +220,26 @@ class DefaultSmsProvider implements SmsProviderInterface {
       ->getEditable('sms.settings')
       ->set('default_gateway', $sms_gateway->id())
       ->save();
+  }
+
+  /**
+   * Get the gateway for a SMS message.
+   *
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
+   *   A SMS message.
+   *
+   * @return \Drupal\sms\Entity\SmsGatewayInterface
+   *   A SMS Gateway config entity.
+   */
+  protected function getGateway(SmsMessageInterface $sms_message) {
+    if (isset($options['gateway'])) {
+      $gateway = SmsGateway::load($options['gateway']);
+    }
+    else if ($sms_message instanceof SmsMessageEntityInterface) {
+      $gateway = $sms_message->getGateway();
+    }
+
+    return !empty($gateway) ? $gateway : $this->getDefaultGateway();
   }
 
 }
