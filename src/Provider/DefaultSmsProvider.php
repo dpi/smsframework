@@ -56,6 +56,12 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * {@inheritdoc}
    */
   public function queue(SmsMessageInterface $sms_message) {
+    $gateway = $this->getGateway($sms_message);
+    if ($gateway->getSkipQueue()) {
+      $this->send($sms_message, []);
+      return;
+    }
+
     if (!$sms_message instanceof SmsMessageEntityInterface) {
       $sms_message = SmsMessage::convertFromSmsMessage($sms_message);
     }
@@ -74,24 +80,34 @@ class DefaultSmsProvider implements SmsProviderInterface {
       throw new SmsException(sprintf('Can not queue SMS message because there are %s validation error(s).', $count));
     }
 
-    return $sms_message->save();
+    $sms_message->save();
+  }
+
+  /**
+   * Get the gateway for a SMS message.
+   *
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
+   *   A SMS message.
+   *
+   * @return \Drupal\sms\Entity\SmsGatewayInterface
+   *   A SMS Gateway config entity.
+   */
+  protected function getGateway(SmsMessageInterface $sms_message) {
+    if (isset($options['gateway'])) {
+      $gateway = SmsGateway::load($options['gateway']);
+    }
+    else if ($sms_message instanceof SmsMessageEntityInterface) {
+      $gateway = $sms_message->getGateway();
+    }
+
+    return !empty($gateway) ? $gateway : $this->getDefaultGateway();
   }
 
   /**
    * {@inheritdoc}
    */
   public function send(SmsMessageInterface $sms, array $options = array()) {
-    // Check if a preferred gateway is specified in the $options.
-    if (isset($options['gateway'])) {
-      $gateway = SmsGateway::load($options['gateway']);
-    }
-    else if ($sms instanceof SmsMessageEntityInterface) {
-      $gateway = $sms->getGateway();
-    }
-    if (empty($gateway)) {
-      $gateway = $this->getDefaultGateway();
-    }
-
+    $gateway = $this->getGateway($sms);
     if ($this->preProcess($sms, $options, $gateway)) {
       $this->moduleHandler->invokeAll('sms_send', [$sms, $options, $gateway]);
       // @todo Apply token replacements.

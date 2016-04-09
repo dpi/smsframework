@@ -30,4 +30,44 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    */
   public function getPluginId();
 
+  /**
+   * Get whether messages sent to this gateway should be sent immediately.
+   *
+   * @return boolean
+   *   Whether messages sent to this gateway should be sent immediately.
+   */
+  public function getSkipQueue();
+
+  /**
+   * Set whether messages sent to this gateway should be sent immediately.
+   *
+   * @param boolean $skip_queue
+   *   Whether messages sent to this gateway should be sent immediately.
+   *
+   * @return $this
+   *   Return this gateway for chaining.
+   */
+  public function setSkipQueue($skip_queue);
+
+  /**
+   * Get how many seconds to hold messages after they are sent.
+   *
+   * Use zero to never expire.
+   *
+   * @return int
+   *   How long messages should persist in seconds.
+   */
+  public function getRetentionDuration();
+
+  /**
+   * Set how many seconds to hold messages after they are sent.
+   *
+   * @param int $retention_duration
+   *   How many seconds to hold messages, or use zero to never expire.
+   *
+   * @return $this
+   *   Return this gateway for chaining.
+   */
+  public function setRetentionDuration($retention_duration);
+
 }

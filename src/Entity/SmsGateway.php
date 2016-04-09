@@ -82,6 +82,20 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   protected $pluginCollection;
 
   /**
+   * Whether messages sent to this gateway should be sent immediately.
+   *
+   * @var boolean
+   */
+  protected $skip_queue;
+
+  /**
+   * How many seconds to hold messages after they are sent.
+   *
+   * @var integer
+   */
+  protected $retention_duration;
+
+  /**
    * Encapsulates the creation of the action's LazyPluginCollection.
    *
    * @return \Drupal\Component\Plugin\LazyPluginCollection
@@ -117,6 +131,36 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
    */
   public function getPluginId() {
     return $this->plugin;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSkipQueue() {
+    return !empty($this->skip_queue);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSkipQueue($skip_queue) {
+    $this->skip_queue = (boolean)$skip_queue;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRetentionDuration() {
+    return (int)$this->retention_duration;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRetentionDuration($retention_duration) {
+    $this->retention_duration = (int)$retention_duration;
+    return $this;
   }
 
 }

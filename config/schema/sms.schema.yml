@@ -49,6 +49,12 @@ sms.gateway.*:
       label: 'Gateway plugin type'
     settings:
       type: sms_gateway.settings.[%parent.plugin]
+    skip_queue:
+      type: boolean
+      label: 'Whether messages sent to this gateway should be sent immediately.'
+    retention_duration:
+      type: integer
+      label: 'How many seconds to hold messages after they are sent. Use zero to never expire.'
 
 sms.phone.*.*:
   type: config_entity

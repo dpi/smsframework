@@ -114,6 +114,28 @@ class SmsGatewayForm extends EntityForm {
       '#default_value' => !$sms_gateway->isNew() ? $sms_gateway->getPlugin()->getPluginId() : '',
     ];
 
+    $form['message_queue'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Message queue'),
+      '#open' => TRUE,
+    ];
+
+    $form['message_queue']['skip_queue'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Skip queue'),
+      '#description' => $this->t('Whether messages sent to this gateway should skip the load balancing queue. This setting should only be used when debugging and should not be used in production.'),
+      '#default_value' => $sms_gateway->getSkipQueue(),
+    ];
+
+    $form['message_queue']['retention_duration'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Retention'),
+      '#description' => $this->t('How many seconds to keep messages after they are sent. Use zero to never expire.'),
+      '#field_suffix' => $this->t('seconds'),
+      '#default_value' => $sms_gateway->getRetentionDuration(),
+      '#min' => 0,
+    ];
+
     if (!$sms_gateway->isNew()) {
       $form['delivery_report_path'] = [
         '#type' => 'item',
