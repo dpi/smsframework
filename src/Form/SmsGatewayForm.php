@@ -124,7 +124,7 @@ class SmsGatewayForm extends EntityForm {
     $form['message_queue']['skip_queue'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Skip queue'),
-      '#description' => $this->t('Whether messages sent to this gateway should skip the load balancing queue. This setting should only be used when debugging and should not be used in production.'),
+      '#description' => $this->t('Whether messages sent with this gateway skip the load balancing queue and process immediately. Only turn on this setting when debugging, do not use it on production sites.'),
       '#default_value' => $sms_gateway->getSkipQueue(),
     ];
 
