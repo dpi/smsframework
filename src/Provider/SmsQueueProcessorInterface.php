@@ -19,4 +19,9 @@ interface SmsQueueProcessorInterface {
    */
   public function processUnqueued();
 
+  /**
+   * Delete messages which have been processed and are expired.
+   */
+  public function garbageCollection();
+
 }

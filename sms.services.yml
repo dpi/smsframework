@@ -12,4 +12,4 @@ services:
     arguments: ['@entity_type.manager', '@config.factory', '@token', '@sms_provider']
   sms.queue:
     class: Drupal\sms\Provider\SmsQueueProcessor
-    arguments: ['@sms_provider']
+    arguments: ['@entity_type.manager', '@sms_provider']

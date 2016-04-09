@@ -86,6 +86,7 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
           ->send($sms_message, []);
         $sms_message
           ->setProcessedTime(REQUEST_TIME)
+          ->setQueued(FALSE)
           ->save();
       }
     }
