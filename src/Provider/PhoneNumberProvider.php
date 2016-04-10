@@ -110,7 +110,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
 
     $sms_message->addRecipient(reset($phone_numbers));
     $this->smsProvider
-      ->queue($sms_message);
+      ->queueOut($sms_message);
   }
 
   /**
@@ -191,7 +191,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
         ->setAutomated(FALSE);
 
       $this->smsProvider
-        ->queue($sms_message);
+        ->queueOut($sms_message);
     }
 
     return $phone_verification;

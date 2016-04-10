@@ -55,20 +55,11 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function queue(SmsMessageInterface $sms_message) {
+  public function queue(SmsMessageEntityInterface $sms_message) {
     $gateway = $this->getGateway($sms_message);
     if ($gateway->getSkipQueue()) {
       $this->send($sms_message, []);
       return;
-    }
-
-    if (!$sms_message instanceof SmsMessageEntityInterface) {
-      $sms_message = SmsMessage::convertFromSmsMessage($sms_message);
-    }
-
-    if (NULL == $sms_message->getDirection()) {
-      // @fixme add a direction method?
-      $sms_message->set('direction', SmsMessageEntityInterface::DIRECTION_OUTGOING);
     }
 
     if (!$sms_message->getGateway()) {
@@ -81,6 +72,20 @@ class DefaultSmsProvider implements SmsProviderInterface {
     }
 
     $sms_message->save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function queueIn(SmsMessageInterface $sms_message) {
+    $this->plainMessageQueue($sms_message, SmsMessageEntityInterface::DIRECTION_INCOMING);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function queueOut(SmsMessageInterface $sms_message) {
+    $this->plainMessageQueue($sms_message, SmsMessageEntityInterface::DIRECTION_OUTGOING);
   }
 
   /**
@@ -240,6 +245,30 @@ class DefaultSmsProvider implements SmsProviderInterface {
     }
 
     return !empty($gateway) ? $gateway : $this->getDefaultGateway();
+  }
+
+  /**
+   * Queues a standard SMS message object and converts it to an entity.
+   *
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
+   *   A standard SMS message object.
+   * @param $direction
+   *   Value of SmsMessageEntityInterface::DIRECTION_* constants.
+   */
+  protected function plainMessageQueue(SmsMessageInterface $sms_message, $direction) {
+    $gateway = $this->getGateway($sms_message);
+    if ($gateway->getSkipQueue() && $direction == SmsMessageEntityInterface::DIRECTION_OUTGOING) {
+      $this->send($sms_message, []);
+      return;
+    }
+
+    // Convert SMS message to an entity.
+    $sms_message = SmsMessage::convertFromSmsMessage($sms_message);
+
+    // @fixme add a direction method?
+    $sms_message->set('direction', $direction);
+
+    $this->queue($sms_message);
   }
 
 }
