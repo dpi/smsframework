@@ -45,7 +45,6 @@ class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
     parent::setUp();
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('sms_phone_number_verification');
-    $this->installConfig('sms');
 
     $this->phoneField = FieldStorageConfig::create([
       'entity_type' => 'entity_test',
@@ -67,6 +66,7 @@ class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
       ->setFieldName('phone_number', $this->phoneField->getName())
       ->setPurgeVerificationPhoneNumber(FALSE)
       ->setVerificationCodeLifetime(3600)
+      ->setVerificationMessage('message')
       ->save();
 
     $this->testEntity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, ['+123123123']);

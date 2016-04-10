@@ -31,6 +31,7 @@ trait SmsFrameworkTestTrait {
       'id' => $id,
       'label' => $this->randomString(),
       'settings' => ['gateway_id' => $id],
+      'skip_queue' => TRUE,
     ]);
     $gateway->enable();
     $gateway->save();

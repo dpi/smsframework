@@ -37,7 +37,7 @@ class SmsFrameworkTokenTest extends SmsFrameworkKernelBase {
   protected function setUp() {
     parent::setUp();
     $this->tokenService = $this->container->get('token');
-    $this->installConfig(['system', 'sms']);
+    $this->installConfig(['system']);
     $this->installSchema('system', ['router']);
     \Drupal::service('router.builder')->rebuild();
   }

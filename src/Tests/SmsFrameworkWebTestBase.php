@@ -47,6 +47,10 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
     parent::setUp();
     $this->gatewayManager = $this->container->get('plugin.manager.sms_gateway');
     $this->defaultSmsProvider = $this->container->get('sms_provider.default');
+    $this->defaultSmsProvider
+      ->getDefaultGateway()
+      ->setSkipQueue(TRUE)
+      ->save();
 
     // Add an instance of test gateway.
     $this->testGateway = $this->createMemoryGateway();

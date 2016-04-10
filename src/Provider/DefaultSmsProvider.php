@@ -102,7 +102,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * {@inheritdoc}
    */
   public function send(SmsMessageInterface $sms, array $options = array()) {
-    $gateway = $this->getGateway($sms);
+    $gateway = $this->getGateway($sms, $options);
     if ($this->preProcess($sms, $options, $gateway)) {
       $this->moduleHandler->invokeAll('sms_send', [$sms, $options, $gateway]);
       // @todo Apply token replacements.
@@ -242,11 +242,13 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *
    * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
    *   A SMS message.
+   * @param array $options
+   *   Arbitrary options for standard message objects.
    *
    * @return \Drupal\sms\Entity\SmsGatewayInterface
    *   A SMS Gateway config entity.
    */
-  protected function getGateway(SmsMessageInterface $sms_message) {
+  protected function getGateway(SmsMessageInterface $sms_message, $options = []) {
     if (isset($options['gateway'])) {
       $gateway = SmsGateway::load($options['gateway']);
     }
