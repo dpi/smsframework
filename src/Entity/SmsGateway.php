@@ -10,7 +10,6 @@ namespace Drupal\sms\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\sms\Plugin\SmsGatewayPluginCollection;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
-use Drupal\sms\Entity\SmsMessageInterface;
 
 /**
  * Defines storage for an SMS Gateway instance.
@@ -181,6 +180,15 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
         break;
     }
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMaxRecipientsOutgoing() {
+    $definition = $this->getPlugin()
+      ->getPluginDefinition();
+    return isset($definition['outgoing_message_max_recipients']) ? (int)$definition['outgoing_message_max_recipients'] : 1;
   }
 
 }

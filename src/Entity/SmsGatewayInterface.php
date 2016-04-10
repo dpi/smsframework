@@ -75,4 +75,12 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    */
   public function setRetentionDuration($direction, $retention_duration);
 
+  /**
+   * Get maximum number of recipients per outgoing message.
+   *
+   * @return int
+   *   Maximum number of recipients, or -1 for no limit.
+   */
+  public function getMaxRecipientsOutgoing();
+
 }

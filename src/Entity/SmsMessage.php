@@ -325,12 +325,30 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   public function getProcessedTime() {
     return $this->get('processed')->value;
   }
+
   /**
    * {@inheritdoc}
    */
   public function setProcessedTime($processed) {
     $this->set('processed', $processed);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function chunkByRecipients($size) {
+    $recipients_all = $this->getRecipients();
+    // Create a baseline SMS message with recipients cleaned out.
+    $base = $this->createDuplicate();
+    $base->removeRecipients($recipients_all);
+
+    $messages = [];
+    foreach (array_chunk($recipients_all, $size) as $recipients) {
+      $messages[] = $base->createDuplicate()
+        ->addRecipients($recipients);
+    }
+    return $messages;
   }
 
   /**

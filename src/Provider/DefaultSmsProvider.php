@@ -71,7 +71,17 @@ class DefaultSmsProvider implements SmsProviderInterface {
       throw new SmsException(sprintf('Can not queue SMS message because there are %s validation error(s).', $count));
     }
 
-    $sms_message->save();
+    // Split messages to overcome gateway limits.
+    $max = $gateway->getMaxRecipientsOutgoing();
+    $recipients_all = $sms_message->getRecipients();
+    if ($max > 0 && count($recipients_all) > $max) {
+      foreach ($sms_message->chunkByRecipients($max) as $sms_message) {
+        $sms_message->save();
+      }
+    }
+    else {
+      $sms_message->save();
+    }
   }
 
   /**
