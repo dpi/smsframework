@@ -178,15 +178,4 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    */
   public function setProcessedTime($processed);
 
-  /**
-   * Split this SMS message into new messages by chunks of recipients.
-   *
-   * @param $size
-   *   The quantity of recipients to chunk by.
-   *
-   * @return static[]
-   *   An array of SMS messages split by recipient chunks.
-   */
-  public function chunkByRecipients($size);
-
 }

@@ -242,4 +242,15 @@ interface SmsMessageInterface {
    */
   public function isAutomated();
 
+  /**
+   * Split this SMS message into new messages by chunks of recipients.
+   *
+   * @param $size
+   *   The quantity of recipients to chunk by.
+   *
+   * @return static[]
+   *   An array of SMS messages split by recipient chunks.
+   */
+  public function chunkByRecipients($size);
+
 }
