@@ -21,6 +21,11 @@ Installation
 3. Set and configure your default gateway at admin/smsframework/gateways
 4. Check out the settings pages at admin/smsframework
 
+Optional Configuration
+======================
+SMS Framework automatically adds an improved token selection UI to SMS message
+forms if the Token module (https://drupal.org/project/token) is installed.
+
 Documentation
 =============
 Documentation for site builders and developers is available in the handbook
