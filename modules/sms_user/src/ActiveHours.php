@@ -25,6 +25,23 @@ class ActiveHours implements ActiveHoursInterface {
   protected $configFactory;
 
   /**
+   * Whether active hours is enabled in configuration, or null if configuration
+   * has not been built yet.
+   *
+   * @var boolean|NULL
+   */
+  protected $status = NULL;
+
+  /**
+   * Date ranges as they exist in configuration.
+   *
+   * @var array
+   *   An unsorted array containing arrays with keys 'start' and 'end' with
+   *   values in strtotime() format.
+   */
+  protected $ranges = [];
+
+  /**
    * Constructs a QueryFactory object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -38,23 +55,17 @@ class ActiveHours implements ActiveHoursInterface {
    * @inheritdoc
    */
   public function inHours(UserInterface $user, $now = 'now') {
-    // Users current time
-    $timezone = $user->getTimeZone();
-    $date = new DrupalDateTime($now, $timezone);
-
-    $settings = $this->configFactory
-      ->get('sms_user.settings')
-      ->get('active_hours');
+    $this->build();
 
     // We're in hours if active hours feature is disabled.
-    if (!empty($settings['status'])) {
+    if (!$this->status) {
       return TRUE;
     }
 
-    foreach ($settings['ranges'] as $range) {
-      $start = new DrupalDateTime($range['start'], $timezone);
-      $end = new DrupalDateTime($range['end'], $timezone);
-      if ($date >= $start && $date <= $end) {
+    $timezone = $user->getTimeZone();
+    $now = new DrupalDateTime($now, $timezone);
+    foreach ($this->getRanges($timezone) as $date) {
+      if ($now >= $date['start'] && $now <= $date['end']) {
         return TRUE;
       }
     }
@@ -68,31 +79,14 @@ class ActiveHours implements ActiveHoursInterface {
   public function findNextTime(UserInterface $user, $now = 'now') {
     $timezone = $user->getTimeZone();
     $now = new DrupalDateTime($now, $timezone);
-
-    // Find the next time.
-    $settings = $this->configFactory
-      ->get('sms_user.settings')
-      ->get('active_hours');
-
-    $dates = [];
-    foreach ($settings['ranges'] as $range) {
-      $date['start'] = new DrupalDateTime($range['start'], $timezone);
-      $date['end'] = new DrupalDateTime($range['end'], $timezone);
+    foreach ($this->getRanges($timezone) as $date) {
       // The end date may have already passed.
-      if ($now < $date['end']) {
-        $dates[] = $date;
+      if ($now > $date['end']) {
+        continue;
       }
+      return $date;
     }
-
-    // Sort so nearest date is closest.
-    usort($dates, function($a, $b) {
-      if ($a['start'] == $b['end']) {
-        return 0;
-      }
-      return $a['start'] < $b['start'] ? -1 : 1;
-    });
-
-    return reset($dates);
+    return FALSE;
   }
 
   /**
@@ -105,6 +99,48 @@ class ActiveHours implements ActiveHoursInterface {
         $sms_message->setSendTime($range['start']->format('U'));
       }
     }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getRanges($timezone) {
+    $this->build();
+
+    $dates = [];
+    foreach ($this->ranges as $range) {
+      $date['start'] = new DrupalDateTime($range['start'], $timezone);
+      $date['end'] = new DrupalDateTime($range['end'], $timezone);
+      $dates[] = $date;
+    }
+
+    // Sort so nearest date is closest.
+    // Can't do this in build() since computed relative dates can be different
+    // per timezone.
+    usort($dates, function($a, $b) {
+      if ($a['start'] == $b['start']) {
+        return 0;
+      }
+      return $a['start'] < $b['start'] ? -1 : 1;
+    });
+
+    return $dates;
+  }
+
+  /**
+   * Store the active hours configuration state.
+   */
+  protected function build() {
+    if (isset($this->status)) {
+      return;
+    }
+
+    $settings = $this->configFactory
+      ->get('sms_user.settings')
+      ->get('active_hours');
+
+    $this->status = !empty($settings['status']);
+    $this->ranges = $settings['ranges'];
   }
 
 }

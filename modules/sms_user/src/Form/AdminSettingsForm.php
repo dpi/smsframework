@@ -83,7 +83,7 @@ class AdminSettingsForm extends ConfigFormBase {
     $form['active_hours']['status'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Enable active hours'),
-      '#default_value' => $config->get('active_hours.enabled'),
+      '#default_value' => $config->get('active_hours.status'),
     );
 
     $form['active_hours']['days'] = [
