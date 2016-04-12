@@ -75,7 +75,7 @@ class AdminSettingsForm extends ConfigFormBase {
     $form['active_hours'] = [
       '#type' => 'details',
       '#title' => $this->t('Active hours'),
-      '#description' => $this->t('Active hours will suspend transmission of automated SMS messages until the users local time is between any of these hours. The site default timezone is used if a user has not selected a timezone. Active hours are not applied to SMS messages created as a result of direct user action.'),
+      '#description' => $this->t('Active hours will suspend transmission of automated SMS messages until the users local time is between any of these hours. The site default timezone is used if a user has not selected a timezone. Active hours are not applied to SMS messages created as a result of direct user action. Messages which are already queued are not retroactively updated.'),
       '#open' => TRUE,
       '#tree' => TRUE,
     ];
@@ -145,7 +145,7 @@ class AdminSettingsForm extends ConfigFormBase {
         '#type' => 'select',
         '#title' => $this->t('Start time for @day', ['@day' => $day]),
         '#title_display' => 'invisible',
-        '#default_value' => isset($day_defaults[$day_lower]['end']) ? $day_defaults[$day_lower]['end'] : NULL,
+        '#default_value' => isset($day_defaults[$day_lower]['end']) ? $day_defaults[$day_lower]['end'] : 24,
         '#options' => $end_hours,
       ];
 
