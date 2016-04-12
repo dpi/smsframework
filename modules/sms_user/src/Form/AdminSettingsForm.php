@@ -95,6 +95,24 @@ class AdminSettingsForm extends ConfigFormBase {
       ],
     ];
 
+    // Convert configuration into days.
+    $day_defaults = [];
+    foreach ($config->get('active_hours.ranges') as $range) {
+      $start = new DrupalDateTime($range['start']);
+      $end = new DrupalDateTime($range['end']);
+      $start_day = strtolower($start->format('l'));
+
+      $day_defaults[$start_day]['start'] = $start->format('G');
+
+      if (new DrupalDateTime($start_day . ' +1 day') == $end) {
+        $day_defaults[$start_day]['end'] = 24;
+      }
+      else {
+        $day_defaults[$start_day]['end'] = $end->format('G');
+      }
+    }
+
+    // Prepare options for select fields.
     $hours = [];
     for ($i = 0; $i < 24; $i++) {
       $hours[$i] = DrupalDateTime::datePad($i) . ':00';
@@ -108,6 +126,7 @@ class AdminSettingsForm extends ConfigFormBase {
     for ($i = 0; $i < 7; $i++) {
       $row = ['#tree' => TRUE,];
       $day = strftime('%A', $timestamp);
+      $day_lower = strtolower($day);
 
       $row['day']['#plain_text'] = $day;
 
@@ -117,7 +136,7 @@ class AdminSettingsForm extends ConfigFormBase {
         '#type' => 'select',
         '#title' => $this->t('Start time for @day', ['@day' => $day]),
         '#title_display' => 'invisible',
-//        '#default_value' => 0,
+        '#default_value' => isset($day_defaults[$day_lower]['start']) ? $day_defaults[$day_lower]['start'] : NULL,
         '#options' => $hours,
         '#empty_option' => $this->t(' - Suspend messages for this day - '),
         '#empty_value' => -1,
@@ -126,12 +145,12 @@ class AdminSettingsForm extends ConfigFormBase {
         '#type' => 'select',
         '#title' => $this->t('Start time for @day', ['@day' => $day]),
         '#title_display' => 'invisible',
-        '#default_value' => 24,
+        '#default_value' => isset($day_defaults[$day_lower]['end']) ? $day_defaults[$day_lower]['end'] : NULL,
         '#options' => $end_hours,
       ];
 
       $timestamp = strtotime('+1 day', $timestamp);
-      $form['active_hours']['days'][strtolower($day)] = $row;
+      $form['active_hours']['days'][$day_lower] = $row;
     }
 
     // SMS User opt-out settings.
