@@ -10,15 +10,23 @@ sms_user.settings:
     confirmation_message:
       type: string
       label: 'Confirmation message format'
-    enable_sleep:
-      type: boolean
-      label: 'Enable sleep hours'
-    sleep_start_time:
-      type: string
-      label: 'Sleep start time'
-    sleep_end_time:
-      type: string
-      label: 'Sleep end time'
+    active_hours:
+      type: mapping
+      mapping:
+        status:
+          type: boolean
+          label: 'Enable sleep hours'
+        ranges:
+          type: sequence
+          sequence:
+            - type: mapping
+              mapping:
+                start:
+                  type: string
+                  label: 'Start time in PHP strtotime natural language.'
+                end:
+                  type: string
+                  label: 'End time in PHP strtotime natural language.'
     allow_opt_out:
       type: boolean
       label: 'Allow users to opt-out of receiving messages from this site'
