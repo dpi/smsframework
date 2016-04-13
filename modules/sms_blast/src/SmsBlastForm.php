@@ -8,9 +8,51 @@
 namespace Drupal\sms_blast;
 
 use Drupal\Core\Form\FormBase;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\sms\Provider\PhoneNumberProviderInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\sms\Message\SmsMessage;
 
 class SmsBlastForm extends FormBase {
+
+  /**
+   * Storage for Phone Number Verification entities.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $phoneNumberVerificationStorage;
+
+  /**
+   * Phone number provider.
+   *
+   * @var \Drupal\sms\Provider\PhoneNumberProviderInterface
+   */
+  protected $phoneNumberProvider;
+
+  /**
+   * Constructs a new SmsBlastForm object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   * @param \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider
+   *   The phone number provider.
+   */
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, PhoneNumberProviderInterface $phone_number_provider) {
+    $this->phoneNumberVerificationStorage = $entity_type_manager
+      ->getStorage('sms_phone_number_verification');
+    $this->phoneNumberProvider = $phone_number_provider;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('entity_type.manager'),
+      $container->get('sms.phone_number')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -42,21 +84,25 @@ class SmsBlastForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $result = db_select('sms_user', 'su')
-      ->fields('su', array('uid'))
-      ->condition('status', 2)
+    $sms_message = new SmsMessage();
+    $sms_message->setMessage($form_state->getValue('message'));
+
+    $ids = $this->phoneNumberVerificationStorage->getQuery()
+      ->condition('status', 1)
+      ->condition('entity__target_type', 'user')
       ->execute();
 
-    $count = 0;
-    foreach ($result as $row) {
-      sms_user_send($row->uid, $form_state->getValue('message'));
-      $count++;
+    $entity_ids = [];
+    /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $verification */
+    foreach ($this->phoneNumberVerificationStorage->loadMultiple($ids) as $verification) {
+      // Ensure entity exists and one message is sent to each entity.
+      if (($entity = $verification->getEntity()) && !in_array($entity->id(), $entity_ids)) {
+        $entity_ids[] = $entity->id();
+        $this->phoneNumberProvider
+          ->sendMessage($entity, $sms_message);
+      }
     }
-    if ($count) {
-      drupal_set_message($this->t('The message was sent to %count users.', array('%count' => $count)));
-    }
-    else {
-      drupal_set_message($this->t('There are 0 users with confirmed phone numbers. The message was not sent.'));
-    }
+
+    drupal_set_message($this->formatPlural(count($entity_ids), 'Message sent to @count user.', 'Message sent to @count users.'));
   }
 }

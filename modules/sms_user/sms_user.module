@@ -14,6 +14,7 @@ use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\sms\Message\SmsMessage;
 
 define('SMS_USER_BLOCKED', 0);
 define('SMS_USER_PENDING', 1);
@@ -23,63 +24,6 @@ define('SMS_USER_MAX_CHARS', 140);
 
 // require_once 'sms_user.actions.inc';
 // require_once 'sms_user.rules.inc';
-
-/**
- * Sends a message to a user.
- *
- * @param int $uid
- *   The ID of the user to receive the message.
- * @param string $message
- *   The message to be sent.
- *
- * @return bool
- *   true if the message was successfully sent, false otherwise.
- *
- * @deprecated in 8.x-dev, will be removed before 8.x-1.0. Use
- *   \Drupal::service('sms.phone_number')->sendMessage() instead.
- */
-function sms_user_send($uid, $message) {
-  $account = User::load($uid);
-  // Check if the user is enabled to receive SMS.
-  if ($account->hasPermission('receive sms')) {
-    if ($account->sms_user['status'] >= SMS_USER_CONFIRMED) {
-      return sms_send($account->sms_user['number'], $message, (array) $account->sms_user['gateway']);
-    }
-    else {
-      \Drupal::logger('sms_user')->alert("User %user has not validated mobile number", array('%user' => $account->getUsername()));
-      return FALSE;
-    }
-  }
-  else {
-    \Drupal::logger('sms_user')->alert("User %user is not enabled to receive SMS, see 'receive sms' permission", array('%user' => $account->getUsername()));
-    return FALSE;
-  }
-}
-
-/**
- * Returns a verified number of a given user.
- *
- * @param \Drupal\Core\Session\AccountInterface $account
- *   The user account for which to get the number.
- *
- * @return string|bool
- *   The user's verified number, or false if the user does not have access.
- *
- * @deprecated
- *   See \Drupal::service('sms.phone_number')->getPhoneNumbers()
- */
-function sms_user_get_number(AccountInterface $account) {
-  // Check if the user is enabled to receive SMS.
-  if ($account->hasPermission('receive sms')) {
-    if ($account->sms_user['status'] >= SMS_USER_CONFIRMED) {
-      return $account->sms_user['number'];
-    }
-    else {
-      return FALSE;
-    }
-  }
-  return FALSE;
-}
 
 /**
  * Returns the uid of the owner of a number.
@@ -597,7 +541,11 @@ function sms_user_sms_incoming($op, SmsMessageInterface $sms, array $options) {
         if ($account = sms_user_register_new_user($number, $message, $options)) {
           // Send the new user the registration message if one exists.
           if ($message = $config->get('new_account_message')) {
-            sms_user_send($account->id(), $message);
+            /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
+            $phone_number_provider = \Drupal::service('sms.phone_number');
+            $sms_message = new SmsMessage();
+            $sms_message->setMessage($message);
+            $phone_number_provider->sendMessage($account, $sms_message);
           }
         }
       }

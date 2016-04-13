@@ -94,4 +94,31 @@ class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkWebTestBase {
     $this->assertText(t('There has been too many failed verification attempts. Try again later.'));
   }
 
+  /**
+   * Test changing verification path.
+   */
+  public function testVerifyPathSettings() {
+    $account = $this->drupalCreateUser([
+      'sms verify phone number',
+      'administer smsframework',
+    ]);
+    $this->drupalLogin($account);
+
+    // Hard code path, don't use Url::fromRoute.
+    $this->drupalGet('/verify');
+    $this->assertResponse(200, 'Default phone number verification route exists at /verify');
+
+    $path_verify = '/' . $this->randomMachineName() . '/' . $this->randomMachineName();
+    $edit = [
+      'pages[verify]' => $path_verify,
+    ];
+    $this->drupalPostForm(Url::fromRoute('sms.settings'), $edit, 'Save configuration');
+
+    // Ensure the route cache is rebuilt by getting the verify route.
+    $this->drupalGet($path_verify);
+    $this->assertResponse(200, 'Phone number verification route changed to ' . $path_verify);
+    $this->drupalGet('/verify');
+    $this->assertResponse(404, 'Previous route path was invalidated.');
+  }
+
 }

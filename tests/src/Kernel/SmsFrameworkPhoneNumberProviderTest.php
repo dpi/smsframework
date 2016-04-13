@@ -39,6 +39,13 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
   protected $phoneNumberSettings;
 
   /**
+   * The default gateway.
+   *
+   * @var \Drupal\sms\Entity\SmsGatewayInterface
+   */
+  protected $gateway;
+
+  /**
    * Modules to enable.
    *
    * @var array
@@ -55,7 +62,8 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $this->installConfig('sms');
 
     $sms_provider = $this->container->get('sms_provider.default');
-    $sms_provider->setDefaultGateway($this->createMemoryGateway());
+    $this->gateway = $this->createMemoryGateway();
+    $sms_provider->setDefaultGateway($this->gateway);
 
     $this->phoneNumberProvider = $this->container->get('sms.phone_number');
 
@@ -147,14 +155,10 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $phone_numbers = ['+123123123'];
     $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
     $this->resetTestMessages();
-
-    $sms_message = new SmsMessage(
-      '+999888777',
-      [],
-      $this->randomString(),
-      [],
-      1
-    );
+    $sms_message = new SmsMessage();
+    $sms_message
+      ->setSender('+999888777')
+      ->setMessage($this->randomString());
     $this->setExpectedException(\Drupal\sms\Exception\NoPhoneNumberException::class);
     $this->phoneNumberProvider->sendMessage($entity, $sms_message);
   }
@@ -170,15 +174,33 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $this->resetTestMessages();
     $this->verifyPhoneNumber($entity, $phone_numbers[0]);
 
-    $sms_message = new SmsMessage(
-      '+999888777',
-      [],
-      $this->randomString(),
-      [],
-      1
-    );
+    $sms_message = new SmsMessage();
+    $sms_message
+      ->setSender('+999888777')
+      ->setMessage($this->randomString());
     $this->phoneNumberProvider->sendMessage($entity, $sms_message);
-    $this->assertEquals(1, count($this->getTestMessages()));
+    $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
+  }
+
+  /**
+   * Ensure default behaviour is to send one phone number per entity.
+   *
+   * @covers ::sendMessage
+   */
+  public function testSendMessageOneMessage() {
+    $phone_numbers = ['+123123123', '+456456456'];
+    $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
+    $this->resetTestMessages();
+    $this->verifyPhoneNumber($entity, $phone_numbers[0]);
+    $this->verifyPhoneNumber($entity, $phone_numbers[1]);
+
+    $sms_message = new SmsMessage();
+    $sms_message
+      ->setMessage($this->randomString());
+    $this->phoneNumberProvider->sendMessage($entity, $sms_message);
+
+    $message = $this->getLastTestMessage($this->gateway);
+    $this->assertEquals([$phone_numbers[0]], $message->getRecipients(), 'The SMS message is using the first phone number from the entity.');
   }
 
   /**
@@ -282,7 +304,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $this->assertTrue($return instanceof PhoneNumberVerificationInterface);
 
     // Catch the phone verification message.
-    $this->assertEquals(1, count($this->getTestMessages()));
+    $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
 
     $verification = $this->getLastVerification();
     $this->assertEquals($entity->id(), $verification->getEntity()->id());
