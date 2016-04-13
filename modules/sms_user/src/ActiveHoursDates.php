@@ -9,17 +9,56 @@ namespace Drupal\sms_user;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 
+/**
+ * Define a start and end date container for DrupalDateTime.
+ *
+ * This class is similar to \DatePeriod, but without an interval.
+ */
 class ActiveHoursDates {
 
+  /**
+   * The start date.
+   *
+   * @var \Drupal\Core\Datetime\DrupalDateTime
+   */
+  protected $start;
+
+  /**
+   * The end date.
+   *
+   * @var \Drupal\Core\Datetime\DrupalDateTime
+   */
+  protected $end;
+
+  /**
+   * Construct a new ActiveHoursDates object.
+   *
+   * @param \Drupal\Core\Datetime\DrupalDateTime $start
+   *   The start date.
+   * @param \Drupal\Core\Datetime\DrupalDateTime $end
+   *   The end date.
+   */
   function __construct(DrupalDateTime $start, DrupalDateTime $end) {
     $this->start = $start;
     $this->end = $end;
   }
 
+  /**
+   * Get the start date.
+   *
+   * @return \Drupal\Core\Datetime\DrupalDateTime
+   *   The start date.
+   */
   function getStartDate() {
     return $this->start;
   }
 
+  /**
+   * Get the end date.
+   *
+   * @return \Drupal\Core\Datetime\DrupalDateTime
+   *   The end date.
+   */
   function getEndDate() {
     return $this->end;
   }
