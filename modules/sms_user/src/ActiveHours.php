@@ -65,7 +65,7 @@ class ActiveHours implements ActiveHoursInterface {
     $timezone = $user->getTimeZone();
     $now = new DrupalDateTime($now, $timezone);
     foreach ($this->getRanges($timezone) as $date) {
-      if ($now >= $date['start'] && $now <= $date['end']) {
+      if ($now >= $date->getStartDate() && $now <= $date->getEndDate()) {
         return TRUE;
       }
     }
@@ -81,7 +81,7 @@ class ActiveHours implements ActiveHoursInterface {
     $now = new DrupalDateTime($now, $timezone);
     foreach ($this->getRanges($timezone) as $date) {
       // The end date may have already passed.
-      if ($now > $date['end']) {
+      if ($now > $date->getEndDate()) {
         continue;
       }
       return $date;
@@ -109,19 +109,20 @@ class ActiveHours implements ActiveHoursInterface {
 
     $dates = [];
     foreach ($this->ranges as $range) {
-      $date['start'] = new DrupalDateTime($range['start'], $timezone);
-      $date['end'] = new DrupalDateTime($range['end'], $timezone);
-      $dates[] = $date;
+      $dates[] = new ActiveHoursDates(
+        new DrupalDateTime($range['start'], $timezone),
+        new DrupalDateTime($range['end'], $timezone)
+      );
     }
 
     // Sort so nearest date is closest.
     // Can't do this in build() since computed relative dates can be different
     // per timezone.
     usort($dates, function($a, $b) {
-      if ($a['start'] == $b['start']) {
+      if ($a->getStartDate() == $b->getStartDate()) {
         return 0;
       }
-      return $a['start'] < $b['start'] ? -1 : 1;
+      return $a->getStartDate() < $b->getStartDate() ? -1 : 1;
     });
 
     return $dates;

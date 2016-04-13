@@ -15,8 +15,6 @@ use Drupal\sms\Entity\SmsMessageInterface;
  */
 interface ActiveHoursInterface {
 
-  // @todo create a dedicated start/end container class.
-
   /**
    * Determine if the current time of a user is within permitted hour ranges.
    *
@@ -39,9 +37,8 @@ interface ActiveHoursInterface {
    *   A time or strtotime() relative string localised to the users timezone.
    *   Defaults to current time for the user.
    *
-   * @return array|FALSE
-   *   A array with keys 'start' and 'end' with values as
-   *   \Drupal\Core\Datetime\DrupalDateTime objects.
+   * @return \Drupal\sms_user\ActiveHoursDates|FALSE
+   *   A date pair, or FALSE if no next date could be determined.
    */
   public function findNextTime(UserInterface $user, $now = 'now');
 
@@ -59,10 +56,8 @@ interface ActiveHoursInterface {
    * @param string|\DateTimeZone $timezone
    *   A timezone string or object.
    *
-   * @return array
-   *   A array containing arrays with keys 'start' and 'end' with values as
-   *   \Drupal\Core\Datetime\DrupalDateTime objects. The containing array is
-   *   sorted chronologically by start dates.
+   * @return \Drupal\sms_user\ActiveHoursDates[]
+   *   A array of date pairs sorted chronologically by start dates.
    */
   public function getRanges($timezone);
 
