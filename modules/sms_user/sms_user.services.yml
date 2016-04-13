@@ -1,0 +1,4 @@
+services:
+  sms_user.active_hours:
+    class: Drupal\sms_user\ActiveHours
+    arguments: ['@config.factory']

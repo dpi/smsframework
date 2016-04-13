@@ -10,12 +10,15 @@ namespace Drupal\sms\Provider;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Url;
+use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Drupal\sms\Exception\SmsException;
 
 /**
  * The SMS provider that provides default messaging functionality.
@@ -52,15 +55,54 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms, array $options = array()) {
-    // Check if a preferred gateway is specified in the $options.
-    if (isset($options['gateway'])) {
-      $gateway = SmsGateway::load($options['gateway']);
-    }
-    if (empty($gateway)) {
-      $gateway = $this->getDefaultGateway();
+  public function queue(SmsMessageEntityInterface $sms_message) {
+    $gateway = $this->getGateway($sms_message);
+    if ($gateway->getSkipQueue()) {
+      $this->send($sms_message, []);
+      return;
     }
 
+    if (!$sms_message->getGateway()) {
+      // @fixme getGateway being falsy is undocumented...
+      $sms_message->setGateway($this->getDefaultGateway());
+    }
+
+    if ($count = $sms_message->validate()->count()) {
+      throw new SmsException(sprintf('Can not queue SMS message because there are %s validation error(s).', $count));
+    }
+
+    // Split messages to overcome gateway limits.
+    $max = $gateway->getMaxRecipientsOutgoing();
+    $recipients_all = $sms_message->getRecipients();
+    if ($max > 0 && count($recipients_all) > $max) {
+      foreach ($sms_message->chunkByRecipients($max) as $sms_message) {
+        $sms_message->save();
+      }
+    }
+    else {
+      $sms_message->save();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function queueIn(SmsMessageInterface $sms_message) {
+    $this->plainMessageQueue($sms_message, SmsMessageEntityInterface::DIRECTION_INCOMING);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function queueOut(SmsMessageInterface $sms_message) {
+    $this->plainMessageQueue($sms_message, SmsMessageEntityInterface::DIRECTION_OUTGOING);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function send(SmsMessageInterface $sms, array $options = array()) {
+    $gateway = $this->getGateway($sms, $options);
     if ($this->preProcess($sms, $options, $gateway)) {
       $this->moduleHandler->invokeAll('sms_send', [$sms, $options, $gateway]);
       // @todo Apply token replacements.
@@ -193,6 +235,52 @@ class DefaultSmsProvider implements SmsProviderInterface {
       ->getEditable('sms.settings')
       ->set('default_gateway', $sms_gateway->id())
       ->save();
+  }
+
+  /**
+   * Get the gateway for a SMS message.
+   *
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
+   *   A SMS message.
+   * @param array $options
+   *   Arbitrary options for standard message objects.
+   *
+   * @return \Drupal\sms\Entity\SmsGatewayInterface
+   *   A SMS Gateway config entity.
+   */
+  protected function getGateway(SmsMessageInterface $sms_message, $options = []) {
+    if (isset($options['gateway'])) {
+      $gateway = SmsGateway::load($options['gateway']);
+    }
+    else if ($sms_message instanceof SmsMessageEntityInterface) {
+      $gateway = $sms_message->getGateway();
+    }
+
+    return !empty($gateway) ? $gateway : $this->getDefaultGateway();
+  }
+
+  /**
+   * Queues a standard SMS message object and converts it to an entity.
+   *
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
+   *   A standard SMS message object.
+   * @param $direction
+   *   Value of SmsMessageEntityInterface::DIRECTION_* constants.
+   */
+  protected function plainMessageQueue(SmsMessageInterface $sms_message, $direction) {
+    $gateway = $this->getGateway($sms_message);
+    if ($gateway->getSkipQueue() && $direction == SmsMessageEntityInterface::DIRECTION_OUTGOING) {
+      $this->send($sms_message, []);
+      return;
+    }
+
+    // Convert SMS message to an entity.
+    $sms_message = SmsMessage::convertFromSmsMessage($sms_message);
+
+    // @fixme add a direction method?
+    $sms_message->set('direction', $direction);
+
+    $this->queue($sms_message);
   }
 
 }

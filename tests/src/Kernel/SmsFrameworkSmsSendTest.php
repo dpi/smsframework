@@ -35,7 +35,6 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installConfig('sms');
     $this->defaultSmsProvider = $this->container->get('sms_provider.default');
   }
 

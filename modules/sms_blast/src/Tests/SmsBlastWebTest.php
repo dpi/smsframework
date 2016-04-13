@@ -54,6 +54,7 @@ class SmsBlastWebTest extends SmsFrameworkWebTestBase {
       ->setPhoneNumberEntityTypeId('user')
       ->setPhoneNumberBundle('user')
       ->setFieldName('phone_number', $phone_field->getName())
+      ->setVerificationMessage('message')
       ->save();
   }
 

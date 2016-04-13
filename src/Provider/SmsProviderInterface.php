@@ -10,6 +10,7 @@ namespace Drupal\sms\Provider;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
 
 /**
  * Provides an interface for sending messages
@@ -17,7 +18,37 @@ use Symfony\Component\HttpFoundation\Request;
 interface SmsProviderInterface {
 
   /**
+   * Queue a SMS message for sending or receiving.
+   *
+   * @param \Drupal\sms\Entity\SmsMessageInterface $sms_message
+   *   A SMS message entity.
+   */
+  public function queue(SmsMessageEntityInterface $sms_message);
+
+  /**
+   * Queue a standard SMS message for receiving.
+   *
+   * @todo Remove if standard message gets a direction property.
+   *
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
+   *   A standard SMS message.
+   */
+  public function queueIn(SmsMessageInterface $sms_message);
+
+  /**
+   * Queue a standard SMS message for sending.
+   *
+   * @todo Remove if standard message gets a direction property.
+   *
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
+   *   A standard SMS message.
+   */
+  public function queueOut(SmsMessageInterface $sms_message);
+
+  /**
    * Sends an SMS using the active gateway.
+   *
+   * It is preferred to use queue method over directly invoking send().
    *
    * @param \Drupal\sms\Message\SmsMessageInterface
    *   The message to be sent.

@@ -233,4 +233,21 @@ class SmsMessage implements SmsMessageInterface {
     return \Drupal::service('uuid');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function chunkByRecipients($size) {
+    $recipients_all = $this->getRecipients();
+
+    $base = clone $this;
+    $base->removeRecipients($recipients_all);
+
+    $messages = [];
+    foreach (array_chunk($recipients_all, $size) as $recipients) {
+      $message = clone $base;
+      $messages[] = $message->addRecipients($recipients);
+    }
+    return $messages;
+  }
+
 }

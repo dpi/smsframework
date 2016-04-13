@@ -17,6 +17,7 @@ use Drupal\sms\Message\SmsMessageResult;
  * @SmsGateway(
  *   id = "log",
  *   label = @Translation("Drupal log"),
+ *   outgoing_message_max_recipients = -1,
  * )
  */
 class LogGateway extends SmsGatewayPluginBase {
