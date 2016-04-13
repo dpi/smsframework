@@ -463,6 +463,10 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    *   An unsaved SMS Message entity.
    */
   public static function convertFromSmsMessage(StdSmsMessageInterface $sms_message) {
+    if ($sms_message instanceof static) {
+      return $sms_message;
+    }
+
     $new = static::create();
     $new
       ->setAutomated($sms_message->isAutomated())

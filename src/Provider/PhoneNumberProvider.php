@@ -13,6 +13,8 @@ use Drupal\Core\Utility\Token;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
+use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
+use Drupal\sms\Entity\SmsMessage as SmsMessageEntity;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\Component\Utility\Random;
@@ -108,7 +110,10 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       throw new NoPhoneNumberException('Attempted to send an SMS to entity without a phone number.');
     }
 
-    $sms_message->addRecipient(reset($phone_numbers));
+    $sms_message = SmsMessageEntity::convertFromSmsMessage($sms_message)
+      ->addRecipient(reset($phone_numbers))
+      ->setRecipientEntity($entity);
+
     $this->smsProvider
       ->queueOut($sms_message);
   }
