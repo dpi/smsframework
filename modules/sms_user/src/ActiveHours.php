@@ -18,7 +18,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
 class ActiveHours implements ActiveHoursInterface {
 
   /**
-   * The config factory used by the config entity query.
+   * The configuration factory.
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface;
    */
@@ -42,10 +42,10 @@ class ActiveHours implements ActiveHoursInterface {
   protected $ranges = [];
 
   /**
-   * Constructs a QueryFactory object.
+   * Constructs a ActiveHours object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config storage used by the config entity query.
+   *   The configuration factory.
    */
   public function __construct(ConfigFactoryInterface $config_factory) {
     $this->configFactory = $config_factory;
