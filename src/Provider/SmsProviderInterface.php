@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains definition of \Drupal\sms\SmsProviderInterface
+ * Contains definition of \Drupal\sms\Provider\SmsProviderInterface
  */
 
 namespace Drupal\sms\Provider;
@@ -23,7 +23,7 @@ interface SmsProviderInterface {
    * @param \Drupal\sms\Entity\SmsMessageInterface $sms_message
    *   A SMS message entity.
    */
-  public function queue(SmsMessageEntityInterface $sms_message);
+  public function queue(SmsMessageEntityInterface &$sms_message);
 
   /**
    * Queue a standard SMS message for receiving.

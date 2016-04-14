@@ -286,7 +286,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function isQueued() {
-    return $this->get('queued')->value;
+    return (boolean)$this->get('queued')->value;
   }
 
   /**

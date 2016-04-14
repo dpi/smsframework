@@ -55,7 +55,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function queue(SmsMessageEntityInterface $sms_message) {
+  public function queue(SmsMessageEntityInterface &$sms_message) {
     $gateway = $this->getGateway($sms_message);
     if ($gateway->getSkipQueue()) {
       $this->send($sms_message, []);
