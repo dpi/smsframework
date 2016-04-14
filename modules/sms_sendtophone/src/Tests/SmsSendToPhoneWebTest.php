@@ -42,6 +42,10 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
         'name' => 'Article'
       ));
     }
+
+    $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
+    $this->defaultSmsProvider
+      ->setDefaultGateway($this->gateway);
   }
 
   /**
@@ -95,13 +99,10 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     $this->assertResponse(200);
     $this->assertText(Url::fromUri('entity:node/' . $node->id(), array('absolute' => true))->toString());
 
-    // Set test gateway.
-    $this->defaultSmsProvider->setDefaultGateway($this->testGateway);
-
     // Click the send button there.
     $this->drupalPostForm(NULL, ['number' => '23456897623'], t('Send'));
 
-    $sms_message = $this->getLastTestMessage();
+    $sms_message = $this->getLastTestMessage($this->gateway);
     $this->assertTrue(in_array($user->sms_user['number'], $sms_message->getRecipients()));
     $this->assertEqual($sms_message->getMessage(), Url::fromUri('entity:node/' . $node->id(), array('absolute' => true))->toString());
   }
@@ -140,7 +141,6 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     $this->clickLink('(Send to phone)');
     $this->assertText($node_body);
     // Submit phone number and confirm message received.
-    $this->defaultSmsProvider->setDefaultGateway($this->testGateway);
     $this->drupalPostForm(NULL, array(), t('Send'), array(
       'query' => array(
         'text' => $node_body,
@@ -148,7 +148,7 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
       )
     ));
 
-    $sms_message = $this->getLastTestMessage();
+    $sms_message = $this->getLastTestMessage($this->gateway);
     $this->assertEqual($sms_message->getMessage(), $node_body, 'Message body "' . $node_body . '" successfully sent.');
 
     // For number not registered, assert the corresponding message.
@@ -222,9 +222,8 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
       'status' => 2,
     );
     $user->save();
-    // Set test gateway and click send button.
-    $this->defaultSmsProvider->setDefaultGateway($this->testGateway);
 
+    // Click send button.
     $this->drupalGet('node/' . $test_node->id());
     $this->assertText($random_text, 'Field format works');
     $this->assertText($random_text . ' (Send to phone)');
@@ -233,7 +232,7 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     // Click the send button there.
     $this->drupalPostForm(NULL, [], 'Send', array('query' => array('text' => $random_text)));
 
-    $sms_message = $this->getLastTestMessage();
+    $sms_message = $this->getLastTestMessage($this->gateway);
     $this->assertTrue(in_array($user->sms_user['number'], $sms_message->getRecipients()), 'Message sent to correct number');
     $this->assertEqual($sms_message->getMessage(), $random_text, 'Field content sent to user');
   }
