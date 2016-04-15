@@ -23,15 +23,7 @@ abstract class SmsFrameworkKernelBase extends KernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-
     $this->installConfig('sms');
-
-    /** @var \Drupal\sms\Provider\DefaultSmsProvider $provider */
-    $provider = \Drupal::service('sms_provider');
-    $provider
-      ->getDefaultGateway()
-      ->setSkipQueue(TRUE)
-      ->save();
   }
 
 }

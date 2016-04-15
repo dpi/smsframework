@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @SmsGateway(
  *   id = "memory",
  *   label = @Translation("Memory"),
+ *   outgoing_message_max_recipients = -1,
  * )
  */
 class Memory extends SmsGatewayPluginBase {

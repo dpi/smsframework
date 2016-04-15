@@ -225,6 +225,13 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
+  public function setDirection($direction) {
+    return $this->set('direction', $direction);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getGateway() {
     return $this->get('gateway')->entity;
   }
@@ -286,7 +293,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function isQueued() {
-    return $this->get('queued')->value;
+    return (boolean)$this->get('queued')->value;
   }
 
   /**
