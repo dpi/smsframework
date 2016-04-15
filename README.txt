@@ -33,6 +33,18 @@ pages on Drupal.org at the following URL:
 
 http://drupal.org/node/362258
 
+Testing
+=======
+
+Drupal core phpunit.xml.dist does not run unit tests located in submodules.
+Navigate to the SMS Framework directory to run. Your commands should look 
+something like:
+
+    # Run all unit tests:
+    modules/smsframework$ ../../vendor/bin/phpunit
+    # Run a single test:
+    modules/smsframework$ ../../vendor/bin/phpunit --filter SmsFrameworkQueueTest
+
 Credits
 =======
 Will White of Development Seed (http://drupal.org/user/32237)
