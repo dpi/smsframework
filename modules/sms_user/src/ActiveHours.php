@@ -96,7 +96,7 @@ class ActiveHours implements ActiveHoursInterface {
     $recipient = $sms_message->getRecipientEntity();
     if ($sms_message->isAutomated() && $recipient instanceof UserInterface) {
       if (!$this->inHours($recipient) && ($range = $this->findNextTime($recipient))) {
-        $sms_message->setSendTime($range['start']->format('U'));
+        $sms_message->setSendTime($range->getStartDate()->format('U'));
       }
     }
   }
@@ -141,7 +141,7 @@ class ActiveHours implements ActiveHoursInterface {
       ->get('active_hours');
 
     $this->status = !empty($settings['status']);
-    $this->ranges = $settings['ranges'];
+    $this->ranges = !empty($settings['ranges']) ? $settings['ranges'] : [];
   }
 
 }
