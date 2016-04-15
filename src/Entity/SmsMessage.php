@@ -225,6 +225,13 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
+  public function setDirection($direction) {
+    return $this->set('direction', $direction);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getGateway() {
     return $this->get('gateway')->entity;
   }

@@ -7,10 +7,8 @@
 
 namespace Drupal\Tests\sms\Kernel;
 
-use Drupal\sms\Message\SmsMessage as StandardSmsMessage;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsMessageInterface;
-use Drupal\sms\Entity\SmsGateway;
 
 /**
  * Tests behaviour of SMS Framework message queue.
@@ -182,9 +180,8 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
    * @return \Drupal\sms\Entity\SmsMessageInterface
    */
   protected function createSmsMessage(array $values = []) {
-    return SmsMessage::create([
-        'direction' => SmsMessageInterface::DIRECTION_OUTGOING,
-      ] + $values)
+    return SmsMessage::create($values)
+      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
       ->setMessage($this->randomString());
   }
 

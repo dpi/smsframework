@@ -26,13 +26,22 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
   /**
    * Get direction of the message.
    *
-   * Direction is immutable so there is no setter. Set direction on creation.
-   *
    * @return int
    *   See \Drupal\sms\Entity\SmsMessageInterface::DIRECTION_* constants for
    *   potential values.
    */
   public function getDirection();
+
+  /**
+   * Set direction of the message.
+   *
+   * @param int $direction
+   *   Any of \Drupal\sms\Entity\SmsMessageInterface::DIRECTION_* constants
+   *
+   * @return $this
+   *   Return SMS message for chaining.
+   */
+  public function setDirection($direction);
 
   /**
    * Get the gateway for this message.

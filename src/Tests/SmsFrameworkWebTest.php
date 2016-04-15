@@ -76,13 +76,13 @@ class SmsFrameworkWebTest extends SmsFrameworkWebTestBase {
       ->addRecipients($this->randomPhoneNumbers());
 
     for ($i = 0; $i < 2; $i++) {
-      $clone = $sms_message->createDuplicate();
-      $clone->set('direction', SmsMessageInterface::DIRECTION_INCOMING);
+      $clone = $sms_message->createDuplicate()
+        ->setDirection(SmsMessageInterface::DIRECTION_INCOMING);
       $provider->queue($clone);
     }
     for ($i = 0; $i < 4; $i++) {
-      $clone = $sms_message->createDuplicate();
-      $clone->set('direction', SmsMessageInterface::DIRECTION_OUTGOING);
+      $clone = $sms_message->createDuplicate()
+        ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
       $provider->queue($clone);
     }
 

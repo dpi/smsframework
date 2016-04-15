@@ -179,9 +179,8 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    * @return \Drupal\sms\Entity\SmsMessageInterface
    */
   protected function createSmsMessage(array $values = []) {
-    return SmsMessage::create([
-        'direction' => SmsMessageInterface::DIRECTION_OUTGOING,
-      ] + $values)
+    return SmsMessage::create($values)
+      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
       ->setMessage($this->randomString());
   }
 

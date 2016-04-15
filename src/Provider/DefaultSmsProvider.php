@@ -275,10 +275,8 @@ class DefaultSmsProvider implements SmsProviderInterface {
     }
 
     // Convert SMS message to an entity.
-    $sms_message = SmsMessage::convertFromSmsMessage($sms_message);
-
-    // @fixme add a direction method?
-    $sms_message->set('direction', $direction);
+    $sms_message = SmsMessage::convertFromSmsMessage($sms_message)
+      ->setDirection($direction);
 
     $this->queue($sms_message);
   }
