@@ -136,7 +136,7 @@ class AdminSettingsForm extends ConfigFormBase {
         '#type' => 'select',
         '#title' => $this->t('Start time for @day', ['@day' => $day]),
         '#title_display' => 'invisible',
-        '#default_value' => isset($day_defaults[$day_lower]['start']) ? $day_defaults[$day_lower]['start'] : NULL,
+        '#default_value' => isset($day_defaults[$day_lower]['start']) ? $day_defaults[$day_lower]['start'] : -1,
         '#options' => $hours,
         '#empty_option' => $this->t(' - Suspend messages for this day - '),
         '#empty_value' => -1,
