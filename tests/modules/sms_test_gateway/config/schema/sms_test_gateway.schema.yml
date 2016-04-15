@@ -8,3 +8,10 @@ sms_gateway.settings.memory:
     widget:
       type: string
       label: 'Widget'
+sms_gateway.settings.memory_chunked:
+  type: sms_gateway_settings
+  label: 'Memory Chunked'
+  mapping:
+    gateway_id:
+      type: string
+      label: 'ID of the gateway config entity.'

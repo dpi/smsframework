@@ -28,6 +28,11 @@ function sms_cron() {
   /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
   $phone_number_provider = \Drupal::service('sms.phone_number');
   $phone_number_provider->purgeExpiredVerifications();
+
+  /** @var \Drupal\sms\Provider\SmsQueueProcessorInterface $sms_queue_processor */
+  $sms_queue_processor = \Drupal::service('sms.queue');
+  $sms_queue_processor->processUnqueued();
+  $sms_queue_processor->garbageCollection();
 }
 
 /**
@@ -54,13 +59,23 @@ function sms_entity_delete(EntityInterface $entity) {
     return;
   }
 
-  $verification_storage = \Drupal::entityTypeManager()
-    ->getStorage('sms_phone_number_verification');
-  $verification_entities = $verification_storage->loadByProperties([
-    'entity__target_id' => $entity->id(),
-    'entity__target_type' => $entity->getEntityTypeId(),
-  ]);
-  $verification_storage->delete($verification_entities);
+  $phone_number_provider = \Drupal::service('sms.phone_number');
+
+  // Check the entity uses phone numbers. To save on a SQL call, and to prevent
+  // having to install phone number verification for SMS Framework tests which
+  // delete entities. Which would otherwise error on non-existent tables.
+  try {
+    $phone_number_provider->getPhoneNumberSettingsForEntity($entity);
+    $verification_storage = \Drupal::entityTypeManager()
+      ->getStorage('sms_phone_number_verification');
+    $verification_entities = $verification_storage->loadByProperties([
+      'entity__target_id' => $entity->id(),
+      'entity__target_type' => $entity->getEntityTypeId(),
+    ]);
+    $verification_storage->delete($verification_entities);
+  }
+  catch (PhoneNumberSettingsException $e) {
+  }
 }
 
 /**

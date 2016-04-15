@@ -210,4 +210,19 @@ trait SmsFrameworkMessageTestTrait {
     $this->assertNotEquals($sms1->getUuid(), $sms2->getUuid());
   }
 
+  /**
+   * Tests chunk by recipients
+   *
+   * @covers ::chunkByRecipients
+   */
+  public function testsChunkByRecipients() {
+    $sms_message = $this->createSmsMessage();
+    $sms_message->addRecipients(['100', '200', '300', '400', '500']);
+    $sms_messages = $sms_message->chunkByRecipients(2);
+    $this->assertEquals(3, count($sms_messages));
+    $this->assertEquals(['100', '200'], $sms_messages[0]->getRecipients());
+    $this->assertEquals(['300', '400'], $sms_messages[1]->getRecipients());
+    $this->assertEquals(['500'], $sms_messages[2]->getRecipients());
+  }
+
 }

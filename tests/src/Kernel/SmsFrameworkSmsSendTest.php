@@ -35,7 +35,6 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installConfig('sms');
     $this->defaultSmsProvider = $this->container->get('sms_provider.default');
   }
 
@@ -58,7 +57,7 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
     $gateways = [];
     $message_counts = [];
     for ($a = 0; $a < 3; $a++) {
-      $gateways[$a] = $this->createMemoryGateway();
+      $gateways[$a] = $this->createMemoryGateway(['skip_queue' => TRUE]);
       $message_counts[$a] = 0;
     }
 
@@ -81,8 +80,8 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
    * Tests SMS message 'gateway' option.
    */
   public function testSmsSendSpecified() {
-    $test_gateway1 = $this->createMemoryGateway();
-    $test_gateway2 = $this->createMemoryGateway();
+    $test_gateway1 = $this->createMemoryGateway(['skip_queue' => TRUE]);
+    $test_gateway2 = $this->createMemoryGateway(['skip_queue' => TRUE]);
     $this->defaultSmsProvider->setDefaultGateway($test_gateway1);
 
     // Test message goes to default gateway.

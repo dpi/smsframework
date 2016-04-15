@@ -11,7 +11,7 @@ use Drupal\sms\Message\SmsMessageResultInterface;
  *
  * @group SMS Framework
  */
-class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase{
+class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase {
 
   /**
    * Tests delivery reports integration.
@@ -21,7 +21,9 @@ class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase{
     $this->drupalLogin($user);
     $sms_message = $this->randomSmsMessage($user->id());
 
-    $result = $this->defaultSmsProvider->send($sms_message, ['gateway' => $this->testGateway->id()]);
+    $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
+    $result = $this->defaultSmsProvider
+      ->send($sms_message, ['gateway' => $test_gateway->id()]);
 
     $this->assertTrue($result instanceof SmsMessageResultInterface);
     $this->assertEqual(count($sms_message->getRecipients()), count($result->getReports()));
@@ -31,7 +33,7 @@ class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase{
     $this->assertEqual($first_report->getStatus(), SmsDeliveryReportInterface::STATUS_SENT);
 
     // Get the delivery reports url and simulate push delivery report.
-    $url = Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $this->testGateway->id()], ['absolute' => TRUE])->toString();
+    $url = Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $test_gateway->id()], ['absolute' => TRUE])->toString();
     $delivered_time = REQUEST_TIME;
     $delivery_report =<<<EOF
 {
@@ -54,7 +56,7 @@ EOF;
     \Drupal::state()->resetCache();
 
     // Get the stored report and verify that it was properly parsed.
-    $second_report = $this->getTestMessageReport($first_report->getMessageId(), $this->testGateway);
+    $second_report = $this->getTestMessageReport($first_report->getMessageId(), $test_gateway);
     $this->assertEqual($first_report->getMessageId(), $second_report->getMessageId());
     $this->assertEqual("800", $second_report->getStatus());
     $this->assertEqual("THIS_HAS_BEEN_DELIVERED", $second_report->getGatewayStatus());

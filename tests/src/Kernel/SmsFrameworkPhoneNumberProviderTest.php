@@ -59,10 +59,9 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     parent::setUp();
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('sms_phone_number_verification');
-    $this->installConfig('sms');
 
     $sms_provider = $this->container->get('sms_provider.default');
-    $this->gateway = $this->createMemoryGateway();
+    $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
     $sms_provider->setDefaultGateway($this->gateway);
 
     $this->phoneNumberProvider = $this->container->get('sms.phone_number');
@@ -85,6 +84,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
       ->setPhoneNumberEntityTypeId('entity_test')
       ->setPhoneNumberBundle('entity_test')
       ->setFieldName('phone_number', $this->phoneField->getName())
+      ->setVerificationMessage($this->randomString())
       ->save();
   }
 
