@@ -4,12 +4,6 @@ sms_user.settings:
   type: config_object
   label: 'SMS User settings'
   mapping:
-    registration_form:
-      type: integer
-      label: 'Show mobile fields during user registration'
-    confirmation_message:
-      type: string
-      label: 'Confirmation message format'
     active_hours:
       type: mapping
       mapping:
@@ -27,9 +21,6 @@ sms_user.settings:
                 end:
                   type: string
                   label: 'End time in PHP strtotime natural language.'
-    allow_opt_out:
-      type: boolean
-      label: 'Allow users to opt-out of receiving messages from this site'
     registration_enabled:
       type: boolean
       label: 'Enable registration of new users via SMS'
@@ -39,6 +30,3 @@ sms_user.settings:
     new_account_message:
       type: string
       label: 'New user message via SMS'
-    max_chars:
-      type: integer
-      label: 'Maximum number of chars for SMS sending using actions'

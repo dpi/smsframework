@@ -1,10 +1,6 @@
-registration_form: 0
-confirmation_message: '[site:name] confirmation code: '
 active_hours:
   status: false
   ranges: []
-allow_opt_out: true
 registration_enabled: false
 allow_password: false
 new_account_message: ''
-max_chars: 140
