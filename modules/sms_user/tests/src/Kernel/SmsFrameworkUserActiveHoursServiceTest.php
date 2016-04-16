@@ -8,8 +8,10 @@
 namespace Drupal\Tests\sms_user\Kernel;
 
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\sms\Entity\SmsMessage;
 use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
 use Drupal\user\Entity\User;
+use Drupal\sms\Entity\SmsMessageInterface;
 
 /**
  * Tests active hours service.
@@ -17,6 +19,7 @@ use Drupal\user\Entity\User;
  * Using absolute dates to prevent random test failures.
  *
  * @group SMS Framework
+ * @coversDefaultClass \Drupal\sms_user\ActiveHours
  */
 class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
 
@@ -25,7 +28,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    *
    * @var array
    */
-  public static $modules = ['sms', 'sms_user', 'user'];
+  public static $modules = ['sms', 'sms_user', 'user', 'telephone', 'dynamic_entity_reference'];
 
   /**
    * @var \Drupal\sms_user\ActiveHoursInterface
@@ -35,12 +38,25 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   protected $activeHoursService;
 
   /**
+   * @var \Drupal\sms\Provider\SmsProviderInterface
+   *
+   * The default SMS provider.
+   */
+  protected $smsProvider;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
     $this->activeHoursService = $this->container->get('sms_user.active_hours');
+    $this->smsProvider = $this->container->get('sms_provider');
     $this->installEntitySchema('user');
+    $this->installEntitySchema('sms');
+
+    // @todo Remove when sms_user_user_load() no longer queries a 'sms_user'
+    // table.
+    $this->installSchema('sms_user', ['sms_user']);
   }
 
   /**
@@ -179,6 +195,9 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
     $this->assertEquals(new DrupalDateTime('2016-03-13 Sunday 5pm America/New_York'), $range->getEndDate());
   }
 
+  /**
+   * Tests getting date ranges.
+   */
   public function testGetRanges() {
     $this->setActiveHours([
       ['start' => '2016-03-15 tuesday 9:00', 'end' => '2016-03-15 tuesday 17:00'],
@@ -196,6 +215,51 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
     $this->assertEquals('America/New_York', $ranges[1]->getStartDate()->getTimezone()->getName());
     $this->assertEquals(new DrupalDateTime('2016-03-16 wednesday 5pm America/New_York'), $ranges[1]->getEndDate());
     $this->assertEquals('America/New_York', $ranges[1]->getEndDate()->getTimezone()->getName());
+  }
+
+  /**
+   * Tests delay was applied to a SMS message.
+   *
+   * Checks invokation of sms_user_entity_presave(). This happens when queue()
+   * is called and the SMS message is saved.
+   */
+  public function testDelaySmsMessage() {
+    $timestamp = (new DrupalDateTime('next tuesday 9:00'))->format('U');
+    $this->activeHoursStatus(TRUE);
+    $this->setActiveHours([
+      ['start' => 'next tuesday 9:00', 'end' => 'next tuesday 17:00'],
+    ]);
+
+    $user = $this->createUser();
+    $sms_message = SmsMessage::create()
+      ->setMessage($this->randomString())
+      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
+      ->setRecipientEntity($user)
+      ->setAutomated(TRUE);
+    $this->smsProvider->queue($sms_message);
+
+    $this->assertEquals($timestamp, $sms_message->getSendTime());
+  }
+
+  /**
+   * Tests delay was not applied to a SMS message if it is tagged as automated.
+   */
+  public function testDelaySmsMessageNotAutomated() {
+    $timestamp = (new DrupalDateTime('next tuesday 9:00'))->format('U');
+    $this->activeHoursStatus(TRUE);
+    $this->setActiveHours([
+      ['start' => 'next tuesday 9:00', 'end' => 'next tuesday 17:00'],
+    ]);
+
+    $user = $this->createUser();
+    $sms_message = SmsMessage::create()
+      ->setMessage($this->randomString())
+      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
+      ->setRecipientEntity($user)
+      ->setAutomated(FALSE);
+    $this->smsProvider->queue($sms_message);
+
+    $this->assertNotEquals($timestamp, $sms_message->getSendTime());
   }
 
   /**
