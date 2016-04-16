@@ -50,9 +50,31 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
   }
 
   /**
+   * Tests sms_user admin options.
+   */
+  public function testSettingsGeneralForm() {
+    $user = $this->drupalCreateUser(array('administer smsframework'));
+    $this->drupalLogin($user);
+
+    // Set the sms_user admin options.
+    $edit = array(
+      'registration_enabled' => 1,
+      'allow_password' => 1,
+      'new_account_message' => $this->randomString(30),
+    );
+    $this->drupalPostForm('admin/config/smsframework/sms_user_options', $edit, t('Save configuration'));
+    $this->assertResponse(200);
+
+    // Verify that the variables are set.
+    foreach ($edit as $name => $value) {
+      $this->assertEqual($value, $this->config('sms_user.settings')->get($name), sprintf('Variable %s has been set.', $name));
+    }
+  }
+
+  /**
    * Tests saving form and verifying configuration is saved.
    */
-  function testSettingsForm() {
+  public function testSettingsForm() {
     $this->drupalGet(Url::fromRoute('sms_user.options'));
     $this->assertResponse(200);
 
@@ -101,7 +123,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
   /**
    * Tests saving form with invalid values.
    */
-  function testSettingsFormValidationFail() {
+  public function testSettingsFormValidationFail() {
     // End time < start time.
     $edit = [
       'active_hours[days][wednesday][start]' => 10,
