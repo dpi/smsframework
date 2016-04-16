@@ -152,6 +152,7 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     $this->assertEqual($sms_message->getMessage(), $node_body, 'Message body "' . $node_body . '" successfully sent.');
 
     // For number not registered, assert the corresponding message.
+    // @todo dereprecatd
     sms_user_delete($user->id());
     $this->drupalGet('sms/sendtophone/inline');
     $this->assertText('You need to setup your mobile phone to send messages.');
