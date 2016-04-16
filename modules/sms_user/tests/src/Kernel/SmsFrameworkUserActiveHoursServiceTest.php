@@ -14,6 +14,8 @@ use Drupal\user\Entity\User;
 /**
  * Tests active hours service.
  *
+ * Using absolute dates to prevent random test failures.
+ *
  * @group SMS Framework
  */
 class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
@@ -46,10 +48,10 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    */
   public function testInHoursActiveHoursOff() {
     $this->activeHoursStatus(FALSE);
-    $this->setActiveHours([['start' => 'sunday 9:00', 'end' => 'sunday 17:00']]);
+    $this->setActiveHours([['start' => '2016-03-13 sunday 9:00', 'end' => '2016-03-13 sunday 17:00']]);
     $user = $this->createUser(['timezone' => 'America/New_York']);
 
-    $now = 'Sunday 10pm America/New_York';
+    $now = '2016-03-13 Sunday 10pm America/New_York';
     $this->assertTrue($this->activeHoursService->inHours($user, $now));
   }
 
@@ -58,10 +60,10 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    */
   public function testInHoursDifferentTimezone() {
     $this->activeHoursStatus(TRUE);
-    $this->setActiveHours([['start' => 'sunday 9:00', 'end' => 'sunday 17:00']]);
+    $this->setActiveHours([['start' => '2016-03-13 sunday 9:00', 'end' => '2016-03-13 sunday 17:00']]);
     $user = $this->createUser(['timezone' => 'America/New_York']);
 
-    $now = 'Sunday 4pm America/Los_Angeles';
+    $now = '2016-03-13 Sunday 4pm America/Los_Angeles';
     $this->assertFalse($this->activeHoursService->inHours($user, $now));
   }
 
@@ -70,10 +72,10 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    */
   public function testInHoursSameTimezone() {
     $this->activeHoursStatus(TRUE);
-    $this->setActiveHours([['start' => 'sunday 9:00', 'end' => 'sunday 17:00']]);
+    $this->setActiveHours([['start' => '2016-03-13 sunday 9:00', 'end' => '2016-03-13 sunday 17:00']]);
     $user = $this->createUser(['timezone' => 'America/New_York']);
 
-    $now = 'Sunday 4pm America/New_York';
+    $now = '2016-03-13 Sunday 4pm America/New_York';
     $this->assertTrue($this->activeHoursService->inHours($user, $now));
   }
 
@@ -82,10 +84,10 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    */
   public function testInHoursDifferentDay() {
     $this->activeHoursStatus(TRUE);
-    $this->setActiveHours([['start' => 'monday 9:00', 'end' => 'monday 17:00']]);
+    $this->setActiveHours([['start' => '2016-03-14 monday 9:00', 'end' => '2016-03-14 monday 17:00']]);
     $user = $this->createUser(['timezone' => 'America/New_York']);
 
-    $now = 'Sunday 12pm America/New_York';
+    $now = '2016-03-13 Sunday 12pm America/New_York';
     $this->assertFalse($this->activeHoursService->inHours($user, $now));
   }
 
@@ -94,22 +96,22 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    */
   public function testInHoursAllDay() {
     $this->activeHoursStatus(TRUE);
-    $this->setActiveHours([['start' => 'wednesday', 'end' => 'wednesday +1 day']]);
+    $this->setActiveHours([['start' => '2016-03-16 wednesday', 'end' => '2016-03-16 wednesday +1 day']]);
     $user = $this->createUser(['timezone' => 'America/New_York']);
 
-    $now = 'Tuesday 8pm America/New_York';
+    $now = '2016-03-15 Tuesday 8pm America/New_York';
     $this->assertFalse($this->activeHoursService->inHours($user, $now));
-    $now = 'Tuesday 11:59:59pm America/New_York';
+    $now = '2016-03-15 Tuesday 11:59:59pm America/New_York';
     $this->assertFalse($this->activeHoursService->inHours($user, $now));
-    $now = 'Wednesday 12am America/New_York';
+    $now = '2016-03-16 Wednesday 12am America/New_York';
     $this->assertTrue($this->activeHoursService->inHours($user, $now));
-    $now = 'Wednesday 12pm America/New_York';
+    $now = '2016-03-16 Wednesday 12pm America/New_York';
     $this->assertTrue($this->activeHoursService->inHours($user, $now));
-    $now = 'Wednesday 11:59pm America/New_York';
+    $now = '2016-03-16 Wednesday 11:59pm America/New_York';
     $this->assertTrue($this->activeHoursService->inHours($user, $now));
-    $now = 'Thursday 12am America/New_York';
+    $now = '2016-03-17 Thursday 12am America/New_York';
     $this->assertTrue($this->activeHoursService->inHours($user, $now));
-    $now = 'Thursday 12:01:01am America/New_York';
+    $now = '2016-03-17 Thursday 12:01:01am America/New_York';
     $this->assertFalse($this->activeHoursService->inHours($user, $now));
   }
 
@@ -118,22 +120,22 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    */
   public function testInHoursAllDayDifferentTimezone() {
     $this->activeHoursStatus(TRUE);
-    $this->setActiveHours([['start' => 'wednesday', 'end' => 'wednesday +1 day']]);
+    $this->setActiveHours([['start' => '2016-03-16 wednesday', 'end' => '2016-03-16 wednesday +1 day']]);
     $user = $this->createUser(['timezone' => 'America/New_York']);
 
-    $now = 'Tuesday 8pm America/Los_Angeles';
+    $now = '2016-03-15 Tuesday 8pm America/Los_Angeles';
     $this->assertFalse($this->activeHoursService->inHours($user, $now));
-    $now = 'Tuesday 11:59:59pm America/Los_Angeles';
+    $now = '2016-03-15 Tuesday 11:59:59pm America/Los_Angeles';
     $this->assertTrue($this->activeHoursService->inHours($user, $now));
-    $now = 'Wednesday 12am America/Los_Angeles';
+    $now = '2016-03-16 Wednesday 12am America/Los_Angeles';
     $this->assertTrue($this->activeHoursService->inHours($user, $now));
-    $now = 'Wednesday 12pm America/Los_Angeles';
+    $now = '2016-03-16 Wednesday 12pm America/Los_Angeles';
     $this->assertTrue($this->activeHoursService->inHours($user, $now));
-    $now = 'Wednesday 11:59pm America/Los_Angeles';
+    $now = '2016-03-16 Wednesday 11:59pm America/Los_Angeles';
     $this->assertFalse($this->activeHoursService->inHours($user, $now));
-    $now = 'Thursday 12am America/Los_Angeles';
+    $now = '2016-03-17 Thursday 12am America/Los_Angeles';
     $this->assertFalse($this->activeHoursService->inHours($user, $now));
-    $now = 'Thursday 12:01:01am America/Los_Angeles';
+    $now = '2016-03-17 Thursday 12:01:01am America/Los_Angeles';
     $this->assertFalse($this->activeHoursService->inHours($user, $now));
   }
 
@@ -146,70 +148,53 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Test find next time when its need to loop around the weekend.
-   */
-  public function testFindNextTimeNextWeek() {
-    $this->setActiveHours([
-      ['start' => 'tuesday 9:00', 'end' => 'tuesday 17:00'],
-      ['start' => 'wednesday 9:00', 'end' => 'wednesday 17:00'],
-      ['start' => 'thursday 9:00', 'end' => 'thursday 17:00'],
-    ]);
-    $user = $this->createUser(['timezone' => 'America/New_York']);
-    $now = 'Friday 1pm America/New_York';
-    $range = $this->activeHoursService->findNextTime($user, $now);
-    $this->assertEquals(new DrupalDateTime('Tuesday 9am America/New_York'), $range->getStartDate());
-    $this->assertEquals(new DrupalDateTime('Tuesday 5pm America/New_York'), $range->getEndDate());
-  }
-
-  /**
    * Test getting the range for today when within todays range.
    */
   public function testFindNextTimeSameDay() {
     $this->setActiveHours([
-      ['start' => 'tuesday 9:00', 'end' => 'tuesday 17:00'],
-      ['start' => 'wednesday 9:00', 'end' => 'wednesday 17:00'],
-      ['start' => 'thursday 9:00', 'end' => 'thursday 17:00'],
+      ['start' => '2016-03-15 tuesday 9:00', 'end' => '2016-03-15 tuesday 17:00'],
+      ['start' => '2016-03-16 wednesday 9:00', 'end' => '2016-03-16 wednesday 17:00'],
+      ['start' => '2016-03-17 thursday 9:00', 'end' => '2016-03-17 thursday 17:00'],
     ]);
     $user = $this->createUser(['timezone' => 'America/New_York']);
-    $now = 'Wednesday 1pm America/New_York';
+    $now = '2016-03-16 Wednesday 1pm America/New_York';
     $range = $this->activeHoursService->findNextTime($user, $now);
-    $this->assertEquals(new DrupalDateTime('Wednesday 9am America/New_York'), $range->getStartDate());
-    $this->assertEquals(new DrupalDateTime('Wednesday 5pm America/New_York'), $range->getEndDate());
+    $this->assertEquals(new DrupalDateTime('2016-03-16 Wednesday 9am America/New_York'), $range->getStartDate());
+    $this->assertEquals(new DrupalDateTime('2016-03-16 Wednesday 5pm America/New_York'), $range->getEndDate());
   }
-
 
   /**
    * Test getting a range for next day when out of hours when a range was today.
    */
   public function testFindNextTimeSameDayOutOfHours() {
     $this->setActiveHours([
-      ['start' => 'tuesday 9:00', 'end' => 'tuesday 17:00'],
-      ['start' => 'wednesday 9:00', 'end' => 'wednesday 17:00'],
-      ['start' => 'thursday 9:00', 'end' => 'thursday 17:00'],
+      ['start' => '2016-03-15 tuesday 9:00', 'end' => '2016-03-15 tuesday 17:00'],
+      ['start' => '2016-03-12 saturday 9:00', 'end' => '2016-03-12 saturday 17:00'],
+      ['start' => '2016-03-13 sunday 9:00', 'end' => '2016-03-13 sunday 17:00'],
     ]);
     $user = $this->createUser(['timezone' => 'America/New_York']);
-    $now = 'Wednesday 5:00:01pm America/New_York';
+    $now = '2016-03-12 saturday 5:00:01pm America/New_York';
     $range = $this->activeHoursService->findNextTime($user, $now);
-    $this->assertEquals(new DrupalDateTime('Thursday 9am America/New_York'), $range->getStartDate());
-    $this->assertEquals(new DrupalDateTime('Thursday 5pm America/New_York'), $range->getEndDate());
+    $this->assertEquals(new DrupalDateTime('2016-03-13 Sunday 9am America/New_York'), $range->getStartDate());
+    $this->assertEquals(new DrupalDateTime('2016-03-13 Sunday 5pm America/New_York'), $range->getEndDate());
   }
 
   public function testGetRanges() {
     $this->setActiveHours([
-      ['start' => 'tuesday 9:00', 'end' => 'tuesday 17:00'],
-      ['start' => 'wednesday 9:00', 'end' => 'wednesday 17:00'],
+      ['start' => '2016-03-15 tuesday 9:00', 'end' => '2016-03-15 tuesday 17:00'],
+      ['start' => '2016-03-16 wednesday 9:00', 'end' => '2016-03-16 wednesday 17:00'],
     ]);
 
     $ranges = $this->activeHoursService->getRanges('America/New_York');
     // Need to test timezone is same as well, as data objects will compare
     // equality across timezones.
-    $this->assertEquals(new DrupalDateTime('Tuesday 9am America/New_York'), $ranges[0]->getStartDate());
+    $this->assertEquals(new DrupalDateTime('2016-03-15 tuesday 9am America/New_York'), $ranges[0]->getStartDate());
     $this->assertEquals('America/New_York', $ranges[0]->getStartDate()->getTimezone()->getName());
-    $this->assertEquals(new DrupalDateTime('Tuesday 5pm America/New_York'), $ranges[0]->getEndDate());
+    $this->assertEquals(new DrupalDateTime('2016-03-15 tuesday 5pm America/New_York'), $ranges[0]->getEndDate());
     $this->assertEquals('America/New_York', $ranges[0]->getEndDate()->getTimezone()->getName());
-    $this->assertEquals(new DrupalDateTime('Wednesday 9am America/New_York'), $ranges[1]->getStartDate());
+    $this->assertEquals(new DrupalDateTime('2016-03-16 wednesday 9am America/New_York'), $ranges[1]->getStartDate());
     $this->assertEquals('America/New_York', $ranges[1]->getStartDate()->getTimezone()->getName());
-    $this->assertEquals(new DrupalDateTime('Wednesday 5pm America/New_York'), $ranges[1]->getEndDate());
+    $this->assertEquals(new DrupalDateTime('2016-03-16 wednesday 5pm America/New_York'), $ranges[1]->getEndDate());
     $this->assertEquals('America/New_York', $ranges[1]->getEndDate()->getTimezone()->getName());
   }
 
