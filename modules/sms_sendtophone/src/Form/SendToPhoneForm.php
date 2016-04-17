@@ -50,8 +50,9 @@ class SendToPhoneForm extends FormBase {
         // User has no phone number, or unconfirmed.
         $form['message'] = [
           '#type' => 'markup',
-          '#markup' => $this->t('You need to @setup and confirm your mobile phone to send messages.',
-            array('@setup' => $this->l('set up', Url::fromRoute('entity.user.edit_form', ['user' => $user->id()])))),
+          '#markup' => $this->t('You need to @setup and confirm your mobile phone to send messages.', [
+            '@setup' => $user->toLink('set up', 'edit-form')->toString(),
+          ])
         ];
       }
       else {
@@ -104,11 +105,11 @@ class SendToPhoneForm extends FormBase {
             '#cols' => 35,
             '#rows' => 2,
             '#attributes' => array('disabled' => TRUE),
-            '#default_value' => Url::fromUri('entity:node/' . $node->id(), ['absolute' => TRUE])->toString(),
+            '#default_value' => $node->toUrl()->setAbsolute()->toString(),
           );
           $form['message'] = array(
             '#type' => 'value',
-            '#value' => Url::fromUri('entity:node/' . $node->id(), ['absolute' => TRUE])->toString(),
+            '#value' => $node->toUrl()->setAbsolute()->toString(),
           );
         }
         break;

@@ -35,9 +35,15 @@ function sms_sendtophone_node_links_alter(array &$links, NodeInterface $node, ar
   if (in_array($node->bundle(), $types)) {
     if ($user->hasPermission('send to any number') || count($phone_numbers)) {
       // Only show "send to phone" link if user is permitted to do so.
+      $url = Url::fromRoute(
+        'sms_sendtophone.page',
+        ['type' => 'node', 'extra' => $node->id()],
+        ['query' => \Drupal::destination()->getAsArray()]
+      );
+      
       $build['sms_sendtophone'] = array(
         'title' => t('Send to phone'),
-        'url' => Url::fromRoute('sms_sendtophone.page', ['type' => 'node', 'extra' => $node->id()], ['query' => drupal_get_destination()]),
+        'url' => $url,
         'attributes' => array(
           'class' => 'sms-sendtophone',
           'title' => 'Send a link via SMS.',

@@ -106,7 +106,7 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     // added.
     $types = array_keys(array_filter($expected));
     $node = $this->drupalCreateNode(array('type' => $types[0]));
-    $this->drupalGet('node/' . $node->id());
+    $this->drupalGet($node->toUrl());
     // Confirm message for user without confirmed number.
     $this->assertText(t('Set up and confirm your mobile number to send to phone.'));
 
@@ -116,7 +116,7 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     $user->save();
     $this->verifyPhoneNumber($user, $phone_number);
 
-    $this->drupalGet('node/' . $node->id());
+    $this->drupalGet($node->toUrl());
     // Confirm message for user without confirmed number.
     $this->assertText('Send to phone');
     $this->assertFieldByXPath('//a[@title="Send a link via SMS." and @class="sms-sendtophone"]', NULL);
@@ -133,7 +133,7 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
 
     $sms_message = $this->getLastTestMessage($this->gateway);
     $this->assertTrue(in_array($phone_number, $sms_message->getRecipients()));
-    $this->assertEqual($sms_message->getMessage(), Url::fromUri('entity:node/' . $node->id(), array('absolute' => true))->toString());
+    $this->assertEqual($sms_message->getMessage(), $node->toUrl()->setAbsolute()->toString());
   }
 
   /**
@@ -169,7 +169,7 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     $user->save();
     $this->verifyPhoneNumber($user, $phone_number);
 
-    $this->drupalGet('node/' . $node->id());
+    $this->drupalGet($node->toUrl());
     // Confirm link was created for Send to phone.
     $this->assertText("$node_body (Send to phone)");
 
@@ -178,12 +178,9 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     $this->assertText($node_body);
 
     // Submit phone number and confirm message received.
-    $this->drupalPostForm(NULL, array(), t('Send'), array(
-      'query' => array(
-        'text' => $node_body,
-        'destination' => 'node/' . $node->id(),
-      )
-    ));
+    $this->drupalPostForm(NULL, array(), t('Send'), [
+      'query' => ['text' => $node_body],
+    ]);
 
     $sms_message = $this->getLastTestMessage($this->gateway);
     $this->assertEqual($sms_message->getMessage(), $node_body, 'Message body "' . $node_body . '" successfully sent.');
