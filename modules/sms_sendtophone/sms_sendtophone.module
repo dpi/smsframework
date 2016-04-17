@@ -39,13 +39,13 @@ function sms_sendtophone_node_links_alter(array &$links, NodeInterface $node, ar
       if (empty($user->sms_user['number'])) {
         $build['sms_sendtophone'] = array(
           'title' => t('Setup your mobile number to send to phone.'),
-          'url' => Url::fromRoute('sms_user.user_edit', ['user' => $user->id()]),
+          'url' => Url::fromRoute('entity.user.edit_form', ['user' => $user->id()]),
         );
       }
       elseif ($user->sms_user['status'] != 2) {
         $build['sms_sendtophone'] = array(
           'title' => t('Confirm your mobile number to send to phone.'),
-          'url' => Url::fromRoute('sms_user.user_edit', ['user' => $user->id()]),
+          'url' => Url::fromRoute('entity.user.edit_form', ['user' => $user->id()]),
         );
       }
     }

@@ -33,13 +33,13 @@ class SendToPhoneForm extends FormBase {
         $form['message'] = [
           '#type' => 'markup',
           '#markup' => $this->t('You need to @setup your mobile phone to send messages.',
-            array('@setup' => $this->l('setup', Url::fromRoute('sms_user.user_edit', ['user' => $user->id()])))),
+            array('@setup' => $this->l('setup', Url::fromRoute('entity.user.edit_form', ['user' => $user->id()])))),
         ];
       }
       elseif ($user->id() > 0 && !empty($user->sms_user) && $user->sms_user['status'] != 2) {
         $form['message'] = [
           '#markup' => $this->t('You need to @confirm your mobile phone number to send messages.',
-            array('@confirm' => $this->l('confirm', Url::fromRoute('sms_user.user_edit', ['user' => $user->id()])))),
+            array('@confirm' => $this->l('confirm', Url::fromRoute('entity.user.edit_form', ['user' => $user->id()])))),
         ];
       }
       else {
