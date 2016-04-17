@@ -14,6 +14,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
 use Drupal\sms\Tests\SmsFrameworkWebTestBase;
+use Drupal\sms\Entity\PhoneNumberSettings;
 
 /**
  * Integration tests for the SMS SendToPhone Module.
@@ -23,6 +24,16 @@ use Drupal\sms\Tests\SmsFrameworkWebTestBase;
 class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
 
   public static $modules = ['sms', 'sms_user', 'sms_sendtophone', 'sms_test_gateway', 'node', 'field', 'field_ui'];
+
+  /**
+   * @var \Drupal\field\FieldStorageConfigInterface
+   */
+  protected $phoneField;
+
+  /**
+   * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
+   */
+  protected $phoneNumberSettings;
 
   /**
    * {@inheritdoc}
@@ -46,6 +57,27 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
     $this->defaultSmsProvider
       ->setDefaultGateway($this->gateway);
+
+    $this->phoneField = FieldStorageConfig::create([
+      'entity_type' => 'user',
+      'field_name' => Unicode::strtolower($this->randomMachineName()),
+      'type' => 'telephone',
+    ]);
+    $this->phoneField->save();
+
+    FieldConfig::create([
+      'entity_type' => 'user',
+      'bundle' => 'user',
+      'field_name' => $this->phoneField->getName(),
+    ])->save();
+
+    $this->phoneNumberSettings = PhoneNumberSettings::create();
+    $this->phoneNumberSettings
+      ->setPhoneNumberEntityTypeId('user')
+      ->setPhoneNumberBundle('user')
+      ->setFieldName('phone_number', $this->phoneField->getName())
+      ->setVerificationMessage($this->randomString())
+      ->save();
   }
 
   /**
@@ -76,19 +108,14 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     $node = $this->drupalCreateNode(array('type' => $types[0]));
     $this->drupalGet('node/' . $node->id());
     // Confirm message for user without confirmed number.
-    $this->assertText('Setup your mobile number to send to phone.');
-
-    // Add unconfirmed phone number.
-    $user->sms_user['number'] = '23456897623';
-    $user->save();
-    $this->drupalGet('user/' . $user->id() . '/edit');
-    $this->drupalGet('node/' . $node->id());
-    // Confirm message for user without confirmed number.
-    $this->assertText('Confirm your mobile number to send to phone.');
+    $this->assertText(t('Set up and confirm your mobile number to send to phone.'));
 
     // Confirm phone number.
-    $user->sms_user['status'] = 2;
+    $phone_number = $this->randomPhoneNumbers(1)[0];
+    $user->{$this->phoneField->getName()} = [$phone_number];
     $user->save();
+    $this->verifyPhoneNumber($user, $phone_number);
+
     $this->drupalGet('node/' . $node->id());
     // Confirm message for user without confirmed number.
     $this->assertText('Send to phone');
@@ -97,13 +124,15 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     // Navigate to the "Send to phone" link.
     $this->clickLink('Send to phone');
     $this->assertResponse(200);
-    $this->assertText(Url::fromUri('entity:node/' . $node->id(), array('absolute' => true))->toString());
+
+    $this->assertFieldByName('number', $phone_number);
+    $this->assertFieldByName('message_display', $node->toUrl()->setAbsolute()->toString());
 
     // Click the send button there.
-    $this->drupalPostForm(NULL, ['number' => '23456897623'], t('Send'));
+    $this->drupalPostForm(NULL, ['number' => $phone_number], t('Send'));
 
     $sms_message = $this->getLastTestMessage($this->gateway);
-    $this->assertTrue(in_array($user->sms_user['number'], $sms_message->getRecipients()));
+    $this->assertTrue(in_array($phone_number, $sms_message->getRecipients()));
     $this->assertEqual($sms_message->getMessage(), Url::fromUri('entity:node/' . $node->id(), array('absolute' => true))->toString());
   }
 
@@ -129,17 +158,25 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
         'format' => 'plain_text',
       )),
     ));
+
+    // Unconfirmed users
+    $this->drupalGet('sms/sendtophone/inline');
+    $this->assertText('You need to set up and confirm your mobile phone to send messages');
+
+    // Confirm phone number.
+    $phone_number = $this->randomPhoneNumbers(1)[0];
+    $user->{$this->phoneField->getName()} = [$phone_number];
+    $user->save();
+    $this->verifyPhoneNumber($user, $phone_number);
+
     $this->drupalGet('node/' . $node->id());
     // Confirm link was created for Send to phone.
     $this->assertText("$node_body (Send to phone)");
-    // Add confirmed phone number assert the corresponding message.
-    $user->sms_user = array(
-      'number' => '97623234568',
-      'status' => 2,
-    );
-    $user->save();
+
     $this->clickLink('(Send to phone)');
+    $this->assertResponse(200);
     $this->assertText($node_body);
+
     // Submit phone number and confirm message received.
     $this->drupalPostForm(NULL, array(), t('Send'), array(
       'query' => array(
@@ -150,20 +187,6 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
 
     $sms_message = $this->getLastTestMessage($this->gateway);
     $this->assertEqual($sms_message->getMessage(), $node_body, 'Message body "' . $node_body . '" successfully sent.');
-
-    // For number not registered, assert the corresponding message.
-    sms_user_delete($user->id());
-    $this->drupalGet('sms/sendtophone/inline');
-    $this->assertText('You need to setup your mobile phone to send messages.');
-
-    // Check for unconfirmed number.
-    $user->sms_user = array(
-      'number' => '97623234568',
-      'status' => 1,
-    );
-    $user->save();
-    $this->drupalGet('sms/sendtophone/inline');
-    $this->assertText('You need to confirm your mobile phone number to send messages.');
   }
 
   /**
@@ -214,14 +237,13 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     $this->drupalLogin($this->rootUser);
     $this->drupalPostForm('admin/structure/types/manage/article/display', ['fields['. $field_name . '][type]' => 'sms_link'], 'Save');
 
-    // Setup users phone number to check sending.
+    // Confirm phone number.
     $user = $this->drupalCreateUser();
-    $this->drupalLogin($user);
-    $user->sms_user = array(
-      'number' => '97623234568',
-      'status' => 2,
-    );
+    $phone_number = $this->randomPhoneNumbers(1)[0];
+    $user->{$this->phoneField->getName()} = [$phone_number];
     $user->save();
+    $this->verifyPhoneNumber($user, $phone_number);
+    $this->drupalLogin($user);
 
     // Click send button.
     $this->drupalGet('node/' . $test_node->id());
@@ -233,7 +255,7 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     $this->drupalPostForm(NULL, [], 'Send', array('query' => array('text' => $random_text)));
 
     $sms_message = $this->getLastTestMessage($this->gateway);
-    $this->assertTrue(in_array($user->sms_user['number'], $sms_message->getRecipients()), 'Message sent to correct number');
+    $this->assertTrue(in_array($phone_number, $sms_message->getRecipients()), 'Message sent to correct number');
     $this->assertEqual($sms_message->getMessage(), $random_text, 'Field content sent to user');
   }
 

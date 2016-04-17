@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
@@ -18,12 +19,21 @@ function sms_sendtophone_page_attachments(array &$attachments) {
  * Implements hook_node_links_alter().
  */
 function sms_sendtophone_node_links_alter(array &$links, NodeInterface $node, array &$context) {
+  /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
+  $phone_number_provider = \Drupal::service('sms.phone_number');
   /** @var \Drupal\user\UserInterface $user */
   $user = User::load(\Drupal::currentUser()->id());
+
+  $phone_numbers = [];
+  try {
+    $phone_numbers = $phone_number_provider->getPhoneNumbers($user);
+  }
+  catch (PhoneNumberSettingsException $e) {}
+
   $types = \Drupal::config('sms_sendtophone.settings')->get('content_types');
   $build = [];
   if (in_array($node->bundle(), $types)) {
-    if ($user->hasPermission('send to any number') || (!empty($user->sms_user['number']) && $user->sms_user['status'] == 2)) {
+    if ($user->hasPermission('send to any number') || count($phone_numbers)) {
       // Only show "send to phone" link if user is permitted to do so.
       $build['sms_sendtophone'] = array(
         'title' => t('Send to phone'),
@@ -34,17 +44,11 @@ function sms_sendtophone_node_links_alter(array &$links, NodeInterface $node, ar
         ),
       );
     }
-    else if ($user->id() > 0) {
+    else if ($user->isAuthenticated()) {
       // Show messages to encourage users to register their mobile number.
-      if (empty($user->sms_user['number'])) {
+      if (!count($phone_numbers)) {
         $build['sms_sendtophone'] = array(
-          'title' => t('Setup your mobile number to send to phone.'),
-          'url' => Url::fromRoute('entity.user.edit_form', ['user' => $user->id()]),
-        );
-      }
-      elseif ($user->sms_user['status'] != 2) {
-        $build['sms_sendtophone'] = array(
-          'title' => t('Confirm your mobile number to send to phone.'),
+          'title' => t('Set up and confirm your mobile number to send to phone.'),
           'url' => Url::fromRoute('entity.user.edit_form', ['user' => $user->id()]),
         );
       }
