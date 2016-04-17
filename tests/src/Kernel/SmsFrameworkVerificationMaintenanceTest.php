@@ -26,7 +26,7 @@ class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
    *
    * @var array
    */
-  public static $modules = ['sms', 'entity_test', 'user', 'field', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = ['sms', 'sms_test_gateway', 'entity_test', 'user', 'field', 'telephone', 'dynamic_entity_reference'];
 
   /**
    * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
@@ -45,7 +45,6 @@ class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
     parent::setUp();
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('sms_phone_number_verification');
-    $this->installConfig('sms');
 
     $this->phoneField = FieldStorageConfig::create([
       'entity_type' => 'entity_test',
@@ -67,7 +66,12 @@ class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
       ->setFieldName('phone_number', $this->phoneField->getName())
       ->setPurgeVerificationPhoneNumber(FALSE)
       ->setVerificationCodeLifetime(3600)
+      ->setVerificationMessage($this->randomString())
       ->save();
+
+    /** @var \Drupal\sms\Provider\DefaultSmsProvider $provider */
+    $provider = \Drupal::service('sms_provider');
+    $provider->setDefaultGateway($this->createMemoryGateway(['skip_queue' => TRUE]));
 
     $this->testEntity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, ['+123123123']);
   }

@@ -205,14 +205,17 @@ interface SmsMessageInterface {
   /**
    * Gets the user who created the SMS message.
    *
-   * @return int
+   * @return int|NULL
+   *   The ID of the user who created the message. Or NULL if no user entity is
+   *   associated as the sender.
    */
   public function getUid();
 
   /**
    * Set the user who created the SMS message
-   * @param int $uid
    *
+   * @param int $uid
+   *   The ID of a user entity.
    *
    * @return $this
    *   The called SMS message object.
@@ -238,5 +241,16 @@ interface SmsMessageInterface {
    *   Whether this SMS message was generated automatically.
    */
   public function isAutomated();
+
+  /**
+   * Split this SMS message into new messages by chunks of recipients.
+   *
+   * @param $size
+   *   The quantity of recipients to chunk by.
+   *
+   * @return static[]
+   *   An array of SMS messages split by recipient chunks.
+   */
+  public function chunkByRecipients($size);
 
 }

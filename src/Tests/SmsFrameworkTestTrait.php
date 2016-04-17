@@ -22,31 +22,34 @@ trait SmsFrameworkTestTrait {
   /**
    * Creates a memory gateway.
    *
+   * @param array $values
+   *   Additional values to use when creating the gateway.
+   *
    * @return \Drupal\sms\Entity\SmsGatewayInterface
    */
-  protected function createMemoryGateway() {
+  protected function createMemoryGateway($values = []) {
     $id = Unicode::strtolower($this->randomMachineName(16));
     $gateway = SmsGateway::create([
       'plugin' => 'memory',
       'id' => $id,
       'label' => $this->randomString(),
       'settings' => ['gateway_id' => $id],
-    ]);
+    ] + $values);
     $gateway->enable();
     $gateway->save();
     return $gateway;
   }
 
   /**
-   * Get all SMS messages sent to 'Memory' gateway.
+   * Get all SMS messages sent to a 'Memory' gateway.
    *
-   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
-   *   A gateway plugin, or NULL to use gateway stored in $this->testGateway.
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
+   *   A gateway plugin instance.
    *
    * @return \Drupal\sms\Message\SmsMessageInterface[]
    */
-  function getTestMessages(SmsGatewayInterface $sms_gateway = NULL) {
-    $gateway_id = $sms_gateway ? $sms_gateway->id() : $this->testGateway->id();
+  function getTestMessages(SmsGatewayInterface $sms_gateway) {
+    $gateway_id = $sms_gateway->id();
     $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
     return isset($sms_messages[$gateway_id]) ? $sms_messages[$gateway_id] : [];
   }
@@ -54,14 +57,14 @@ trait SmsFrameworkTestTrait {
   /**
    * Get the last SMS message sent to 'Memory' gateway.
    *
-   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
-   *   A gateway plugin, or NULL to use gateway stored in $this->testGateway.
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
+   *   A gateway plugin.
    *
    * @return \Drupal\sms\Message\SmsMessageInterface|FALSE
    *   The last SMS message, or FALSE if no messages have been sent.
    */
-  public function getLastTestMessage(SmsGatewayInterface $sms_gateway = NULL) {
-    $gateway_id = $sms_gateway ? $sms_gateway->id() : $this->testGateway->id();
+  public function getLastTestMessage(SmsGatewayInterface $sms_gateway) {
+    $gateway_id = $sms_gateway->id();
     $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
     return isset($sms_messages[$gateway_id]) ? end($sms_messages[$gateway_id]) : FALSE;
   }
@@ -85,13 +88,13 @@ trait SmsFrameworkTestTrait {
   /**
    * Gets all SMS reports for messages sent to 'Memory' gateway.
    *
-   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
-   *   A gateway plugin, or NULL to use gateway stored in $this->testGateway.
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
+   *   A gateway plugin.
    *
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
    */
-  protected function getTestMessageReports(SmsGatewayInterface $sms_gateway = NULL) {
-    $gateway_id = $sms_gateway ? $sms_gateway->id() : $this->testGateway->id();
+  protected function getTestMessageReports(SmsGatewayInterface $sms_gateway) {
+    $gateway_id = $sms_gateway->id();
     $sms_reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
     return isset($sms_reports[$gateway_id]) ? $sms_reports[$gateway_id] : [];
   }
@@ -99,14 +102,14 @@ trait SmsFrameworkTestTrait {
   /**
    * Gets the last SMS report for messages sent to 'Memory' gateway.
    *
-   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
-   *   A gateway plugin, or NULL to use gateway stored in $this->testGateway.
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
+   *   A gateway plugin.
    *
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface|false
    *   The last SMS message, or FALSE if no messages have been sent.
    */
-  protected function getLastTestMessageReport(SmsGatewayInterface $sms_gateway = NULL) {
-    $gateway_id = $sms_gateway ? $sms_gateway->id() : $this->testGateway->id();
+  protected function getLastTestMessageReport(SmsGatewayInterface $sms_gateway) {
+    $gateway_id = $sms_gateway->id();
     $sms_reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
     return isset($sms_reports[$gateway_id]) ? end($sms_reports[$gateway_id]) : FALSE;
   }
@@ -116,12 +119,14 @@ trait SmsFrameworkTestTrait {
    *
    * @param string $message_id
    *   The message ID.
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
+   *   A gateway plugin.
    *
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface
    *   The last SMS message, or FALSE if no messages have been sent.
    */
-  protected function getTestMessageReport($message_id, SmsGatewayInterface $sms_gateway = NULL) {
-    $gateway_id = $sms_gateway ? $sms_gateway->id() : $this->testGateway->id();
+  protected function getTestMessageReport($message_id, SmsGatewayInterface $sms_gateway) {
+    $gateway_id = $sms_gateway->id();
     $reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
     return $reports[$gateway_id][$message_id];
   }
@@ -216,12 +221,17 @@ trait SmsFrameworkTestTrait {
   /**
    * Generates random phone numbers for tests.
    *
+   * @param int|NULL $quantity
+   *   Quantity of phone numbers, or NULL to generate at least 2.
+   *
    * @return array
+   *   An array of phone numbers.
    */
-  protected function randomPhoneNumbers() {
-    $numbers =[];
-    for ($i = 0; $i < rand(0,20); $i++) {
-      $numbers[] = '234' . rand(1000000, 9999999);
+  protected function randomPhoneNumbers($quantity = NULL) {
+    $quantity = isset($quantity) ? $quantity : rand(2, 20);
+    $numbers = [];
+    for ($i = 0; $i < $quantity; $i++) {
+      $numbers[] = '+' . rand(1000, 999999999);
     }
     return $numbers;
   }

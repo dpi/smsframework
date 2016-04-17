@@ -34,22 +34,12 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
   protected $defaultSmsProvider;
 
   /**
-   * 'Memory' test gateway instance.
-   *
-   * @var \Drupal\sms\Entity\SmsGatewayInterface
-   */
-  protected $testGateway;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
     $this->gatewayManager = $this->container->get('plugin.manager.sms_gateway');
-    $this->defaultSmsProvider = $this->container->get('sms_provider.default');
-
-    // Add an instance of test gateway.
-    $this->testGateway = $this->createMemoryGateway();
+    $this->defaultSmsProvider = $this->container->get('sms_provider');
   }
 
   /**

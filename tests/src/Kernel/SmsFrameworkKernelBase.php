@@ -18,4 +18,12 @@ abstract class SmsFrameworkKernelBase extends KernelTestBase {
 
   use SmsFrameworkTestTrait;
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+    $this->installConfig('sms');
+  }
+
 }

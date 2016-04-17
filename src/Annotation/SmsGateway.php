@@ -29,4 +29,13 @@ class SmsGateway extends Plugin {
    */
   protected $label;
 
+  /**
+   * Maximum number of recipients per outgoing message.
+   *
+   * Use -1 for no limit.
+   *
+   * @var int
+   */
+  protected $outgoing_message_max_recipients;
+
 }
