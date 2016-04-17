@@ -30,6 +30,9 @@ use Drupal\sms\Message\SmsMessageInterface as StdSmsMessageInterface;
  *     "id" = "id",
  *     "uuid" = "uuid",
  *   },
+ *   handlers = {
+ *     "views_data" = "Drupal\sms\Views\SmsMessageViewsData",
+ *   },
  * )
  */
 class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
