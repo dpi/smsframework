@@ -27,6 +27,7 @@ class AdminSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, $op = NULL, $domain = NULL) {
+    $form['#attached']['library'][] = 'sms_user/admin';
     $config = $this->config('sms_user.settings');
 
     // Active hours.
@@ -111,43 +112,122 @@ class AdminSettingsForm extends ConfigFormBase {
       $form['active_hours']['days'][$day_lower] = $row;
     }
 
-    // Registration settings.
-    $form['registration'] = array(
-      '#type' => 'fieldset',
-      '#title' => $this->t('Registration settings'),
-      '#collapsible' => TRUE,
-      '#collapsed' => FALSE,
-    );
-    $form['registration']['registration_enabled'] = array(
+    // Account registration.
+    $form['account_registration'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Account creation'),
+      '#description' => $this->t('New accounts can be created and associated with a phone number.'),
+      '#open' => TRUE,
+      '#tree' => TRUE,
+    ];
+
+    if ($config->get('account_registration.all_unknown_numbers.status')) {
+      $radio_value = 'all';
+    }
+    else if ($config->get('account_registration.formatted.status')) {
+      $radio_value = 'formatted';
+    }
+    else {
+      $radio_value = 'none';
+    }
+
+    $form['account_registration']['behaviour'] = [
+      '#type' => 'radios',
+      '#options' => NULL,
+      '#title' => $this->t('Account registration via SMS'),
+      '#required' => TRUE,
+      '#default_value' => $radio_value,
+    ];
+
+    $form['account_registration']['none']['#tree'] = TRUE;
+    $form['account_registration']['none']['radio'] = [
+      '#type' => 'radio',
+      '#title' => $this->t('Disabled'),
+      '#description' => $this->t('Disable account creation via SMS.'),
+      '#return_value' => 'none',
+      '#parents' => ['account_registration', 'behaviour'],
+      '#default_value' => $radio_value,
+    ];
+
+    $form['account_registration']['all']['#tree'] = TRUE;
+    $form['account_registration']['all']['radio'] = [
+      '#type' => 'radio',
+      '#title' => $this->t('All unrecognised phone numbers'),
+      '#description' => $this->t('Automatically create a Drupal account for all phone numbers not associated with an existing account.'),
+      '#return_value' => 'all',
+      '#parents' => ['account_registration', 'behaviour'],
+      '#default_value' => $radio_value,
+    ];
+
+    $form['account_registration']['all_options'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => ['sms_user-radio-indent'],
+      ],
+    ];
+
+    $form['account_registration']['all_options']['reply_status'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Enable registration'),
-      '#default_value' => $config->get('registration_enabled'),
-      '#description' => $this->t('If selected, users can create user accounts via SMS.'),
-    );
-    $form['registration']['allow_password'] = array(
-      '#type' => 'checkbox',
-      '#title' => $this->t('Allow password creation'),
-      '#default_value' => $config->get('allow_password'),
-      '#description' => $this->t('If selected, the user will be allowed to include a password in their registration request -- the password will be the first word in the first line of the request.'),
-    );
-    $form['registration']['new_account_message'] = array(
+      '#title' => $this->t('Enable reply message'),
+      '#default_value' => $config->get('account_registration.all_unknown_numbers.reply.status'),
+    ];
+
+    $form['account_registration']['all_options']['reply_message'] = [
       '#type' => 'textarea',
-      '#title' => $this->t('New user message'),
-      '#default_value' => $config->get('new_account_message'),
-      '#description' => $this->t('The message that will be sent to newly registered users.  Leave empty for no message.'),
-    );
-  
-    // Add the token help to a collapsed fieldset at the end of the registration page.
-    $form['registration']['tokens']['token_help'] = array(
-      '#type' => 'fieldset',
-      '#title' => $this->t('Available Tokens List'),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
-    $form['registration']['tokens']['token_help']['content'] = array(
-      '#theme' => 'token_tree',
-      '#token_types' => array('sms_user'),
-    );
+      '#title' => $this->t('Reply message'),
+      '#description' => $this->t('Send a message after a new account is created.'),
+      '#default_value' => $config->get('account_registration.all_unknown_numbers.reply.message'),
+    ];
+
+    $form['account_registration']['all_options']['reply_tokens'] = $this->buildTokenElement();
+
+    $form['account_registration']['formatted']['radio'] = [
+      '#type' => 'radio',
+      '#title' => $this->t('Pre-formatted message'),
+      '#description' => $this->t('Automatically create a Drupal account if message is received in a specified format.'),
+      '#return_value' => 'formatted',
+      '#parents' => ['account_registration', 'behaviour'],
+      '#default_value' => $radio_value,
+    ];
+
+    $form['account_registration']['formatted_options'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => ['sms_user-radio-indent'],
+      ],
+    ];
+
+    $form['account_registration']['formatted_options']['incoming_message'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Incoming message'),
+      '#description' => $this->t('You must use at least one token: [email] and/or [password]. [username] is also available. If password is omitted: a random password will be generated. If username is omitted: a random username will be generated. If email address is omitted: no email address will be associated with the account.'),
+      '#default_value' => $config->get('account_registration.formatted.incoming_messages.0'),
+    ];
+
+    $form['account_registration']['formatted_options']['activation_email'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Send activation email'),
+      '#description' => $this->t('Send activation email if an [email] token is present, and [password] token is omitted.'),
+      '#default_value' => $config->get('account_registration.formatted.activation_email'),
+    ];
+
+    $form['account_registration']['formatted_options']['reply_status'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable reply message'),
+      '#default_value' => $config->get('account_registration.formatted.reply.status'),
+    ];
+
+    $form['account_registration']['formatted_options']['reply_message'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Reply message'),
+      '#description' => $this->t('Send a message after a new account is created.'),
+      '#wrapper_attributes' => [
+        'class' => ['sms_user-radio-indent'],
+      ],
+      '#default_value' => $config->get('account_registration.formatted.reply.message'),
+    ];
+
+    $form['account_registration']['formatted_options']['reply_tokens'] = $this->buildTokenElement();
 
     return parent::buildForm($form, $form_state);
   }
@@ -194,20 +274,30 @@ class AdminSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    // Clean up the form_state values and save to config
-    $form_state->cleanValues();
-    $settings = $form_state->getValues();
-    $settings['active_hours']['status'] = (boolean)$settings['active_hours']['status'];
+    $config = $this->config('sms_user.settings');
+
+    // Account Registration.
+    $account_registration = $form_state->getValue('account_registration');
+    $behaviour = $account_registration['behaviour'];
+
+    $config
+      ->set('account_registration.all_unknown_numbers.status', $behaviour == 'all')
+      ->set('account_registration.formatted.status', $behaviour == 'formatted')
+      ->set('account_registration.all_unknown_numbers.reply.status', $account_registration['all_options']['reply_status'])
+      ->set('account_registration.all_unknown_numbers.reply.message', $account_registration['all_options']['reply_message'])
+      ->set('account_registration.formatted.incoming_messages.0', $account_registration['formatted_options']['incoming_message'])
+      ->set('account_registration.formatted.reply.status', $account_registration['formatted_options']['reply_status'])
+      ->set('account_registration.formatted.reply.message', $account_registration['formatted_options']['reply_message'])
+      ->set('account_registration.formatted.activation_email', $account_registration['formatted_options']['activation_email']);
+
+    // Active Hours.
+    $config->set('active_hours.status', (boolean)$form_state->getValue(['active_hours', 'status']));
 
     // Days make sense for this form, however storage uses generic 'range' term.
     // Remove keys so it is a raw sequence.
-    $settings['active_hours']['ranges'] = array_values($settings['active_hours']['days']);
+    $config->set('active_hours.ranges', array_values($form_state->getValue(['active_hours', 'days'])));
 
-    unset($settings['active_hours']['days']);
-
-    $this->config('sms_user.settings')
-      ->setData($settings)
-      ->save();
+    $config->save();
     parent::submitForm($form, $form_state);
   }
 
@@ -216,6 +306,33 @@ class AdminSettingsForm extends ConfigFormBase {
    */
   protected function getEditableConfigNames() {
     return ['sms_user.settings'];
+  }
+
+  /**
+   * Build a token element.
+   *
+   * @return array
+   *   A render array.
+   */
+  protected function buildTokenElement() {
+    $tokens = ['sms-message', 'user'];
+
+    /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
+    $module_handler = \Drupal::service('module_handler');
+    if ($module_handler->moduleExists('token')) {
+      return [
+        '#theme' => 'token_tree',
+        '#token_types' => $tokens,
+      ];
+    }
+    else {
+      foreach ($tokens as &$token) {
+        $token = "[$token:*]";
+      }
+      return [
+        '#markup' => $this->t('Available tokens include: @token_types', ['@token_types' => implode(' ', $tokens)]),
+      ];
+    }
   }
 
 }

@@ -1,6 +1,14 @@
 active_hours:
   status: false
   ranges: []
-registration_enabled: false
-allow_password: false
-new_account_message: ''
+account_registration:
+  all_unknown_numbers:
+    status: false
+    reply_message: ''
+  formatted:
+    status: false
+    incoming_messages: []
+    reply:
+      status: false
+      message: ''
+    activation_email: true
