@@ -106,7 +106,7 @@ The following sites offer support for SMS Framework:
    https://www.drupal.org/irc
 
 Testing
-=======
+-------
 
 Drupal core phpunit.xml.dist does not run unit tests located in submodules.
 Navigate to the SMS Framework directory to run. Your commands should look 
