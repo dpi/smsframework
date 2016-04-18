@@ -164,6 +164,11 @@ class AdminSettingsForm extends ConfigFormBase {
       '#attributes' => [
         'class' => ['sms_user-radio-indent'],
       ],
+      '#states' => [
+        'visible' => [
+          ':input[name="account_registration[behaviour]"]' => ['value' => 'all'],
+        ],
+      ],
     ];
 
     $form['account_registration']['all_options']['reply_status'] = [
@@ -172,14 +177,28 @@ class AdminSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('account_registration.all_unknown_numbers.reply.status'),
     ];
 
-    $form['account_registration']['all_options']['reply_message'] = [
+    $form['account_registration']['all_options']['reply'] = [
+      '#type' => 'container',
+      '#states' => [
+        'visible' => [
+          ':input[name="account_registration[all_options][reply_status]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+
+    $form['account_registration']['all_options']['reply']['message'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Reply message'),
       '#description' => $this->t('Send a message after a new account is created.'),
       '#default_value' => $config->get('account_registration.all_unknown_numbers.reply.message'),
+      '#states' => [
+        'visible' => [
+          ':input[name="account_registration[all_options][reply_status]"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
-    $form['account_registration']['all_options']['reply_tokens'] = $this->buildTokenElement();
+    $form['account_registration']['all_options']['reply']['tokens'] = $this->buildTokenElement();
 
     $form['account_registration']['formatted']['radio'] = [
       '#type' => 'radio',
@@ -194,6 +213,11 @@ class AdminSettingsForm extends ConfigFormBase {
       '#type' => 'container',
       '#attributes' => [
         'class' => ['sms_user-radio-indent'],
+      ],
+      '#states' => [
+        'visible' => [
+          ':input[name="account_registration[behaviour]"]' => ['value' => 'formatted'],
+        ],
       ],
     ];
 
@@ -217,17 +241,26 @@ class AdminSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('account_registration.formatted.reply.status'),
     ];
 
-    $form['account_registration']['formatted_options']['reply_message'] = [
+    $form['account_registration']['formatted_options']['reply'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => ['sms_user-radio-indent'],
+      ],
+      '#states' => [
+        'visible' => [
+          ':input[name="account_registration[formatted_options][reply_status]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+
+    $form['account_registration']['formatted_options']['reply']['message'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Reply message'),
       '#description' => $this->t('Send a message after a new account is created.'),
-      '#wrapper_attributes' => [
-        'class' => ['sms_user-radio-indent'],
-      ],
       '#default_value' => $config->get('account_registration.formatted.reply.message'),
     ];
 
-    $form['account_registration']['formatted_options']['reply_tokens'] = $this->buildTokenElement();
+    $form['account_registration']['formatted_options']['reply']['tokens'] = $this->buildTokenElement();
 
     return parent::buildForm($form, $form_state);
   }
@@ -284,10 +317,10 @@ class AdminSettingsForm extends ConfigFormBase {
       ->set('account_registration.all_unknown_numbers.status', $behaviour == 'all')
       ->set('account_registration.formatted.status', $behaviour == 'formatted')
       ->set('account_registration.all_unknown_numbers.reply.status', $account_registration['all_options']['reply_status'])
-      ->set('account_registration.all_unknown_numbers.reply.message', $account_registration['all_options']['reply_message'])
+      ->set('account_registration.all_unknown_numbers.reply.message', $account_registration['all_options']['reply']['message'])
       ->set('account_registration.formatted.incoming_messages.0', $account_registration['formatted_options']['incoming_message'])
       ->set('account_registration.formatted.reply.status', $account_registration['formatted_options']['reply_status'])
-      ->set('account_registration.formatted.reply.message', $account_registration['formatted_options']['reply_message'])
+      ->set('account_registration.formatted.reply.message', $account_registration['formatted_options']['reply']['message'])
       ->set('account_registration.formatted.activation_email', $account_registration['formatted_options']['activation_email']);
 
     // Active Hours.
@@ -321,7 +354,7 @@ class AdminSettingsForm extends ConfigFormBase {
     $module_handler = \Drupal::service('module_handler');
     if ($module_handler->moduleExists('token')) {
       return [
-        '#theme' => 'token_tree',
+        '#theme' => 'token_tree_link',
         '#token_types' => $tokens,
       ];
     }
