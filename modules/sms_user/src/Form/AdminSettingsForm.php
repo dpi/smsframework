@@ -321,16 +321,14 @@ class AdminSettingsForm extends ConfigFormBase {
       ->set('account_registration.formatted.incoming_messages.0', $account_registration['formatted_options']['incoming_message'])
       ->set('account_registration.formatted.reply.status', $account_registration['formatted_options']['reply_status'])
       ->set('account_registration.formatted.reply.message', $account_registration['formatted_options']['reply']['message'])
-      ->set('account_registration.formatted.activation_email', $account_registration['formatted_options']['activation_email']);
+      ->set('account_registration.formatted.activation_email', $account_registration['formatted_options']['activation_email'])
+      // Active Hours.
+      ->set('active_hours.status', (boolean)$form_state->getValue(['active_hours', 'status']))
+      // Days make sense for this form, however storage uses generic 'range' term.
+      // Remove keys so it is a raw sequence.
+      ->set('active_hours.ranges', array_values($form_state->getValue(['active_hours', 'days'])))
+      ->save();
 
-    // Active Hours.
-    $config->set('active_hours.status', (boolean)$form_state->getValue(['active_hours', 'status']));
-
-    // Days make sense for this form, however storage uses generic 'range' term.
-    // Remove keys so it is a raw sequence.
-    $config->set('active_hours.ranges', array_values($form_state->getValue(['active_hours', 'days'])));
-
-    $config->save();
     parent::submitForm($form, $form_state);
   }
 
