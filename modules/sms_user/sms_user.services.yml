@@ -2,3 +2,6 @@ services:
   sms_user.active_hours:
     class: Drupal\sms_user\ActiveHours
     arguments: ['@config.factory']
+  sms_user.account_registration:
+    class: Drupal\sms_user\AccountRegistration
+    arguments: ['@config.factory', '@sms_provider', '@sms.phone_number']
