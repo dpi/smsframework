@@ -310,11 +310,18 @@ class AdminSettingsForm extends ConfigFormBase {
       ],
     ];
 
-    $form['account_registration']['formatted_options']['reply']['message'] = [
+    $form['account_registration']['formatted_options']['reply']['message_success'] = [
       '#type' => 'textarea',
-      '#title' => $this->t('Reply message'),
-      '#description' => $this->t('Send a message after a new account is created.'),
+      '#title' => $this->t('Reply message (success)'),
+      '#description' => $this->t('Send a message after a new account is successfully created.'),
       '#default_value' => $config->get('account_registration.formatted.reply.message'),
+    ];
+
+    $form['account_registration']['formatted_options']['reply']['message_failure'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Reply message (failure)'),
+      '#description' => $this->t('Send a message if a new account could not be created. Such reasons include: username already taken, email already used.'),
+      '#default_value' => $config->get('account_registration.formatted.reply.message_failure'),
     ];
 
     $form['account_registration']['formatted_options']['reply']['tokens'] = $this->buildTokenElement();
@@ -377,7 +384,8 @@ class AdminSettingsForm extends ConfigFormBase {
       ->set('account_registration.all_unknown_numbers.reply.message', $account_registration['all_options']['reply']['message'])
       ->set('account_registration.formatted.incoming_messages.0', $account_registration['formatted_options']['incoming_message'])
       ->set('account_registration.formatted.reply.status', $account_registration['formatted_options']['reply_status'])
-      ->set('account_registration.formatted.reply.message', $account_registration['formatted_options']['reply']['message'])
+      ->set('account_registration.formatted.reply.message', $account_registration['formatted_options']['reply']['message_success'])
+      ->set('account_registration.formatted.reply.message_failure', $account_registration['formatted_options']['reply']['message_failure'])
       ->set('account_registration.formatted.activation_email', $account_registration['formatted_options']['activation_email'])
       // Active Hours.
       ->set('active_hours.status', (boolean)$form_state->getValue(['active_hours', 'status']))
