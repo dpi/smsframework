@@ -25,7 +25,7 @@ class SmsTrackArchiveTest extends WebTestBase {
   public function testArchiveWriteForSentMessages() {
 
     // Create Author User
-    $author = $this->drupalCreateUser(['administer smsframework', 'receive sms', 'edit own sms number', 'view own sms messages', 'view all sms messages']);
+    $author = $this->drupalCreateUser(['administer smsframework', 'view own sms messages', 'view all sms messages']);
     $this->drupalLogin($author);
 
     $archiving_settings = array(
@@ -48,7 +48,7 @@ class SmsTrackArchiveTest extends WebTestBase {
     $this->drupalLogout();
 
     // Create Recipient User
-    $recipient = $this->drupalCreateUser(['administer smsframework', 'receive sms', 'edit own sms number', 'view own sms messages']);
+    $recipient = $this->drupalCreateUser(['administer smsframework', 'view own sms messages']);
     $this->drupalLogin($recipient);
 
     // Confirm recipient number.

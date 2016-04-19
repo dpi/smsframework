@@ -5,5 +5,4 @@ core: 8.x
 package: SMS Framework
 dependencies:
   - sms
-  - sms_user
   - views

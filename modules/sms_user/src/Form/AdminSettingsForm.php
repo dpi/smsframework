@@ -28,48 +28,6 @@ class AdminSettingsForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, $op = NULL, $domain = NULL) {
     $config = $this->config('sms_user.settings');
-    $form['registration_form'] = array(
-      '#type' => 'radios',
-      '#title' => $this->t('Show mobile fields during user registration'),
-      '#description' => $this->t('Specify if the site should collect mobile information during registration.'),
-      '#options' => array(
-        $this->t('Disabled'),
-        $this->t('Optional'),
-        $this->t('Required')
-      ),
-      '#default_value' => $config->get('registration_form'),
-    );
-  
-    $form['confirmation_message'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Confirmation message format'),
-      '#default_value' => $config->get('confirmation_message'),
-      '#description' => $this->t('Specify the format for confirmation messages. Keep this as short as possible.'),
-      '#size' => 140,
-      '#maxlength' => 255,
-    );
-  
-    // Add the token help to a collapsed fieldset at the end of the configuration page.
-    $form['tokens']['token_help'] = array(
-      '#type' => 'fieldset',
-      '#title' => $this->t('Available Tokens List'),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
-    $form['tokens']['token_help']['content'] = array(
-      '#theme' => 'token_tree',
-      '#token_types' => array('sms_user'),
-    );
-    /*
-    $form['tokens'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Available replacement patterns'),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
-  
-    $form['tokens']['content']['#value'] = theme('token_tree', array('token_types' => array('sms_user')));
-    */
 
     // Active hours.
     $form['active_hours'] = [
@@ -153,21 +111,6 @@ class AdminSettingsForm extends ConfigFormBase {
       $form['active_hours']['days'][$day_lower] = $row;
     }
 
-    // SMS User opt-out settings.
-    $form['opt_out'] = array(
-      '#type' => 'fieldset',
-      '#title' => $this->t('User Opt Out Settings'),
-      '#collapsible' => TRUE,
-      '#collapsed' => FALSE,
-    );
-
-    $form['opt_out']['allow_opt_out'] = array(
-      '#type' => 'checkbox',
-      '#title' => $this->t('Allow users to opt-out of receiving messages from this site'),
-      '#description' => $this->t('If checked, users will be able to opt out of receiving messages from the site.'),
-      '#default_value' => $config->get('allow_opt_out'),
-    );
-
     // Registration settings.
     $form['registration'] = array(
       '#type' => 'fieldset',
@@ -205,24 +148,7 @@ class AdminSettingsForm extends ConfigFormBase {
       '#theme' => 'token_tree',
       '#token_types' => array('sms_user'),
     );
-    /*
-    $form['registration']['tokens'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Available replacement patterns'),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
-  
-    $form['registration']['tokens']['content']['#value'] = theme('token_tree', array('token_types' => array('sms_user')));
-    */
-    $form['max_chars'] = array(
-      '#type' => 'textfield',
-      '#default_value' => $config->get('max_chars'),
-      '#size' => 3,
-      '#title' => $this->t('Maximum number of chars for SMS sending using actions'),
-    );
-          
-    // Get system setting form
+
     return parent::buildForm($form, $form_state);
   }
 
