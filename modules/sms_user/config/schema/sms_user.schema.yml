@@ -63,3 +63,6 @@ sms_user.settings:
                 message:
                   type: string
                   label: 'Reply message'
+                message_failure:
+                  type: string
+                  label: 'Reply message'

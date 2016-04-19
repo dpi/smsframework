@@ -8,7 +8,8 @@ account_registration:
   formatted:
     status: false
     incoming_messages: []
+    activation_email: true
     reply:
       status: false
       message: ''
-    activation_email: true
+      message_failure: ''
