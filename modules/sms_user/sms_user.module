@@ -17,6 +17,7 @@ use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\sms\Message\SmsMessage;
+use Drupal\sms\Message\SmsMessageInterface;
 
 define('SMS_USER_BLOCKED', 0);
 define('SMS_USER_PENDING', 1);
@@ -534,40 +535,11 @@ function sms_user_token_info() {
 /**
  * Implements hook_sms_incoming().
  */
-function sms_user_sms_incoming($op, SmsMessageInterface $sms, array $options) {
-  $config = \Drupal::config('sms_user.settings');
-  $number = $sms->getRecipients()[0];
-  $message = $sms->getMessage();
-  switch ($op) {
-    case 'pre process':
-      if ($account = sms_user_authenticate($number)) {
-        $metadata = array(
-          'login' => TRUE,
-          'number' => $number,
-          'message' => $message,
-          'options' => $options,
-        );
-        sms_user_login_metadata($account->id(), $metadata);
-        // @todo fix this in https://www.drupal.org/node/2401699
-        // _sms_user_switch($account);
-      }
-      elseif ($config->get('registration_enabled') && $number) {
-        if ($account = sms_user_register_new_user($number, $message, $options)) {
-          // Send the new user the registration message if one exists.
-          if ($message = $config->get('new_account_message')) {
-            /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
-            $phone_number_provider = \Drupal::service('sms.phone_number');
-            $sms_message = new SmsMessage();
-            $sms_message->setMessage($message);
-            $phone_number_provider->sendMessage($account, $sms_message);
-          }
-        }
-      }
-      break;
-    case 'post process':
-      // @todo fix this in https://www.drupal.org/node/2401699
-      // _sms_user_switch();
-      break;
+function sms_user_sms_incoming($op, SmsMessageInterface $sms_message, array $options) {
+  if ($op == 'pre process') {
+    /** @var \Drupal\sms_user\AccountRegistrationInterface $account_registration */
+    $account_registration = \Drupal::service('sms_user.account_registration');
+    $account_registration->createAccount($sms_message);
   }
 }
 
