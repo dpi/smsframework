@@ -85,10 +85,6 @@ class AccountRegistration implements AccountRegistrationInterface {
     // @see https://www.drupal.org/node/2709463
     $this->phoneNumberVerificationStorage = \Drupal::entityTypeManager()
       ->getStorage('sms_phone_number_verification');
-
-    $this->settings = $this->configFactory
-      ->get('sms_user.settings')
-      ->get('account_registration');
   }
 
   /**
@@ -106,10 +102,10 @@ class AccountRegistration implements AccountRegistrationInterface {
         ->execute();
 
       if (!$count) {
-        if (!empty($this->settings['all_unknown_numbers']['status'])) {
+        if (!empty($this->settings('all_unknown_numbers.status'))) {
           $this->allUnknownNumbers($sms_message);
         }
-        if (!empty($this->settings['formatted']['status'])) {
+        if (!empty($this->settings('formatted.status'))) {
           $this->preFormattedMessage($sms_message);
         }
       }
@@ -131,7 +127,7 @@ class AccountRegistration implements AccountRegistrationInterface {
     // Sender phone number.
     $sender_number = $sms_message->getSenderNumber();
     $t_args['%sender_phone_number'] = $sender_number;
-    $phone_field_name = $this->userPhoneNumberSettings->getFieldName('phone_number');
+    $phone_field_name = PhoneNumberSettings::load('user.user')->getFieldName('phone_number');
     $user->{$phone_field_name}[] = $sender_number;
 
     // Password.
@@ -151,8 +147,8 @@ class AccountRegistration implements AccountRegistrationInterface {
         ->info('Creating new account for %sender_phone_number. Username: %name. User ID: %uid', $t_args);
 
       // Optionally send a reply.
-      if (!empty($this->settings['all_unknown_numbers']['reply']['status'])) {
-        $message = $this->settings['all_unknown_numbers']['reply']['message'];
+      if (!empty($this->settings('all_unknown_numbers.reply.status'))) {
+        $message = $this->settings('all_unknown_numbers.reply.message');
         $message = str_replace('[user:password]', $password, $message);
         $this->sendReply($sender_number, $user, $message);
       }
@@ -172,8 +168,8 @@ class AccountRegistration implements AccountRegistrationInterface {
    *   An incoming SMS message.
    */
   protected function preFormattedMessage(SmsMessageInterface $sms_message) {
-    if (!empty($this->settings['formatted']['incoming_messages'][0])) {
-      $incoming_form = $this->settings['formatted']['incoming_messages'][0];
+    if (!empty($this->settings('formatted.incoming_messages.0'))) {
+      $incoming_form = $this->settings('formatted.incoming_messages.0');
       $incoming_form = str_replace("\r\n", "\n", $incoming_form);
       $compiled = $this->compileFormRegex($incoming_form);
       $matches = [];
@@ -192,7 +188,7 @@ class AccountRegistration implements AccountRegistrationInterface {
         $t_args['%sender_phone_number'] = $sender_number;
 
         // Sender phone number.
-        $phone_field_name = $this->userPhoneNumberSettings->getFieldName('phone_number');
+        $phone_field_name = PhoneNumberSettings::load('user.user')->getFieldName('phone_number');
         $user->{$phone_field_name}[] = $sender_number;
 
         if (!empty($matches['email'][0]) && $contains_email) {
@@ -209,7 +205,7 @@ class AccountRegistration implements AccountRegistrationInterface {
           // @todo autoconfirm the number?
           // @see https://www.drupal.org/node/2709911
 
-          $message = $this->settings['formatted']['reply']['message'];
+          $message = $this->settings('formatted.reply.message');
           $message = str_replace('[user:password]', $password, $message);
 
           \Drupal::logger('sms_user.account_registration.formatted')
@@ -219,12 +215,12 @@ class AccountRegistration implements AccountRegistrationInterface {
             ]);
 
           // Send an activation email if no password placeholder is found.
-          if (!$contains_password && !empty($this->settings['formatted']['activation_email'])) {
+          if (!$contains_password && !empty($this->settings('formatted.activation_email'))) {
             _user_mail_notify('register_no_approval_required', $user);
           }
         }
         else {
-          $message = $this->settings['formatted']['reply']['message_failure'];
+          $message = $this->settings('formatted.reply.message_failure');
 
           $error = $this->buildError($validate);
           $message = str_replace('[error]', strip_tags($error), $message);
@@ -236,7 +232,7 @@ class AccountRegistration implements AccountRegistrationInterface {
         }
 
         // Optionally send a reply.
-        if (!empty($this->settings['formatted']['reply']['status'])) {
+        if (!empty($this->settings('formatted.reply.status'))) {
           $this->sendReply($sender_number, $user, $message);
         }
       }
@@ -358,6 +354,20 @@ class AccountRegistration implements AccountRegistrationInterface {
     }
     while (user_validate_name($username) || user_load_by_name($username));
     return $username;
+  }
+
+  /**
+   * Get the account_registration configuration.
+
+   * @param string $name
+   *   The configuration name.
+   *
+   * @return array|mixed|null
+   */
+  protected function settings($name) {
+    return $this->configFactory
+      ->get('sms_user.settings')
+      ->get('account_registration.' . $name);
   }
 
 }
