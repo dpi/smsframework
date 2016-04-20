@@ -187,7 +187,7 @@ class PhoneNumberSettingsForm extends EntityForm {
     $tokens = ['sms-message'];
     if ($this->moduleHandler->moduleExists('token')) {
       $form['message']['tokens']['list'] = [
-        '#theme' => 'token_tree',
+        '#theme' => 'token_tree_link',
         '#token_types' => $tokens,
       ];
     }
