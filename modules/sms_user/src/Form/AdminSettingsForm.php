@@ -281,14 +281,14 @@ class AdminSettingsForm extends ConfigFormBase {
     $form['account_registration']['formatted_options']['incoming_message'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Incoming message'),
-      '#description' => $this->t('You must use at least one token: [email] and/or [password]. [username] is also available. If password is omitted: a random password will be generated. If username is omitted: a random username will be generated. If email address is omitted: no email address will be associated with the account.'),
+      '#description' => $this->t('You must use at least one placeholder: [email] and/or [password]. [username] is also available. If password is omitted: a random password will be generated. If username is omitted: a random username will be generated. If email address is omitted: no email address will be associated with the account.'),
       '#default_value' => $config->get('account_registration.formatted.incoming_messages.0'),
     ];
 
     $form['account_registration']['formatted_options']['activation_email'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Send activation email'),
-      '#description' => $this->t('Send activation email if an [email] token is present, and [password] token is omitted.'),
+      '#description' => $this->t('Send activation email if an [email] placeholder is present, and [password] placeholder is omitted.'),
       '#default_value' => $config->get('account_registration.formatted.activation_email'),
     ];
 
