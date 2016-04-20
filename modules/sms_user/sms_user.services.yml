@@ -4,4 +4,4 @@ services:
     arguments: ['@config.factory']
   sms_user.account_registration:
     class: Drupal\sms_user\AccountRegistration
-    arguments: ['@config.factory', '@sms_provider', '@sms.phone_number']
+    arguments: ['@config.factory', '@token', '@sms_provider', '@sms.phone_number']

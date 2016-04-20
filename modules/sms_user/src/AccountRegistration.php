@@ -8,6 +8,7 @@
 namespace Drupal\sms_user;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Utility\Token;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\sms\Entity\PhoneNumberSettings;
 use Drupal\sms\Provider\PhoneNumberProviderInterface;
@@ -28,6 +29,13 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @var \Drupal\Core\Config\ConfigFactoryInterface;
    */
   protected $configFactory;
+
+  /**
+   * The token service.
+   *
+   * @var \Drupal\Core\Utility\Token
+   */
+  protected $token;
 
   /**
    * The SMS provider.
@@ -55,13 +63,16 @@ class AccountRegistration implements AccountRegistrationInterface {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
+   * @param \Drupal\Core\Utility\Token $token
+   *   The token replacement system.
    * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
    *   The SMS provider.
    * @param \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider
    *   The phone number provider.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, SmsProviderInterface $sms_provider, PhoneNumberProviderInterface $phone_number_provider) {
+  public function __construct(ConfigFactoryInterface $config_factory, Token $token, SmsProviderInterface $sms_provider, PhoneNumberProviderInterface $phone_number_provider) {
     $this->configFactory = $config_factory;
+    $this->token = $token;
     $this->smsProvider = $sms_provider;
     $this->phoneNumberProvider = $phone_number_provider;
 
@@ -252,7 +263,7 @@ class AccountRegistration implements AccountRegistrationInterface {
 
     $data['sms-message'] = $sms_message;
     $data['user'] = $user;
-    $sms_message->setMessage(\Drupal::token()->replace($message, $data));
+    $sms_message->setMessage($this->token->replace($message, $data));
 
     // Use queue(), instead of phone number provider sendMessage()
     // because the phone number is not confirmed.
@@ -270,46 +281,46 @@ class AccountRegistration implements AccountRegistrationInterface {
    *   A regular expression.
    */
   protected function compileFormRegex($form_string) {
-    $tokens = ['username' => '.+', 'email' => '\S+', 'password' => '.+'];
+    $placeholders = ['username' => '.+', 'email' => '\S+', 'password' => '.+'];
 
-    // Tokens enclosed in square brackets and escaped for use in regular
+    // Placeholders enclosed in square brackets and escaped for use in regular
     // expressions. \[user\] , \[email\] etc.
-    $regex_tokens = [];
-    foreach (array_keys($tokens) as $d) {
-      $regex_tokens[] = preg_quote('[' . $d . ']');
+    $regex_placeholders = [];
+    foreach (array_keys($placeholders) as $d) {
+      $regex_placeholders[] = preg_quote('[' . $d . ']');
     }
 
-    // Split message so tokens are separated from other text.
+    // Split message so placeholders are separated from other text.
     // e.g. for 'U [username] P [password], splits to:
     // 'U ', '[username]', ' P ', '[password]'.
-    $regex = '/(' . implode('|', $regex_tokens) . '+)/';
+    $regex = '/(' . implode('|', $regex_placeholders) . '+)/';
     $words = preg_split($regex, $form_string, NULL, PREG_SPLIT_DELIM_CAPTURE);
 
-    // Track if a token was used, so subsequent usages create a named
-    // back reference. This allows you to use tokens more than once as a form of
+    // Track if a placeholder was used, so subsequent usages create a named
+    // back reference. This allows you to use placeholders more than once as a form of
     // confirmation. e.g: 'U [username] P [password] [password]'
-    $token_usage = [];
+    $placeholder_usage = [];
 
     $compiled = '';
     foreach ($words as $word) {
-      // Remove square brackets from word to determine if it is a token.
-      $token = mb_substr($word, 1, -1);
+      // Remove square brackets from word to determine if it is a placeholder.
+      $placeholder = mb_substr($word, 1, -1);
 
-      // Determine if word is a token.
-      if (isset($tokens[$token])) {
-        $token_regex = $tokens[$token];
-        if (!in_array($token, $token_usage)) {
-          // Convert token to a capture group.
-          $compiled .= '(?<' . $token . '>' . $token_regex . ')';
-          $token_usage[] = $token;
+      // Determine if word is a placeholder.
+      if (isset($placeholders[$placeholder])) {
+        $placeholder_regex = $placeholders[$placeholder];
+        if (!in_array($placeholder, $placeholder_usage)) {
+          // Convert placeholder to a capture group.
+          $compiled .= '(?<' . $placeholder . '>' . $placeholder_regex . ')';
+          $placeholder_usage[] = $placeholder;
         }
         else {
           // Create a back reference to the previous named capture group.
-          $compiled .= '\k{' . $token . '}';
+          $compiled .= '\k{' . $placeholder . '}';
         }
       }
       else {
-        // Text is not a token, do not convert to a capture group.
+        // Text is not a placeholder, do not convert to a capture group.
         $compiled .= preg_quote($word);
       }
     }
