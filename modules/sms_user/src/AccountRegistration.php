@@ -66,12 +66,12 @@ class AccountRegistration implements AccountRegistrationInterface {
     $this->phoneNumberProvider = $phone_number_provider;
 
     // @fixme, use phone number provider to get settings.
-    // phone number provider should return a PhoneNumberSettings obj,
+    // @see https://www.drupal.org/node/2709465
 //      $phone_number_settings = $this->phoneNumberProvider->getPhoneNumberSettings('user', 'usxer');
     $this->userPhoneNumberSettings = PhoneNumberSettings::load('user.user');
 
-    // @fixme. Temporary. number resolution should move to a method on
-    // phonenumberprovider.
+    // @fixme.  number resolution should move to a method on
+    // @see https://www.drupal.org/node/2709463
     $this->phoneNumberVerificationStorage = \Drupal::entityTypeManager()
       ->getStorage('sms_phone_number_verification');
 
@@ -130,7 +130,9 @@ class AccountRegistration implements AccountRegistrationInterface {
     $validate = $user->validate();
     if ($validate->count() == 0) {
       $user->save();
+
       // @todo autoconfirm the number?
+      // @see https://www.drupal.org/node/2709911
 
       $t_args['%name'] = $user->label();
       $t_args['%uid'] = $user->id();
@@ -192,6 +194,9 @@ class AccountRegistration implements AccountRegistrationInterface {
         $validate = $user->validate();
         if ($validate->count() == 0) {
           $user->save();
+
+          // @todo autoconfirm the number?
+          // @see https://www.drupal.org/node/2709911
 
           $message = $this->settings['formatted']['reply']['message'];
           $message = str_replace('[user:password]', $password, $message);
