@@ -260,32 +260,47 @@ class AccountRegistration implements AccountRegistrationInterface {
    *   A regular expression.
    */
   protected function compileFormRegex($form_string) {
-    $delimiters = ['username' => '.+', 'email' => '\S+', 'password' => '.+'];
-    $regex_delimiters = [];
+    $tokens = ['username' => '.+', 'email' => '\S+', 'password' => '.+'];
 
-    foreach (array_keys($delimiters) as $d) {
-      $regex_delimiters[] = preg_quote('[' . $d . ']');
+    // Tokens enclosed in square brackets and escaped for use in regular
+    // expressions. \[user\] , \[email\] etc.
+    $regex_tokens = [];
+    foreach (array_keys($tokens) as $d) {
+      $regex_tokens[] = preg_quote('[' . $d . ']');
     }
 
-    $regex = '/(' . implode('|', $regex_delimiters) . '+)/';
-    $words = preg_split($regex, $form_string, NULL,   PREG_SPLIT_DELIM_CAPTURE);
+    // Split message so tokens are separated from other text.
+    // e.g. for 'U [username] P [password], splits to:
+    // 'U ', '[username]', ' P ', '[password]'.
+    $regex = '/(' . implode('|', $regex_tokens) . '+)/';
+    $words = preg_split($regex, $form_string, NULL, PREG_SPLIT_DELIM_CAPTURE);
+
+    // Track if a token was used, so subsequent usages create a named
+    // back reference. This allows you to use tokens more than once as a form of
+    // confirmation. e.g: 'U [username] P [password] [password]'
+    $token_usage = [];
 
     $compiled = '';
-    $delimiter_counter = [];
-    foreach ($words as $w) {
-      $trimmed = mb_substr($w, 1, -1);
-      if (isset($delimiters[$trimmed])) {
-        $delimiter_regex = $delimiters[$trimmed];
-        if (!isset($delimiter_counter[$trimmed])) {
-          $compiled .= '(?<' . $trimmed . '>' . $delimiter_regex . ')';
+    foreach ($words as $word) {
+      // Remove square brackets from word to determine if it is a token.
+      $token = mb_substr($word, 1, -1);
+
+      // Determine if word is a token.
+      if (isset($tokens[$token])) {
+        $token_regex = $tokens[$token];
+        if (!in_array($token, $token_usage)) {
+          // Convert token to a capture group.
+          $compiled .= '(?<' . $token . '>' . $token_regex . ')';
+          $token_usage[] = $token;
         }
         else {
-          $compiled .= '\k{' . $trimmed . '}';
+          // Create a back reference to the previous named capture group.
+          $compiled .= '\k{' . $token . '}';
         }
-        $delimiter_counter[$trimmed] = TRUE;
       }
       else {
-        $compiled .= preg_quote($w);
+        // Text is not a token, do not convert to a capture group.
+        $compiled .= preg_quote($word);
       }
     }
 
