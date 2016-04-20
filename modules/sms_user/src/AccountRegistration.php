@@ -135,7 +135,8 @@ class AccountRegistration implements AccountRegistrationInterface {
     $user->setPassword($password);
 
     $validate = $user->validate();
-    if ($validate->count() == 0) {
+    if ($validate->count() <= 1) {
+      // Email is an acceptable failure. @fixme
       $user->save();
 
       // @todo autoconfirm the number?
@@ -199,7 +200,8 @@ class AccountRegistration implements AccountRegistrationInterface {
         $user->setPassword($password);
 
         $validate = $user->validate();
-        if ($validate->count() == 0) {
+        // @fixme, email causes failure.
+        if ($validate->count() == 0 || (!$contains_email && $validate->count() == 1)) {
           $user->save();
 
           // @todo autoconfirm the number?
