@@ -333,6 +333,7 @@ class AdminSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
+    // Active hours.
     foreach ($form_state->getValue(['active_hours', 'days']) as $day => $row) {
       foreach ($row as $position => $hour) {
         if ($hour == -1) {
@@ -364,6 +365,44 @@ class AdminSettingsForm extends ConfigFormBase {
       if ($end < $start) {
         $form_state->setError($form['active_hours']['days_container']['days'][$day]['end'], $this->t('End time must be greater than start time.'));
       }
+    }
+
+    // Account registration.
+    $account_registration = $form_state->getValue(['account_registration']);
+    if (!empty($account_registration['all_options']['reply_status']) && empty($account_registration['all_options']['reply']['message'])) {
+      // Reply is enabled, but empty reply.
+      $form_state->setError($form['account_registration']['all_options']['reply']['message'], $this->t('Reply message must have a value if reply is enabled.'));
+    }
+
+    // Incoming message.
+    $incoming_message = $account_registration['formatted_options']['incoming_message'];
+    if ($account_registration['behaviour'] == 'formatted' && empty($incoming_message)) {
+      // Empty incoming message.
+      $form_state->setError($form['account_registration']['formatted_options']['incoming_message'], $this->t('Incoming message must be filled if using pre-formatted option.'));
+    }
+    else if (!empty($incoming_message)) {
+      $contains_email = strpos($incoming_message, '[email]') !== FALSE;
+      $contains_password = strpos($incoming_message, '[password]') !== FALSE;
+      if (!$contains_email && !$contains_password) {
+        // Doesn't contain either placeholder.
+        $form_state->setError($form['account_registration']['formatted_options']['incoming_message'], $this->t('Incoming message must contain at least one [email] and/or [password] placeholders.'));
+      }
+
+      $activation_email = $account_registration['formatted_options']['activation_email'];
+      if ($activation_email && !($contains_email && !$contains_password)) {
+        // Check if password and email occur at the same time.
+        $form_state->setError($form['account_registration']['formatted_options']['activation_email'], $this->t('Activation email cannot be sent if [password] placeholder is present.'));
+      }
+    }
+
+    // Replies.
+    if (!empty($account_registration['formatted_options']['reply_status']) && empty($account_registration['formatted_options']['reply']['message_success'])) {
+      // Reply is enabled, but empty reply.
+      $form_state->setError($form['account_registration']['formatted_options']['reply']['message_success'], $this->t('Reply message must have a value if reply is enabled.'));
+    }
+    if (!empty($account_registration['formatted_options']['reply_status']) && empty($account_registration['formatted_options']['reply']['message_failure'])) {
+      // Reply is enabled, but empty reply.
+      $form_state->setError($form['account_registration']['formatted_options']['reply']['message_failure'], $this->t('Reply message must have a value if reply is enabled.'));
     }
   }
 
