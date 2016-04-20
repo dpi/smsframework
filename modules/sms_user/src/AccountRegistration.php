@@ -115,12 +115,17 @@ class AccountRegistration implements AccountRegistrationInterface {
   protected function allUnknownNumbers(SmsMessageInterface $sms_message) {
     /** @var \Drupal\user\UserInterface $user */
     $user = User::create(['name' => $this->generateUniqueUsername()]);
+    $user->activate();
 
     // Sender phone number.
     $sender_number = $sms_message->getSenderNumber();
     $t_args['%sender_phone_number'] = $sender_number;
     $phone_field_name = $this->userPhoneNumberSettings->getFieldName('phone_number');
     $user->{$phone_field_name}[] = $sender_number;
+
+    // Password.
+    $password = user_password();
+    $user->setPassword($password);
 
     $validate = $user->validate();
     if ($validate->count() == 0) {
@@ -132,10 +137,10 @@ class AccountRegistration implements AccountRegistrationInterface {
       \Drupal::logger('sms_user.account_registration.all_unknown_numbers')
         ->info('Creating new account for %sender_phone_number. Username: %name. User ID: %uid', $t_args);
 
-
       // Optionally send a reply.
-      if (!empty($this->settings['formatted']['reply']['status'])) {
+      if (!empty($this->settings['all_unknown_numbers']['reply']['status'])) {
         $message = $this->settings['all_unknown_numbers']['reply']['message'];
+        $message = str_replace('[user:password]', $password, $message);
         $this->sendReply($sender_number, $user, $message);
       }
     }
@@ -181,15 +186,16 @@ class AccountRegistration implements AccountRegistrationInterface {
           $user->setEmail($matches['email'][0]);
         }
 
-        if (!empty($matches['password'][0]) && $contains_password) {
-          $user->setPassword($matches['password'][0]);
-        }
+        $password = (!empty($matches['password'][0]) && $contains_password) ? $matches['password'][0] : user_password();
+        $user->setPassword($password);
 
         $validate = $user->validate();
         if ($validate->count() == 0) {
           $user->save();
 
           $message = $this->settings['formatted']['reply']['message'];
+          $message = str_replace('[user:password]', $password, $message);
+
           \Drupal::logger('sms_user.account_registration.formatted')
             ->info('Creating new account for %sender_phone_number. Username: %name. User ID: %uid', $t_args + [
               '%uid' => $user->id(),
