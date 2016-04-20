@@ -15,6 +15,7 @@ use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\user\Entity\User;
 use Drupal\Component\Utility\Random;
 use Drupal\sms\Entity\SmsMessage;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Defines the account registration service.
@@ -139,11 +140,7 @@ class AccountRegistration implements AccountRegistrationInterface {
       }
     }
     else {
-      $error = '';
-      foreach ($validate as $e) {
-        $error .= $e->getPropertyPath() . ': ' . (string)$e->getMessage() . " \n";
-      }
-      $t_args['@error'] = $error;
+      $t_args['@error'] = $this->buildError($validate);
       \Drupal::logger('sms_user.account_registration.all_unknown_numbers')
         ->error('Could not create new account for %sender_phone_number because there was a problem with validation: @error', $t_args);
     }
@@ -200,12 +197,9 @@ class AccountRegistration implements AccountRegistrationInterface {
             ]);
         }
         else {
-          $error = '';
-          foreach ($validate as $e) {
-            $error .= $e->getPropertyPath() . ': ' . (string) $e->getMessage() . " \n";
-          }
-
           $message = $this->settings['formatted']['reply']['message_failure'];
+
+          $error = $this->buildError($validate);
           $message = str_replace('[error]', strip_tags($error), $message);
 
           \Drupal::logger('sms_user.account_registration.formatted')
@@ -305,6 +299,23 @@ class AccountRegistration implements AccountRegistrationInterface {
     }
 
     return $compiled;
+  }
+
+  /**
+   * Build an error string from a constraint violation list.
+   *
+   * @param \Symfony\Component\Validator\ConstraintViolationListInterface $violations
+   *   A constraint violation list.
+   *
+   * @return string
+   *   Violation errors joined together.
+   */
+  protected function buildError(ConstraintViolationListInterface $violations) {
+    $error = '';
+    foreach ($violations as $violation) {
+      $error .= $violation->getPropertyPath() . ': ' . (string) $violation->getMessage() . " \n";
+    }
+    return $error;
   }
 
   /**
