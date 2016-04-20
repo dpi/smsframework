@@ -351,6 +351,27 @@ class AdminSettingsForm extends ConfigFormBase {
         // Check if password and email occur at the same time.
         $form_state->setError($form['account_registration']['formatted_options']['activation_email'], $this->t('Activation email cannot be sent if [password] placeholder is present.'));
       }
+
+      // Make sure there is a separator between placeholders so regex capture
+      // groups work correctly.
+      $placeholders = ['[username]', '[email]', '[password]'];
+      $regex_placeholder = [];
+      foreach ($placeholders as $placeholder) {
+        $regex_placeholder[] = preg_quote($placeholder);
+      }
+
+      $regex = '/(' . implode('|', $regex_placeholder) . '+)/';
+      $last_word_is_placeholder = FALSE;
+      foreach (preg_split($regex, $incoming_message, NULL, PREG_SPLIT_DELIM_CAPTURE) as $word) {
+        if ($word === '') {
+          continue;
+        }
+        $this_word_is_placeholder = in_array($word, $placeholders);
+        if ($last_word_is_placeholder && $this_word_is_placeholder) {
+          $form_state->setError($form['account_registration']['formatted_options']['incoming_message'], $this->t('There must be a separator between placeholders.'));
+        }
+        $last_word_is_placeholder = $this_word_is_placeholder;
+      }
     }
 
     // Replies.
