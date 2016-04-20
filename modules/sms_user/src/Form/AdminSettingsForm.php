@@ -75,7 +75,6 @@ class AdminSettingsForm extends ConfigFormBase {
     $form['active_hours'] = [
       '#type' => 'details',
       '#title' => $this->t('Active hours'),
-      '#description' => $this->t('Active hours will suspend transmission of automated SMS messages until the users local time is between any of these hours. The site default timezone is used if a user has not selected a timezone. Active hours are not applied to SMS messages created as a result of direct user action. Messages which are already queued are not retroactively updated.'),
       '#open' => TRUE,
       '#tree' => TRUE,
     ];
@@ -83,16 +82,27 @@ class AdminSettingsForm extends ConfigFormBase {
     $form['active_hours']['status'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Enable active hours'),
+      '#description' => $this->t('Active hours will suspend transmission of automated SMS messages until the users local time is between any of these hours. The site default timezone is used if a user has not selected a timezone. Active hours are not applied to SMS messages created as a result of direct user action. Messages which are already queued are not retroactively updated.'),
       '#default_value' => $config->get('active_hours.status'),
     );
 
-    $form['active_hours']['days'] = [
+    $form['active_hours']['days_container'] = [
+      '#type' => 'container',
+      '#states' => [
+        'visible' => [
+          ':input[name="active_hours[status]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+
+    $form['active_hours']['days_container']['days'] = [
       '#type' => 'table',
       '#header' => [
         'day' => $this->t('Day'),
         'start' => $this->t('Start time'),
         'end' => $this->t('End time'),
       ],
+      '#parents' => ['active_hours', 'days']
     ];
 
     // Convert configuration into days.
@@ -147,10 +157,15 @@ class AdminSettingsForm extends ConfigFormBase {
         '#title_display' => 'invisible',
         '#default_value' => isset($day_defaults[$day_lower]['end']) ? $day_defaults[$day_lower]['end'] : 24,
         '#options' => $end_hours,
+        '#states' => [
+          'invisible' => [
+            ':input[name="active_hours[days][' . $day_lower . '][start]"]' => ['value' => '-1'],
+          ],
+        ],
       ];
 
       $timestamp = strtotime('+1 day', $timestamp);
-      $form['active_hours']['days'][$day_lower] = $row;
+      $form['active_hours']['days_container']['days'][$day_lower] = $row;
     }
 
     // SMS User opt-out settings.
@@ -249,8 +264,8 @@ class AdminSettingsForm extends ConfigFormBase {
     // Ensure at least one enabled.
     if ($form_state->getValue(['active_hours', 'status']) && empty($form_state->getValue(['active_hours', 'days']))) {
       // Show error on all start elements.
-      foreach (Element::children($form['active_hours']['days']) as $day) {
-        $form_state->setError($form['active_hours']['days'][$day]['start'], $this->t('If active hours hours are enabled there must be at least one enabled day.'));
+      foreach (Element::children($form['active_hours']['days_container']['days']) as $day) {
+        $form_state->setError($form['active_hours']['days_container']['days'][$day]['start'], $this->t('If active hours hours are enabled there must be at least one enabled day.'));
       }
     }
 
@@ -259,7 +274,7 @@ class AdminSettingsForm extends ConfigFormBase {
       $start = new DrupalDateTime($row['start']);
       $end = new DrupalDateTime($row['end']);
       if ($end < $start) {
-        $form_state->setError($form['active_hours']['days'][$day]['end'], $this->t('End time must be greater than start time.'));
+        $form_state->setError($form['active_hours']['days_container']['days'][$day]['end'], $this->t('End time must be greater than start time.'));
       }
     }
   }
