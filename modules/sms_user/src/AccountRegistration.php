@@ -195,6 +195,11 @@ class AccountRegistration implements AccountRegistrationInterface {
               '%uid' => $user->id(),
               '%name' => $user->label(),
             ]);
+
+          // Send an activation email if no password placeholder is found.
+          if (!$contains_password && !empty($this->settings['formatted']['activation_email'])) {
+            _user_mail_notify('register_no_approval_required', $user);
+          }
         }
         else {
           $message = $this->settings['formatted']['reply']['message_failure'];
