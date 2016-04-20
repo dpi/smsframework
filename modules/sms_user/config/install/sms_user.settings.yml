@@ -6,12 +6,15 @@ account_registration:
     status: false
     reply:
       status: false
-      message: ''
+      message: 'Hi, your [site:name] account is ready. Your username is [user:account-name] your password is [user:password].'
   formatted:
     status: false
-    incoming_messages: []
+    incoming_messages:
+      - |
+        E [email]
+        U [username]
     activation_email: true
     reply:
       status: false
-      message: ''
-      message_failure: ''
+      message: 'Hi [user:account-name], you will receive an activation email shortly - [site:name]'
+      message_failure: 'There was a problem creating your account: [error]'
