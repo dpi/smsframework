@@ -112,11 +112,12 @@ class AccountRegistration implements AccountRegistrationInterface {
    *   An incoming SMS message.
    */
   protected function allUnknownNumbers(SmsMessageInterface $sms_message) {
-    $sender_number = $sms_message->getSenderNumber();
-    $t_args['%sender_phone_number'] = $sender_number;
-
     /** @var \Drupal\user\UserInterface $user */
     $user = User::create(['name' => $this->generateUniqueUsername()]);
+
+    // Sender phone number.
+    $sender_number = $sms_message->getSenderNumber();
+    $t_args['%sender_phone_number'] = $sender_number;
     $phone_field_name = $this->userPhoneNumberSettings->getFieldName('phone_number');
     $user->{$phone_field_name}[] = $sender_number;
 
@@ -130,24 +131,11 @@ class AccountRegistration implements AccountRegistrationInterface {
       \Drupal::logger('sms_user.account_registration.all_unknown_numbers')
         ->info('Creating new account for %sender_phone_number. Username: %name. User ID: %uid', $t_args);
 
+
       // Optionally send a reply.
-      if (!empty($this->settings['all_unknown_numbers']['reply']['status'])) {
+      if (!empty($this->settings['formatted']['reply']['status'])) {
         $message = $this->settings['all_unknown_numbers']['reply']['message'];
-        $data['sms-message'] = $sms_message;
-        $data['user'] = $user;
-        $message = \Drupal::token()->replace($message, $data);
-
-        /** @var \Drupal\sms\Entity\SmsMessageInterface $reply */
-        $reply = SmsMessage::create();
-        $reply
-          ->setMessage($message)
-          ->addRecipient($sender_number)
-          ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
-
-        // Use queue(), instead of phone number provider sendMessage()
-        // because the phone number is not confirmed.
-        $this->smsProvider
-          ->queue($reply);
+        $this->sendReply($sender_number, $user, $message);
       }
     }
     else {
@@ -187,6 +175,8 @@ class AccountRegistration implements AccountRegistrationInterface {
         // Sender phone number.
         $sender_number = $sms_message->getSenderNumber();
         $t_args['%sender_phone_number'] = $sender_number;
+
+        // Sender phone number.
         $phone_field_name = $this->userPhoneNumberSettings->getFieldName('phone_number');
         $user->{$phone_field_name}[] = $sender_number;
 
@@ -201,46 +191,63 @@ class AccountRegistration implements AccountRegistrationInterface {
         $validate = $user->validate();
         if ($validate->count() == 0) {
           $user->save();
-          $t_args['%name'] = $user->label();
-          $t_args['%uid'] = $user->id();
-          $severity = 'info';
-          $log = 'Creating new account for %sender_phone_number. Username: %name. User ID: %uid';
+
+          $message = $this->settings['formatted']['reply']['message'];
+          \Drupal::logger('sms_user.account_registration.formatted')
+            ->info('Creating new account for %sender_phone_number. Username: %name. User ID: %uid', $t_args + [
+              '%uid' => $user->id(),
+              '%name' => $user->label(),
+            ]);
         }
         else {
           $error = '';
           foreach ($validate as $e) {
             $error .= $e->getPropertyPath() . ': ' . (string) $e->getMessage() . " \n";
           }
-          $t_args['@error'] = $error;
-          $severity = 'warning';
-          $log = 'Could not create new account for %sender_phone_number because there was a problem with validation: @error';
-        }
 
-        \Drupal::logger('sms_user.account_registration.formatted')
-          ->log($severity, $log, $t_args);
+          $message = $this->settings['formatted']['reply']['message_failure'];
+          $message = str_replace('[error]', strip_tags($error), $message);
+
+          \Drupal::logger('sms_user.account_registration.formatted')
+            ->warning('Could not create new account for %sender_phone_number because there was a problem with validation: @error', $t_args + [
+              '@error' => $error,
+            ]);
+        }
 
         // Optionally send a reply.
         if (!empty($this->settings['formatted']['reply']['status'])) {
-          $message = ($validate->count() == 0) ? $this->settings['formatted']['reply']['message'] : $this->settings['formatted']['reply']['message_failure'];
-          $data['sms-message'] = $sms_message;
-          $data['user'] = $user;
-          $message = \Drupal::token()->replace($message, $data);
-          if (isset($t_args['@error'])) {
-            $message = str_replace('[error]', strip_tags($t_args['@error']), $message);
-          }
-
-          /** @var \Drupal\sms\Entity\SmsMessageInterface $reply */
-          $reply = SmsMessage::create();
-          $reply
-            ->setMessage($message)
-            ->addRecipient($sender_number)
-            ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
-
-          $this->smsProvider
-            ->queue($reply);
+          $this->sendReply($sender_number, $user, $message);
         }
       }
     }
+  }
+
+  /**
+   * Send a reply message to the sender of a message.
+   *
+   * @param $sender_number
+   *   Phone number of sender of incoming message. And if a user was created,
+   *   this number was used.
+   * @param $user
+   *   A user account. The account may not be saved.
+   * @param $message
+   *   Message to send as a reply.
+   */
+  protected function sendReply($sender_number, $user, $message) {
+    /** @var \Drupal\sms\Entity\SmsMessageInterface $sms_message */
+    $sms_message = SmsMessage::create();
+    $sms_message
+      ->addRecipient($sender_number)
+      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
+
+    $data['sms-message'] = $sms_message;
+    $data['user'] = $user;
+    $sms_message->setMessage(\Drupal::token()->replace($message, $data));
+
+    // Use queue(), instead of phone number provider sendMessage()
+    // because the phone number is not confirmed.
+    $this->smsProvider
+      ->queue($sms_message);
   }
 
   /**
