@@ -65,10 +65,6 @@ function sms_sendtophone_node_links_alter(array &$links, NodeInterface $node, ar
       '#attributes' => array('class' => array('links', 'inline')),
     );
   }
-  // Add thickbox js if module exists.
-  if (\Drupal::moduleHandler()->moduleExists('thickbox')) {
-    $links['#attached']['library'][] = 'sms_sendtophone/thickbox_js';
-  }
 
 }
 
