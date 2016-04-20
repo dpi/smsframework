@@ -6,7 +6,9 @@ active_hours:
 account_registration:
   all_unknown_numbers:
     status: false
-    reply_message: ''
+    reply:
+      status: false
+      message: ''
   formatted:
     status: false
     incoming_messages: []
