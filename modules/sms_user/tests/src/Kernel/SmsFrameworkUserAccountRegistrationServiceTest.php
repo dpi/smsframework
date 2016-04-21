@@ -172,8 +172,6 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
 
     $message = "$password $username $password";
     $this->sendIncomingMessage('+123123123', $message);
-
-    $this->assertTrue(user_load_by_name($username) instanceof UserInterface, 'User was created');
   }
 
   /**
@@ -197,6 +195,86 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
+   * Test if a user is created despite no email address.
+   *
+   * @covers ::userIsValid
+   */
+  public function testUnrecognisedNoEmail() {
+    $this->config('sms_user.settings')
+      ->set('account_registration.all_unknown_numbers.status', 1)
+      ->save();
+
+    $this->assertEquals(0, $this->countUsers());
+    $this->sendIncomingMessage('+123123123', $this->randomString());
+    $this->assertFalse(empty($this->getLastUser()->getAccountName()));
+    $this->assertTrue(empty($this->getLastUser()->getEmail()));
+  }
+
+  /**
+   * Test if a user is created despite no email address.
+   *
+   * @covers ::userIsValid
+   */
+  public function testPreformattedNoEmail() {
+    $this->config('sms_user.settings')
+      ->set('account_registration.formatted.status', 1)
+      ->set('account_registration.formatted.incoming_messages.0', "[username] [password]")
+      ->save();
+
+    $this->assertEquals(0, $this->countUsers());
+
+    $username = $this->randomMachineName();
+    $message = "$username " . $this->randomMachineName();
+    $this->sendIncomingMessage('+123123123', $message);
+    $this->assertEquals($username, $this->getLastUser()->getAccountName());
+    $this->assertTrue(empty($this->getLastUser()->getEmail()));
+  }
+
+  /**
+   * Test error builder.
+   *
+   * @covers ::buildError
+   */
+  public function testErrorBuilder() {
+    $failure_prefix = 'foo: ';
+    $this->config('sms_user.settings')
+      ->set('account_registration.formatted.status', 1)
+      ->set('account_registration.formatted.incoming_messages.0', "[username] [email]")
+      ->set('account_registration.formatted.reply.status', 1)
+      ->set('account_registration.formatted.reply.message_failure', $failure_prefix . '[error]')
+      ->save();
+
+    $username = $this->randomMachineName();
+    $email = 'email@domain.tld';
+    User::create(['name' => $username, 'mail' => $email])->save();
+
+    $message = "$username " . $this->randomMachineName();
+    $this->sendIncomingMessage('+123123123', $message);
+
+    $expected_error = 'The username ' . $username . ' is already taken. This value is not a valid email address. ';
+    $actual = $this->getLastTestMessage($this->gateway)->getMessage();
+    $this->assertEquals($failure_prefix . $expected_error, $actual);
+  }
+
+  /**
+   * Test unique username.
+   *
+   * @covers ::generateUniqueUsername
+   */
+  public function testUniqueUsername() {
+    $this->config('sms_user.settings')
+      ->set('account_registration.all_unknown_numbers.status', 1)
+      ->save();
+
+    $this->sendIncomingMessage('+123123123', $this->randomString());
+    $user1 = $this->getLastUser();
+    $this->sendIncomingMessage('+456456456', $this->randomString());
+    $user2 = $this->getLastUser();
+
+    $this->assertNotEquals($user1->getAccountName(), $user2->getAccountName());
+  }
+
+  /**
    * Send an incoming SMS message.
    *
    * @param string $sender_number
@@ -214,8 +292,26 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     $this->smsProvider->queue($incoming);
   }
 
-//    $this->assertEquals([], sms_test_gateway_get_incoming('process'));
-//    $sms_message = $this->getLastTestMessage($this->gateway);
-//    $this->assertEquals('=', $sms_message->getMessage());
+  /**
+   * Count number of registered users.
+   *
+   * @return integer
+   *   Number of users in database.
+   */
+  protected function countUsers() {
+    return count(User::loadMultiple());
+  }
+
+  /**
+   * Count number of registered users.
+   *
+   * @return \Drupal\user\UserInterface|NULL
+   *   Get last created user, or NULL if no users in database.
+   */
+  protected function getLastUser() {
+    $users = User::loadMultiple();
+    return $users ? end($users) : NULL;
+  }
+
 
 }

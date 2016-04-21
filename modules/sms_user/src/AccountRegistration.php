@@ -16,6 +16,7 @@ use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\user\Entity\User;
 use Drupal\Component\Utility\Random;
 use Drupal\sms\Entity\SmsMessage;
+use Drupal\Core\Entity\EntityConstraintViolationListInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -120,7 +121,6 @@ class AccountRegistration implements AccountRegistrationInterface {
    *   An incoming SMS message.
    */
   protected function allUnknownNumbers(SmsMessageInterface $sms_message) {
-    /** @var \Drupal\user\UserInterface $user */
     $user = User::create(['name' => $this->generateUniqueUsername()]);
     $user->activate();
 
@@ -134,9 +134,8 @@ class AccountRegistration implements AccountRegistrationInterface {
     $password = user_password();
     $user->setPassword($password);
 
-    $validate = $user->validate();
-    if ($validate->count() <= 1) {
-      // Email is an acceptable failure. @fixme
+    $validate = $this->removeAcceptableViolations($user->validate());
+    if ($validate->count() == 0) {
       $user->save();
 
       // @todo autoconfirm the number?
@@ -180,7 +179,6 @@ class AccountRegistration implements AccountRegistrationInterface {
         $contains_password = strpos($incoming_form, '[password]') !== FALSE;
 
         $username = (!empty($matches['username'][0]) && $contains_username) ? $matches['username'][0] : $this->generateUniqueUsername();
-        /** @var \Drupal\user\UserInterface $user */
         $user = User::create(['name' => $username]);
         $user->activate();
 
@@ -199,9 +197,8 @@ class AccountRegistration implements AccountRegistrationInterface {
         $password = (!empty($matches['password'][0]) && $contains_password) ? $matches['password'][0] : user_password();
         $user->setPassword($password);
 
-        $validate = $user->validate();
-        // @fixme, email causes failure.
-        if ($validate->count() == 0 || (!$contains_email && $validate->count() == 1)) {
+        $validate = $this->removeAcceptableViolations($user->validate(), $incoming_form);
+        if ($validate->count() == 0) {
           $user->save();
 
           // @todo autoconfirm the number?
@@ -225,7 +222,7 @@ class AccountRegistration implements AccountRegistrationInterface {
           $message = $this->settings('formatted.reply.message_failure');
 
           $error = $this->buildError($validate);
-          $message = str_replace('[error]', strip_tags($error), $message);
+          $message = str_replace('[error]', $error, $message);
 
           \Drupal::logger('sms_user.account_registration.formatted')
             ->warning('Could not create new account for %sender_phone_number because there was a problem with validation: @error', $t_args + [
@@ -338,9 +335,9 @@ class AccountRegistration implements AccountRegistrationInterface {
   protected function buildError(ConstraintViolationListInterface $violations) {
     $error = '';
     foreach ($violations as $violation) {
-      $error .= $violation->getPropertyPath() . ': ' . (string) $violation->getMessage() . " \n";
+      $error .= (string)$violation->getMessage() . " ";
     }
-    return $error;
+    return strip_tags($error);
   }
 
   /**
@@ -356,6 +353,32 @@ class AccountRegistration implements AccountRegistrationInterface {
     }
     while (user_validate_name($username) || user_load_by_name($username));
     return $username;
+  }
+
+  /**
+   * Filter out acceptable validation errors.
+
+   * @param \Drupal\Core\Entity\EntityConstraintViolationListInterface $violations
+   *   A violation list.
+   * @param string|NULL
+   *   Incoming form, if applicable.
+   *
+   * @return \Drupal\Core\Entity\EntityConstraintViolationListInterface
+   *   A filtered violation list.
+   */
+  protected function removeAcceptableViolations(EntityConstraintViolationListInterface $violations, $incoming_form = NULL) {
+    // 'mail' will not fail validation if current user has 'administer users'.
+    $needs_email = isset($incoming_form) && (strpos($incoming_form, '[email]') !== FALSE);
+    if (!$needs_email) {
+      // Invalid email field is acceptable if it is not required.
+      foreach ($violations as $offset => $violation) {
+        if ($violation->getPropertyPath() == 'mail') {
+          $violations->remove($offset);
+        }
+      }
+    }
+
+    return $violations;
   }
 
   /**
