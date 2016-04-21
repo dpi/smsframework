@@ -47,6 +47,23 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   protected $smsProvider;
 
   /**
+   * A memory gateway.
+   *
+   * @var \Drupal\sms\Entity\SmsGatewayInterface
+   */
+  protected $gateway;
+
+  /**
+   * @var \Drupal\field\FieldStorageConfigInterface
+   */
+  protected $phoneField;
+
+  /**
+   * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
+   */
+  protected $phoneNumberSettings;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -89,14 +106,15 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Ensure incoming SMS does not create messages or users.
    */
-  public function testIncomingIgnored() {
-    $username = $this->randomMachineName();
-    $email = 'email@email.com';
-    $message = "E " . $email . "\nU " . $username;
+  public function testUnrecognisedOffNoCreateUser() {
+    $this->config('sms_user.settings')
+      ->set('account_registration.all_unknown_numbers.status', 0)
+      ->set('account_registration.all_unknown_numbers.reply.status', 1)
+      ->save();
 
-    $this->sendIncomingMessage('+123', $message);
+    $this->sendIncomingMessage('+123', $this->randomString());
     $this->assertEquals(0, count($this->getTestMessages($this->gateway)), 'No messages were created');
-    $this->assertEquals(0, count(User::loadMultiple()), 'No users exist.');
+    $this->assertEquals(0, $this->countUsers(), 'No users exist.');
   }
 
   /**
@@ -108,18 +126,18 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
       ->set('account_registration.all_unknown_numbers.reply.status', 1)
       ->save();
 
-    $this->assertEquals(0, count(User::loadMultiple()), 'No users exist.');
-
     $sender_number = '+123123123';
     $this->sendIncomingMessage($sender_number, $this->randomString());
 
-    $this->assertEquals(1, count(User::loadMultiple()), 'One user created.');
+    $user = $this->getLastUser();
+    $this->assertTrue($user instanceof UserInterface, 'One user created.');
+    $this->assertEquals($sender_number, $user->{$this->phoneField->getName()}->value, 'Phone number associated');
   }
 
   /**
    * Test a user is not created if the sender phone number is already used.
    */
-  public function testUnrecognisedCreateUserPhoneNumberExists() {
+  public function testUnrecognisedCreateUserPhoneNumberRecognised() {
     $this->config('sms_user.settings')
       ->set('account_registration.all_unknown_numbers.status', 1)
       ->set('account_registration.all_unknown_numbers.reply.status', 1)
@@ -129,11 +147,9 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     $this->createEntityWithPhoneNumber($this->phoneNumberSettings, [$sender_number]);
     $this->resetTestMessages();
 
-    $this->assertEquals(1, count(User::loadMultiple()));
-
-
+    $this->assertEquals(1, $this->countUsers());
     $this->sendIncomingMessage($sender_number, $this->randomString());
-    $this->assertEquals(1, count(User::loadMultiple()));
+    $this->assertEquals(1, $this->countUsers());
     $this->assertEquals(0, count($this->getTestMessages($this->gateway)));
   }
 
@@ -148,19 +164,48 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
 
     $username = $this->randomMachineName();
     $email = 'email@email.com';
+    $sender_number = '+123123123';
     $message = "E " . $email . "\nU " . $username;
-    $this->sendIncomingMessage('+123', $message);
+    $this->sendIncomingMessage($sender_number, $message);
 
     $user = user_load_by_name($username);
     $this->assertTrue($user instanceof UserInterface, 'User was created');
-    $this->assertEquals($username, $user->label());
+    $this->assertEquals($username, $user->getAccountName());
     $this->assertEquals($email, $user->getEmail());
+    $this->assertEquals($sender_number, $user->{$this->phoneField->getName()}->value, 'Phone number associated');
+  }
+
+  /**
+   * Test all placeholders make their way into the user object.
+   */
+  public function testPreformattedPlaceholders() {
+    $this->config('sms_user.settings')
+      ->set('account_registration.formatted.status', 1)
+      ->set('account_registration.formatted.reply.status', 1)
+      ->set('account_registration.formatted.incoming_messages.0', "[email] [username] [password]")
+      ->save();
+
+    $email = 'email@domain.tld';
+    $username = $this->randomMachineName();
+    $password = $this->randomMachineName();
+
+    $message = "$email $username $password";
+    $this->sendIncomingMessage('+123123123', $message);
+
+    $user = $this->getLastUser();
+    $this->assertEquals($email, $user->getEmail());
+    $this->assertEquals($username, $user->getAccountName());
+
+    // Ensure password is correct:
+    /** @var \Drupal\user\UserAuthInterface $userAuth */
+    $userAuth = \Drupal::service('user.auth');
+    $this->assertNotFalse($userAuth->authenticate($username, $password));
   }
 
   /**
    * Test if a duplicated placeholder is confirmed.
    */
-  public function testPreformattedPlaceholdersSuccess() {
+  public function testPreformattedMultiplePlaceholderSuccess() {
     $this->config('sms_user.settings')
       ->set('account_registration.formatted.status', 1)
       ->set('account_registration.formatted.reply.status', 1)
@@ -177,7 +222,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Test if a duplicated placeholder is not confirmed
    */
-  public function testPreformattedPlaceholdersFailure() {
+  public function testPreformattedMultiplePlaceholderFailure() {
     $this->config('sms_user.settings')
       ->set('account_registration.formatted.status', 1)
       ->set('account_registration.formatted.reply.status', 1)
@@ -312,6 +357,5 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     $users = User::loadMultiple();
     return $users ? end($users) : NULL;
   }
-
 
 }

@@ -55,7 +55,7 @@ class AccountRegistration implements AccountRegistrationInterface {
   /**
    * Phone number settings for user.user bundle.
    *
-   * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface|NULL
+   * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
    */
   protected $userPhoneNumberSettings;
 
@@ -77,11 +77,6 @@ class AccountRegistration implements AccountRegistrationInterface {
     $this->smsProvider = $sms_provider;
     $this->phoneNumberProvider = $phone_number_provider;
 
-    // @fixme, use phone number provider to get settings.
-    // @see https://www.drupal.org/node/2709465
-//      $phone_number_settings = $this->phoneNumberProvider->getPhoneNumberSettings('user', 'usxer');
-    $this->userPhoneNumberSettings = PhoneNumberSettings::load('user.user');
-
     // @fixme.  number resolution should move to a method on
     // @see https://www.drupal.org/node/2709463
     $this->phoneNumberVerificationStorage = \Drupal::entityTypeManager()
@@ -92,6 +87,13 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @inheritdoc
    */
   public function createAccount(SmsMessageInterface $sms_message) {
+    // @fixme, use phone number provider to get settings.
+    // @see https://www.drupal.org/node/2709465
+    if (!$this->userPhoneNumberSettings = PhoneNumberSettings::load('user.user')) {
+      // Can't do anything if there is no phone number settings for user.
+      return;
+    }
+
     $sender_number = $sms_message->getSenderNumber();
     if (!empty($sender_number)) {
       // Any users with this phone number?
@@ -127,7 +129,8 @@ class AccountRegistration implements AccountRegistrationInterface {
     // Sender phone number.
     $sender_number = $sms_message->getSenderNumber();
     $t_args['%sender_phone_number'] = $sender_number;
-    $phone_field_name = PhoneNumberSettings::load('user.user')->getFieldName('phone_number');
+    $phone_field_name = $this->userPhoneNumberSettings
+      ->getFieldName('phone_number');
     $user->{$phone_field_name}[] = $sender_number;
 
     // Password.
@@ -187,7 +190,8 @@ class AccountRegistration implements AccountRegistrationInterface {
         $t_args['%sender_phone_number'] = $sender_number;
 
         // Sender phone number.
-        $phone_field_name = PhoneNumberSettings::load('user.user')->getFieldName('phone_number');
+        $phone_field_name = $this->userPhoneNumberSettings
+          ->getFieldName('phone_number');
         $user->{$phone_field_name}[] = $sender_number;
 
         if (!empty($matches['email'][0]) && $contains_email) {
