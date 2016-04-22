@@ -75,6 +75,9 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     $this->installSchema('system', ['sequences']);
     $this->installConfig('sms_user');
 
+    // @todo Remove table install after https://www.drupal.org/node/2677690
+    $this->installSchema('sms_user', ['sms_user']);
+
     $this->accountRegistration = $this->container->get('sms_user.account_registration');
     $this->smsProvider = $this->container->get('sms_provider');
 
