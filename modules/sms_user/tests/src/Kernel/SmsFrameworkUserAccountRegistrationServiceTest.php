@@ -16,6 +16,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Component\Utility\Unicode;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\sms\Entity\PhoneNumberSettings;
+use Drupal\sms\Entity\SmsGatewayInterface;
 
 /**
  * Tests account registration.
@@ -154,6 +155,38 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
+   * Ensure no reply sent if turned off.
+   */
+  public function testUnrecognisedNoReply() {
+    $reply_message = $this->randomString();
+    $this->config('sms_user.settings')
+      ->set('account_registration.all_unknown_numbers.status', TRUE)
+      ->set('account_registration.all_unknown_numbers.reply.status', FALSE)
+      ->set('account_registration.all_unknown_numbers.reply.message', $reply_message)
+      ->save();
+
+    $this->sendIncomingMessage('+123123123', $this->randomString());
+    $this->assertEquals(1, $this->countUsers(), 'User created');
+    $this->assertFalse($this->inTestMessages($this->gateway, $reply_message));
+  }
+
+  /**
+   * Ensure reply sent if turned on.
+   */
+  public function testUnrecognisedGotReply() {
+    $reply_message = $this->randomString();
+    $this->config('sms_user.settings')
+      ->set('account_registration.all_unknown_numbers.status', TRUE)
+      ->set('account_registration.all_unknown_numbers.reply.status', TRUE)
+      ->set('account_registration.all_unknown_numbers.reply.message', $reply_message)
+      ->save();
+
+    $this->sendIncomingMessage('+123123123', $this->randomString());
+    $this->assertEquals(1, $this->countUsers(), 'User created');
+    $this->assertTrue($this->inTestMessages($this->gateway, $reply_message));
+  }
+
+  /**
    * Test user is created from a preformatted message.
    */
   public function testPreformattedUserCreated() {
@@ -276,6 +309,42 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
+   * Ensure no reply sent if turned off.
+   */
+  public function testPreformattedNoReply() {
+    $reply_message = $this->randomString();
+    $this->config('sms_user.settings')
+      ->set('account_registration.formatted.status', TRUE)
+      ->set('account_registration.formatted.incoming_messages.0', "[username] [password]")
+      ->set('account_registration.formatted.reply.status', FALSE)
+      ->set('account_registration.formatted.reply.message', $reply_message)
+      ->save();
+
+    $incoming_message = $this->randomMachineName() . ' ' . $this->randomMachineName();
+    $this->sendIncomingMessage('+123123123', $incoming_message);
+    $this->assertEquals(1, $this->countUsers(), 'User created');
+    $this->assertFalse($this->inTestMessages($this->gateway, $reply_message));
+  }
+
+  /**
+   * Ensure reply sent if turned on.
+   */
+  public function testPreformattedHasReply() {
+    $reply_message = $this->randomString();
+    $this->config('sms_user.settings')
+      ->set('account_registration.formatted.status', TRUE)
+      ->set('account_registration.formatted.incoming_messages.0', "[username] [password]")
+      ->set('account_registration.formatted.reply.status', TRUE)
+      ->set('account_registration.formatted.reply.message', $reply_message)
+      ->save();
+
+    $incoming_message = $this->randomMachineName() . ' ' . $this->randomMachineName();
+    $this->sendIncomingMessage('+123123123', $incoming_message);
+    $this->assertEquals(1, $this->countUsers(), 'User created');
+    $this->assertTrue($this->inTestMessages($this->gateway, $reply_message));
+  }
+
+  /**
    * Test error builder.
    *
    * @covers ::buildError
@@ -320,6 +389,25 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
+   * Ensure non-global tokens are replaced in reply message.
+   */
+  public function testReplyTokens() {
+    $this->config('sms_user.settings')
+      ->set('account_registration.formatted.status', TRUE)
+      ->set('account_registration.formatted.incoming_messages.0', "[username] [password]")
+      ->set('account_registration.formatted.reply.status', TRUE)
+      ->set('account_registration.formatted.reply.message', 'Foo [user:account-name] Bar')
+      ->save();
+
+    $username = $this->randomMachineName();
+    $incoming_message = $username . ' ' . $this->randomMachineName();
+    $this->sendIncomingMessage('+123123123', $incoming_message);
+
+    $reply_message = 'Foo ' . $username . ' Bar';
+    $this->assertTrue($this->inTestMessages($this->gateway, $reply_message));
+  }
+
+  /**
    * Send an incoming SMS message.
    *
    * @param string $sender_number
@@ -356,6 +444,26 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   protected function getLastUser() {
     $users = User::loadMultiple();
     return $users ? end($users) : NULL;
+  }
+
+  /**
+   * Check if the message body can be found in the test message memory buffer.
+   *
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
+   *   A gateway plugin instance.
+   * @param string $message
+   *   The message to check.
+   *
+   * @return boolean
+   *   Whether message was found in any memory messages.
+   */
+  public function inTestMessages(SmsGatewayInterface $sms_gateway, $message) {
+    foreach ($this->getTestMessages($sms_gateway) as $sms_message) {
+      if ($sms_message->getMessage() == $message) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }
