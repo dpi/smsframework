@@ -198,6 +198,22 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
+   * Test if a user is created despite no email address.
+   *
+   * @covers ::userIsValid
+   */
+  public function testUnrecognisedNoEmail() {
+    $this->config('sms_user.settings')
+      ->set('account_registration.all_unknown_numbers.status', 1)
+      ->save();
+
+    $this->assertEquals(0, $this->countUsers());
+    $this->sendIncomingMessage('+123123123', $this->randomString());
+    $this->assertFalse(empty($this->getLastUser()->getAccountName()));
+    $this->assertTrue(empty($this->getLastUser()->getEmail()));
+  }
+
+  /**
    * Test user is created from a preformatted message.
    */
   public function testPreformattedUserCreated() {
@@ -288,22 +304,6 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    *
    * @covers ::userIsValid
    */
-  public function testUnrecognisedNoEmail() {
-    $this->config('sms_user.settings')
-      ->set('account_registration.all_unknown_numbers.status', 1)
-      ->save();
-
-    $this->assertEquals(0, $this->countUsers());
-    $this->sendIncomingMessage('+123123123', $this->randomString());
-    $this->assertFalse(empty($this->getLastUser()->getAccountName()));
-    $this->assertTrue(empty($this->getLastUser()->getEmail()));
-  }
-
-  /**
-   * Test if a user is created despite no email address.
-   *
-   * @covers ::userIsValid
-   */
   public function testPreformattedNoEmail() {
     $this->config('sms_user.settings')
       ->set('account_registration.formatted.status', 1)
@@ -317,6 +317,31 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     $this->sendIncomingMessage('+123123123', $message);
     $this->assertEquals($username, $this->getLastUser()->getAccountName());
     $this->assertTrue(empty($this->getLastUser()->getEmail()));
+  }
+
+  /**
+   * Test if a user is created despite no placeholders
+   *
+   * @covers ::userIsValid
+   */
+  public function testPreformattedNoPlaceholders() {
+    $incoming_message = $this->randomString();
+    $this->config('sms_user.settings')
+      ->set('account_registration.formatted.status', 1)
+      ->set('account_registration.formatted.incoming_messages.0', $incoming_message)
+      ->set('account_registration.formatted.reply.status', TRUE)
+      ->set('account_registration.formatted.reply.message', '[user:account-name] Foo [user:mail]')
+      ->save();
+
+    $this->assertEquals(0, $this->countUsers());
+    $this->sendIncomingMessage('+123123123', $incoming_message);
+    $this->assertEquals(1, $this->countUsers());
+
+    // Check reply contains randomly generated username, and empty email token.
+    $user = $this->getLastUser();
+    $reply_message = $user->getAccountName() . ' Foo ' . $user->getEmail();
+    $reply = $this->getLastTestMessage($this->gateway);
+    $this->assertEquals($reply_message, $reply->getMessage());
   }
 
   /**
@@ -450,21 +475,22 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
-   * Ensure non-global tokens are replaced in reply message.
+   * Ensure non-global tokens and [user:password] are replaced in reply message.
    */
   public function testReplyTokens() {
     $this->config('sms_user.settings')
       ->set('account_registration.formatted.status', TRUE)
       ->set('account_registration.formatted.incoming_messages.0', "[username] [password]")
       ->set('account_registration.formatted.reply.status', TRUE)
-      ->set('account_registration.formatted.reply.message', 'Foo [user:account-name] Bar')
+      ->set('account_registration.formatted.reply.message', 'Username is [user:account-name] Password is [user:password]')
       ->save();
 
     $username = $this->randomMachineName();
-    $incoming_message = $username . ' ' . $this->randomMachineName();
+    $password = $this->randomMachineName();
+    $incoming_message = $username . ' ' . $password;
     $this->sendIncomingMessage('+123123123', $incoming_message);
 
-    $reply_message = 'Foo ' . $username . ' Bar';
+    $reply_message = 'Username is ' . $username . ' Password is ' . $password;
     $this->assertTrue($this->inTestMessages($this->gateway, $reply_message));
   }
 
