@@ -17,7 +17,6 @@ use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\sms\Message\SmsMessage;
-use Drupal\sms\Message\SmsMessageInterface;
 
 define('SMS_USER_BLOCKED', 0);
 define('SMS_USER_PENDING', 1);
