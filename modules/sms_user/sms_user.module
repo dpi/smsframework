@@ -16,7 +16,7 @@ use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\sms\Message\SmsMessage;
+use Drupal\sms\Entity\SmsMessage as SmsMessageEntity;
 
 define('SMS_USER_BLOCKED', 0);
 define('SMS_USER_PENDING', 1);
@@ -538,6 +538,12 @@ function sms_user_sms_incoming($op, SmsMessageInterface $sms_message, array $opt
   if ($op == 'pre process') {
     /** @var \Drupal\sms_user\AccountRegistrationInterface $account_registration */
     $account_registration = \Drupal::service('sms_user.account_registration');
+
+    // Upgrade standard SMS message to entity.
+    // @todo Remove after ->createAccount works with standard SMS messages
+    // @see https://www.drupal.org/node/2709469
+    $sms_message = SmsMessageEntity::convertFromSmsMessage($sms_message);
+
     $account_registration->createAccount($sms_message);
   }
 }
