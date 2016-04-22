@@ -199,8 +199,6 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
 
   /**
    * Test if a user is created despite no email address.
-   *
-   * @covers ::userIsValid
    */
   public function testUnrecognisedNoEmail() {
     $this->config('sms_user.settings')
@@ -301,8 +299,6 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
 
   /**
    * Test if a user is created despite no email address.
-   *
-   * @covers ::userIsValid
    */
   public function testPreformattedNoEmail() {
     $this->config('sms_user.settings')
@@ -321,8 +317,6 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
 
   /**
    * Test if a user is created despite no placeholders
-   *
-   * @covers ::userIsValid
    */
   public function testPreformattedNoPlaceholders() {
     $incoming_message = $this->randomString();
