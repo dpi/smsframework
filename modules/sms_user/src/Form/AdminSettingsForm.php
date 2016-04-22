@@ -246,7 +246,7 @@ class AdminSettingsForm extends ConfigFormBase {
     $form['account_registration']['all_options']['reply']['message'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Reply message'),
-      '#description' => $this->t('Send a message after a new account is created.'),
+      '#description' => $this->t('Send a message after a new account is created. In addition to the tokens listed below, [user:password] is also available.'),
       '#default_value' => $config->get('account_registration.all_unknown_numbers.reply.message'),
       '#states' => [
         'visible' => [
@@ -281,7 +281,7 @@ class AdminSettingsForm extends ConfigFormBase {
     $form['account_registration']['formatted_options']['incoming_message'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Incoming message'),
-      '#description' => $this->t('You must use at least one placeholder: [email] and/or [password]. [username] is also available. If password is omitted: a random password will be generated. If username is omitted: a random username will be generated. If email address is omitted: no email address will be associated with the account.'),
+      '#description' => $this->t('You should use at least one placeholder: [email, [password], or [username]. If password is omitted: a random password will be generated. If username is omitted: a random username will be generated. If email address is omitted: no email address will be associated with the account.'),
       '#default_value' => $config->get('account_registration.formatted.incoming_messages.0'),
     ];
 
@@ -313,14 +313,14 @@ class AdminSettingsForm extends ConfigFormBase {
     $form['account_registration']['formatted_options']['reply']['message_success'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Reply message (success)'),
-      '#description' => $this->t('Send a message after a new account is successfully created.'),
+      '#description' => $this->t('Send a message after a new account is successfully created. In addition to the tokens listed below, [user:password] is also available.'),
       '#default_value' => $config->get('account_registration.formatted.reply.message'),
     ];
 
     $form['account_registration']['formatted_options']['reply']['message_failure'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Reply message (failure)'),
-      '#description' => $this->t('Send a message if a new account could not be created. Such reasons include: username already taken, email already used.'),
+      '#description' => $this->t('Send a message if a new account could not be created. Such reasons include: username already taken, email already used. In addition to the tokens listed below, [error] is also available.'),
       '#default_value' => $config->get('account_registration.formatted.reply.message_failure'),
     ];
 
@@ -383,13 +383,12 @@ class AdminSettingsForm extends ConfigFormBase {
     else if (!empty($incoming_message)) {
       $contains_email = strpos($incoming_message, '[email]') !== FALSE;
       $contains_password = strpos($incoming_message, '[password]') !== FALSE;
-      if (!$contains_email && !$contains_password) {
-        // Doesn't contain either placeholder.
-        $form_state->setError($form['account_registration']['formatted_options']['incoming_message'], $this->t('Incoming message must contain at least one [email] and/or [password] placeholders.'));
-      }
-
       $activation_email = $account_registration['formatted_options']['activation_email'];
-      if ($activation_email && !($contains_email && !$contains_password)) {
+      if ($activation_email && !$contains_email) {
+        // Email placeholder must be present if activation email is on.
+        $form_state->setError($form['account_registration']['formatted_options']['activation_email'], $this->t('Activation email cannot be sent if [email] placeholder is missing.'));
+      }
+      if ($activation_email && $contains_email && $contains_password) {
         // Check if password and email occur at the same time.
         $form_state->setError($form['account_registration']['formatted_options']['activation_email'], $this->t('Activation email cannot be sent if [password] placeholder is present.'));
       }
