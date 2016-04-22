@@ -8,6 +8,7 @@
 namespace Drupal\Tests\sms_user\Kernel;
 
 use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
+use Drupal\Core\Test\AssertMailTrait;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\user\Entity\User;
@@ -25,6 +26,8 @@ use Drupal\sms\Entity\SmsGatewayInterface;
  * @coversDefaultClass \Drupal\sms_user\AccountRegistration
  */
 class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelBase {
+
+  use AssertMailTrait;
 
   /**
    * Modules to enable.
@@ -101,6 +104,14 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
       ->setPhoneNumberBundle('user')
       ->setFieldName('phone_number', $this->phoneField->getName())
       ->setVerificationMessage($this->randomString())
+      ->save();
+
+    $this->config('system.mail')
+      ->set('interface.default', 'test_mail_collector')
+      ->save();
+
+    $this->config('user.settings')
+      ->set('notify.register_no_approval_required', TRUE)
       ->save();
   }
 
@@ -342,6 +353,56 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     $this->sendIncomingMessage('+123123123', $incoming_message);
     $this->assertEquals(1, $this->countUsers(), 'User created');
     $this->assertTrue($this->inTestMessages($this->gateway, $reply_message));
+  }
+
+  /**
+   * Ensure account activation email sent.
+   */
+  public function testPreformattedActivateEmail() {
+    $this->config('sms_user.settings')
+      ->set('account_registration.formatted.status', TRUE)
+      ->set('account_registration.formatted.incoming_messages.0', "E [email] U [username]")
+      ->set('account_registration.formatted.activation_email', TRUE)
+      ->save();
+
+    $subject = $this->randomMachineName();
+    $this->config('user.mail')
+      ->set('register_no_approval_required.subject', $subject)
+      ->set('register_no_approval_required.body', 'Foo [user:display-name] Bar')
+      ->save();
+
+    $email = 'email@domain.tld';
+    $username = $this->randomMachineName();
+    $this->sendIncomingMessage('+123123123', 'E ' . $email . ' U ' . $username);
+
+    $emails = $this->getMails();
+    $this->assertEquals(1, count($emails), 'One email was sent.');
+    $this->assertMailString('to', $email, 1);
+    $this->assertMailString('subject', $subject, 1);
+    $this->assertMailString('body', 'Foo ' . $username . ' Bar', 1);
+  }
+
+  /**
+   * Ensure no activation email sent.
+   */
+  public function testPreformattedNoActivateEmail() {
+    $this->config('sms_user.settings')
+      ->set('account_registration.formatted.status', TRUE)
+      ->set('account_registration.formatted.incoming_messages.0', "E [email] P [password]")
+      ->set('account_registration.formatted.activation_email', TRUE)
+      ->save();
+
+    $this->config('user.mail')
+      ->set('register_no_approval_required.subject', $this->randomMachineName())
+      ->set('register_no_approval_required.body', $this->randomMachineName())
+      ->save();
+
+    $email = 'email@domain.tld';
+    $password = $this->randomMachineName();
+    $this->sendIncomingMessage('+123123123', 'E ' . $email . ' P ' . $password);
+
+    $emails = $this->getMails();
+    $this->assertEquals(0, count($emails), 'Zero emails sent because incoming message contained password.');
   }
 
   /**
