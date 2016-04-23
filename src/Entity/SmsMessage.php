@@ -439,7 +439,8 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
       ->setDefaultValue(FALSE)
       ->setRequired(TRUE)
       ->setSetting('on_label', t('Queued'))
-      ->setSetting('off_label', t('Processed'));
+      // Off = processed, or not queued yet.
+      ->setSetting('off_label', t('Not queued'));
 
     // Dates.
     $fields['created'] = BaseFieldDefinition::create('created')
