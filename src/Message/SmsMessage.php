@@ -20,7 +20,7 @@ class SmsMessage implements SmsMessageInterface {
   protected $uuid;
 
   /**
-   * The sender of the message.
+   * The senders' phone number.
    *
    * @var string
    */
@@ -61,8 +61,8 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * Creates a new instance of an SMS message.
    *
-   * @param string $sender
-   *   (optional) The sender of the message.
+   * @param $sender_number $sender
+   *   (optional) The senders' phone number.
    * @param array $recipients
    *   (optional) The list of recipient phone numbers for the message.
    * @param string $message
@@ -72,27 +72,28 @@ class SmsMessage implements SmsMessageInterface {
    * @param int $uid
    *   (optional) The user who created the SMS message.
    */
-  public function __construct($sender = '', array $recipients = [], $message = '', array $options = [], $uid = NULL) {
-    $this->sender = $sender;
+  public function __construct($sender_number = NULL, array $recipients = [], $message = '', array $options = [], $uid = NULL) {
+    $this->setSenderNumber($sender_number);
     $this->addRecipients($recipients);
+    $this->setMessage($message);
     $this->message = $message;
     $this->options = $options;
-    $this->uid = $uid;
+    $this->setUid($uid);
     $this->uuid = $this->uuidGenerator()->generate();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getSender() {
+  public function getSenderNumber() {
     return $this->sender;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setSender($sender) {
-    $this->sender = $sender;
+  public function setSenderNumber($number) {
+    $this->sender = $number;
     return $this;
   }
 

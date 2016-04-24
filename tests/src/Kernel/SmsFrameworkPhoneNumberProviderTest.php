@@ -157,7 +157,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $this->resetTestMessages();
     $sms_message = new SmsMessage();
     $sms_message
-      ->setSender('+999888777')
+      ->setSenderNumber('+999888777')
       ->setMessage($this->randomString());
     $this->setExpectedException(\Drupal\sms\Exception\NoPhoneNumberException::class);
     $this->phoneNumberProvider->sendMessage($entity, $sms_message);
@@ -176,7 +176,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
 
     $sms_message = new SmsMessage();
     $sms_message
-      ->setSender('+999888777')
+      ->setSenderNumber('+999888777')
       ->setMessage($this->randomString());
     $this->phoneNumberProvider->sendMessage($entity, $sms_message);
     $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
