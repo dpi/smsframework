@@ -10,6 +10,7 @@ namespace Drupal\sms\Plugin\QueueWorker;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -82,8 +83,16 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
       $id = $data['id'];
       /** @var \Drupal\sms\Entity\SmsMessageInterface $sms_message */
       if ($sms_message = $this->smsMessageStorage->load($id)) {
-        $this->smsProvider
-          ->send($sms_message, []);
+        switch ($sms_message->getDirection()) {
+          case SmsMessage::DIRECTION_INCOMING:
+            $this->smsProvider
+              ->incoming($sms_message, []);
+            break;
+          case SmsMessage::DIRECTION_OUTGOING:
+            $this->smsProvider
+              ->send($sms_message, []);
+            break;
+        }
 
         $duration = NULL;
         if ($gateway = $sms_message->getGateway()) {
