@@ -21,12 +21,50 @@ sms_user.settings:
                 end:
                   type: string
                   label: 'End time in PHP strtotime natural language.'
-    registration_enabled:
-      type: boolean
-      label: 'Enable registration of new users via SMS'
-    allow_password:
-      type: boolean
-      label: 'Allow password creation when registering via SMS'
-    new_account_message:
-      type: string
-      label: 'New user message via SMS'
+    account_registration:
+      type: mapping
+      label: 'Options to create user accounts when a message is received.'
+      mapping:
+        all_unknown_numbers:
+          label: 'Create user accounts for all phone numbers not associated with existing users.'
+          type: mapping
+          mapping:
+            status:
+              type: boolean
+              label: 'Enable account creation based on unrecognised phone numbers.'
+            reply:
+              type: mapping
+              mapping:
+                status:
+                  type: boolean
+                  label: 'Enable reply message'
+                message:
+                  type: string
+                  label: 'The reply message when an account was successfully created.'
+        formatted:
+          type: mapping
+          mapping:
+            status:
+              type: boolean
+              label: 'Enable account creation based on incoming message patterns.'
+            incoming_messages:
+              type: sequence
+              label: 'Incoming message patterns.'
+              sequence:
+               - type: string
+                 label: 'An incoming message pattern matcher.'
+            activation_email:
+              type: boolean
+              label: 'Option to send an account email if email address is present and password is omitted.'
+            reply:
+              type: mapping
+              mapping:
+                status:
+                  type: boolean
+                  label: 'Enable reply message'
+                message:
+                  type: string
+                  label: 'The reply message when an account was successfully created.'
+                message_failure:
+                  type: string
+                  label: 'The reply message when an account creation failed.'

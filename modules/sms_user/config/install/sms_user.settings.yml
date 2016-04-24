@@ -1,6 +1,21 @@
 active_hours:
   status: false
   ranges: []
-registration_enabled: false
-allow_password: false
-new_account_message: ''
+account_registration:
+  all_unknown_numbers:
+    status: false
+    reply:
+      status: false
+      message: 'Hi, your [site:name] account is ready. Your username is [user:account-name] your password is [user:password].'
+  formatted:
+    status: false
+    incoming_messages:
+      - |
+        E [email]
+        U [username]
+    activation_email: true
+    reply:
+      status: false
+      message: 'Hi [user:account-name], you will receive an activation email shortly - [site:name]'
+      message_failure: 'There was a problem creating your account: [error]'
+

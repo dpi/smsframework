@@ -7,7 +7,8 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
-use Drupal\user\Entity\User;
+use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Entity\SmsMessage as SmsMessageEntity;
 
 /**
  * Implements hook_entity_presave().
@@ -22,95 +23,18 @@ function sms_user_entity_presave(EntityInterface $entity) {
 }
 
 /**
- * Registers a new user via SMS
- *
- * @param string $number
- *   The user's mobile number.
- * @param string $message
- *   Body of the SMS message.
- * @param array $options
- *   An associative array of metadata passed from the incoming gateway.
- *
- * @return object|bool
- *   The user object of the created user, false if registration failed.
- *
- * @deprecated
- *   Needs to be migrated to a service, rework with phone number provider
- *   system.
+ * Implements hook_sms_incoming().
  */
-function sms_user_register_new_user($number, $message, $options) {
-  $edit = array();
+function sms_user_sms_incoming($op, SmsMessageInterface $sms_message, array $options) {
+  if ($op == 'pre process') {
+    /** @var \Drupal\sms_user\AccountRegistrationInterface $account_registration */
+    $account_registration = \Drupal::service('sms_user.account_registration');
 
-  // If we have a from address from the e-mail gateway, use it, otherwise
-  // leave the e-mail fields blank.
-  $mail = isset($options['sms_email_gateway_from']) ? $options['sms_email_gateway_from'] : '';
+    // Upgrade standard SMS message to entity.
+    // @todo Remove after ->createAccount works with standard SMS messages
+    // @see https://www.drupal.org/node/2709469
+    $sms_message = SmsMessageEntity::convertFromSmsMessage($sms_message);
 
-  // Pass in sms_user specific data for saving.
-  $edit['sms_user'] = array(
-    'number' => $number,
-    'status' => SMS_USER_SMS_REGISTERED,
-    'code' => '',
-    'gateway' => array(),
-  );
-
-  $edit['timezone'] = '';
-  // If by chance there's already a user with the same email address, then use
-  // it instead of creating a new user.
-  $ids = \Drupal::entityQuery('user')
-    ->condition('mail', $mail)
-    ->execute();
-  if (!empty($mail) && ($account = array_shift(User::loadMultiple($ids)))) {
-    $account = User::create($edit);
+    $account_registration->createAccount($sms_message);
   }
-  else {
-    $edit['mail'] = $edit['init'] = $mail;
-
-    $config = \Drupal::config('sms_user.settings');
-    // Add password if enabled.
-    if ($config->get('allow_password')) {
-      $lines = explode("\n", $message);
-      $words = explode(" ", $lines[0]);
-      foreach ($words as $word) {
-        if (trim($word)) {
-          $edit['pass'] = preg_replace('/\s+/', '-', $word);
-          break;
-        }
-      }
-    }
-    // Auto-generated password.
-    if (!isset($edit['pass']) || !$edit['pass']) {
-      $edit['pass'] = user_password();
-    }
-
-    // Pick a pseudo-random name for the user -- using the email
-    // address would be a privacy violation.
-    $edit['name'] = substr(md5($number . strval(REQUEST_TIME)), 0, 10);
-
-    // Save the user.
-    $edit['status'] = \Drupal::config('user.settings')->get('register') == USER_REGISTER_VISITORS;
-    $account = User::create($edit);
-    $account->save();
-    \Drupal::logger('sms_user')->info('%name was created using SMS.', array('%name' => $account->getUsername()));
-  }
-
-  // Verify that the account was created.
-  if (is_object($account)) {
-    $metadata = array(
-      'register' => TRUE,
-      'number' => $number,
-      'message' => $message,
-      'options' => $options,
-    );
-    ##sms_user_login_metadata($account->id(), $metadata);
-    if ($account->isActive()) {
-      // User account is directly enabled.
-      ##_sms_user_switch($account);
-    }
-    \Drupal::moduleHandler()->invokeAll('user_login', $edit, $account);
-
-    return $account;
-  }
-
-  return FALSE;
-
 }

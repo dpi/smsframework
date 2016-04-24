@@ -86,10 +86,28 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Test message is queued and received on cron run.
+   */
+  public function testQueueIncoming() {
+    $sms_message = $this->createSmsMessage()
+      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING);
+
+    // @todo sms_test_gateway_sms_incoming() requires an incoming recipient.
+    $sms_message->addRecipients($this->randomPhoneNumbers());
+
+    $this->smsProvider->queue($sms_message);
+    $this->assertEquals(0, count($this->getTestMessages($this->gateway)), 'Message not received yet.');
+
+    $this->cronService->run();
+    $this->assertEquals($sms_message->getMessage(), sms_test_gateway_get_incoming('process')['message'], 'Message was received.');
+  }
+
+  /**
    * Test message is queued and sent on cron run.
    */
-  public function testQueue() {
-    $sms_message = $this->createSmsMessage();
+  public function testQueueOutgoing() {
+    $sms_message = $this->createSmsMessage()
+      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
     $this->smsProvider->queue($sms_message);
     $this->assertEquals(0, count($this->getTestMessages($this->gateway)), 'Message not sent yet.');
 

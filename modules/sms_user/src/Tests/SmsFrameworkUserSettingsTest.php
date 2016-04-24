@@ -141,4 +141,150 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
     $this->assertRaw(t('If active hours hours are enabled there must be at least one enabled day.'));
   }
 
+  /**
+   * Test account registrations are off.
+   */
+  public function testAccountRegistrationOff() {
+    $edit = [
+      'account_registration[behaviour]' => 'none',
+    ];
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->assertRaw(t('The configuration options have been saved.'));
+
+    $settings = $this->config('sms_user.settings')->get('account_registration');
+    $this->assertFalse($settings['all_unknown_numbers']['status']);
+    $this->assertFalse($settings['formatted']['status']);
+  }
+
+  /**
+   * Test fallback token list for when token.module not available.
+   */
+  public function testAccountRegistrationReplyTokens() {
+    $this->drupalGet(Url::fromRoute('sms_user.options'));
+    $this->assertResponse(200);
+    $this->assertRaw('Available tokens include: [sms-message:*] [user:*]');
+  }
+
+  /**
+   * Test account registrations for unrecognised numbers saves to config.
+   */
+  public function testAccountRegistrationUnrecognised() {
+    $reply_message = $this->randomString();
+    $edit = [
+      'account_registration[behaviour]' => 'all',
+      'account_registration[all_options][reply_status]' => TRUE,
+      'account_registration[all_options][reply][message]' => $reply_message,
+    ];
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->assertRaw(t('The configuration options have been saved.'));
+
+    $settings = $this->config('sms_user.settings')->get('account_registration');
+
+    // Status
+    $this->assertTrue($settings['all_unknown_numbers']['status']);
+    $this->assertFalse($settings['formatted']['status']);
+
+    // Settings
+    $this->assertTrue($settings['all_unknown_numbers']['reply']['status']);
+    $this->assertEqual($reply_message, $settings['all_unknown_numbers']['reply']['message']);
+  }
+
+  /**
+   * Test account registrations for preformatted saves to config.
+   */
+  public function testAccountRegistrationPreformatted() {
+    $incoming_message = '[email] ' . $this->randomString();
+    $reply_message_success = $this->randomString();
+    $reply_message_failure = $this->randomString();
+    $edit = [
+      'account_registration[behaviour]' => 'formatted',
+      'account_registration[formatted_options][incoming_message]' => $incoming_message,
+      'account_registration[formatted_options][activation_email]' => TRUE,
+      'account_registration[formatted_options][reply_status]' => TRUE,
+      'account_registration[formatted_options][reply][message_success]' => $reply_message_success,
+      'account_registration[formatted_options][reply][message_failure]' => $reply_message_failure,
+    ];
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->assertRaw(t('The configuration options have been saved.'));
+
+    $settings = $this->config('sms_user.settings')->get('account_registration');
+
+    // Status
+    $this->assertFalse($settings['all_unknown_numbers']['status']);
+    $this->assertTrue($settings['formatted']['status']);
+
+    // Settings
+    $this->assertEqual($incoming_message, $settings['formatted']['incoming_messages'][0]);
+    $this->assertTrue($settings['formatted']['activation_email']);
+    $this->assertTrue($settings['formatted']['reply']['status']);
+    $this->assertEqual($reply_message_success, $settings['formatted']['reply']['message']);
+    $this->assertEqual($reply_message_failure, $settings['formatted']['reply']['message_failure']);
+  }
+
+  /**
+   * Test account registrations validation failures on empty replies.
+   */
+  public function testAccountRegistrationValidationEmptyReplies() {
+    $edit = [
+      'account_registration[behaviour]' => 'all',
+      'account_registration[all_options][reply_status]' => TRUE,
+      'account_registration[all_options][reply][message]' => '',
+    ];
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->assertRaw('Reply message must have a value if reply is enabled.', 'Validation failed for message on all unrecognised numbers when reply status is enabled.');
+
+    $edit = [
+      'account_registration[behaviour]' => 'formatted',
+      'account_registration[formatted_options][reply_status]' => TRUE,
+      'account_registration[formatted_options][reply][message_success]' => '',
+    ];
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->assertRaw('Reply message must have a value if reply is enabled.', 'Validation failed for message_success on formatted when reply status is enabled.');
+
+    $edit = [
+      'account_registration[behaviour]' => 'formatted',
+      'account_registration[formatted_options][reply_status]' => TRUE,
+      'account_registration[formatted_options][reply][message_failure]' => '',
+    ];
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->assertRaw('Reply message must have a value if reply is enabled.', 'Validation failed for message_failure on formatted when reply status is enabled.');
+  }
+
+  /**
+   * Test account registrations validation failures on empty replies.
+   */
+  public function testAccountRegistrationValidationPreformatted() {
+    $edit = [
+      'account_registration[behaviour]' => 'formatted',
+      'account_registration[formatted_options][incoming_message]' => '',
+    ];
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->assertRaw('Incoming message must be filled if using pre-formatted option');
+
+    $edit = [
+      'account_registration[behaviour]' => 'formatted',
+      'account_registration[formatted_options][activation_email]' => TRUE,
+      'account_registration[formatted_options][incoming_message]' => $this->randomString(),
+    ];
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->assertRaw('Activation email cannot be sent if [email] placeholder is missing.');
+
+    $edit = [
+      'account_registration[behaviour]' => 'formatted',
+      'account_registration[formatted_options][activation_email]' => TRUE,
+      'account_registration[formatted_options][incoming_message]' => 'E [email] P [password]',
+    ];
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->assertRaw('Activation email cannot be sent if [password] placeholder is present.');
+
+    // Placeholder seperation.
+    // Tests separator so regex doesn't have problems.
+    $edit = [
+      'account_registration[behaviour]' => 'formatted',
+      'account_registration[formatted_options][incoming_message]' => 'Email [email][password]',
+    ];
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->assertRaw('There must be a separator between placeholders.');
+  }
+
 }

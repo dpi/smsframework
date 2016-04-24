@@ -33,12 +33,6 @@ class SmsTrackArchiveTest extends WebTestBase {
     );
     $this->drupalPostForm('admin/config/smsframework/sms_track', $archiving_settings, t('Save'));
 
-    $sms_user_settings = array(
-      'registration_enabled' => FALSE,
-      'allow_password' => FALSE,
-    );
-    $this->drupalPostForm('admin/config/smsframework/sms_user_options', $sms_user_settings, t('Save configuration'));
-
     // Confirm author number.
     $edit = array('number' => '1234567890');
     $this->drupalPostForm('user/' . $author->id() . '/mobile', $edit, t('Confirm number'));

@@ -1,0 +1,82 @@
+<?php
+
+/**
+ * @file
+ * Contains \Drupal\Tests\sms_user\Kernel\SmsFrameworkUserTest.
+ */
+
+namespace Drupal\Tests\sms_user\Kernel;
+
+use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
+use Drupal\sms\Entity\SmsMessage;
+use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Entity\PhoneNumberSettings;
+
+/**
+ * General tests for SMS User.
+ *
+ * @group SMS Framework
+ */
+class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = ['system', 'sms', 'sms_user', 'sms_test_gateway', 'user', 'telephone', 'dynamic_entity_reference', 'field'];
+
+  /**
+   * @var \Drupal\sms\Provider\SmsProviderInterface
+   *
+   * The default SMS provider.
+   */
+  protected $smsProvider;
+
+  /**
+   * A memory gateway.
+   *
+   * @var \Drupal\sms\Entity\SmsGatewayInterface
+   */
+  protected $gateway;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+    $this->installSchema('system', ['sequences']);
+    $this->installConfig('sms_user');
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('sms');
+    $this->installEntitySchema('sms_phone_number_verification');
+    $this->smsProvider = $this->container->get('sms_provider');
+    $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
+    $this->smsProvider->setDefaultGateway($this->gateway);
+  }
+
+  /**
+   * Ensure sms_user.account_registration service does not crash and burn if
+   * there are no phone number settings for user.user.
+   */
+  public function testAccountRegistrationNoPhoneSettings() {
+    $this->config('sms_user.settings')
+      ->set('account_registration.all_unknown_numbers.status', 1)
+      ->set('account_registration.all_unknown_numbers.reply.status', 1)
+      ->save();
+
+    $message = $this->randomString();
+    $incoming = SmsMessage::create()
+      ->setSenderNumber('+123')
+      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING)
+      ->setMessage($message)
+      ->addRecipients($this->randomPhoneNumbers(1));
+    $this->smsProvider->queue($incoming);
+
+    $this->assertEquals($message, sms_test_gateway_get_incoming('process')['message']);
+    // Make sure the phone number settings does not exist, in case it makes its
+    // way into this test in the future.
+    $this->assertNull(PhoneNumberSettings::load('user.user'), 'No phone numbser settings for user.user.');
+  }
+
+}
