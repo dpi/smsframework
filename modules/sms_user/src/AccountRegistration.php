@@ -174,7 +174,7 @@ class AccountRegistration implements AccountRegistrationInterface {
     if (!empty($this->settings('formatted.incoming_messages.0'))) {
       $incoming_form = $this->settings('formatted.incoming_messages.0');
       $incoming_form = str_replace("\r\n", "\n", $incoming_form);
-      $compiled = $this->compileFormRegex($incoming_form);
+      $compiled = $this->compileFormRegex($incoming_form, '/');
       $matches = [];
       if (preg_match_all('/^' . $compiled . '$/', $sms_message->getMessage(), $matches)) {
         $contains_email = strpos($incoming_form, '[email]') !== FALSE;
@@ -275,11 +275,13 @@ class AccountRegistration implements AccountRegistrationInterface {
    *
    * @param string $form_string
    *   A incoming form configuration message.
+   * @param string $delimiter
+   *   The delimiter to escape, as used by preg_match*().
    *
    * @return string
    *   A regular expression.
    */
-  protected function compileFormRegex($form_string) {
+  protected function compileFormRegex($form_string, $delimiter) {
     $placeholders = ['username' => '.+', 'email' => '\S+', 'password' => '.+'];
 
     // Placeholders enclosed in square brackets and escaped for use in regular
@@ -320,7 +322,7 @@ class AccountRegistration implements AccountRegistrationInterface {
       }
       else {
         // Text is not a placeholder, do not convert to a capture group.
-        $compiled .= preg_quote($word);
+        $compiled .= preg_quote($word, $delimiter);
       }
     }
 
