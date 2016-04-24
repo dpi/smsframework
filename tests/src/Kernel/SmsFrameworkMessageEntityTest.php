@@ -135,19 +135,6 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Tests sender phone number.
-   *
-   * @covers ::getSenderNumber
-   * @covers ::setSenderNumber
-   */
-  public function testSenderNumber() {
-    $number = '1234567890';
-    $sms_message = $this->createSmsMessage();
-    $sms_message->setSenderNumber($number);
-    $this->assertEquals($number, $sms_message->getSenderNumber());
-  }
-
-  /**
    * Tests sender entity.
    *
    * @covers ::getSenderEntity
