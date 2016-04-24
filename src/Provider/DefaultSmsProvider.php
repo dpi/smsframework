@@ -65,7 +65,6 @@ class DefaultSmsProvider implements SmsProviderInterface {
         case SmsMessageEntityInterface::DIRECTION_OUTGOING:
           $this->send($sms_message, []);
           return;
-
       }
       return;
     }
