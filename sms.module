@@ -59,6 +59,7 @@ function sms_entity_delete(EntityInterface $entity) {
     return;
   }
 
+  /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
   $phone_number_provider = \Drupal::service('sms.phone_number');
 
   // Check the entity uses phone numbers. To save on a SQL call, and to prevent
@@ -94,7 +95,7 @@ function _sms_entity_postsave(EntityInterface $entity) {
 
   try {
     $phone_number_settings = $phone_number_provider->getPhoneNumberSettingsForEntity($entity);
-    $field_name = $phone_number_settings->get('fields.phone_number');
+    $field_name = $phone_number_settings->getFieldName('phone_number');
     if (!empty($field_name)) {
       $items_original = &$entity->original->{$field_name};
       $items = &$entity->{$field_name};

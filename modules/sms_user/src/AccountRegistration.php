@@ -87,9 +87,9 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @inheritdoc
    */
   public function createAccount(SmsMessageInterface $sms_message) {
-    // @fixme, use phone number provider to get settings.
-    // @see https://www.drupal.org/node/2709465
-    if (!$this->userPhoneNumberSettings = PhoneNumberSettings::load('user.user')) {
+    $this->userPhoneNumberSettings = $this->phoneNumberProvider
+      ->getPhoneNumberSettings('user', 'user');
+    if (!$this->userPhoneNumberSettings) {
       // Can't do anything if there is no phone number settings for user.
       return;
     }

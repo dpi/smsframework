@@ -93,9 +93,9 @@ class VerifyPhoneNumberForm extends FormBase {
 
     if ($phone_verification && !$phone_verification->getStatus()) {
       $entity = $phone_verification->getEntity();
-      $config = $this->phoneNumberProvider
+      $phone_number_settings = $this->phoneNumberProvider
         ->getPhoneNumberSettingsForEntity($entity);
-      $lifetime = $config->get('verification_code_lifetime') ?: 0;
+      $lifetime = $phone_number_settings->getVerificationCodeLifetime() ?: 0;
 
       if ($current_time > $phone_verification->getCreatedTime() + $lifetime) {
         $form_state->setError($form['code'], $this->t('Verification code is expired.'));
