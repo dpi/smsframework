@@ -9,15 +9,14 @@ use Drupal\sms\Message\SmsMessageInterface;
 /**
  * Implements hook_sms_incoming().
  */
-function sms_test_gateway_sms_incoming($op, SmsMessageInterface $sms, array $options) {
+function sms_test_gateway_sms_incoming_preprocess(SmsMessageInterface $sms_message) {
   // Save incoming result for later retrieval.
-  $key = 'sms_test_gateway_get_incoming' . $op;
+  $key = 'sms_test_gateway_sms_incoming_preprocess';
   $result = &drupal_static($key);
 
-  if (!is_null($sms->getRecipients()) && !is_null($sms->getMessage())) {
-    $result['number'] = $sms->getRecipients()[0];
-    $result['message'] = $sms->getMessage();
-    $result['options'] = $options;
+  if (!is_null($sms_message->getRecipients()) && !is_null($sms_message->getMessage())) {
+    $result['number'] = $sms_message->getRecipients()[0];
+    $result['message'] = $sms_message->getMessage();
     \Drupal::state()->set($key, $result);
   }
 }

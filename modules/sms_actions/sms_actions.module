@@ -9,9 +9,9 @@
 use Drupal\sms\Message\SmsMessage;
 
 /**
- * Implementation of hook_sms_incoming()
+ * Implementation of hook_sms_incoming_postprocess()
  */
-function sms_actions_sms_incoming($op, $number, $message) {
+function sms_actions_sms_incoming_postprocess($sms_message) {
   if ($op == 'process') {
     $commands = sms_actions_get_commands();
     foreach ($commands as $command) {
