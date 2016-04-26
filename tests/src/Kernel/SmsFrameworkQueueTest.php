@@ -99,7 +99,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
     $this->assertEquals(0, count($this->getTestMessages($this->gateway)), 'Message not received yet.');
 
     $this->cronService->run();
-    $this->assertEquals($sms_message->getMessage(), sms_test_gateway_get_incoming('process')['message'], 'Message was received.');
+    $this->assertEquals($sms_message->getMessage(), sms_test_gateway_get_incoming()['message'], 'Message was received.');
   }
 
   /**

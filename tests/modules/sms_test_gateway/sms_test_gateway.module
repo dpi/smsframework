@@ -21,8 +21,8 @@ function sms_test_gateway_sms_incoming_preprocess(SmsMessageInterface $sms_messa
   }
 }
 
-function sms_test_gateway_get_incoming($op, $reset = FALSE) {
-  $key = __FUNCTION__ . $op;
+function sms_test_gateway_get_incoming($reset = FALSE) {
+  $key = 'sms_test_gateway_sms_incoming_preprocess';
   $result = &drupal_static($key);
 
   if (!isset($result)) {
