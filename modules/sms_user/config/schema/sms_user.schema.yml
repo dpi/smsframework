@@ -4,12 +4,6 @@ sms_user.settings:
   type: config_object
   label: 'SMS User settings'
   mapping:
-    registration_form:
-      type: integer
-      label: 'Show mobile fields during user registration'
-    confirmation_message:
-      type: string
-      label: 'Confirmation message format'
     active_hours:
       type: mapping
       mapping:

@@ -1,5 +1,3 @@
-registration_form: 0
-confirmation_message: '[site:name] confirmation code: '
 active_hours:
   status: false
   ranges: []
@@ -20,3 +18,4 @@ account_registration:
       status: false
       message: 'Hi [user:account-name], you will receive an activation email shortly - [site:name]'
       message_failure: 'There was a problem creating your account: [error]'
+
