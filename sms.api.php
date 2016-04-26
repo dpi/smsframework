@@ -19,7 +19,7 @@ function hook_sms_gateway_info_alter(&$gateways) {
 }
 
 /**
- * Called before the SMS message is processed to the gateway plugin.
+ * Called before the SMS message is processed by the gateway plugin.
  *
  * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
  *   A SMS message.
