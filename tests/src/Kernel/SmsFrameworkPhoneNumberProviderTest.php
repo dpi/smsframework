@@ -14,6 +14,7 @@ use Drupal\sms\Entity\PhoneNumberSettings;
 use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Entity\PhoneNumberVerificationInterface;
+use Drupal\sms\Entity\PhoneNumberSettingsInterface;
 
 /**
  * Tests Phone Number Provider.
@@ -210,13 +211,13 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
    */
   public function testGetPhoneNumberSettings() {
     $return = $this->phoneNumberProvider->getPhoneNumberSettings($this->randomMachineName(), $this->randomMachineName());
-    $this->assertEmpty($return->get());
+    $this->assertNull($return, 'Phone number settings does not exist.');
 
     $return = $this->phoneNumberProvider->getPhoneNumberSettings('entity_test', $this->randomMachineName());
-    $this->assertEmpty($return->get());
+    $this->assertNull($return, 'Phone number settings does not exist.');
 
     $return = $this->phoneNumberProvider->getPhoneNumberSettings('entity_test', 'entity_test');
-    $this->assertNotEmpty($return->get());
+    $this->assertTrue($return instanceof PhoneNumberSettingsInterface);
   }
 
   /**
@@ -242,7 +243,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
   public function testGetPhoneNumberSettingsForEntity() {
     $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings);
     $return = $this->phoneNumberProvider->getPhoneNumberSettingsForEntity($entity);
-    $this->assertNotEmpty($return->get());
+    $this->assertTrue($return instanceof PhoneNumberSettingsInterface);
   }
 
   /**

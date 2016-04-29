@@ -56,8 +56,8 @@ interface PhoneNumberProviderInterface {
    * @param $bundle
    *   An entity bundle.
    *
-   * @return \Drupal\Core\Config\ImmutableConfig
-   *   A 'sms.phone.*' configuration object.
+   * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|NULL
+   *   A phone number settings entity, or NULL if it does not exist.
    */
   public function getPhoneNumberSettings($entity_type_id, $bundle);
 
@@ -67,8 +67,8 @@ interface PhoneNumberProviderInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to get settings.
    *
-   * @return \Drupal\Core\Config\ImmutableConfig
-   *   A 'sms.phone.*' configuration object.
+   * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|NULL
+   *   A phone number settings entity, or NULL if it does not exist.
    *
    * @throws \Drupal\sms\Exception\PhoneNumberSettingsException
    *   Thrown if entity is not configured for phone numbers.
