@@ -35,7 +35,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
   protected $phoneField;
 
   /**
-   * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
+   * @var PhoneNumberSettingsInterface
    */
   protected $phoneNumberSettings;
 
