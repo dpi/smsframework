@@ -203,7 +203,7 @@ function sms_incoming_queue_worker(array $item) {
 function sms_incoming($number, $message, array $options = array()) {
   $sender = isset($options['sender']) ? $options['sender'] : '';
   $sms = new SmsMessage($sender, explode(',', $number), $message, $options, \Drupal::currentUser()->id());
-  \Drupal::service('sms_provider')->incoming($sms, $options);
+  \Drupal::service('sms_provider')->incoming($sms);
 }
 
 /**

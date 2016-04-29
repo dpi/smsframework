@@ -85,23 +85,14 @@ function sms_track_sms_send_process($op, SmsMessageInterface $sms, array $option
 
 
 /**
- * Implements hook_sms_incoming().
- *
- * @param string $op
- *   SMS incoming operation string (pre process, process, post process).
- * @param \Drupal\sms\Message\SmsMessageInterface $sms
- *   The SMS message object.
- * @param array $options
- *   Additional options including receiver MSISDN.
+ * Implements hook_sms_incoming_preprocess().
  */
-function sms_track_sms_incoming($op, SmsMessageInterface $sms, array $options) {
-  $message = $sms->getMessage();
-  if ($op == 'pre process') {
-    // Archiving (incoming == 1)
-    $dir = 1;
-    foreach ($sms->getRecipients() as $number) {
-      sms_track_archive_write($dir, $number, $message, $options);
-    }
+function sms_track_sms_incoming_preprocess(SmsMessageInterface $sms_message) {
+  $message = $sms_message->getMessage();
+  // Archiving (incoming == 1)
+  $dir = 1;
+  foreach ($sms_message->getRecipients() as $number) {
+    sms_track_archive_write($dir, $number, $message, []);
   }
 }
 

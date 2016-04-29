@@ -532,20 +532,18 @@ function sms_user_token_info() {
 }
 
 /**
- * Implements hook_sms_incoming().
+ * Implements hook_sms_incoming_preprocess().
  */
-function sms_user_sms_incoming($op, SmsMessageInterface $sms_message, array $options) {
-  if ($op == 'pre process') {
-    /** @var \Drupal\sms_user\AccountRegistrationInterface $account_registration */
-    $account_registration = \Drupal::service('sms_user.account_registration');
+function sms_user_sms_incoming_preprocess(SmsMessageInterface $sms_message) {
+  /** @var \Drupal\sms_user\AccountRegistrationInterface $account_registration */
+  $account_registration = \Drupal::service('sms_user.account_registration');
 
-    // Upgrade standard SMS message to entity.
-    // @todo Remove after ->createAccount works with standard SMS messages
-    // @see https://www.drupal.org/node/2709469
-    $sms_message = SmsMessageEntity::convertFromSmsMessage($sms_message);
+  // Upgrade standard SMS message to entity.
+  // @todo Remove after ->createAccount works with standard SMS messages
+  // @see https://www.drupal.org/node/2709469
+  $sms_message = SmsMessageEntity::convertFromSmsMessage($sms_message);
 
-    $account_registration->createAccount($sms_message);
-  }
+  $account_registration->createAccount($sms_message);
 }
 
 /**
