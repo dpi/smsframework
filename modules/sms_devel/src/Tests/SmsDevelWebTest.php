@@ -57,7 +57,7 @@ class SmsDevelWebTest extends SmsFrameworkWebTestBase {
     $this->assertText('Message received from number ' . $test_message2['number'] . ' and message: ' . $test_message2['message'], 'Successfully received message using form.');
 
     // Use sms_test_gateway_get_incoming to get the incoming sms.
-    $result = array_intersect_assoc(sms_test_gateway_get_incoming('process'), $test_message2);
+    $result = array_intersect_assoc(sms_test_gateway_get_incoming(), $test_message2);
     $this->assertEqual($result, $test_message2, 'Message was received correctly using sms_devel.');
   }
 }

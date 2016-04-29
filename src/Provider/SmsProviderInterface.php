@@ -64,18 +64,10 @@ interface SmsProviderInterface {
   /**
    * Handles a message received by the server.
    *
-   * Allows gateways to pass messages in a standard format for processing.
-   * Every implementation of hook_sms_incoming() will be invoked by this method.
-   *
-   * Additionally, 'sms_incoming' rules event will be invoked if rules module is
-   * enabled.
-   *
    * @param \Drupal\sms\Message\SmsMessageInterface
    *   The message received.
-   * @param array
-   *   Additional options to be passed to the SMS gateway.
    */
-  public function incoming(SmsMessageInterface $sms, array $options);
+  public function incoming(SmsMessageInterface $sms_message);
 
   /**
    * Handles responses to the SMS provider from gateways.
