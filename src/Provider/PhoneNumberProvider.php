@@ -152,6 +152,21 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   /**
    * {@inheritdoc}
    */
+  public function getPhoneVerificationByPhoneNumber($phone_number, $verified = TRUE, $entity_type = NULL) {
+    $properties['phone'] = $phone_number;
+    if (isset($entity_type)) {
+      $properties['entity__target_type'] = $entity_type;
+    }
+    if (isset($verified)) {
+      $properties['status'] = (int)$verified;
+    }
+    return $this->phoneNumberVerificationStorage
+      ->loadByProperties($properties);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number) {
     $entities = $this->phoneNumberVerificationStorage
       ->loadByProperties([

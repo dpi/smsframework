@@ -76,11 +76,6 @@ class AccountRegistration implements AccountRegistrationInterface {
     $this->token = $token;
     $this->smsProvider = $sms_provider;
     $this->phoneNumberProvider = $phone_number_provider;
-
-    // @fixme.  number resolution should move to a method on
-    // @see https://www.drupal.org/node/2709463
-    $this->phoneNumberVerificationStorage = \Drupal::entityTypeManager()
-      ->getStorage('sms_phone_number_verification');
   }
 
   /**
@@ -97,14 +92,9 @@ class AccountRegistration implements AccountRegistrationInterface {
     $sender_number = $sms_message->getSenderNumber();
     if (!empty($sender_number)) {
       // Any users with this phone number?
-      $count = $this->phoneNumberVerificationStorage
-        ->getQuery()
-        ->condition('entity__target_type', 'user')
-        ->condition('phone', $sender_number)
-        ->count()
-        ->execute();
-
-      if (!$count) {
+      $entities = $this->phoneNumberProvider
+        ->getPhoneVerificationByPhoneNumber($sender_number, NULL, 'user');
+      if (!count($entities)) {
         if (!empty($this->settings('all_unknown_numbers.status'))) {
           $this->allUnknownNumbers($sms_message);
         }
