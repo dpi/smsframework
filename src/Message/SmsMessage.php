@@ -24,7 +24,7 @@ class SmsMessage implements SmsMessageInterface {
    *
    * @var string
    */
-  protected $sender;
+  protected $sender_phone_number;
 
   /**
    * @var array
@@ -61,7 +61,7 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * Creates a new instance of an SMS message.
    *
-   * @param $sender_number $sender
+   * @param string $sender_phone_number
    *   (optional) The senders' phone number.
    * @param array $recipients
    *   (optional) The list of recipient phone numbers for the message.
@@ -72,8 +72,8 @@ class SmsMessage implements SmsMessageInterface {
    * @param int $uid
    *   (optional) The user who created the SMS message.
    */
-  public function __construct($sender_number = NULL, array $recipients = [], $message = '', array $options = [], $uid = NULL) {
-    $this->setSenderNumber($sender_number);
+  public function __construct($sender_phone_number = NULL, array $recipients = [], $message = '', array $options = [], $uid = NULL) {
+    $this->setSenderNumber($sender_phone_number);
     $this->addRecipients($recipients);
     $this->setMessage($message);
     $this->message = $message;
@@ -86,14 +86,14 @@ class SmsMessage implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function getSenderNumber() {
-    return $this->sender;
+    return $this->sender_phone_number;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setSenderNumber($number) {
-    $this->sender = $number;
+    $this->sender_phone_number = $number;
     return $this;
   }
 
