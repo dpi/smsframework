@@ -86,7 +86,7 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
         switch ($sms_message->getDirection()) {
           case SmsMessage::DIRECTION_INCOMING:
             $this->smsProvider
-              ->incoming($sms_message, []);
+              ->incoming($sms_message);
             break;
           case SmsMessage::DIRECTION_OUTGOING:
             $this->smsProvider

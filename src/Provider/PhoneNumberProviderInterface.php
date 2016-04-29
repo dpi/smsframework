@@ -88,6 +88,27 @@ interface PhoneNumberProviderInterface {
   public function getPhoneVerificationByCode($code);
 
   /**
+   * Gets phone number verifications for a phone number.
+   *
+   * This is the primary helper to determine if a phone number is in use.
+   *
+   * It is possible for multiple entities to have the same phone number, so this
+   * helper may return more than one phone verification.
+   *
+   * @param string $phone_number
+   *   A phone number.
+   * @param boolean|NULL $verified
+   *   Whether the returned phone numbers must be verified, or NULL to get all
+   *   regardless of status.
+   * @param string $entity_type
+   *   An entity type ID to filter.
+   *
+   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface[]
+   *   An array of phone number verification entities, if any.
+   */
+  public function getPhoneVerificationByPhoneNumber($phone_number, $verified = TRUE, $entity_type = NULL);
+
+  /**
    * Gets a phone number verification for an entity and phone number pair.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
