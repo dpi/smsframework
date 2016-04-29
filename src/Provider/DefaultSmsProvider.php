@@ -16,6 +16,7 @@ use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
+use Drupal\sms\Plugin\SmsGatewayPluginIncomingInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\sms\Exception\SmsException;
@@ -57,14 +58,22 @@ class DefaultSmsProvider implements SmsProviderInterface {
    */
   public function queue(SmsMessageEntityInterface &$sms_message) {
     $gateway = $this->getGateway($sms_message);
-    if ($gateway->getSkipQueue()) {
-      $this->send($sms_message, []);
-      return;
-    }
 
     if (!$sms_message->getGateway()) {
       // @fixme getGateway being falsy is undocumented...
-      $sms_message->setGateway($this->getDefaultGateway());
+      $sms_message->setGateway($gateway);
+    }
+
+    if ($gateway->getSkipQueue()) {
+      switch ($sms_message->getDirection()) {
+        case SmsMessageEntityInterface::DIRECTION_INCOMING:
+          $this->incoming($sms_message);
+          return;
+        case SmsMessageEntityInterface::DIRECTION_OUTGOING:
+          $this->send($sms_message, []);
+          return;
+      }
+      return;
     }
 
     if ($count = $sms_message->validate()->count()) {
@@ -177,12 +186,18 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function incoming(SmsMessageInterface $sms, array $options) {
-    // @todo Implement rules event integration here for incoming SMS.
-    // Execute three phases.
-    $this->moduleHandler->invokeAll('sms_incoming', array('pre process', $sms, $options));
-    $this->moduleHandler->invokeAll('sms_incoming', array('process', $sms, $options));
-    $this->moduleHandler->invokeAll('sms_incoming', array('post process', $sms, $options));
+  public function incoming(SmsMessageInterface $sms_message) {
+    $this->moduleHandler->invokeAll('sms_incoming_preprocess', [$sms_message]);
+
+    // Process the SMS message with the gateway plugin.
+    if ($sms_message instanceof SmsMessageEntityInterface) {
+      $plugin = $sms_message->getGateway()->getPlugin();
+      if ($plugin instanceof SmsGatewayPluginIncomingInterface) {
+        $plugin->incoming($sms_message);
+      }
+    }
+
+    $this->moduleHandler->invokeAll('sms_incoming_postprocess', [$sms_message]);
   }
 
   /**

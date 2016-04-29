@@ -56,8 +56,8 @@ interface PhoneNumberProviderInterface {
    * @param $bundle
    *   An entity bundle.
    *
-   * @return \Drupal\Core\Config\ImmutableConfig
-   *   A 'sms.phone.*' configuration object.
+   * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|NULL
+   *   A phone number settings entity, or NULL if it does not exist.
    */
   public function getPhoneNumberSettings($entity_type_id, $bundle);
 
@@ -67,8 +67,8 @@ interface PhoneNumberProviderInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to get settings.
    *
-   * @return \Drupal\Core\Config\ImmutableConfig
-   *   A 'sms.phone.*' configuration object.
+   * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|NULL
+   *   A phone number settings entity, or NULL if it does not exist.
    *
    * @throws \Drupal\sms\Exception\PhoneNumberSettingsException
    *   Thrown if entity is not configured for phone numbers.
@@ -86,6 +86,27 @@ interface PhoneNumberProviderInterface {
    *   verification code.
    */
   public function getPhoneVerificationByCode($code);
+
+  /**
+   * Gets phone number verifications for a phone number.
+   *
+   * This is the primary helper to determine if a phone number is in use.
+   *
+   * It is possible for multiple entities to have the same phone number, so this
+   * helper may return more than one phone verification.
+   *
+   * @param string $phone_number
+   *   A phone number.
+   * @param boolean|NULL $verified
+   *   Whether the returned phone numbers must be verified, or NULL to get all
+   *   regardless of status.
+   * @param string $entity_type
+   *   An entity type ID to filter.
+   *
+   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface[]
+   *   An array of phone number verification entities, if any.
+   */
+  public function getPhoneVerificationByPhoneNumber($phone_number, $verified = TRUE, $entity_type = NULL);
 
   /**
    * Gets a phone number verification for an entity and phone number pair.

@@ -1,8 +1,10 @@
 langcode: en
 status: false
 dependencies:
+  enforced:
+    module:
+      - sms_user
   module:
-    - sms_user
     - user
 id: sms_user_admin
 label: 'SMS User Admin'
