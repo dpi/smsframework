@@ -8,16 +8,26 @@
 namespace Drupal\sms_track\Tests;
 
 use Drupal\Component\Utility\Xss;
-use Drupal\simpletest\WebTestBase;
+use Drupal\sms\Tests\SmsFrameworkWebTestBase;
 
 /**
  * Integration tests for the SMS Framework Track Module.
  *
  * @group SMS Framework
  */
-class SmsTrackArchiveTest extends WebTestBase {
+class SmsTrackArchiveTest extends SmsFrameworkWebTestBase {
 
-  protected static $modules = ['sms', 'sms_test_gateway', 'sms_track', 'sms_devel'];
+  public static $modules = ['sms_track', 'sms_devel'];
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
+    $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
+    $this->defaultSmsProvider
+      ->setDefaultGateway($this->gateway);
+  }
 
   /**
    * Tests recording a message sent from one site user to another.

@@ -6,6 +6,7 @@
  * sending and receiving SMS messages.
  */
 
+use Drupal\sms\Entity\SmsMessage as SmsMessageEntity;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
@@ -14,6 +15,7 @@ use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Exception\SmsException;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\sms\Entity\SmsMessageInterface;
 
 // Direction codes.
 define('SMS_DIR_NONE',  0);
@@ -133,45 +135,6 @@ function _sms_entity_postsave(EntityInterface $entity) {
 }
 
 /**
- * Sends a message using the active gateway.
- *
- * @param string $number
- *   The destination number.
- * @param string $message
- *   The text of the message to send.
- * @param array $options
- *   An array of additional properties as defined by gateway modules.
- *
- * @return bool
- *   true if the message was sent to the server, false otherwise.
- *
- * @see \Drupal\sms\Provider\DefaultSmsProvider::handleResult().
- */
-function sms_send($number, $message, array $options = array()) {
-  $sender = isset($options['sender']) ? $options['sender'] : '';
-  $sms = new SmsMessage($sender, explode(',', $number), $message, $options, \Drupal::currentUser()->id());
-  /** @var \Drupal\sms\Message\SmsMessageResultInterface $result */
-  $result = \Drupal::service('sms_provider')->send($sms, $options);
-  if ($result instanceof SmsMessageResultInterface) {
-    if ($result->getStatus()) {
-      return TRUE;
-    }
-    else {
-      // @todo Review all of this.
-      $error_message = t('Sending SMS to %number failed.', ['%number' => implode(',', $sms->getRecipients())]);
-      if ($message = $result->getErrorMessage()) {
-        $error_message .= t(' The gateway said %message.', ['%message' => $message]);
-      }
-      \Drupal::logger('sms')->error($message);
-      throw new SmsException($error_message);
-    }
-  }
-  else {
-    return FALSE;
-  }
-}
-
-/**
  * Queue worker callback for queued incoming messages.
  *
  * @param array $item
@@ -278,7 +241,19 @@ function sms_send_form_validate($form, FormStateInterface $form_state) {
  * @see sms_send_form_validate()
  */
 function sms_send_form_submit($form, FormStateInterface $form_state) {
-  sms_send(sms_formatter($form_state->getValue('number')), $form_state->getValue('message'), $form_state->getValue('gateway', array()));
+  $sms_message = SmsMessageEntity::create()
+    ->addRecipient(sms_formatter($form_state->getValue('number')))
+    ->setMessage($form_state->getValue('message'))
+    ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
+
+  // Gateway plugin form options
+  foreach ($form_state->getValue('gateway', []) as $key => $value) {
+    $sms_message->setOption($key, $value);
+  }
+
+  /** @var \Drupal\sms\Provider\SmsProviderInterface $provider */
+  $provider = \Drupal::service('sms_provider');
+  $provider->queue($sms_message);
 }
 
 /******************************************************************************
