@@ -8,6 +8,8 @@
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\SmsGateway;
+use Drupal\sms\Message\SmsMessageResultInterface;
+use Drupal\sms\Message\SmsMessage;
 
 /**
  * Tests sending SMS messages.
@@ -65,7 +67,12 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
     for ($a = 0; $a < 3; $a++) {
       foreach ($gateways as $i => &$gateway) {
         $this->defaultSmsProvider->setDefaultGateway($gateway);
-        sms_send('+123123123', $this->randomString());
+
+        $sms_message = (new SmsMessage())
+          ->addRecipients($this->randomPhoneNumbers(1))
+          ->setMessage($this->randomString());
+        $this->defaultSmsProvider->queueOut($sms_message);
+
         $message_counts[$i]++;
         foreach ($gateways as $k => $gateway2) {
           $this->assertEquals($message_counts[$k], count($this->getTestMessages($gateway2)));
@@ -84,23 +91,15 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
     $test_gateway2 = $this->createMemoryGateway(['skip_queue' => TRUE]);
     $this->defaultSmsProvider->setDefaultGateway($test_gateway1);
 
-    // Test message goes to default gateway.
-    $message = $this->randomString();
-    $number = '+123123123';
-    $options['sender'] = 'Sender';
+    $sms_message = (new SmsMessage())
+      ->addRecipients($this->randomPhoneNumbers(1))
+      ->setMessage($this->randomString());
 
-    $result = sms_send($number, $message, $options);
-    $this->assertTrue($result, 'Message successfully sent.');
-
-    $this->assertEquals(1, count($this->getTestMessages($test_gateway1)), 'Message sent to default gateway.');
-    $this->assertEquals(0, count($this->getTestMessages($test_gateway2)), 'Message not sent to extra gateway.');
-
-    // Test message goes to specified gateway.
     $options['gateway'] = $test_gateway2->id();
-    $result = sms_send($number, $message, $options);
-    $this->assertTrue($result, 'Message successfully sent.');
+    $result = $this->defaultSmsProvider->send($sms_message, $options);
+    $this->assertTrue($result instanceof SmsMessageResultInterface, 'Message successfully sent.');
+    $this->assertEquals(0, count($this->getTestMessages($test_gateway1)), 'Message not sent to the default gateway.');
     $this->assertEquals(1, count($this->getTestMessages($test_gateway2)), 'Message sent to the specified gateway.');
-    $this->assertEquals(1, count($this->getTestMessages($test_gateway1)), 'Message not sent to the default gateway.');
   }
 
 }
