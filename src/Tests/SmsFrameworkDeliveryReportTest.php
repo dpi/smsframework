@@ -22,7 +22,7 @@ class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase {
 
     $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
     $sms_message = $this->randomSmsMessage($user->id())
-      ->setOption('gateway', $test_gateway->id());
+      ->setGateway($test_gateway);
 
     $result = $this->defaultSmsProvider->send($sms_message);
 
