@@ -44,25 +44,6 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
   public function setDirection($direction);
 
   /**
-   * Get the gateway for this message.
-   *
-   * @return \Drupal\sms\Entity\SmsGatewayInterface
-   *   A gateway plugin instance.
-   */
-  public function getGateway();
-
-  /**
-   * Set the gateway for this message.
-   *
-   * @param \Drupal\sms\Entity\SmsGatewayInterface $gateway
-   *   A gateway plugin instance.
-   *
-   * @return $this
-   *   Return SMS message for chaining.
-   */
-  public function setGateway(SmsGatewayInterface $gateway);
-
-  /**
    * Get phone number of the sender.
    *
    * @return string
