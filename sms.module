@@ -15,6 +15,7 @@ use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Exception\SmsException;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\sms\Entity\SmsMessageInterface;
 
 // Direction codes.
 define('SMS_DIR_NONE',  0);
@@ -242,7 +243,8 @@ function sms_send_form_validate($form, FormStateInterface $form_state) {
 function sms_send_form_submit($form, FormStateInterface $form_state) {
   $sms_message = SmsMessageEntity::create()
     ->addRecipient(sms_formatter($form_state->getValue('number')))
-    ->setMessage($form_state->getValue('message'));
+    ->setMessage($form_state->getValue('message'))
+    ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
 
   // Gateway plugin form options
   foreach ($form_state->getValue('gateway', []) as $key => $value) {
