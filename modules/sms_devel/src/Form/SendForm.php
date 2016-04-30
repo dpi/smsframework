@@ -9,6 +9,7 @@ namespace Drupal\sms_devel\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\sms\Message\SmsMessage;
 
 class SendForm extends FormBase {
 
@@ -66,25 +67,27 @@ class SendForm extends FormBase {
    * {@inheritdoc}
    */
   function submitForm(array &$form, FormStateInterface $form_state) {
+    $phone_number = $form_state->getValue('number');
+    $message = $form_state->getValue('message');
+    $t_args = [
+      '@number'  => $phone_number,
+      '@message' => $message,
+    ];
+
     if ($form_state->getTriggeringElement()['#value'] === $form_state->getValue('submit')) {
       sms_send_form_submit($form, $form_state);
-      // Display a message to the user.
-      drupal_set_message($this->t("Form submitted ok for number @number and message: @message",
-        [
-          '@number'  => $form_state->getValue('number'),
-          '@message' => $form_state->getValue('message')
-        ]));
+      drupal_set_message($this->t('Form submitted ok for number @number and message: @message', $t_args));
     }
     elseif ($form_state->getTriggeringElement()['#value'] === $form_state->getValue('receive')) {
-      // Display a message to the user.
-      $number = $form_state->getValue('number');
-      $message = $form_state->getValue('message');
-      sms_incoming($number, $message);
-      drupal_set_message($this->t("Message received from number @number and message: @message",
-        [
-          '@number'  => $form_state->getValue('number'),
-          '@message' => $form_state->getValue('message')
-        ]));
+      $sms_message = (new SmsMessage())
+        ->addRecipient($phone_number)
+        ->setMessage($message);
+
+      /** @var \Drupal\sms\Provider\SmsProviderInterface $provider */
+      $provider = \Drupal::service('sms_provider');
+      $provider->incoming($sms_message);
+
+      drupal_set_message($this->t('Message received from number @number and message: @message', $t_args));
     }
   }
 

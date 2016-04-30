@@ -14,6 +14,7 @@
  "in_number" to simply "gw_number".
  */
 
+use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Plugin\SmsGatewayPluginInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 
@@ -80,19 +81,32 @@ function sms_devel_virtualgw_send($number, $message, $options) {
  *   Array of options.
  */
 function sms_devel_virtualgw_receiver($number = NULL, $message = NULL, $options = array()) {
+  $sms_message = SmsMessage::create();
+
   // Handle HTTP requests rather than direct function calls
-  if ($number === NULL) {
-    $number  = $_REQUEST['number'];
-    $message = (array_key_exists('message', $_REQUEST)) ? $_REQUEST['message'] : 'NO_MESSAGE';
-    $options['gw_number'] = (array_key_exists('gw_number', $_REQUEST)) ? $_REQUEST['gw_number'] : 'NO_GW_NUMBER';
-    $options['reference'] = (array_key_exists('reference', $_REQUEST)) ? $_REQUEST['reference'] : 'NO_REFERENCE';
+  if (isset($number)) {
+    $sms_message->addRecipient($number);
+    $sms_message->setMessage($message);
+  }
+  else {
+    $sms_message->addRecipient($_REQUEST['number']);
+    $sms_message->setMessage((array_key_exists('message', $_REQUEST)) ? $_REQUEST['message'] : 'NO_MESSAGE');
+    $sms_message->setOption('gw_number', (array_key_exists('gw_number', $_REQUEST)) ? $_REQUEST['gw_number'] : 'NO_GW_NUMBER');
+    $sms_message->setOption('reference', (array_key_exists('reference', $_REQUEST)) ? $_REQUEST['reference'] : 'NO_REFERENCE');
   }
 
   // Write log record for incoming message
-  sms_devel_virtualgw_log_insert(SMS_DEVEL_VIRTUALGW_TYPE_IN, $number, $message, $options);
+  $recipients = $sms_message->getRecipients();
+  sms_devel_virtualgw_log_insert(
+    SMS_DEVEL_VIRTUALGW_TYPE_IN,
+    reset($recipients),
+    $sms_message->getMessage(),
+    $sms_message->getOptions())
+  ;
 
-  // Call SMS Framework incoming message handler
-  sms_incoming($number, $message, $options);
+  /** @var \Drupal\sms\Provider\SmsProviderInterface $provider */
+  $provider = \Drupal::service('sms_provider');
+  $provider->incoming($sms_message);
 }
 
 
