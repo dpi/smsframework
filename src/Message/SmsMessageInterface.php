@@ -159,23 +159,23 @@ interface SmsMessageInterface {
   public function removeOption($name);
 
   /**
-   * Gets the name of the sender of this SMS message.
+   * Get phone number of the sender.
    *
-   * @return string|NULL
-   *   The name of the sender, or NULL if none is defined.
+   * @return string
+   *   The phone number of the sender.
    */
-  public function getSender();
+  public function getSenderNumber();
 
   /**
-   * Set the name of the sender of this SMS message.
+   * Set the phone number of the sender.
    *
-   * @param string $sender
-   *   The name of the sender.
+   * @param string $number
+   *   The phone number of the sender.
    *
    * @return $this
-   *   The called SMS message object.
+   *   Return SMS message for chaining.
    */
-  public function setSender($sender);
+  public function setSenderNumber($number);
 
   /**
    * Gets the message to be sent.

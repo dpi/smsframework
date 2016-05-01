@@ -485,7 +485,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     $new = static::create();
     $new
       ->setAutomated($sms_message->isAutomated())
-      ->setSender($sms_message->getSender())
+      ->setSenderNumber($sms_message->getSenderNumber())
       ->addRecipients($sms_message->getRecipients())
       ->setMessage($sms_message->getMessage());
 
