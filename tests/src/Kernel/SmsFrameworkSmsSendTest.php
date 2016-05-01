@@ -8,6 +8,8 @@
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\SmsGateway;
+use Drupal\sms\Message\SmsMessage;
+use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
  * Tests sending SMS messages.
@@ -75,32 +77,22 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Tests the sending of messages.
-   *
-   * Tests SMS message 'gateway' option.
+   * Tests overriding default gateway with message option.
    */
   public function testSmsSendSpecified() {
     $test_gateway1 = $this->createMemoryGateway(['skip_queue' => TRUE]);
     $test_gateway2 = $this->createMemoryGateway(['skip_queue' => TRUE]);
     $this->defaultSmsProvider->setDefaultGateway($test_gateway1);
 
-    // Test message goes to default gateway.
-    $message = $this->randomString();
-    $number = '+123123123';
-    $options['sender'] = 'Sender';
+    $sms_message = (new SmsMessage())
+      ->addRecipients($this->randomPhoneNumbers(1))
+      ->setMessage($this->randomString());
 
-    $result = sms_send($number, $message, $options);
-    $this->assertTrue($result, 'Message successfully sent.');
-
-    $this->assertEquals(1, count($this->getTestMessages($test_gateway1)), 'Message sent to default gateway.');
-    $this->assertEquals(0, count($this->getTestMessages($test_gateway2)), 'Message not sent to extra gateway.');
-
-    // Test message goes to specified gateway.
     $options['gateway'] = $test_gateway2->id();
-    $result = sms_send($number, $message, $options);
-    $this->assertTrue($result, 'Message successfully sent.');
+    $results = $this->defaultSmsProvider->send($sms_message, $options);
+    $this->assertTrue($results[0] instanceof SmsMessageResultInterface, 'Message successfully sent.');
+    $this->assertEquals(0, count($this->getTestMessages($test_gateway1)), 'Message not sent to the default gateway.');
     $this->assertEquals(1, count($this->getTestMessages($test_gateway2)), 'Message sent to the specified gateway.');
-    $this->assertEquals(1, count($this->getTestMessages($test_gateway1)), 'Message not sent to the default gateway.');
   }
 
 }
