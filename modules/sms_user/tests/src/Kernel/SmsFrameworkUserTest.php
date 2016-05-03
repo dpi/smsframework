@@ -73,7 +73,7 @@ class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
       ->addRecipients($this->randomPhoneNumbers(1));
     $this->smsProvider->queue($incoming);
 
-    $this->assertEquals($message, sms_test_gateway_get_incoming('process')['message']);
+    $this->assertEquals($message, sms_test_gateway_get_incoming()['message']);
     // Make sure the phone number settings does not exist, in case it makes its
     // way into this test in the future.
     $this->assertNull(PhoneNumberSettings::load('user.user'), 'No phone numbser settings for user.user.');

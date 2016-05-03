@@ -129,13 +129,11 @@ class SmsValidWebTest extends WebTestBase {
    */
   public function testSmsValidSettingsForm() {
     // Create two rulesets for test.
-    $ruleset = $this->randomRuleset();
-    $ruleset->prefix = '991';
+    $ruleset = $this->randomRuleset(['prefix' => '991']);
     $ruleset->rules = sms_valid_text_to_rules("23- # Explicit deny 23");
     $ruleset->save();
 
-    $ruleset = $this->randomRuleset();
-    $ruleset->prefix = '234';
+    $ruleset = $this->randomRuleset(['prefix' => '234']);
     $ruleset->rules = sms_valid_text_to_rules("56+ # Explicit allow 56");
     $ruleset->save();
 
@@ -177,8 +175,7 @@ class SmsValidWebTest extends WebTestBase {
     $this->assertFalse($result['pass'], 'Global ruleset "234" applied to invalid number');
 
     // Local number validation.
-    $ruleset = $this->randomRuleset();
-    $ruleset->prefix = '419';
+    $ruleset = $this->randomRuleset(['prefix' => '419']);
     $ruleset->rules = sms_valid_text_to_rules("80- # Explicit deny 80\n90+ # Explicit allow 90");
     $ruleset->save();
     $this->config('sms_valid.settings')->set('local_number_prefix',  '0')
@@ -212,12 +209,12 @@ class SmsValidWebTest extends WebTestBase {
     // Clear all rulesets.
     $count = count(sms_valid_get_all_rulesets());
 
-    $ruleset1 = $this->randomRuleset();
+    $ruleset1 = $this->randomRuleset(['prefix' => '123']);
     $ruleset1->iso2 = 'XX';
     $ruleset1->rules = sms_valid_text_to_rules("80- # Test 1\n90+ # Test 2");
     $ruleset1->save();
 
-    $ruleset2 = $this->randomRuleset();
+    $ruleset2 = $this->randomRuleset(['prefix' => '456']);
     $ruleset2->iso2 = 'XX';
     $ruleset2->rules = sms_valid_text_to_rules("81- # Test 1\n91+ # Test 2");
     $ruleset2->save();
@@ -258,13 +255,12 @@ class SmsValidWebTest extends WebTestBase {
    *
    * @return \Drupal\sms_valid\Entity\Ruleset
    */
-  protected function randomRuleset() {
+  protected function randomRuleset($values = []) {
     $ruleset = array(
-      'prefix' => (string) rand(1, 999),
       'name' => $this->randomMachineName(),
       'dirs_enabled' => 4,
       'iso2' => strtoupper($this->randomMachineName(1) . $this->randomMachineName(1)),
-    );
+    ) + $values;
     // Populate random rules.
     for ($i = 0; $i < rand(0, 10); $i++) {
       $ruleset['rules'][rand(1, 99)] = array(

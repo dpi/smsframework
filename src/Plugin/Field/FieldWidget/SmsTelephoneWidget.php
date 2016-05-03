@@ -47,7 +47,7 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
     $current_time = \Drupal::request()->server->get('REQUEST_TIME');
 
     $t_args['@url'] = $this->url('sms.phone.verify');
-    $lifetime = $config->get('verification_code_lifetime') ?: 0;
+    $lifetime = $config->getVerificationCodeLifetime() ?: 0;
 
     if (isset($items[$delta]->value)) {
       $phone_verification = $phone_number_provider
