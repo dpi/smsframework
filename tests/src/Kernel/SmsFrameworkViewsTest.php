@@ -21,7 +21,7 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
 
   use SmsFrameworkTestTrait;
 
-  public static $modules = ['user', 'sms', 'sms_test_gateway', 'sms_test_views', 'telephone', 'dynamic_entity_reference', 'field'];
+  public static $modules = ['views', 'user', 'sms', 'sms_test_gateway', 'sms_test_views', 'telephone', 'dynamic_entity_reference', 'field'];
 
   /**
    * Views used by this test.
