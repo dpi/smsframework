@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\sms\Kernel;
+namespace Drupal\sms\Tests\Kernel;
 
 use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Tests\SmsFrameworkTestTrait;
