@@ -40,13 +40,13 @@ env:
     - DRUPAL_TI_ENVIRONMENT="drupal-8"
 
     # The installation profile to use:
-    - DRUPAL_TI_INSTALL_PROFILE="testing"
+    #- DRUPAL_TI_INSTALL_PROFILE="testing"
 
     # Drupal specific variables.
     - DRUPAL_TI_DB="drupal_travis_db"
-    - DRUPAL_TI_DB_URL="mysql://root:@localhost/drupal_travis_db"
+    - DRUPAL_TI_DB_URL="mysql://root:@127.0.0.1/drupal_travis_db"
     # Note: Do not add a trailing slash here.
-    - DRUPAL_TI_WEBSERVER_URL="http://localhost"
+    - DRUPAL_TI_WEBSERVER_URL="http://127.0.0.1"
     - DRUPAL_TI_WEBSERVER_PORT="8080"
 
     # Simpletest specific commandline arguments, the DRUPAL_TI_SIMPLETEST_GROUP is appended at the end.
