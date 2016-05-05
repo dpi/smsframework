@@ -38,4 +38,16 @@ class SmsGateway extends Plugin {
    */
   protected $outgoing_message_max_recipients;
 
+  /**
+   * Whether the gateway is capable of delaying messages until a date.
+   *
+   * Schedule aware gateways must extract sending time from all message
+   * getSendTime() method. Keep in mind this method is only available if the
+   * message is a SMS message entity. See the schedule aware gateway
+   * implementation in the test modules for an example.
+   *
+   * @var boolean
+   */
+  protected $schedule_aware;
+
 }

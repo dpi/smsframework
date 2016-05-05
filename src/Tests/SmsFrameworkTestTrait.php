@@ -29,7 +29,7 @@ trait SmsFrameworkTestTrait {
    */
   protected function createMemoryGateway($values = []) {
     $id = Unicode::strtolower($this->randomMachineName(16));
-    $gateway = SmsGateway::create([
+    $gateway = SmsGateway::create($values + [
       'plugin' => 'memory',
       'id' => $id,
       'label' => $this->randomString(),

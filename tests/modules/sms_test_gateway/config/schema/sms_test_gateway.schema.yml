@@ -15,3 +15,10 @@ sms_gateway.settings.memory_chunked:
     gateway_id:
       type: string
       label: 'ID of the gateway config entity.'
+
+sms_gateway.settings.memory_schedule_aware:
+  type: sms_gateway_settings
+  label: 'Schedule aware'
+  mapping:
+    gateway_id:
+      type: string

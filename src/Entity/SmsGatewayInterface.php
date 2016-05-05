@@ -83,4 +83,12 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    */
   public function getMaxRecipientsOutgoing();
 
+  /**
+   * Get whether this gateway is schedule aware.
+   *
+   * @return boolean
+   *   Whether this gateway is schedule aware.
+   */
+  public function isScheduleAware();
+
 }

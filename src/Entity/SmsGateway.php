@@ -193,4 +193,13 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
     return isset($definition['outgoing_message_max_recipients']) ? (int)$definition['outgoing_message_max_recipients'] : 1;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function isScheduleAware() {
+    $definition = $this->getPlugin()
+      ->getPluginDefinition();
+    return !empty($definition['schedule_aware']);
+  }
+
 }

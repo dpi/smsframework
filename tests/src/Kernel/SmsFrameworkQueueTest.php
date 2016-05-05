@@ -9,6 +9,7 @@ namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Entity\SmsGateway;
 
 /**
  * Tests behaviour of SMS Framework message queue.
@@ -126,6 +127,22 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
 
     $this->cronService->run();
     $this->assertEquals(0, count($this->getTestMessages($this->gateway)), 'Message not sent yet.');
+  }
+
+  /**
+   * Test message is not delayed for schedule aware gateways..
+   */
+  public function testQueueNotDelayedScheduleAware() {
+    $gateway = $this->createMemoryGateway(['plugin' => 'memory_schedule_aware']);
+
+    $sms_message = $this->createSmsMessage()
+      ->setSendTime(REQUEST_TIME + 9999)
+      ->setGateway($gateway);
+
+    $this->smsProvider->queue($sms_message);
+
+    $this->cronService->run();
+    $this->assertEquals(1, count($this->getTestMessages($gateway)), 'Message sent.');
   }
 
   /**
