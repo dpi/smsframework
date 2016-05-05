@@ -10,9 +10,9 @@ namespace Drupal\sms_user;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\sms\Provider\SmsProviderInterface;
-use Drupal\sms\Entity\PhoneNumberSettings;
 use Drupal\sms\Provider\PhoneNumberProviderInterface;
-use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
 use Drupal\user\Entity\User;
 use Drupal\Component\Utility\Random;
 use Drupal\sms\Entity\SmsMessage;
@@ -109,7 +109,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * Process an incoming message and create a user if the phone number is
    * unrecognised.
    *
-   * @param \Drupal\sms\Entity\SmsMessageInterface $sms_message
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
    *   An incoming SMS message.
    */
   protected function allUnknownNumbers(SmsMessageInterface $sms_message) {
@@ -244,11 +244,10 @@ class AccountRegistration implements AccountRegistrationInterface {
    *   Message to send as a reply.
    */
   protected function sendReply($sender_number, $user, $message) {
-    /** @var \Drupal\sms\Entity\SmsMessageInterface $sms_message */
     $sms_message = SmsMessage::create();
     $sms_message
       ->addRecipient($sender_number)
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
+      ->setDirection(SmsMessageEntityInterface::DIRECTION_OUTGOING);
 
     $data['sms-message'] = $sms_message;
     $data['user'] = $user;
