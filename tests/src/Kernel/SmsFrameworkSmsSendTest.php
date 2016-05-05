@@ -8,8 +8,8 @@
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\SmsGateway;
-use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Message\SmsMessage;
+use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
  * Tests sending SMS messages.
@@ -82,9 +82,7 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Tests the sending of messages.
-   *
-   * Tests SMS message 'gateway' option.
+   * Tests overriding default gateway with message option.
    */
   public function testSmsSendSpecified() {
     $test_gateway1 = $this->createMemoryGateway(['skip_queue' => TRUE]);
@@ -96,8 +94,8 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
       ->setMessage($this->randomString())
       ->setGateway($test_gateway2);
 
-    $result = $this->defaultSmsProvider->send($sms_message);
-    $this->assertTrue($result instanceof SmsMessageResultInterface, 'Message successfully sent.');
+    $results = $this->defaultSmsProvider->send($sms_message);
+    $this->assertTrue($results[0] instanceof SmsMessageResultInterface, 'Message successfully sent.');
     $this->assertEquals(0, count($this->getTestMessages($test_gateway1)), 'Message not sent to the default gateway.');
     $this->assertEquals(1, count($this->getTestMessages($test_gateway2)), 'Message sent to the specified gateway.');
   }

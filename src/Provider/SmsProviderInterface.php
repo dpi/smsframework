@@ -53,9 +53,10 @@ interface SmsProviderInterface {
    * @param \Drupal\sms\Message\SmsMessageInterface
    *   The message to be sent.
    *
-   * @return \Drupal\sms\Message\SmsMessageResultInterface|false
-   *   The result of the message sending operation or false if the process was
-   *   aborted by a pre-process hook.
+   * @return \Drupal\sms\Message\SmsMessageResultInterface[]
+   *   The results of the message sending operation. The message sent can be
+   *   transformed into multiple messages depending on gateway implementation.
+   *   Therefore this function can return multiple results.
    */
   public function send(SmsMessageInterface $sms);
 

@@ -79,13 +79,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
 
     // Split messages to overcome gateway limits.
     $max = $sms_message->getGateway()->getMaxRecipientsOutgoing();
-    $recipients_all = $sms_message->getRecipients();
-    if ($max > 0 && count($recipients_all) > $max) {
-      foreach ($sms_message->chunkByRecipients($max) as $sms_message) {
-        $sms_message->save();
-      }
-    }
-    else {
+    foreach ($sms_message->chunkByRecipients($max) as $sms_message) {
       $sms_message->save();
     }
   }
@@ -107,20 +101,23 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms) {
+  public function send(SmsMessageInterface $sms, array $options = array()) {
     if (!$sms->getGateway()) {
       $sms->setGateway($this->getDefaultGateway());
     }
 
-    if ($this->preProcess($sms)) {
-      $this->moduleHandler->invokeAll('sms_send', [$sms]);
-      $result = $this->process($sms);
-      $this->postProcess($sms, $result);
-      return $result;
+    $results = [];
+    $max = $sms->getGateway()->getMaxRecipientsOutgoing();
+    foreach ($sms->chunkByRecipients($max) as $sms_message) {
+      if ($this->preProcess($sms_message)) {
+        $this->moduleHandler->invokeAll('sms_send', [$sms_message]);
+        $result = $this->process($sms_message);
+        $this->postProcess($sms_message, $result);
+        $results[] = $result;
+      }
     }
-    else {
-      return FALSE;
-    }
+
+    return $results;
   }
 
   /**
