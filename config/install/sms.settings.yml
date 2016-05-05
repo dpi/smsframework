@@ -1,5 +1,4 @@
 default_gateway: log
-bootstrap_queue: { }
 country_codes:
   93: "Afghanistan"
   355: "Albania"

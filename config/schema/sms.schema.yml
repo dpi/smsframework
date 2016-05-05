@@ -7,9 +7,6 @@ sms.settings:
     default_gateway:
       type: string
       label: 'Entity ID of default SMS Gateway'
-    bootstrap_queue:
-      type: sequence
-      label: 'Bootstrap Queue'
     country_codes:
       type: sequence
       label: 'International Country Codes'
