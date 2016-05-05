@@ -101,7 +101,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms, array $options = array()) {
+  public function send(SmsMessageInterface $sms) {
     if (!$sms->getGateway()) {
       $sms->setGateway($this->getDefaultGateway());
     }
