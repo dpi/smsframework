@@ -18,19 +18,16 @@ namespace Drupal\sms\Tests;
 trait SmsFrameworkMessageTestTrait {
 
   /**
-   * Tests recipients for SMS messages.
+   * Tests sender phone number.
    *
-   * @covers ::getSender
-   * @covers ::setSender
+   * @covers ::getSenderNumber
+   * @covers ::setSenderNumber
    */
-  public function testSender() {
-    $sms_message1 = $this->createSmsMessage();
-    $this->assertEquals(NULL, $sms_message1->getSender());
-
-    $sender = $this->randomMachineName();
-    $sms_message2 = $this->createSmsMessage();
-    $sms_message2->setSender($sender);
-    $this->assertEquals($sender, $sms_message2->getSender());
+  public function testSenderNumber() {
+    $number = '1234567890';
+    $sms_message = $this->createSmsMessage();
+    $sms_message->setSenderNumber($number);
+    $this->assertEquals($number, $sms_message->getSenderNumber());
   }
 
   /**
