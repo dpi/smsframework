@@ -60,7 +60,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    * @covers ::send
    */
   public function testSend() {
-    $this->smsProvider->send($this->createSmsMessage(), []);
+    $this->smsProvider->send($this->createSmsMessage());
     $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
   }
 

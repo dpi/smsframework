@@ -215,7 +215,8 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Message\SmsMessageInterface
    */
   protected function randomSmsMessage($uid = 1) {
-    return new SmsMessage($this->randomString(), $this->randomPhoneNumbers(), $this->randomString(), [], $uid);
+    $phone_numbers = $this->randomPhoneNumbers(1);
+    return new SmsMessage($phone_numbers[0], $this->randomPhoneNumbers(), $this->randomString(), [], $uid);
   }
 
   /**

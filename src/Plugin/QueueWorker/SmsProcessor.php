@@ -90,7 +90,7 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
             break;
           case SmsMessage::DIRECTION_OUTGOING:
             $this->smsProvider
-              ->send($sms_message, []);
+              ->send($sms_message);
             break;
         }
 

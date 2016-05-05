@@ -52,7 +52,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
   /**
    * Tests saving form and verifying configuration is saved.
    */
-  function testSettingsForm() {
+  public function testSettingsForm() {
     $this->drupalGet(Url::fromRoute('sms_user.options'));
     $this->assertResponse(200);
 
@@ -101,7 +101,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
   /**
    * Tests saving form with invalid values.
    */
-  function testSettingsFormValidationFail() {
+  public function testSettingsFormValidationFail() {
     // End time < start time.
     $edit = [
       'active_hours[days][wednesday][start]' => 10,

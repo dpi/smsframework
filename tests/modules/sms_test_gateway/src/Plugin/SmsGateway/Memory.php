@@ -68,7 +68,7 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms_message, array $options) {
+  public function send(SmsMessageInterface $sms_message) {
     $state = \Drupal::state()->get('sms_test_gateway.memory.send', []);
 
     $gateway_id = $this->configuration['gateway_id'];

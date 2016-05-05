@@ -349,6 +349,12 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    */
   public function chunkByRecipients($size) {
     $recipients_all = $this->getRecipients();
+
+    // Save processing by returning early.
+    if ($size < 1 || count($recipients_all) <= $size) {
+      return [$this];
+    }
+
     // Create a baseline SMS message with recipients cleaned out.
     $base = $this->createDuplicate();
     $base->removeRecipients($recipients_all);
@@ -485,7 +491,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     $new = static::create();
     $new
       ->setAutomated($sms_message->isAutomated())
-      ->setSender($sms_message->getSender())
+      ->setSenderNumber($sms_message->getSenderNumber())
       ->addRecipients($sms_message->getRecipients())
       ->setMessage($sms_message->getMessage());
 

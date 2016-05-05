@@ -28,7 +28,6 @@ function sms_track_help($path, $arg) {
   return $output;
 }
 
-
 /**
  * Implements hook_cron().
  */
@@ -46,7 +45,7 @@ function sms_track_cron() {
 /**
  * Implements hook_sms_send().
  */
-function sms_track_sms_send(SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway) {
+function sms_track_sms_send(SmsMessageInterface $sms) {
   // Tracking.
   // Place a tracking reference on a sent message if we need to.
   if (!empty($options) && !array_key_exists('reference', $options)) {
@@ -56,24 +55,13 @@ function sms_track_sms_send(SmsMessageInterface $sms, array $options, SmsGateway
 
 /**
  * Implements hook_sms_send_process().
- *
- * @param string $op
- *   Operation string (pre process, process, post process).
- * @param \Drupal\sms\Message\SmsMessageInterface $sms
- *   The SMS message object.
- * @param array $options
- *   Additional options array including sender.
- * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
- *   Gateway array for the active gateway.
- * @param \Drupal\sms\Message\SmsMessageResultInterface $result
- *   (optional) The SMS message result from the gateway.
  */
-function sms_track_sms_send_process($op, SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway, SmsMessageResultInterface $result = NULL) {
+function sms_track_sms_send_process($op, SmsMessageInterface $sms, SmsMessageResultInterface $result = NULL) {
   if ($op == 'post process') {
     // Archiving (outgoing == 0)
     $dir = 0;
     $options = (isset($options) && is_array($options))? $options : array();
-    $options['gateway_id'] = $sms_gateway->id();
+    $options['gateway_id'] = $sms->getGateway()->id();
     $options['result']  = $result;
     $message = $sms->getMessage();
     foreach ($result->getReports() as $report) {
@@ -131,12 +119,7 @@ function sms_track_archive_write($dir, $number, $message, array $options = array
   $user = \Drupal::currentUser();
   $archive_dir = \Drupal::config('sms_track.settings')->get('archive_dir');
   // Query the database for the uid of the user that owns the $number
-  if (\Drupal::moduleHandler()->moduleExists("sms_user")) {
-    $remote_user = sms_user_get_uid($number);
-  }
-  else {
-    $remote_user = false;
-  }
+  $remote_user = FALSE;
 
   $reference = $author = $recipient = $status = NULL;
   if ($dir == 0) {

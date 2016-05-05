@@ -135,19 +135,6 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Tests sender phone number.
-   *
-   * @covers ::getSenderNumber
-   * @covers ::setSenderNumber
-   */
-  public function testSenderNumber() {
-    $number = '1234567890';
-    $sms_message = $this->createSmsMessage();
-    $sms_message->setSenderNumber($number);
-    $this->assertEquals($number, $sms_message->getSenderNumber());
-  }
-
-  /**
    * Tests sender entity.
    *
    * @covers ::getSenderEntity
@@ -259,10 +246,11 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $user = User::create(['uid' => 1, 'name' => 'user']);
     $user->save();
 
+    $sender_number = $this->randomPhoneNumbers(1);
     $original = new StandardSmsMessage('', [], '', [], NULL);
     $original
       ->setAutomated(TRUE)
-      ->setSender($this->randomMachineName())
+      ->setSenderNumber($sender_number[0])
       ->addRecipients(['123123123', '456456456'])
       ->setMessage($this->randomMachineName())
       ->setUid($user->id())
@@ -272,7 +260,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $sms_message = SmsMessage::convertFromSmsMessage($original);
 
     $this->assertEquals($original->isAutomated(), $sms_message->isAutomated());
-    $this->assertEquals($original->getSender(), $sms_message->getSender());
+    $this->assertEquals($original->getSenderNumber(), $sms_message->getSenderNumber());
     $this->assertEquals($original->getRecipients(), $sms_message->getRecipients());
     $this->assertEquals($original->getMessage(), $sms_message->getMessage());
     $this->assertEquals($user->id(), $sms_message->getSenderEntity()->id());
