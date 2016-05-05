@@ -67,7 +67,7 @@ function sms_user_get_uid($number, $status = NULL) {
  *
  * Aborts sending if the user has opted out or is in sleep mode.
  */
-function sms_user_sms_send_process($step, SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway) {
+function sms_user_sms_send_process($step, SmsMessageInterface $sms, \Drupal\sms\Message\SmsMessageResultInterface $result = NULL) {
   if ($step == 'pre process') {
     if (\Drupal::config('sms_user.settings')->get('enable_sleep', 1) && $uid = sms_user_get_uid($sms->getRecipients()[0])) {
       $account = User::load($uid);
