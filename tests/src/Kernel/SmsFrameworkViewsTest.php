@@ -7,6 +7,7 @@ use Drupal\sms\Tests\SmsFrameworkTestTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 use Drupal\views\Tests\ViewTestData;
+use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\Core\Render\RenderContext;
@@ -36,6 +37,13 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
    */
   protected $smsProvider;
 
+  /**
+   * A memory gateway.
+   *
+   * @var \Drupal\sms\Entity\SmsGatewayInterface
+   */
+  protected $gateway;
+
   protected function setUp($import_test_views = TRUE) {
     parent::setUp($import_test_views);
 
@@ -44,8 +52,8 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
 
     $this->smsProvider = $this->container->get('sms_provider');
 
-    $test_gateway = $this->createMemoryGateway();
-    $this->smsProvider->setDefaultGateway($test_gateway);
+    $this->gateway = $this->createMemoryGateway();
+    $this->smsProvider->setDefaultGateway($this->gateway);
 
     ViewTestData::createTestViews(get_class($this), ['sms_test_views']);
   }
@@ -54,12 +62,24 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
    * Tests view of SMS entities with join to recipient table.
    */
   public function testSms() {
+    // Create a role and user which has permission to view the entity links
+    // generated for 'gateway', 'sender_entity__target_id', and
+    // 'recipient_entity__target_id' columns.
+    $role = Role::create(['id' => $this->randomMachineName()]);
+    $role->grantPermission('access user profiles');
+    $role->grantPermission('administer smsframework');
+    $role->save();
 
+    $user0 = User::create(['name' => $this->randomMachineName()]);
+    $user0->addRole($role->id());
+    $user0->save();
+
+    $this->container->get('current_user')->setAccount($user0);
+
+    // Create some users to associate with SMS messages.
     $user1 = User::create(['name' => $this->randomMachineName()]);
     $user1->save();
     $user2 = User::create(['name' => $this->randomMachineName()]);
-
-    $this->assertEquals(1, $user1->id());
 
     $message1 = SmsMessage::create(['created' => 892818493]);
     /** @var SmsMessageInterface $message1 */
@@ -157,31 +177,28 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     $this->assertEquals('Wed, 10/30/1985 - 13:43', $render);
 
     // gateway.
-    // No link rendered because there is no user logged in, therefore no access.
     $render = $renderer->executeInRenderContext(new RenderContext(), function () use ($view, $message1) {
       return $view->field['gateway']->advancedRender($view->result[0]);
     });
-    $this->assertEquals('', $render);
+    $this->assertEquals($this->gateway->toLink(NULL, 'edit-form')->toString(), $render);
 
     $render = $renderer->executeInRenderContext(new RenderContext(), function () use ($view, $message2) {
       return $view->field['gateway']->advancedRender($view->result[1]);
     });
-    $this->assertEquals('', $render);
+    $this->assertEquals($this->gateway->toLink(NULL, 'edit-form')->toString(), $render);
 
     // sender_entity__target_id.
-    // No link rendered because there is no user logged in, therefore no access.
     $render = $renderer->executeInRenderContext(new RenderContext(), function () use ($view, $message1) {
       return $view->field['sender_entity__target_id']->advancedRender($view->result[0]);
     });
-    $this->assertEquals('None', $render);
+    $this->assertEquals($user1->toLink()->toString(), $render);
 
     $render = $renderer->executeInRenderContext(new RenderContext(), function () use ($view, $message2) {
       return $view->field['sender_entity__target_id']->advancedRender($view->result[1]);
     });
-    $this->assertEquals('None', $render);
+    $this->assertEquals($user2->toLink()->toString(), $render);
 
     // recipient_entity__target_id.
-    // No link rendered because there is no user logged in, therefore no access.
     $render = $renderer->executeInRenderContext(new RenderContext(), function () use ($view, $message1) {
       return $view->field['recipient_entity__target_id']->advancedRender($view->result[0]);
     });
@@ -190,7 +207,7 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     $render = $renderer->executeInRenderContext(new RenderContext(), function () use ($view, $message2) {
       return $view->field['recipient_entity__target_id']->advancedRender($view->result[1]);
     });
-    $this->assertEquals('None', $render);
+    $this->assertEquals($user1->toLink()->toString(), $render);
 
     // automated.
     $render = $renderer->executeInRenderContext(new RenderContext(), function () use ($view, $message1) {

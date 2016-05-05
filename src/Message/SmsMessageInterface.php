@@ -7,6 +7,8 @@
 
 namespace Drupal\sms\Message;
 
+use Drupal\sms\Entity\SmsGatewayInterface;
+
 /**
  * Contains information about an SMS message.
  */
@@ -115,6 +117,25 @@ interface SmsMessageInterface {
    *   The called SMS message object.
    */
   public function removeRecipients(array $recipients);
+
+  /**
+   * Get the gateway for this message.
+   *
+   * @return \Drupal\sms\Entity\SmsGatewayInterface|NULL
+   *   A gateway plugin instance, or NULL to let the provider decide.
+   */
+  public function getGateway();
+
+  /**
+   * Set the gateway for this message.
+   *
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $gateway
+   *   A gateway plugin instance.
+   *
+   * @return $this
+   *   Return SMS message for chaining.
+   */
+  public function setGateway(SmsGatewayInterface $gateway);
 
   /**
    * Gets the options for building or sending this SMS message.

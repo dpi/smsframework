@@ -25,7 +25,7 @@ class LogGateway extends SmsGatewayPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms, array $options) {
+  public function send(SmsMessageInterface $sms) {
     // Log sms message to drupal logger.
     $this->logger()->notice('SMS message sent to %number with the text: @message',
       ['%number' => implode(', ', $sms->getRecipients()), '@message' => $sms->getMessage()]);

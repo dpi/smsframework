@@ -339,6 +339,22 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
+   * Ensure escaped delimiters.
+   */
+  public function testPreformattedPlaceholderEscapedDelimiters() {
+    // AccountRegistration::createAccount uses '/' delimiters. Ensure that they
+    // are escaped otherwise a "preg_match_all(): Unknown modifier error" will
+    // be thrown.
+    $incoming_message = $this->randomString() . '/';
+    $this->config('sms_user.settings')
+      ->set('account_registration.formatted.status', 1)
+      ->set('account_registration.formatted.incoming_messages.0', $incoming_message)
+      ->save();
+
+    $this->sendIncomingMessage('+123123123', $this->randomString());
+  }
+
+  /**
    * Ensure no reply sent if turned off.
    */
   public function testPreformattedNoReply() {

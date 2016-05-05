@@ -19,12 +19,14 @@ class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase {
   public function testDeliveryReports() {
     $user = $this->drupalCreateUser();
     $this->drupalLogin($user);
-    $sms_message = $this->randomSmsMessage($user->id());
 
     $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
-    $result = $this->defaultSmsProvider
-      ->send($sms_message, ['gateway' => $test_gateway->id()]);
+    $sms_message = $this->randomSmsMessage($user->id())
+      ->setGateway($test_gateway);
 
+    $result = $this->defaultSmsProvider->send($sms_message);
+
+    $result = reset($result);
     $this->assertTrue($result instanceof SmsMessageResultInterface);
     $this->assertEqual(count($sms_message->getRecipients()), count($result->getReports()));
     $reports = $result->getReports();

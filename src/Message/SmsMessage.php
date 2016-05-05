@@ -7,6 +7,8 @@
 
 namespace Drupal\sms\Message;
 
+use Drupal\sms\Entity\SmsGatewayInterface;
+
 /**
  * Basic implementation of an SMS message.
  */
@@ -37,6 +39,13 @@ class SmsMessage implements SmsMessageInterface {
    *   The content of the message to be sent.
    */
   protected $message;
+
+  /**
+   * The gateway for this message.
+   *
+   * @var \Drupal\sms\Entity\SmsGatewayInterface
+   */
+  protected $gateway;
 
   /**
    * @var string
@@ -157,6 +166,21 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
+  public function getGateway() {
+    return $this->gateway;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setGateway(SmsGatewayInterface $gateway) {
+    $this->gateway = $gateway;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getOptions() {
     return $this->options;
   }
@@ -238,6 +262,11 @@ class SmsMessage implements SmsMessageInterface {
    */
   public function chunkByRecipients($size) {
     $recipients_all = $this->getRecipients();
+
+    // Save processing by returning early.
+    if ($size < 1 || count($recipients_all) <= $size) {
+      return [$this];
+    }
 
     $base = clone $this;
     $base->removeRecipients($recipients_all);

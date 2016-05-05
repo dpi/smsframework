@@ -9,28 +9,26 @@
 use Drupal\sms\Message\SmsMessage;
 
 /**
- * Implementation of hook_sms_incoming()
+ * Implementation of hook_sms_incoming_postprocess()
  */
-function sms_actions_sms_incoming($op, $number, $message) {
-  if ($op == 'process') {
-    $commands = sms_actions_get_commands();
-    foreach ($commands as $command) {
-      if (stripos($message, $command->discriminator) === 0) {
-        $active_command = $command;
-      }
+function sms_actions_sms_incoming_postprocess($sms_message) {
+  $commands = sms_actions_get_commands();
+  foreach ($commands as $command) {
+    if (stripos($message, $command->discriminator) === 0) {
+      $active_command = $command;
     }
+  }
 
-    if ($active_command) {
-      sms_actions_do($active_command, $number, $message);
-    }
-    else {
-      // Try to figure out what command was actually given
-      // preg_match('!^([A-z0-9\-]+).+$!', $message, $matches);
-      // if (variable_get('sms_actions_invalid_cmd_reply', 0)) {
-      //   sms_send($number, t('The command @command was not found.', array('@command' => $matches[1])));
-      // }
-      // watchdog('sms', t('Command %command not found from @number.', array('%command' => $matches[1], '@number' => $number)), WATCHDOG_WARNING);
-    }
+  if ($active_command) {
+    sms_actions_do($active_command, $number, $message);
+  }
+  else {
+    // Try to figure out what command was actually given
+    // preg_match('!^([A-z0-9\-]+).+$!', $message, $matches);
+    // if (variable_get('sms_actions_invalid_cmd_reply', 0)) {
+    //   sms_send($number, t('The command @command was not found.', array('@command' => $matches[1])));
+    // }
+    // watchdog('sms', t('Command %command not found from @number.', array('%command' => $matches[1], '@number' => $number)), WATCHDOG_WARNING);
   }
 }
 

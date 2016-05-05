@@ -12,6 +12,7 @@ use Drupal\Component\Utility\Random;
 use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Message\SmsDeliveryReportInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginBase;
+use Drupal\sms\Plugin\SmsGatewayPluginIncomingInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
 use Drupal\Core\Form\FormStateInterface;
@@ -27,7 +28,7 @@ use Symfony\Component\HttpFoundation\Response;
  *   outgoing_message_max_recipients = -1,
  * )
  */
-class Memory extends SmsGatewayPluginBase {
+class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInterface{
 
   /**
    * {@inheritdoc}
@@ -67,7 +68,7 @@ class Memory extends SmsGatewayPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms_message, array $options) {
+  public function send(SmsMessageInterface $sms_message) {
     $state = \Drupal::state()->get('sms_test_gateway.memory.send', []);
 
     $gateway_id = $this->configuration['gateway_id'];
@@ -83,6 +84,18 @@ class Memory extends SmsGatewayPluginBase {
       'status' => TRUE,
       'reports' => $latest_reports,
     ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function incoming(SmsMessageInterface $sms_message) {
+    // @todo Contents of this method are subject to proposals made in
+    // https://www.drupal.org/node/2712579
+
+    // Set state so we test this method is executed, remove this after above is
+    // addressed.
+    \Drupal::state()->set('sms_test_gateway.memory.incoming_hook_temporary', TRUE);
   }
 
   /**

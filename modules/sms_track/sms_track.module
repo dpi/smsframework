@@ -45,7 +45,7 @@ function sms_track_cron() {
 /**
  * Implements hook_sms_send().
  */
-function sms_track_sms_send(SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway) {
+function sms_track_sms_send(SmsMessageInterface $sms) {
   // Tracking.
   // Place a tracking reference on a sent message if we need to.
   if (!empty($options) && !array_key_exists('reference', $options)) {
@@ -55,24 +55,13 @@ function sms_track_sms_send(SmsMessageInterface $sms, array $options, SmsGateway
 
 /**
  * Implements hook_sms_send_process().
- *
- * @param string $op
- *   Operation string (pre process, process, post process).
- * @param \Drupal\sms\Message\SmsMessageInterface $sms
- *   The SMS message object.
- * @param array $options
- *   Additional options array including sender.
- * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
- *   Gateway array for the active gateway.
- * @param \Drupal\sms\Message\SmsMessageResultInterface $result
- *   (optional) The SMS message result from the gateway.
  */
-function sms_track_sms_send_process($op, SmsMessageInterface $sms, array $options, SmsGatewayInterface $sms_gateway, SmsMessageResultInterface $result = NULL) {
+function sms_track_sms_send_process($op, SmsMessageInterface $sms, SmsMessageResultInterface $result = NULL) {
   if ($op == 'post process') {
     // Archiving (outgoing == 0)
     $dir = 0;
     $options = (isset($options) && is_array($options))? $options : array();
-    $options['gateway_id'] = $sms_gateway->id();
+    $options['gateway_id'] = $sms->getGateway()->id();
     $options['result']  = $result;
     $message = $sms->getMessage();
     foreach ($result->getReports() as $report) {
@@ -84,23 +73,14 @@ function sms_track_sms_send_process($op, SmsMessageInterface $sms, array $option
 
 
 /**
- * Implements hook_sms_incoming().
- *
- * @param string $op
- *   SMS incoming operation string (pre process, process, post process).
- * @param \Drupal\sms\Message\SmsMessageInterface $sms
- *   The SMS message object.
- * @param array $options
- *   Additional options including receiver MSISDN.
+ * Implements hook_sms_incoming_preprocess().
  */
-function sms_track_sms_incoming($op, SmsMessageInterface $sms, array $options) {
-  $message = $sms->getMessage();
-  if ($op == 'pre process') {
-    // Archiving (incoming == 1)
-    $dir = 1;
-    foreach ($sms->getRecipients() as $number) {
-      sms_track_archive_write($dir, $number, $message, $options);
-    }
+function sms_track_sms_incoming_preprocess(SmsMessageInterface $sms_message) {
+  $message = $sms_message->getMessage();
+  // Archiving (incoming == 1)
+  $dir = 1;
+  foreach ($sms_message->getRecipients() as $number) {
+    sms_track_archive_write($dir, $number, $message, []);
   }
 }
 
