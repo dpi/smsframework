@@ -29,48 +29,6 @@ class AdminSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state, $op = NULL, $domain = NULL) {
     $form['#attached']['library'][] = 'sms_user/admin';
     $config = $this->config('sms_user.settings');
-    $form['registration_form'] = array(
-      '#type' => 'radios',
-      '#title' => $this->t('Show mobile fields during user registration'),
-      '#description' => $this->t('Specify if the site should collect mobile information during registration.'),
-      '#options' => array(
-        $this->t('Disabled'),
-        $this->t('Optional'),
-        $this->t('Required')
-      ),
-      '#default_value' => $config->get('registration_form'),
-    );
-  
-    $form['confirmation_message'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Confirmation message format'),
-      '#default_value' => $config->get('confirmation_message'),
-      '#description' => $this->t('Specify the format for confirmation messages. Keep this as short as possible.'),
-      '#size' => 140,
-      '#maxlength' => 255,
-    );
-  
-    // Add the token help to a collapsed fieldset at the end of the configuration page.
-    $form['tokens']['token_help'] = array(
-      '#type' => 'fieldset',
-      '#title' => $this->t('Available Tokens List'),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
-    $form['tokens']['token_help']['content'] = array(
-      '#theme' => 'token_tree',
-      '#token_types' => array('sms_user'),
-    );
-    /*
-    $form['tokens'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Available replacement patterns'),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
-  
-    $form['tokens']['content']['#value'] = theme('token_tree', array('token_types' => array('sms_user')));
-    */
 
     // Active hours.
     $form['active_hours'] = [

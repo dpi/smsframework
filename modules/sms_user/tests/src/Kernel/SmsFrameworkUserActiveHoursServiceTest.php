@@ -53,10 +53,6 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
     $this->smsProvider = $this->container->get('sms_provider');
     $this->installEntitySchema('user');
     $this->installEntitySchema('sms');
-
-    // @todo Remove when sms_user_user_load() no longer queries a 'sms_user'
-    // table.
-    $this->installSchema('sms_user', ['sms_user']);
   }
 
   /**
