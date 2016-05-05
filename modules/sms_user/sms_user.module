@@ -17,6 +17,7 @@ use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\sms\Entity\SmsMessage as SmsMessageEntity;
+use Drupal\sms\Message\SmsMessage;
 
 define('SMS_USER_BLOCKED', 0);
 define('SMS_USER_PENDING', 1);
@@ -235,7 +236,14 @@ function sms_user_send_confirmation($account, $number, array $options) {
 
   $account->sms_user = $data;
   $account->save();
-  sms_send($number, _sms_user_confirm_message($code), $options);
+
+  $sms_message = (new SmsMessage())
+    ->addRecipient($number)
+    ->setMessage(_sms_user_confirm_message($code));
+
+  /** @var \Drupal\sms\Provider\SmsProviderInterface $provider */
+  $provider = \Drupal::service('sms_provider');
+  $provider->queueOut($sms_message);
 }
 
 /**

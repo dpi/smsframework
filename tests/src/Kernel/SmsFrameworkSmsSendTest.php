@@ -8,8 +8,8 @@
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\SmsGateway;
-use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageResultInterface;
+use Drupal\sms\Message\SmsMessage;
 
 /**
  * Tests sending SMS messages.
@@ -67,7 +67,12 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
     for ($a = 0; $a < 3; $a++) {
       foreach ($gateways as $i => &$gateway) {
         $this->defaultSmsProvider->setDefaultGateway($gateway);
-        sms_send('+123123123', $this->randomString());
+
+        $sms_message = (new SmsMessage())
+          ->addRecipients($this->randomPhoneNumbers(1))
+          ->setMessage($this->randomString());
+        $this->defaultSmsProvider->queueOut($sms_message);
+
         $message_counts[$i]++;
         foreach ($gateways as $k => $gateway2) {
           $this->assertEquals($message_counts[$k], count($this->getTestMessages($gateway2)));
