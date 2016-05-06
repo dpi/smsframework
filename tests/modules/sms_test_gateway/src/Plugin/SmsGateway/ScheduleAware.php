@@ -28,7 +28,10 @@ class ScheduleAware extends Memory {
    */
   public function send(SmsMessageInterface $sms) {
     if ($sms instanceof SmsMessageEntityInterface) {
-      parent::send($sms);
+      return parent::send($sms);
+    }
+    else {
+      throw new \Exception('Not a SMS message entity');
     }
   }
 
