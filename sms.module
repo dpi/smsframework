@@ -402,13 +402,3 @@ function sms_dir($out, $in) {
   }
   return SMS_DIR_NONE;
 }
-
-/**
- * Returns an array of E.164 international country calling codes
- *
- * @return array
- *   Associative array of country calling codes and country names.
- */
-function sms_country_codes() {
-  return \Drupal::config('sms.settings')->get('country_codes');
-}
