@@ -13,3 +13,7 @@ services:
   sms.queue:
     class: Drupal\sms\Provider\SmsQueueProcessor
     arguments: ['@entity_type.manager', '@queue', '@sms_provider']
+  sms.sms_message_processor:
+    class: Drupal\sms\EventSubscriber\SmsMessageProcessor
+    tags:
+      - { name: event_subscriber }
