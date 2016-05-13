@@ -82,6 +82,27 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   protected $pluginCollection;
 
   /**
+   * Whether messages sent to this gateway should be sent immediately.
+   *
+   * @var boolean
+   */
+  protected $skip_queue;
+
+  /**
+   * How many seconds to hold messages after they are received.
+   *
+   * @var integer
+   */
+  protected $retention_duration_incoming;
+
+  /**
+   * How many seconds to hold messages after they are sent.
+   *
+   * @var integer
+   */
+  protected $retention_duration_outgoing;
+
+  /**
    * Encapsulates the creation of the action's LazyPluginCollection.
    *
    * @return \Drupal\Component\Plugin\LazyPluginCollection
@@ -117,6 +138,59 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
    */
   public function getPluginId() {
     return $this->plugin;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSkipQueue() {
+    return !empty($this->skip_queue);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSkipQueue($skip_queue) {
+    $this->skip_queue = (boolean)$skip_queue;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRetentionDuration($direction) {
+    switch ($direction) {
+      case SmsMessageInterface::DIRECTION_INCOMING:
+        return (int)$this->retention_duration_incoming;
+      case SmsMessageInterface::DIRECTION_OUTGOING:
+        return (int)$this->retention_duration_outgoing;
+      default:
+        throw new \Exception('%s is not a valid direction.', $direction);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRetentionDuration($direction, $retention_duration) {
+    switch ($direction) {
+      case SmsMessageInterface::DIRECTION_INCOMING:
+        $this->retention_duration_incoming = $retention_duration;
+        break;
+      case SmsMessageInterface::DIRECTION_OUTGOING:
+        $this->retention_duration_outgoing = $retention_duration;
+        break;
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMaxRecipientsOutgoing() {
+    $definition = $this->getPlugin()
+      ->getPluginDefinition();
+    return isset($definition['outgoing_message_max_recipients']) ? (int)$definition['outgoing_message_max_recipients'] : 1;
   }
 
 }

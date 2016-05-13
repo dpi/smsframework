@@ -13,6 +13,8 @@ use Drupal\Core\Utility\Token;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
+use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
+use Drupal\sms\Entity\SmsMessage as SmsMessageEntity;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\Component\Utility\Random;
@@ -32,6 +34,13 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
    * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $smsProvider;
+
+  /**
+   * Storage for phone number settings.
+   *
+   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
+   */
+  protected $phoneNumberSettings;
 
   /**
    * Storage for Phone Number Verification entities.
@@ -68,6 +77,8 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ConfigFactoryInterface $config_factory, Token $token, SmsProviderInterface $sms_provider) {
     $this->smsProvider = $sms_provider;
+    $this->phoneNumberSettings = $entity_type_manager
+      ->getStorage('phone_number_settings');
     $this->phoneNumberVerificationStorage = $entity_type_manager
       ->getStorage('sms_phone_number_verification');
     $this->token = $token;
@@ -79,7 +90,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
    */
   public function getPhoneNumbers(EntityInterface $entity, $verified = TRUE) {
     $phone_number_settings = $this->getPhoneNumberSettingsForEntity($entity);
-    if (!$field_name = $phone_number_settings->get('fields.phone_number')) {
+    if (!$field_name = $phone_number_settings->getFieldName('phone_number')) {
       throw new PhoneNumberSettingsException(sprintf('Entity phone number config field mapping not set for bundle %s:%s', $entity->getEntityTypeId(), $entity->bundle()));
     }
 
@@ -108,30 +119,30 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       throw new NoPhoneNumberException('Attempted to send an SMS to entity without a phone number.');
     }
 
-    $sms_message->addRecipient(reset($phone_numbers));
+    $sms_message = SmsMessageEntity::convertFromSmsMessage($sms_message)
+      ->addRecipient(reset($phone_numbers))
+      ->setRecipientEntity($entity);
+
     $this->smsProvider
-      // @todo: Remove $options.
-      ->send($sms_message, []);
+      ->queueOut($sms_message);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getPhoneNumberSettings($entity_type_id, $bundle) {
-    return $this->configFactory->get('sms.phone.' . $entity_type_id . '.' . $bundle);
+    return $this->phoneNumberSettings
+      ->load($entity_type_id . '.' . $bundle);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getPhoneNumberSettingsForEntity(EntityInterface $entity) {
-    $config = $this->getPhoneNumberSettings($entity->getEntityTypeId(), $entity->bundle());
-
-    if (!$config || !$config->get()) {
+    if (!$phone_number_settings = $this->getPhoneNumberSettings($entity->getEntityTypeId(), $entity->bundle())) {
       throw new PhoneNumberSettingsException(sprintf('Entity phone number config does not exist for bundle %s:%s', $entity->getEntityTypeId(), $entity->bundle()));
     }
-
-    return $config;
+    return $phone_number_settings;
   }
 
   /**
@@ -143,6 +154,21 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
         'code' => $code,
       ]);
     return reset($entities);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPhoneVerificationByPhoneNumber($phone_number, $verified = TRUE, $entity_type = NULL) {
+    $properties['phone'] = $phone_number;
+    if (isset($entity_type)) {
+      $properties['entity__target_type'] = $entity_type;
+    }
+    if (isset($verified)) {
+      $properties['status'] = (int)$verified;
+    }
+    return $this->phoneNumberVerificationStorage
+      ->loadByProperties($properties);
   }
 
   /**
@@ -163,7 +189,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
    */
   public function newPhoneVerification(EntityInterface $entity, $phone_number) {
     $config = $this->getPhoneNumberSettingsForEntity($entity);
-    $message = $config->get('verification_message') ?: '';
+    $message = $config->getVerificationMessage() ?: '';
 
     // @todo Replace with code generator.
     $random = new Random;
@@ -192,7 +218,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
         ->setAutomated(FALSE);
 
       $this->smsProvider
-        ->send($sms_message, []);
+        ->queueOut($sms_message);
     }
 
     return $phone_verification;
@@ -223,8 +249,8 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       if ($entity = $phone_number_verification->getEntity()) {
         try {
           $config = $this->getPhoneNumberSettingsForEntity($entity);
-          $purge = $config->get('purge_verification_phone_number');
-          $field_name = $config->get('fields.phone_number');
+          $purge = $config->getPurgeVerificationPhoneNumber();
+          $field_name = $config->getFieldName('phone_number');
           if (!empty($purge) && isset($entity->{$field_name})) {
             $entity->{$field_name}->filter(function ($item) use ($phone_number_verification) {
               return $item->value != $phone_number_verification->getPhoneNumber();

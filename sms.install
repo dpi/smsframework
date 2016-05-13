@@ -1,0 +1,59 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for SMS Framework.
+ */
+
+use Drupal\sms\Entity\SmsMessageInterface;
+
+/**
+ * Implements hook_requirements().
+ */
+function sms_requirements($phase) {
+  $requirements = [];
+
+  if ($phase == 'runtime') {
+    $base_query = \Drupal::entityTypeManager()
+      ->getStorage('sms')
+      ->getQuery();
+
+    $query = clone $base_query;
+    $count = $query
+      ->condition('queued', 0)
+      ->condition('direction', SmsMessageInterface::DIRECTION_INCOMING)
+      ->condition('processed', NULL, 'IS NULL')
+      ->count()
+      ->execute();
+
+    $requirements['sms_queue_incoming'] = [
+      'title' => t('SMS incoming queue'),
+      'severity' => REQUIREMENT_INFO,
+      'value' => \Drupal::translation()->formatPlural(
+        $count,
+        'There are @count messages in the incoming queue.',
+        'There are @count messages in the incoming queue.'
+      ),
+    ];
+
+    $query = clone $base_query;
+    $count = $query
+      ->condition('queued', 0)
+      ->condition('direction', SmsMessageInterface::DIRECTION_OUTGOING)
+      ->condition('processed', NULL, 'IS NULL')
+      ->count()
+      ->execute();
+
+    $requirements['sms_queue_outgoing'] = [
+      'title' => t('SMS outgoing queue'),
+      'severity' => REQUIREMENT_INFO,
+      'value' => \Drupal::translation()->formatPlural(
+        $count,
+        'There are @count messages in the outgoing queue.',
+        'There are @count messages in the outgoing queue.'
+      ),
+    ];
+  }
+
+  return $requirements;
+}

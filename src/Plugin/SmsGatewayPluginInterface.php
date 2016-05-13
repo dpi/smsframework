@@ -117,13 +117,11 @@ interface SmsGatewayPluginInterface extends ConfigurablePluginInterface, PluginF
    *
    * @param \Drupal\sms\Message\SmsMessageInterface $sms
    *   The sms to be sent.
-   * @param array $options
-   *   Options to be applied while processing this sms.
    *
    * @return \Drupal\sms\Message\SmsMessageResultInterface
    *   The result of the sms messaging operation.
    */
-  public function send(SmsMessageInterface $sms, array $options);
+  public function send(SmsMessageInterface $sms);
 
   /**
    * Returns the credit balance available on this gateway.
@@ -166,18 +164,6 @@ interface SmsGatewayPluginInterface extends ConfigurablePluginInterface, PluginF
    *   - message: the error message.
    */
   public function getError();
-
-  /**
-   * Returns a form to be appended to the send form.
-   *
-   * @param array $form
-   *   The parent form array.
-   * @param array $form_state
-   *   Form state.
-   * @returns array
-   *   The form for additional gateway-specific sending options.
-   */
-  public function sendForm(array &$form, FormStateInterface $form_state);
 
   /**
    * Carry out gateway-specific number validation.

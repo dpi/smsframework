@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains definition of \Drupal\sms\SmsProviderInterface
+ * Contains definition of \Drupal\sms\Provider\SmsProviderInterface
  */
 
 namespace Drupal\sms\Provider;
@@ -10,6 +10,7 @@ namespace Drupal\sms\Provider;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
 
 /**
  * Provides an interface for sending messages
@@ -17,34 +18,55 @@ use Symfony\Component\HttpFoundation\Request;
 interface SmsProviderInterface {
 
   /**
+   * Queue a SMS message for sending or receiving.
+   *
+   * @param \Drupal\sms\Entity\SmsMessageInterface $sms_message
+   *   A SMS message entity.
+   */
+  public function queue(SmsMessageEntityInterface &$sms_message);
+
+  /**
+   * Queue a standard SMS message for receiving.
+   *
+   * @todo Remove if standard message gets a direction property.
+   *
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
+   *   A standard SMS message.
+   */
+  public function queueIn(SmsMessageInterface $sms_message);
+
+  /**
+   * Queue a standard SMS message for sending.
+   *
+   * @todo Remove if standard message gets a direction property.
+   *
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
+   *   A standard SMS message.
+   */
+  public function queueOut(SmsMessageInterface $sms_message);
+
+  /**
    * Sends an SMS using the active gateway.
+   *
+   * It is preferred to use queue method over directly invoking send().
    *
    * @param \Drupal\sms\Message\SmsMessageInterface
    *   The message to be sent.
-   * @param array
-   *   Additional options to be passed to the SMS gateway.
    *
-   * @return \Drupal\sms\Message\SmsMessageResultInterface|false
-   *   The result of the message sending operation or false if the process was
-   *   aborted by a pre-process hook.
+   * @return \Drupal\sms\Message\SmsMessageResultInterface[]
+   *   The results of the message sending operation. The message sent can be
+   *   transformed into multiple messages depending on gateway implementation.
+   *   Therefore this function can return multiple results.
    */
-  public function send(SmsMessageInterface $sms, array $options);
+  public function send(SmsMessageInterface $sms);
 
   /**
    * Handles a message received by the server.
    *
-   * Allows gateways to pass messages in a standard format for processing.
-   * Every implementation of hook_sms_incoming() will be invoked by this method.
-   *
-   * Additionally, 'sms_incoming' rules event will be invoked if rules module is
-   * enabled.
-   *
    * @param \Drupal\sms\Message\SmsMessageInterface
    *   The message received.
-   * @param array
-   *   Additional options to be passed to the SMS gateway.
    */
-  public function incoming(SmsMessageInterface $sms, array $options);
+  public function incoming(SmsMessageInterface $sms_message);
 
   /**
    * Handles responses to the SMS provider from gateways.

@@ -7,12 +7,16 @@
 
 namespace Drupal\sms_sendtophone\Form;
 
-use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormBase;
+use Drupal\sms\Provider\SmsProviderInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
+use Drupal\sms\Entity\SmsMessage;
+use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\user\Entity\User;
+use Drupal\sms\Exception\PhoneNumberSettingsException;
 
 /**
  * Default controller for the sms_sendtophone module.
@@ -20,26 +24,64 @@ use Drupal\user\Entity\User;
 class SendToPhoneForm extends FormBase {
 
   /**
+   * Phone numbers for the authenticated user.
+   *
+   * @var array
+   */
+  protected $phone_numbers = [];
+
+  /**
+   * The SMS Provider.
+   *
+   * @var \Drupal\sms\Provider\SmsProviderInterface
+   */
+  protected $smsProvider;
+
+  /**
+   * Creates an new SendForm object.
+   *
+   * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
+   *   The SMS service provider.
+   */
+  public function __construct(SmsProviderInterface $sms_provider) {
+    $this->smsProvider = $sms_provider;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('sms_provider')
+    );
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, $type = NULL, $extra = NULL) {
+    /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
+    $phone_number_provider = \Drupal::service('sms.phone_number');
     /** @var \Drupal\user\UserInterface $user */
     $user = User::load($this->currentUser()->id());
-    if ($user->hasPermission('send to any number') || (!empty($user->sms_user) && !empty($user->sms_user['number']) && $user->sms_user['status'] == 2)) {
+
+    // @todo This block should be a route access checker.
+    try {
+      $this->phone_numbers = $phone_number_provider->getPhoneNumbers($user);
+    }
+    catch (PhoneNumberSettingsException $e) {}
+
+    if ($user->hasPermission('send to any number') || count($this->phone_numbers)) {
       $form = $this->getForm($form, $form_state, $type, $extra);
     }
     else {
-      if ($user->id() > 0 && !empty($user->sms_user) && empty($user->sms_user['number'])) {
+      if (!count($this->phone_numbers)) {
+        // User has no phone number, or unconfirmed.
         $form['message'] = [
           '#type' => 'markup',
-          '#markup' => $this->t('You need to @setup your mobile phone to send messages.',
-            array('@setup' => $this->l('setup', Url::fromRoute('sms_user.user_edit', ['user' => $user->id()])))),
-        ];
-      }
-      elseif ($user->id() > 0 && !empty($user->sms_user) && $user->sms_user['status'] != 2) {
-        $form['message'] = [
-          '#markup' => $this->t('You need to @confirm your mobile phone number to send messages.',
-            array('@confirm' => $this->l('confirm', Url::fromRoute('sms_user.user_edit', ['user' => $user->id()])))),
+          '#markup' => $this->t('You need to @setup and confirm your mobile phone to send messages.', [
+            '@setup' => $user->toLink('set up', 'edit-form')->toString(),
+          ])
         ];
       }
       else {
@@ -53,6 +95,7 @@ class SendToPhoneForm extends FormBase {
         ];
       }
     }
+
     return $form;
   }
 
@@ -91,25 +134,23 @@ class SendToPhoneForm extends FormBase {
             '#cols' => 35,
             '#rows' => 2,
             '#attributes' => array('disabled' => TRUE),
-            '#default_value' => Url::fromUri('entity:node/' . $node->id(), ['absolute' => TRUE])->toString(),
+            '#default_value' => $node->toUrl()->setAbsolute()->toString(),
           );
           $form['message'] = array(
             '#type' => 'value',
-            '#value' => Url::fromUri('entity:node/' . $node->id(), ['absolute' => TRUE])->toString(),
+            '#value' => $node->toUrl()->setAbsolute()->toString(),
           );
         }
         break;
     }
 
-    $user = User::load($this->currentUser()->id());
-    $form = array_merge(sms_send_form(), $form);
-    if (!empty($user->sms_user)) {
-      $form['number']['#default_value'] = $user->sms_user['number'];
-      if (is_array($user->sms_user['gateway'])) {
-        foreach ($user->sms_user['gateway'] as $option => $value) {
-          $form['gateway'][$option]['#default_value'] = $value;
-        }
-      }
+    $form['number'] = [
+      '#type' => 'tel',
+      '#title' => $this->t('Phone number'),
+    ];
+
+    if (count($this->phone_numbers)) {
+      $form['number']['#default_value'] = reset($this->phone_numbers);
     }
 
     $form['submit'] = array(
@@ -126,28 +167,19 @@ class SendToPhoneForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    $formatted = sms_formatter($form_state->getValue('number'));
-    $form_state->setValue('number', $formatted);
-    if (!$formatted) {
-      $form_state->setErrorByName('number', $this->t('Please enter a valid phone number.'));
-    }
-    if ($form_state->isValueEmpty('gateway')) {
-      $form_state->setValue('gateway', array());
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    if (sms_send($form_state->getValue('number'), $form_state->getValue('message'), $form_state->getValue('gateway'))) {
-      drupal_set_message($this->t('The message "@message" has been sent to @number.',
-        array(
-          '@message' => $form_state->getValue('message'),
-          '@number' => $form_state->getValue('number')
-        )));
-    }
+    $user = User::load($this->currentUser()->id());
+    $number = $form_state->getValue('number');
+    $message = $form_state->getValue('message');
+
+    $sms_message = SmsMessage::create()
+      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
+      ->setMessage($message)
+      ->setSenderEntity($user)
+      ->addRecipient($number);
+    $this->smsProvider->queue($sms_message);
+
+    drupal_set_message($this->t('Message has been sent.'));
   }
 
 }

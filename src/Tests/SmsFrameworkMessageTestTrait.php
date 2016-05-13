@@ -18,19 +18,16 @@ namespace Drupal\sms\Tests;
 trait SmsFrameworkMessageTestTrait {
 
   /**
-   * Tests recipients for SMS messages.
+   * Tests sender phone number.
    *
-   * @covers ::getSender
-   * @covers ::setSender
+   * @covers ::getSenderNumber
+   * @covers ::setSenderNumber
    */
-  public function testSender() {
-    $sms_message1 = $this->createSmsMessage();
-    $this->assertEquals(NULL, $sms_message1->getSender());
-
-    $sender = $this->randomMachineName();
-    $sms_message2 = $this->createSmsMessage();
-    $sms_message2->setSender($sender);
-    $this->assertEquals($sender, $sms_message2->getSender());
+  public function testSenderNumber() {
+    $number = '1234567890';
+    $sms_message = $this->createSmsMessage();
+    $sms_message->setSenderNumber($number);
+    $this->assertEquals($number, $sms_message->getSenderNumber());
   }
 
   /**
@@ -208,6 +205,21 @@ trait SmsFrameworkMessageTestTrait {
 
     // Test that UUIDs are different.
     $this->assertNotEquals($sms1->getUuid(), $sms2->getUuid());
+  }
+
+  /**
+   * Tests chunk by recipients
+   *
+   * @covers ::chunkByRecipients
+   */
+  public function testsChunkByRecipients() {
+    $sms_message = $this->createSmsMessage();
+    $sms_message->addRecipients(['100', '200', '300', '400', '500']);
+    $sms_messages = $sms_message->chunkByRecipients(2);
+    $this->assertEquals(3, count($sms_messages));
+    $this->assertEquals(['100', '200'], $sms_messages[0]->getRecipients());
+    $this->assertEquals(['300', '400'], $sms_messages[1]->getRecipients());
+    $this->assertEquals(['500'], $sms_messages[2]->getRecipients());
   }
 
 }

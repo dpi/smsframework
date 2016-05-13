@@ -10,11 +10,6 @@ sms.settings:
     bootstrap_queue:
       type: sequence
       label: 'Bootstrap Queue'
-    country_codes:
-      type: sequence
-      label: 'International Country Codes'
-      sequence:
-        - type: string
     flood:
       label: 'SMS Framework flood settings'
       type: mapping
@@ -49,6 +44,15 @@ sms.gateway.*:
       label: 'Gateway plugin type'
     settings:
       type: sms_gateway.settings.[%parent.plugin]
+    skip_queue:
+      type: boolean
+      label: 'Whether messages sent to this gateway should be sent immediately.'
+    retention_duration_incoming:
+      type: integer
+      label: 'How many seconds to hold messages after are recieved. Use -1 to never expire.'
+    retention_duration_outgoing:
+      type: integer
+      label: 'How many seconds to hold messages after they are sent. Use -1 to never expire.'
 
 sms.phone.*.*:
   type: config_entity

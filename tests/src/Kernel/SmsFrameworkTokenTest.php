@@ -37,7 +37,7 @@ class SmsFrameworkTokenTest extends SmsFrameworkKernelBase {
   protected function setUp() {
     parent::setUp();
     $this->tokenService = $this->container->get('token');
-    $this->installConfig(['system', 'sms']);
+    $this->installConfig(['system']);
     $this->installSchema('system', ['router']);
     \Drupal::service('router.builder')->rebuild();
   }
@@ -74,7 +74,7 @@ class SmsFrameworkTokenTest extends SmsFrameworkKernelBase {
     $message = $this->randomString();
     $sms_message = new SmsMessage();
     $sms_message
-      ->setSender('+999888777')
+      ->setSenderNumber('+999888777')
       ->setMessage($message)
       ->addRecipients($phone_numbers);
     $data['sms-message'] = $sms_message;

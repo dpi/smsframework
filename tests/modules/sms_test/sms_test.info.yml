@@ -1,0 +1,6 @@
+name: SMS Test
+type: module
+description: Module for testing general integration, such as Drupal hooks.
+package: Testing
+version: VERSION
+core: 8.x

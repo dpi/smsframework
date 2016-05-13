@@ -34,7 +34,9 @@ class SmsBlastWebTest extends SmsFrameworkWebTestBase {
     parent::setUp();
     $this->drupalLogin($this->drupalCreateUser(['Send SMS Blast']));
 
-    $this->defaultSmsProvider->setDefaultGateway($this->testGateway);
+    $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
+    $this->defaultSmsProvider
+      ->setDefaultGateway($this->gateway);
 
     $phone_field = FieldStorageConfig::create([
       'entity_type' => 'user',
@@ -54,6 +56,7 @@ class SmsBlastWebTest extends SmsFrameworkWebTestBase {
       ->setPhoneNumberEntityTypeId('user')
       ->setPhoneNumberBundle('user')
       ->setFieldName('phone_number', $phone_field->getName())
+      ->setVerificationMessage($this->randomString())
       ->save();
   }
 
@@ -79,7 +82,7 @@ class SmsBlastWebTest extends SmsFrameworkWebTestBase {
     $this->assertText('Message sent to 3 users.');
 
     // Get the resulting message that was sent and confirm.
-    $this->assertEqual(3, count($this->getTestMessages()), 'Sent three messages.');
+    $this->assertEqual(3, count($this->getTestMessages($this->gateway)), 'Sent three messages.');
   }
 
 }

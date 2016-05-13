@@ -6,6 +6,7 @@
  * sending and receiving SMS messages.
  */
 
+use Drupal\sms\Entity\SmsMessage as SmsMessageEntity;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
@@ -14,6 +15,7 @@ use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Exception\SmsException;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\sms\Entity\SmsMessageInterface;
 
 // Direction codes.
 define('SMS_DIR_NONE',  0);
@@ -28,6 +30,11 @@ function sms_cron() {
   /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
   $phone_number_provider = \Drupal::service('sms.phone_number');
   $phone_number_provider->purgeExpiredVerifications();
+
+  /** @var \Drupal\sms\Provider\SmsQueueProcessorInterface $sms_queue_processor */
+  $sms_queue_processor = \Drupal::service('sms.queue');
+  $sms_queue_processor->processUnqueued();
+  $sms_queue_processor->garbageCollection();
 }
 
 /**
@@ -54,13 +61,24 @@ function sms_entity_delete(EntityInterface $entity) {
     return;
   }
 
-  $verification_storage = \Drupal::entityTypeManager()
-    ->getStorage('sms_phone_number_verification');
-  $verification_entities = $verification_storage->loadByProperties([
-    'entity__target_id' => $entity->id(),
-    'entity__target_type' => $entity->getEntityTypeId(),
-  ]);
-  $verification_storage->delete($verification_entities);
+  /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
+  $phone_number_provider = \Drupal::service('sms.phone_number');
+
+  // Check the entity uses phone numbers. To save on a SQL call, and to prevent
+  // having to install phone number verification for SMS Framework tests which
+  // delete entities. Which would otherwise error on non-existent tables.
+  try {
+    $phone_number_provider->getPhoneNumberSettingsForEntity($entity);
+    $verification_storage = \Drupal::entityTypeManager()
+      ->getStorage('sms_phone_number_verification');
+    $verification_entities = $verification_storage->loadByProperties([
+      'entity__target_id' => $entity->id(),
+      'entity__target_type' => $entity->getEntityTypeId(),
+    ]);
+    $verification_storage->delete($verification_entities);
+  }
+  catch (PhoneNumberSettingsException $e) {
+  }
 }
 
 /**
@@ -79,7 +97,7 @@ function _sms_entity_postsave(EntityInterface $entity) {
 
   try {
     $phone_number_settings = $phone_number_provider->getPhoneNumberSettingsForEntity($entity);
-    $field_name = $phone_number_settings->get('fields.phone_number');
+    $field_name = $phone_number_settings->getFieldName('phone_number');
     if (!empty($field_name)) {
       $items_original = &$entity->original->{$field_name};
       $items = &$entity->{$field_name};
@@ -117,45 +135,6 @@ function _sms_entity_postsave(EntityInterface $entity) {
 }
 
 /**
- * Sends a message using the active gateway.
- *
- * @param string $number
- *   The destination number.
- * @param string $message
- *   The text of the message to send.
- * @param array $options
- *   An array of additional properties as defined by gateway modules.
- *
- * @return bool
- *   true if the message was sent to the server, false otherwise.
- *
- * @see \Drupal\sms\Provider\DefaultSmsProvider::handleResult().
- */
-function sms_send($number, $message, array $options = array()) {
-  $sender = isset($options['sender']) ? $options['sender'] : '';
-  $sms = new SmsMessage($sender, explode(',', $number), $message, $options, \Drupal::currentUser()->id());
-  /** @var \Drupal\sms\Message\SmsMessageResultInterface $result */
-  $result = \Drupal::service('sms_provider')->send($sms, $options);
-  if ($result instanceof SmsMessageResultInterface) {
-    if ($result->getStatus()) {
-      return TRUE;
-    }
-    else {
-      // @todo Review all of this.
-      $error_message = t('Sending SMS to %number failed.', ['%number' => implode(',', $sms->getRecipients())]);
-      if ($message = $result->getErrorMessage()) {
-        $error_message .= t(' The gateway said %message.', ['%message' => $message]);
-      }
-      \Drupal::logger('sms')->error($message);
-      throw new SmsException($error_message);
-    }
-  }
-  else {
-    return FALSE;
-  }
-}
-
-/**
  * Queue worker callback for queued incoming messages.
  *
  * @param array $item
@@ -188,7 +167,7 @@ function sms_incoming_queue_worker(array $item) {
 function sms_incoming($number, $message, array $options = array()) {
   $sender = isset($options['sender']) ? $options['sender'] : '';
   $sms = new SmsMessage($sender, explode(',', $number), $message, $options, \Drupal::currentUser()->id());
-  \Drupal::service('sms_provider')->incoming($sms, $options);
+  \Drupal::service('sms_provider')->incoming($sms);
 }
 
 /**
@@ -200,69 +179,6 @@ function sms_incoming($number, $message, array $options = array()) {
  */
 function sms_receipt(array $reports, array $options = []) {
   \Drupal::service('sms_provider')->receipt($reports, $options);
-}
-
-/**
- * Form builder for send sms form.
- *
- * Generates a SMS sending form and adds gateway defined elements. The form
- * array that is returned can be merged with an existing form using
- * array_merge().
- *
- * @param bool $required
- *   (optional) true if phone number field is required, false otherwise.
- *
- * @see sms_send_form_submit_validate()
- * @see sms_send_form_submit_submit()
- */
-function sms_send_form($required = FALSE) {
-  /** @var \Drupal\sms\Provider\DefaultSmsProvider $provider */
-  $provider = \Drupal::service('sms_provider.default');
-
-  if ($gateway = $provider->getDefaultGateway()) {
-    $instance = $gateway->getPlugin();
-
-    $form['number'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Phone number'),
-      '#size' => 40,
-      '#maxlength' => 16,
-      '#required' => $required,
-    );
-
-    // Add gateway defined fields
-    $form_state = new FormState();
-    $form['gateway']['#tree'] = TRUE;
-    $form['gateway'] = array_merge($instance->sendForm($form, $form_state), $form['gateway']);
-
-    return $form;
-  }
-
-  return NULL;
-}
-
-/**
- * Form validation handler for sms_send_form().
- *
- * @see sms_send_form()
- * @see sms_send_form_submit()
- */
-function sms_send_form_validate($form, FormStateInterface $form_state) {
-  $number = sms_formatter($form_state->getValue('number'));
-  $errors = sms_validate_number($number, $form_state->getValue('gateway', array()));
-  if ($errors) {
-    $form_state->setErrorByName('number', implode("<br />", $errors));
-  }
-}
-
-/**
- * Form submission handler for sms_send_form().
- *
- * @see sms_send_form()
- * @see sms_send_form_validate()
- */
-function sms_send_form_submit($form, FormStateInterface $form_state) {
-  sms_send(sms_formatter($form_state->getValue('number')), $form_state->getValue('message'), $form_state->getValue('gateway', array()));
 }
 
 /******************************************************************************
@@ -410,14 +326,4 @@ function sms_dir($out, $in) {
     return SMS_DIR_NONE;
   }
   return SMS_DIR_NONE;
-}
-
-/**
- * Returns an array of E.164 international country calling codes
- *
- * @return array
- *   Associative array of country calling codes and country names.
- */
-function sms_country_codes() {
-  return \Drupal::config('sms.settings')->get('country_codes');
 }

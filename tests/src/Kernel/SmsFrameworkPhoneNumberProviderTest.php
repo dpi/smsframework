@@ -14,6 +14,7 @@ use Drupal\sms\Entity\PhoneNumberSettings;
 use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Entity\PhoneNumberVerificationInterface;
+use Drupal\sms\Entity\PhoneNumberSettingsInterface;
 
 /**
  * Tests Phone Number Provider.
@@ -59,10 +60,9 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     parent::setUp();
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('sms_phone_number_verification');
-    $this->installConfig('sms');
 
     $sms_provider = $this->container->get('sms_provider.default');
-    $this->gateway = $this->createMemoryGateway();
+    $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
     $sms_provider->setDefaultGateway($this->gateway);
 
     $this->phoneNumberProvider = $this->container->get('sms.phone_number');
@@ -85,6 +85,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
       ->setPhoneNumberEntityTypeId('entity_test')
       ->setPhoneNumberBundle('entity_test')
       ->setFieldName('phone_number', $this->phoneField->getName())
+      ->setVerificationMessage($this->randomString())
       ->save();
   }
 
@@ -157,7 +158,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $this->resetTestMessages();
     $sms_message = new SmsMessage();
     $sms_message
-      ->setSender('+999888777')
+      ->setSenderNumber('+999888777')
       ->setMessage($this->randomString());
     $this->setExpectedException(\Drupal\sms\Exception\NoPhoneNumberException::class);
     $this->phoneNumberProvider->sendMessage($entity, $sms_message);
@@ -176,7 +177,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
 
     $sms_message = new SmsMessage();
     $sms_message
-      ->setSender('+999888777')
+      ->setSenderNumber('+999888777')
       ->setMessage($this->randomString());
     $this->phoneNumberProvider->sendMessage($entity, $sms_message);
     $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
@@ -210,13 +211,13 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
    */
   public function testGetPhoneNumberSettings() {
     $return = $this->phoneNumberProvider->getPhoneNumberSettings($this->randomMachineName(), $this->randomMachineName());
-    $this->assertEmpty($return->get());
+    $this->assertNull($return, 'Phone number settings does not exist.');
 
     $return = $this->phoneNumberProvider->getPhoneNumberSettings('entity_test', $this->randomMachineName());
-    $this->assertEmpty($return->get());
+    $this->assertNull($return, 'Phone number settings does not exist.');
 
     $return = $this->phoneNumberProvider->getPhoneNumberSettings('entity_test', 'entity_test');
-    $this->assertNotEmpty($return->get());
+    $this->assertTrue($return instanceof PhoneNumberSettingsInterface);
   }
 
   /**
@@ -242,7 +243,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
   public function testGetPhoneNumberSettingsForEntity() {
     $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings);
     $return = $this->phoneNumberProvider->getPhoneNumberSettingsForEntity($entity);
-    $this->assertNotEmpty($return->get());
+    $this->assertTrue($return instanceof PhoneNumberSettingsInterface);
   }
 
   /**
@@ -266,6 +267,62 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $this->createEntityWithPhoneNumber($this->phoneNumberSettings, ['+123123123']);
     $return = $this->phoneNumberProvider->getPhoneVerificationByCode($this->randomMachineName());
     $this->assertFalse($return);
+  }
+
+  /**
+   * Tests get verification by phone number.
+   *
+   * @covers ::getPhoneVerificationByPhoneNumber
+   */
+  public function testGetPhoneVerificationByPhoneNumber() {
+    $phone_number1 = '+123123123';
+    $this->createEntityWithPhoneNumber($this->phoneNumberSettings, [$phone_number1]);
+    // Decoy:
+    $phone_number2 = '+456456456';
+    $this->createEntityWithPhoneNumber($this->phoneNumberSettings, [$phone_number2]);
+
+    $return = $this->phoneNumberProvider->getPhoneVerificationByPhoneNumber($phone_number1, NULL);
+    $this->assertEquals(1, count($return));
+  }
+
+  /**
+   * Tests get verification by phone number with verified option.
+   *
+   * @covers ::getPhoneVerificationByPhoneNumber
+   */
+  public function testGetPhoneVerificationByPhoneNumberVerified() {
+    $phone_number1 = '+123123123';
+    $phone_number2 = '+456456456';
+    $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, [$phone_number1, $phone_number2]);
+    $this->verifyPhoneNumber($entity, $phone_number2);
+
+    $return = $this->phoneNumberProvider->getPhoneVerificationByPhoneNumber($phone_number1, TRUE);
+    $this->assertEquals(0, count($return));
+
+    $return = $this->phoneNumberProvider->getPhoneVerificationByPhoneNumber($phone_number1, FALSE);
+    $this->assertEquals(1, count($return));
+
+    $return = $this->phoneNumberProvider->getPhoneVerificationByPhoneNumber($phone_number2, FALSE);
+    $this->assertEquals(0, count($return));
+
+    $return = $this->phoneNumberProvider->getPhoneVerificationByPhoneNumber($phone_number2, TRUE);
+    $this->assertEquals(1, count($return));
+  }
+
+  /**
+   * Tests get verification by phone number with entity type ID option.
+   *
+   * @covers ::getPhoneVerificationByPhoneNumber
+   */
+  public function testGetPhoneVerificationByPhoneNumberEntityType() {
+    $phone_number = '+123123123';
+    $this->createEntityWithPhoneNumber($this->phoneNumberSettings, [$phone_number]);
+
+    $return = $this->phoneNumberProvider->getPhoneVerificationByPhoneNumber($phone_number, NULL, 'entity_test');
+    $this->assertEquals(1, count($return));
+
+    $return = $this->phoneNumberProvider->getPhoneVerificationByPhoneNumber($phone_number, NULL, $this->randomMachineName());
+    $this->assertEquals(0, count($return));
   }
 
   /**

@@ -28,7 +28,9 @@ class SmsDevelWebTest extends SmsFrameworkWebTestBase {
     $this->drupalLogin($user);
 
     // Set up test default gateway.
-    $this->defaultSmsProvider->setDefaultGateway($this->testGateway);
+    $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
+    $this->defaultSmsProvider
+      ->setDefaultGateway($test_gateway);
 
     $test_message1 = array(
       'number' => '1234567890',
@@ -42,7 +44,7 @@ class SmsDevelWebTest extends SmsFrameworkWebTestBase {
     // Check from gateway that the sms got sent. Use array_intersect_assoc() to
     // remove other array elements not needed.
 
-    $sms_messages = $this->getTestMessages();
+    $sms_messages = $this->getTestMessages($test_gateway);
     $this->assertEqual($sms_messages[0]->getMessage(), $test_message1['message'], 'Message was sent correctly using sms_devel.');
 
     $test_message2 = array(
@@ -55,7 +57,7 @@ class SmsDevelWebTest extends SmsFrameworkWebTestBase {
     $this->assertText('Message received from number ' . $test_message2['number'] . ' and message: ' . $test_message2['message'], 'Successfully received message using form.');
 
     // Use sms_test_gateway_get_incoming to get the incoming sms.
-    $result = array_intersect_assoc(sms_test_gateway_get_incoming('process'), $test_message2);
+    $result = array_intersect_assoc(sms_test_gateway_get_incoming(), $test_message2);
     $this->assertEqual($result, $test_message2, 'Message was received correctly using sms_devel.');
   }
 }

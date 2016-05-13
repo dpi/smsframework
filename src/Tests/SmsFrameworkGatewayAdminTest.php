@@ -9,9 +9,10 @@ namespace Drupal\sms\Tests;
 
 use Drupal\Core\Url;
 use Drupal\Component\Utility\Unicode;
+use Drupal\sms\Entity\SmsMessageInterface;
 
 /**
- * Tests phone number administration user interface.
+ * Tests gateway administration user interface.
  *
  * @group SMS Framework
  */
@@ -43,6 +44,8 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
    * Tests the Gateway list implementation.
    */
   public function testGatewayList() {
+    $this->createMemoryGateway();
+
     // Test no access for anonymous.
     $this->drupalGet(Url::fromRoute('sms.gateway.list'));
     $this->assertResponse(403);
@@ -65,6 +68,8 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
    * Tests setting up the default gateway.
    */
   public function testDefaultGateway() {
+    $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
+
     // Test initial default gateway.
     $sms_gateway_default = $this->defaultSmsProvider->getDefaultGateway();
 
@@ -74,12 +79,12 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
 
     // Change default gateway.
     $this->drupalPostForm('admin/config/smsframework/settings', [
-      'default_gateway' => $this->testGateway->id(),
+      'default_gateway' => $test_gateway->id(),
     ], 'Save configuration');
     $this->assertResponse(200);
 
     $sms_gateway_default = $this->defaultSmsProvider->getDefaultGateway();
-    $this->assertEqual($sms_gateway_default->id(), $this->testGateway->id(), 'Default gateway changed.');
+    $this->assertEqual($sms_gateway_default->id(), $test_gateway->id(), 'Default gateway changed.');
   }
 
   /**
@@ -125,10 +130,16 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
     ]));
     $this->assertResponse(200);
     $this->assertFieldByName('widget');
+    $this->assertNoFieldChecked('edit-skip-queue');
+    $this->assertFieldByName('retention_duration_incoming', '0');
+    $this->assertFieldByName('retention_duration_outgoing', '0');
 
     // Memory gateway has a decoy configuration form.
     $edit = [
       'widget' => $this->randomString(),
+      'skip_queue' => '1',
+      'retention_duration_incoming' => '3600',
+      'retention_duration_outgoing' => '-1',
     ];
     $this->drupalPostForm(NULL, $edit, 'Save');
     $this->assertUrl(Url::fromRoute('sms.gateway.list'));
@@ -137,8 +148,17 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
 
     // Reload the gateway, check configuration saved to config entity.
     /** @var \Drupal\sms\Entity\SmsGatewayInterface $test_gateway */
-    $test_gateway = $this->smsGatewayStorage->load($test_gateway->id());
-    $config = $test_gateway->getPlugin()->getConfiguration();
+    $test_gateway = $this->smsGatewayStorage
+      ->load($test_gateway->id());
+
+    // Gateway settings.
+    $this->assertEqual(TRUE, $test_gateway->getSkipQueue());
+    $this->assertEqual($edit['retention_duration_incoming'], $test_gateway->getRetentionDuration(SmsMessageInterface::DIRECTION_INCOMING));
+    $this->assertEqual($edit['retention_duration_outgoing'], $test_gateway->getRetentionDuration(SmsMessageInterface::DIRECTION_OUTGOING));
+
+    // Plugin form.
+    $config = $test_gateway->getPlugin()
+      ->getConfiguration();
     $this->assertEqual($edit['widget'], $config['widget'], 'Plugin configuration changed.');
   }
 

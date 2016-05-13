@@ -7,6 +7,8 @@
 
 namespace Drupal\sms\Message;
 
+use Drupal\sms\Entity\SmsGatewayInterface;
+
 /**
  * Basic implementation of an SMS message.
  */
@@ -20,11 +22,11 @@ class SmsMessage implements SmsMessageInterface {
   protected $uuid;
 
   /**
-   * The sender of the message.
+   * The senders' phone number.
    *
    * @var string
    */
-  protected $sender;
+  protected $sender_phone_number;
 
   /**
    * @var array
@@ -37,6 +39,13 @@ class SmsMessage implements SmsMessageInterface {
    *   The content of the message to be sent.
    */
   protected $message;
+
+  /**
+   * The gateway for this message.
+   *
+   * @var \Drupal\sms\Entity\SmsGatewayInterface
+   */
+  protected $gateway;
 
   /**
    * @var string
@@ -61,8 +70,8 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * Creates a new instance of an SMS message.
    *
-   * @param string $sender
-   *   (optional) The sender of the message.
+   * @param string $sender_phone_number
+   *   (optional) The senders' phone number.
    * @param array $recipients
    *   (optional) The list of recipient phone numbers for the message.
    * @param string $message
@@ -72,27 +81,28 @@ class SmsMessage implements SmsMessageInterface {
    * @param int $uid
    *   (optional) The user who created the SMS message.
    */
-  public function __construct($sender = '', array $recipients = [], $message = '', array $options = [], $uid = NULL) {
-    $this->sender = $sender;
+  public function __construct($sender_phone_number = NULL, array $recipients = [], $message = '', array $options = [], $uid = NULL) {
+    $this->setSenderNumber($sender_phone_number);
     $this->addRecipients($recipients);
+    $this->setMessage($message);
     $this->message = $message;
     $this->options = $options;
-    $this->uid = $uid;
+    $this->setUid($uid);
     $this->uuid = $this->uuidGenerator()->generate();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getSender() {
-    return $this->sender;
+  public function getSenderNumber() {
+    return $this->sender_phone_number;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setSender($sender) {
-    $this->sender = $sender;
+  public function setSenderNumber($number) {
+    $this->sender_phone_number = $number;
     return $this;
   }
 
@@ -151,6 +161,21 @@ class SmsMessage implements SmsMessageInterface {
    */
   public function removeRecipients(array $recipients) {
     $this->recipients = array_values(array_diff($this->recipients, $recipients));
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getGateway() {
+    return $this->gateway;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setGateway(SmsGatewayInterface $gateway) {
+    $this->gateway = $gateway;
     return $this;
   }
 
@@ -231,6 +256,28 @@ class SmsMessage implements SmsMessageInterface {
    */
   protected function uuidGenerator() {
     return \Drupal::service('uuid');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function chunkByRecipients($size) {
+    $recipients_all = $this->getRecipients();
+
+    // Save processing by returning early.
+    if ($size < 1 || count($recipients_all) <= $size) {
+      return [$this];
+    }
+
+    $base = clone $this;
+    $base->removeRecipients($recipients_all);
+
+    $messages = [];
+    foreach (array_chunk($recipients_all, $size) as $recipients) {
+      $message = clone $base;
+      $messages[] = $message->addRecipients($recipients);
+    }
+    return $messages;
   }
 
 }

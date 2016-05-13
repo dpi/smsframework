@@ -20,6 +20,16 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
   public static $modules = ['entity_test'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+    $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
+    $this->defaultSmsProvider
+      ->setDefaultGateway($test_gateway);
+  }
+
+  /**
    * Test verification code creation on entity postsave.
    *
    * @see _sms_entity_postsave().
@@ -45,13 +55,15 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
    * @see _sms_entity_postsave().
    */
   public function testPhoneNumberVerificationMessage() {
-    $this->defaultSmsProvider->setDefaultGateway($this->testGateway);
+    $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
+    $this->defaultSmsProvider
+      ->setDefaultGateway($test_gateway);
 
     $phone_numbers = ['+123123123'];
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $this->createEntityWithPhoneNumber($phone_number_settings, $phone_numbers);
 
-    $sms_message = $this->getLastTestMessage($this->testGateway);
+    $sms_message = $this->getLastTestMessage($test_gateway);
     $this->assertTrue($sms_message instanceof SmsMessageInterface, 'SMS verification message sent.');
     $this->assertEqual($sms_message->getRecipients(), $phone_numbers, 'Sent to correct phone number.');
 
