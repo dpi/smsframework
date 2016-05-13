@@ -166,18 +166,6 @@ interface SmsGatewayPluginInterface extends ConfigurablePluginInterface, PluginF
   public function getError();
 
   /**
-   * Returns a form to be appended to the send form.
-   *
-   * @param array $form
-   *   The parent form array.
-   * @param array $form_state
-   *   Form state.
-   * @returns array
-   *   The form for additional gateway-specific sending options.
-   */
-  public function sendForm(array &$form, FormStateInterface $form_state);
-
-  /**
    * Carry out gateway-specific number validation.
    *
    * @param array $numbers

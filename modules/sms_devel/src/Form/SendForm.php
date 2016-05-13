@@ -9,8 +9,38 @@ namespace Drupal\sms_devel\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\sms\Provider\SmsProviderInterface;
+use Drupal\sms\Entity\SmsMessage;
+use Drupal\sms\Entity\SmsMessageInterface;
 
 class SendForm extends FormBase {
+
+  /**
+   * The SMS Provider.
+   *
+   * @var \Drupal\sms\Provider\SmsProviderInterface
+   */
+  protected $smsProvider;
+
+  /**
+   * Creates an new SendForm object.
+   *
+   * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
+   *   The SMS service provider.
+   */
+  public function __construct(SmsProviderInterface $sms_provider) {
+    $this->smsProvider = $sms_provider;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('sms_provider')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -22,14 +52,10 @@ class SendForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    // Message to the user about the form.
-    $form['about'] = array(
-      '#type' => 'item',
-      '#value' => 'This is a basic form that contains:<ul><li>include sms_send_form()</li><li>message text field</li><li>submit button</li></ul>The form validation includes sms_send_form_validate().<br/>The form submission includes sms_send_form_submit() which sends the message, and a little note that the form submitted ok.',
-    );
-
-    // Include the sms_send_form from the SMS Framework core.
-    $form = array_merge($form, sms_send_form());
+    $form['number'] = [
+      '#type' => 'tel',
+      '#title' => $this->t('Phone number'),
+    ];
 
     // Message text field for the send form.
     $form['message'] = array(
@@ -58,16 +84,14 @@ class SendForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    sms_send_form_validate($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   function submitForm(array &$form, FormStateInterface $form_state) {
+    $sms_message = SmsMessage::create()
+      ->addRecipient(sms_formatter($form_state->getValue('number')))
+      ->setMessage($form_state->getValue('message'))
+      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
+    $this->smsProvider->queue($sms_message);
+
     if ($form_state->getTriggeringElement()['#value'] === $form_state->getValue('submit')) {
-      sms_send_form_submit($form, $form_state);
       // Display a message to the user.
       drupal_set_message($this->t("Form submitted ok for number @number and message: @message",
         [
