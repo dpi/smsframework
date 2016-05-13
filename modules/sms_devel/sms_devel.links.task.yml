@@ -1,5 +1,0 @@
-sms_devel.admin:
-  route_name: sms_devel.admin
-  base_route: sms_devel.admin
-  title: 'Send SMS Message'
-  weight: -10

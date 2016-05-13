@@ -1,17 +1,17 @@
-sms_devel.admin:
+sms_devel.message:
   path: '/admin/config/development/sms'
   defaults:
-    _title: Devel
-    _form: '\Drupal\sms_devel\Form\SendForm'
+    _title: 'Test SMS'
+    _form: '\Drupal\sms_devel\Form\SmsDevelMessageForm'
   requirements:
-    _permission: 'administer smsframework'
+    _permission: 'sms_devel form'
 
 sms_devel.virtualgw_send:
   path: '/admin/config/smsframework/devel/virtualgw/send'
   defaults:
     _controller: 'sms_devel_virtualgw_ahah_send'
   requirements:
-    _permission: 'administer smsframework'
+    _permission: 'administer sms_devel'
 
 sms_devel.virtualgw_receiver:
   path: '/sms/virtualgw/receiver'
@@ -25,4 +25,4 @@ sms_devel.virtualgw_activity:
   defaults:
     _controller: 'sms_devel_virtualgw_js_getactivity'
   requirements:
-    _permission: 'administer smsframework'
+    _permission: 'administer sms_devel'

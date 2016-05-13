@@ -1,0 +1,8 @@
+administer sms_devel:
+  title: 'Administer SMS Devel'
+  description: 'Manage settings for SMS Devel.'
+  restrict access: TRUE
+
+sms_devel form:
+  title: 'Send any message'
+  description: 'Send or receive test messages'
