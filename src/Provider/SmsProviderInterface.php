@@ -22,8 +22,11 @@ interface SmsProviderInterface {
    *
    * @param \Drupal\sms\Entity\SmsMessageInterface $sms_message
    *   A SMS message entity.
+   *
+   * @return \Drupal\sms\Entity\SmsMessageInterface[]
+   *   some messages @todo
    */
-  public function queue(SmsMessageEntityInterface &$sms_message);
+  public function queue(SmsMessageEntityInterface $sms_message);
 
   /**
    * Queue a standard SMS message for receiving.

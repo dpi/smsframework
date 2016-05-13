@@ -14,6 +14,7 @@ use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
+use Drupal\sms\Exception\RecipientRouteException;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginIncomingInterface;
@@ -56,32 +57,34 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function queue(SmsMessageEntityInterface &$sms_message) {
-    if (!$sms_message->getGateway()) {
-      $sms_message->setGateway($this->getDefaultGateway());
-    }
+  public function queue(SmsMessageEntityInterface $sms_message) {
+    $sms_messages = $this->splitMessageByGateway($sms_message);
 
-    if ($sms_message->getGateway()->getSkipQueue()) {
-      switch ($sms_message->getDirection()) {
-        case SmsMessageEntityInterface::DIRECTION_INCOMING:
-          $this->incoming($sms_message);
-          return;
-        case SmsMessageEntityInterface::DIRECTION_OUTGOING:
-          $this->send($sms_message);
-          return;
+    foreach ($sms_messages as $gateway_id => &$sms_message) {
+      if ($count = $sms_message->validate()->count()) {
+        throw new SmsException(sprintf('Can not queue SMS message because there are %s validation error(s).', $count));
       }
-      return;
+
+      if ($sms_message->getGateway()->getSkipQueue()) {
+        switch ($sms_message->getDirection()) {
+          case SmsMessageEntityInterface::DIRECTION_INCOMING:
+            $this->incoming($sms_message);
+            continue;
+          case SmsMessageEntityInterface::DIRECTION_OUTGOING:
+            $this->send($sms_message);
+            continue;
+        }
+        continue;
+      }
+
+      // Split messages to overcome gateway limits.
+      $max = $sms_message->getGateway()->getMaxRecipientsOutgoing();
+      foreach ($sms_message->chunkByRecipients($max) as $sms_message) {
+        $sms_message->save();
+      }
     }
 
-    if ($count = $sms_message->validate()->count()) {
-      throw new SmsException(sprintf('Can not queue SMS message because there are %s validation error(s).', $count));
-    }
-
-    // Split messages to overcome gateway limits.
-    $max = $sms_message->getGateway()->getMaxRecipientsOutgoing();
-    foreach ($sms_message->chunkByRecipients($max) as $sms_message) {
-      $sms_message->save();
-    }
+    return $sms_messages;
   }
 
   /**
@@ -259,4 +262,50 @@ class DefaultSmsProvider implements SmsProviderInterface {
     $this->queue($sms_message);
   }
 
+  /**
+   * @todo
+   * This function guarantees a gateway is set on the message, otherwise the
+   * exception is thrown...
+   *
+   * @param \Drupal\sms\Entity\SmsMessageInterface $sms_message
+   * @return array
+   *   Array of SMS messages keyed by gateway.
+   */
+  protected function splitMessageByGateway(SmsMessageEntityInterface $sms_message) {
+    $sms_messages = [];
+
+    if ($sms_message->getGateway()) {
+      $sms_messages[] = $sms_message;
+    }
+    else {
+      // Ensure all recipients in this message can be routed to a gateway.
+      $gateways = [];
+      foreach ($sms_message->getRecipients() as $recipient) {
+        if (($gateway = $this->getGatewayForPhoneNumber($recipient)) || ($gateway = $this->getDefaultGateway())) {
+          $gateways[$gateway->id()][] = $recipient;
+        }
+        else {
+          throw new RecipientRouteException(sprintf('Unable to determine gateway for recipient %s.', $recipient));
+        }
+      }
+
+      // Recreate SMS messages depending on the gateway.
+      $base = $sms_message->createDuplicate();
+      $base->set('recipient_phone_number', []);
+
+      foreach ($gateways as $gateway_id => $recipients) {
+        $sms_messages[$gateway_id] = $base->createDuplicate()
+          ->addRecipients($recipients)
+          ->setGateway(SmsGateway::load($gateway_id));
+      }
+    }
+
+    return $sms_messages;
+  }
+
+  protected function getGatewayForPhoneNumber($phone_number) {
+    // invoke a hook here
+//    $this->moduleHandler->invokeAll('invokesomehookhere', [$phone_number]);
+    return FALSE;
+  }
 }
