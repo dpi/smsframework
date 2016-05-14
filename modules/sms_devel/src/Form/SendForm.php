@@ -12,7 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\sms\Entity\SmsMessage;
-use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 
 class SendForm extends FormBase {
 
@@ -88,7 +88,7 @@ class SendForm extends FormBase {
     $sms_message = SmsMessage::create()
       ->addRecipient(sms_formatter($form_state->getValue('number')))
       ->setMessage($form_state->getValue('message'))
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
+      ->setDirection(Direction::OUTGOING);
     $this->smsProvider->queue($sms_message);
 
     if ($form_state->getTriggeringElement()['#value'] === $form_state->getValue('submit')) {

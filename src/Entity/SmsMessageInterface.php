@@ -14,16 +14,6 @@ use Drupal\Core\Entity\EntityInterface;
 interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInterface {
 
   /**
-   * Whether the message is queued to be sent from the website.
-   */
-  const DIRECTION_OUTGOING = 1;
-
-  /**
-   * Whether the message was received by the website.
-   */
-  const DIRECTION_INCOMING = -1;
-
-  /**
    * Get direction of the message.
    *
    * @return int

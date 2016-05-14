@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginManagerInterface;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 
 /**
  * Form controller for SMS Gateways.
@@ -133,7 +134,7 @@ class SmsGatewayForm extends EntityForm {
       '#title' => $this->t('Incoming message retention'),
       '#description' => $this->t('How many seconds to keep messages after they are received. Use -1 to never expire.'),
       '#field_suffix' => $this->t('seconds'),
-      '#default_value' => $sms_gateway->getRetentionDuration(SmsMessageInterface::DIRECTION_INCOMING),
+      '#default_value' => $sms_gateway->getRetentionDuration(Direction::INCOMING),
       '#min' => -1,
     ];
 
@@ -142,7 +143,7 @@ class SmsGatewayForm extends EntityForm {
       '#title' => $this->t('Outgoing message retention'),
       '#description' => $this->t('How many seconds to keep messages after they are sent. Use -1 to never expire.'),
       '#field_suffix' => $this->t('seconds'),
-      '#default_value' => $sms_gateway->getRetentionDuration(SmsMessageInterface::DIRECTION_OUTGOING),
+      '#default_value' => $sms_gateway->getRetentionDuration(Direction::OUTGOING),
       '#min' => -1,
     ];
 

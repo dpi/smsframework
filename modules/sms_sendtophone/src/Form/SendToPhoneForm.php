@@ -14,7 +14,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 use Drupal\sms\Entity\SmsMessage;
-use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 use Drupal\user\Entity\User;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
 
@@ -173,7 +173,7 @@ class SendToPhoneForm extends FormBase {
     $message = $form_state->getValue('message');
 
     $sms_message = SmsMessage::create()
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
+      ->setDirection(Direction::OUTGOING)
       ->setMessage($message)
       ->setSenderEntity($user)
       ->addRecipient($number);
