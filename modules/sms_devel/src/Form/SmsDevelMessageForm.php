@@ -10,6 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 
 /**
  * Simulate a message being sent or received.
@@ -155,7 +156,7 @@ class SmsDevelMessageForm extends FormBase {
    *   The current state of the form.
    */
   function submitReceive(array &$form, FormStateInterface $form_state) {
-    $this->message->setDirection(SmsMessageInterface::DIRECTION_INCOMING);
+    $this->message->setDirection(Direction::INCOMING);
 
     if ($form_state->getValue('skip_queue')) {
       $this->smsProvider->incoming($this->message);
@@ -177,7 +178,7 @@ class SmsDevelMessageForm extends FormBase {
    *   The current state of the form.
    */
   function submitSend(array &$form, FormStateInterface $form_state) {
-    $this->message->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
+    $this->message->setDirection(Direction::OUTGOING);
 
     if ($form_state->getValue('skip_queue')) {
       $this->smsProvider->send($this->message);

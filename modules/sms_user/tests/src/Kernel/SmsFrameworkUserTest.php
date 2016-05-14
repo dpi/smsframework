@@ -9,8 +9,8 @@ namespace Drupal\Tests\sms_user\Kernel;
 
 use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
 use Drupal\sms\Entity\SmsMessage;
-use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Entity\PhoneNumberSettings;
+use Drupal\sms\Direction;
 
 /**
  * General tests for SMS User.
@@ -68,7 +68,7 @@ class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
     $message = $this->randomString();
     $incoming = SmsMessage::create()
       ->setSenderNumber('+123')
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING)
+      ->setDirection(Direction::INCOMING)
       ->setMessage($message)
       ->addRecipients($this->randomPhoneNumbers(1));
     $this->smsProvider->queue($incoming);

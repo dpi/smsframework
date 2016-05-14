@@ -9,7 +9,7 @@ namespace Drupal\sms\Tests;
 
 use Drupal\Core\Url;
 use Drupal\sms\Entity\SmsMessage;
-use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 
 /**
  * Integration tests for the SMS Framework.
@@ -77,12 +77,12 @@ class SmsFrameworkWebTest extends SmsFrameworkWebTestBase {
 
     for ($i = 0; $i < 2; $i++) {
       $clone = $sms_message->createDuplicate()
-        ->setDirection(SmsMessageInterface::DIRECTION_INCOMING);
+        ->setDirection(Direction::INCOMING);
       $provider->queue($clone);
     }
     for ($i = 0; $i < 4; $i++) {
       $clone = $sms_message->createDuplicate()
-        ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
+        ->setDirection(Direction::OUTGOING);
       $provider->queue($clone);
     }
 
