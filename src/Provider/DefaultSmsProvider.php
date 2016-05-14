@@ -9,18 +9,17 @@ namespace Drupal\sms\Provider;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Url;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
 use Drupal\sms\Event\SmsMessageEvent;
 use Drupal\sms\Message\SmsMessageInterface;
-use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginIncomingInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\sms\Exception\SmsException;
+use Drupal\sms\Direction;
 
 /**
  * The SMS provider that provides default messaging functionality.
@@ -79,10 +78,10 @@ class DefaultSmsProvider implements SmsProviderInterface {
 
       if ($sms_message->getGateway()->getSkipQueue()) {
         switch ($sms_message->getDirection()) {
-          case SmsMessageEntityInterface::DIRECTION_INCOMING:
+          case Direction::INCOMING:
             $this->incoming($sms_message);
             continue;
-          case SmsMessageEntityInterface::DIRECTION_OUTGOING:
+          case Direction::OUTGOING:
             $this->send($sms_message);
             continue;
         }
@@ -100,7 +99,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    */
   public function queueIn(SmsMessageInterface $sms_message) {
     $sms_message = SmsMessage::convertFromSmsMessage($sms_message)
-      ->setDirection(SmsMessageEntityInterface::DIRECTION_INCOMING);
+      ->setDirection(Direction::INCOMING);
     $this->queue($sms_message);
   }
 
@@ -109,7 +108,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    */
   public function queueOut(SmsMessageInterface $sms_message) {
     $sms_message = SmsMessage::convertFromSmsMessage($sms_message)
-      ->setDirection(SmsMessageEntityInterface::DIRECTION_OUTGOING);
+      ->setDirection(Direction::OUTGOING);
     $this->queue($sms_message);
   }
 

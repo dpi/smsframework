@@ -9,6 +9,7 @@ namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 
 /**
  * Tests behaviour of SMS Framework message queue.
@@ -90,7 +91,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
    */
   public function testQueueIncoming() {
     $sms_message = $this->createSmsMessage()
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING);
+      ->setDirection(Direction::INCOMING);
 
     // @todo sms_test_gateway_sms_incoming() requires an incoming recipient.
     $sms_message->addRecipients($this->randomPhoneNumbers());
@@ -107,7 +108,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
    */
   public function testQueueOutgoing() {
     $sms_message = $this->createSmsMessage()
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
+      ->setDirection(Direction::OUTGOING);
     $this->smsProvider->queue($sms_message);
     $this->assertEquals(0, count($this->getTestMessages($this->gateway)), 'Message not sent yet.');
 
@@ -135,7 +136,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
    */
   public function testRetentionImmediateDelete() {
     $this->gateway
-      ->setRetentionDuration(SmsMessageInterface::DIRECTION_OUTGOING, 0)
+      ->setRetentionDuration(Direction::OUTGOING, 0)
       ->save();
 
     $sms_message = $this->createSmsMessage();
@@ -153,7 +154,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
    */
   public function testRetentionPersist() {
     $this->gateway
-      ->setRetentionDuration(SmsMessageInterface::DIRECTION_OUTGOING, 9999)
+      ->setRetentionDuration(Direction::OUTGOING, 9999)
       ->save();
 
     $sms_message = $this->createSmsMessage();
@@ -174,7 +175,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
    */
   public function testRetentionUnlimited() {
     $this->gateway
-      ->setRetentionDuration(SmsMessageInterface::DIRECTION_OUTGOING, -1)
+      ->setRetentionDuration(Direction::OUTGOING, -1)
       ->save();
 
     $this->createSmsMessage()
@@ -199,7 +200,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
    */
   protected function createSmsMessage(array $values = []) {
     return SmsMessage::create($values)
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
+      ->setDirection(Direction::OUTGOING)
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers(1));
   }

@@ -15,6 +15,7 @@ use Drupal\sms\Tests\SmsFrameworkMessageTestTrait;
 use Drupal\sms\Tests\SmsFrameworkTestTrait;
 use Drupal\user\Entity\User;
 use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 
 /**
  * Tests SMS message entity.
@@ -109,12 +110,12 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $this->assertTrue(in_array('direction', $sms_message1->validate()->getFieldNames()));
 
     $sms_message2 = $this->createSmsMessage()
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
-    $this->assertEquals(SmsMessageInterface::DIRECTION_OUTGOING, $sms_message2->getDirection());
+      ->setDirection(Direction::OUTGOING);
+    $this->assertEquals(Direction::OUTGOING, $sms_message2->getDirection());
 
     $sms_message3 = $this->createSmsMessage()
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING);
-    $this->assertEquals(SmsMessageInterface::DIRECTION_INCOMING, $sms_message3->getDirection());
+      ->setDirection(Direction::INCOMING);
+    $this->assertEquals(Direction::INCOMING, $sms_message3->getDirection());
   }
 
   /**

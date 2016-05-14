@@ -8,10 +8,13 @@
 namespace Drupal\sms_sendtophone\Form;
 
 use Drupal\Core\Form\FormBase;
+use Drupal\sms\Provider\SmsProviderInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
-use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Entity\SmsMessage;
+use Drupal\sms\Direction;
 use Drupal\user\Entity\User;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
 
@@ -26,6 +29,32 @@ class SendToPhoneForm extends FormBase {
    * @var array
    */
   protected $phone_numbers = [];
+
+  /**
+   * The SMS Provider.
+   *
+   * @var \Drupal\sms\Provider\SmsProviderInterface
+   */
+  protected $smsProvider;
+
+  /**
+   * Creates an new SendForm object.
+   *
+   * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
+   *   The SMS service provider.
+   */
+  public function __construct(SmsProviderInterface $sms_provider) {
+    $this->smsProvider = $sms_provider;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('sms_provider')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -115,7 +144,11 @@ class SendToPhoneForm extends FormBase {
         break;
     }
 
-    $form = array_merge(sms_send_form(), $form);
+    $form['number'] = [
+      '#type' => 'tel',
+      '#title' => $this->t('Phone number'),
+    ];
+
     if (count($this->phone_numbers)) {
       $form['number']['#default_value'] = reset($this->phone_numbers);
     }
@@ -139,15 +172,12 @@ class SendToPhoneForm extends FormBase {
     $number = $form_state->getValue('number');
     $message = $form_state->getValue('message');
 
-    $sms_message = \Drupal\sms\Entity\SmsMessage::create()
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
+    $sms_message = SmsMessage::create()
+      ->setDirection(Direction::OUTGOING)
       ->setMessage($message)
       ->setSenderEntity($user)
       ->addRecipient($number);
-
-    /** @var \Drupal\sms\Provider\SmsProviderInterface $provider */
-    $provider = \Drupal::service('sms_provider');
-    $provider->queue($sms_message);
+    $this->smsProvider->queue($sms_message);
 
     drupal_set_message($this->t('Message has been sent.'));
   }

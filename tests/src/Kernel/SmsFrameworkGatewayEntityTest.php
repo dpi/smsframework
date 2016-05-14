@@ -9,6 +9,7 @@ namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 
 /**
  * Tests SMS Framework gateway entity.
@@ -42,10 +43,10 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
     $gateway = $this->createGateway();
 
     // Default value.
-    $this->assertEquals(0, $gateway->getRetentionDuration(SmsMessageInterface::DIRECTION_INCOMING));
+    $this->assertEquals(0, $gateway->getRetentionDuration(Direction::INCOMING));
 
-    $gateway->setRetentionDuration(SmsMessageInterface::DIRECTION_INCOMING, 444);
-    $this->assertEquals(444, $gateway->getRetentionDuration(SmsMessageInterface::DIRECTION_INCOMING));
+    $gateway->setRetentionDuration(Direction::INCOMING, 444);
+    $this->assertEquals(444, $gateway->getRetentionDuration(Direction::INCOMING));
   }
 
   /**
@@ -55,10 +56,10 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
     $gateway = $this->createGateway();
 
     // Default value.
-    $this->assertEquals(0, $gateway->getRetentionDuration(SmsMessageInterface::DIRECTION_INCOMING));
+    $this->assertEquals(0, $gateway->getRetentionDuration(Direction::INCOMING));
 
-    $gateway->setRetentionDuration(SmsMessageInterface::DIRECTION_OUTGOING, 999);
-    $this->assertEquals(999, $gateway->getRetentionDuration(SmsMessageInterface::DIRECTION_OUTGOING));
+    $gateway->setRetentionDuration(Direction::OUTGOING, 999);
+    $this->assertEquals(999, $gateway->getRetentionDuration(Direction::OUTGOING));
   }
 
   /**

@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\sms\Direction;
 
 /**
  * Transmits SMS messages.
@@ -84,11 +85,11 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
       /** @var \Drupal\sms\Entity\SmsMessageInterface $sms_message */
       if ($sms_message = $this->smsMessageStorage->load($id)) {
         switch ($sms_message->getDirection()) {
-          case SmsMessage::DIRECTION_INCOMING:
+          case Direction::INCOMING:
             $this->smsProvider
               ->incoming($sms_message);
             break;
-          case SmsMessage::DIRECTION_OUTGOING:
+          case Direction::OUTGOING:
             $this->smsProvider
               ->send($sms_message);
             break;

@@ -9,7 +9,7 @@ namespace Drupal\sms\Tests;
 
 use Drupal\Core\Url;
 use Drupal\Component\Utility\Unicode;
-use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 
 /**
  * Tests gateway administration user interface.
@@ -153,8 +153,8 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
 
     // Gateway settings.
     $this->assertEqual(TRUE, $test_gateway->getSkipQueue());
-    $this->assertEqual($edit['retention_duration_incoming'], $test_gateway->getRetentionDuration(SmsMessageInterface::DIRECTION_INCOMING));
-    $this->assertEqual($edit['retention_duration_outgoing'], $test_gateway->getRetentionDuration(SmsMessageInterface::DIRECTION_OUTGOING));
+    $this->assertEqual($edit['retention_duration_incoming'], $test_gateway->getRetentionDuration(Direction::INCOMING));
+    $this->assertEqual($edit['retention_duration_outgoing'], $test_gateway->getRetentionDuration(Direction::OUTGOING));
 
     // Plugin form.
     $config = $test_gateway->getPlugin()
