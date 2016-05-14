@@ -9,7 +9,6 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\sms\Entity\SmsMessage;
-use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Direction;
 
 /**
@@ -80,7 +79,7 @@ class SmsDevelMessageForm extends FormBase {
     $form['gateway'] = [
       '#type' => 'select',
       '#title' => $this->t('Gateway'),
-      '#description' => $this->t('Select a gateway to route the message. The <em>automatic</em> option uses internal rules to decide the destination gateway.'),
+      '#description' => $this->t('Select a gateway to route the message. The <em>automatic</em> option uses internal rules to decide the destination gateway. The <em>automatic</em> option can not be used if receiving a message.'),
       '#options' => $gateways,
       '#empty_option' => '- Automatic -',
     ];
@@ -105,17 +104,19 @@ class SmsDevelMessageForm extends FormBase {
     $form['options']['send_on'] = [
       '#type' => 'datetime',
       '#title' => $this->t('Send on'),
-      '#description' => $this->t('Send this message on this date (server time). This option only applies to messages in the queue.'),
+      '#description' => $this->t('Send this message on this date. This option only applies to messages in the queue.'),
       '#default_value' => new DrupalDateTime('now'),
     ];
 
     $form['actions'] = ['#type' => 'actions'];
     $form['actions']['receive'] = [
       '#type' => 'submit',
+      '#name' => 'receive',
       '#value' => $this->t('Receive'),
       '#submit' => ['::submitReceive'],
     ];
     $form['actions']['submit'] = [
+      '#name' => 'send',
       '#type' => 'submit',
       '#value' => $this->t('Send'),
       '#submit' => ['::submitSend'],
@@ -141,9 +142,13 @@ class SmsDevelMessageForm extends FormBase {
       $this->message->setSendTime($send_on->format('U'));
     }
 
+    $triggering_element = $form_state->getTriggeringElement();
     $gateway = $form_state->getValue('gateway');
     if (!empty($gateway)) {
       $this->message->setGateway(SmsGateway::load($gateway));
+    }
+    else if ($triggering_element['#name'] == 'receive') {
+      $form_state->setError($form['gateway'], $this->t('Gateway must be selected if receiving a message.'));
     }
   }
 
