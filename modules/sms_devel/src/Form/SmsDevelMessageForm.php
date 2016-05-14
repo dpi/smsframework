@@ -92,7 +92,7 @@ class SmsDevelMessageForm extends FormBase {
     $form['options']['skip_queue'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Force skip queue'),
-      '#description' => $this->t('Send or receive the message immediately. If the gateway-specific skip queue setting is turned on, then this option is automatically applied.'),
+      '#description' => $this->t('Send or receive the message immediately. If the gateway-specific skip queue setting is turned on, then this option is already applied.'),
       '#default_value' => TRUE,
     ];
     $form['options']['automated'] = [
