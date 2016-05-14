@@ -1,7 +1,0 @@
-view own sms messages:
-  title: "View user's own sms messages."
-  description: 'View sms messages that were sent or received by currently logged in user.'
-
-view all sms messages:
-  title: 'View all sms messages.'
-  description: 'View sms messages that were sent or received by any user.'
