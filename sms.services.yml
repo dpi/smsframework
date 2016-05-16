@@ -15,5 +15,6 @@ services:
     arguments: ['@entity_type.manager', '@queue', '@sms_provider']
   sms.sms_message_processor:
     class: Drupal\sms\EventSubscriber\SmsMessageProcessor
+    arguments: ['@event_dispatcher', '@config.factory']
     tags:
       - { name: event_subscriber }

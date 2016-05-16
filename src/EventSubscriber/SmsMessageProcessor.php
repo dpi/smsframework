@@ -2,12 +2,14 @@
 
 namespace Drupal\sms\EventSubscriber;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Url;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Event\RecipientGatewayEvent;
 use Drupal\sms\Event\SmsMessageEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\sms\Exception\RecipientRouteException;
 use Drupal\sms\Entity\SmsGateway;
 
@@ -18,6 +20,33 @@ use Drupal\sms\Entity\SmsGateway;
  * not be double processed.
  */
 class SmsMessageProcessor implements EventSubscriberInterface {
+
+  /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
+   * The configuration factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * Creates a new SmsMessageProcessor controller.
+   *
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   *   The event dispatcher.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The configuration factory.
+   */
+  public function __construct(EventDispatcherInterface $event_dispatcher, ConfigFactoryInterface $config_factory) {
+    $this->eventDispatcher = $event_dispatcher;
+    $this->configFactory = $config_factory;
+  }
 
   /**
    * Ensure all recipients are routed to a gateway.
@@ -84,12 +113,10 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    * @return \Drupal\Core\Entity\EntityInterface|NULL
    */
   protected function getGatewayForPhoneNumber($recipient) {
-    // @todo inject
-    $eventDispatcher = \Drupal::service('event_dispatcher');
-
     $event = new RecipientGatewayEvent($recipient);
     /** @var RecipientGatewayEvent $event */
-    $event = $eventDispatcher->dispatch('sms.message.gateway', $event);
+    $event = $this->eventDispatcher
+      ->dispatch('sms.message.gateway', $event);
 
     $gateways = $event->getGatewaysSorted();
     // Use the gateway with the greatest weight.
@@ -100,7 +127,8 @@ class SmsMessageProcessor implements EventSubscriberInterface {
 
     // If no gateways found for a phone number, use site fallback default if
     // available.
-    $gateway_id = \Drupal::config('sms.settings')
+    $gateway_id = $this->configFactory
+      ->get('sms.settings')
       ->get('default_gateway');
 
     return isset($gateway_id) ? SmsGateway::load($gateway_id) : NULL;
