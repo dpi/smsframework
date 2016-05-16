@@ -28,16 +28,23 @@ class SmsMessageEvent extends Event {
   }
 
   /**
+   * Get all messages on this event.
+   *
    * @return \Drupal\sms\Message\SmsMessageInterface[]
+   *   The messages on this event.
    */
   public function getMessages() {
     return $this->messages;
   }
 
   /**
+   * Set the messages on this event.
+   *
    * @param $messages
+   *   The messages to set on this event.
    *
    * @return $this
+   *   Returns this event for chaining.
    */
   public function setMessages($messages) {
     $this->messages = $messages;

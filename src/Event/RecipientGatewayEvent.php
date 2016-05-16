@@ -33,16 +33,23 @@ class RecipientGatewayEvent extends Event {
   }
 
   /**
+   * Get the phone number for this event.
+   *
    * @return string
+   *   The phone number for this event.
    */
   public function getRecipient() {
     return $this->recipient;
   }
 
   /**
+   * Set the phone number for this event.
+   *
    * @param string $recipient
+   *   The phone number for this event.
    *
    * @return $this
+   *   Return this event for chaining.
    */
   public function setRecipient($recipient) {
     $this->recipient = $recipient;
@@ -50,7 +57,7 @@ class RecipientGatewayEvent extends Event {
   }
 
   /**
-   * Get gateways.
+   * Get the gateways for this event.
    *
    * @return array
    *   An array of gateway + priority pairs.
@@ -84,10 +91,15 @@ class RecipientGatewayEvent extends Event {
   }
 
   /**
+   * Add a gateway for the recipient on this event.
+   *
    * @param \Drupal\sms\Entity\SmsGatewayInterface $gateway
+   *   The gateway for the recipient
    * @param int $priority
+   *   The priority for this gateway.
    *
    * @return $this
+   *   Return this event for chaining.
    */
   public function addGateway(SmsGatewayInterface $gateway, $priority = 0) {
     $this->gateways[] = [$gateway, $priority];
@@ -95,6 +107,8 @@ class RecipientGatewayEvent extends Event {
   }
 
   /**
+   * Remove a gateway from this event.
+   *
    * @param $gateway_id
    *   A gateway plugin ID.
    *
@@ -103,6 +117,7 @@ class RecipientGatewayEvent extends Event {
    *   with the identifier.
    *
    * @return $this
+   *   Return this event for chaining.
    */
   public function removeGateway($gateway_id, $priority = NULL) {
     foreach ($this->gateways as $k => $pair) {
