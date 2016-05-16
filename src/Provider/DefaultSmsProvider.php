@@ -129,7 +129,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
       }
 
       // Processes the SMS message and returns the response from the gateway.
-      $result = $sms->getGateway()
+      $result = $sms_message->getGateway()
         ->getPlugin()
         ->send($sms_message);
 

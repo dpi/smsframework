@@ -61,17 +61,33 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    * @covers ::send
    */
   public function testSend() {
-    $this->smsProvider->send($this->createSmsMessage());
+    $message = $this->createSmsMessage()
+      ->addRecipients($this->randomPhoneNumbers());
+    $this->smsProvider->send($message);
     $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
+  }
+
+  /**
+   * Ensure no messages sent if no recipients.
+   */
+  public function testNoSendNoRecipients() {
+    $sms_message = SmsMessage::create()
+      ->setDirection(Direction::OUTGOING)
+      ->setMessage($this->randomString());
+    $this->smsProvider->send($sms_message);
+    $this->assertEquals(0, count($this->getTestMessages($this->gateway)));
   }
 
   /**
    * Test message is saved.
    */
   public function testQueueBasic() {
-    $sms_message = $this->createSmsMessage();
-    $this->smsProvider->queue($sms_message);
+    $sms_message = $this->createSmsMessage()
+      ->addRecipients($this->randomPhoneNumbers());
+    $return = $this->smsProvider->queue($sms_message);
     $this->assertEquals(1, count(SmsMessage::loadMultiple()), 'SMS message saved.');
+    $this->assertEquals(1, count($return));
+    $this->assertTrue($return[0] instanceof SmsMessageInterface);
   }
 
   /**
@@ -81,7 +97,8 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->gateway
       ->setSkipQueue(TRUE)
       ->save();
-    $sms_message = $this->createSmsMessage();
+    $sms_message = $this->createSmsMessage()
+      ->addRecipients($this->randomPhoneNumbers());
     $this->smsProvider->queue($sms_message);
     $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
   }
@@ -153,9 +170,10 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message = $this->createSmsMessage()
       ->setGateway($gateway_chunked)
       ->addRecipients(['123123123', '456456456', '789789789']);
-    $this->smsProvider->queue($sms_message);
+    $return = $this->smsProvider->queue($sms_message);
 
     $this->assertEquals(2, count(SmsMessage::loadMultiple()), 'One SMS message has been split into two.');
+    $this->assertEquals(2, count($return), 'Provider queue method returned two messages.');
   }
 
   /**

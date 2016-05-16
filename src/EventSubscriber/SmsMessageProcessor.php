@@ -4,6 +4,7 @@ namespace Drupal\sms\EventSubscriber;
 
 use Drupal\Core\Url;
 use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Event\RecipientGatewayEvent;
 use Drupal\sms\Event\SmsMessageEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -38,7 +39,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
     // Ignore messages if they already have a gateway.
     foreach ($sms_messages as $k => $sms_message) {
       if ($sms_message->getGateway() instanceof SmsGatewayInterface) {
-        unset($k);
+        unset($sms_messages[$k]);
         $result[] = $sms_message;
       }
     }
@@ -47,7 +48,8 @@ class SmsMessageProcessor implements EventSubscriberInterface {
     foreach ($sms_messages as $sms_message) {
       $gateways = [];
 
-      foreach ($sms_message->getRecipients() as $recipient) {
+      $recipients_all = $sms_message->getRecipients();
+      foreach ($recipients_all as $recipient) {
         $gateway = $this->getGatewayForPhoneNumber($recipient);
         if ($gateway instanceof SmsGatewayInterface) {
           $gateways[$gateway->id()][] = $recipient;
@@ -59,11 +61,12 @@ class SmsMessageProcessor implements EventSubscriberInterface {
       }
 
       // Recreate SMS messages depending on the gateway.
-      $base = $sms_message->createDuplicate();
-      $base->set('recipient_phone_number', []);
+      $base = $sms_message instanceof SmsMessageInterface ? $sms_message->createDuplicate() : (clone $sms_message);
+      $base->removeRecipients($recipients_all);
 
       foreach ($gateways as $gateway_id => $recipients) {
-        $result[] = $base->createDuplicate()
+        $new = $sms_message instanceof SmsMessageInterface ? $sms_message->createDuplicate() : (clone $sms_message);
+        $result[] = $new
           ->addRecipients($recipients)
           ->setGateway(SmsGateway::load($gateway_id));
       }
