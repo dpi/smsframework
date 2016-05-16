@@ -140,45 +140,12 @@ class SmsMessageProcessor implements EventSubscriberInterface {
   }
 
   /**
-   * This is just a POC, wouldnt be included in core.
-   *
-   * @param \Drupal\sms\Event\SmsMessageEvent $event
-   */
-  public function almaudohTest(SmsMessageEvent $event) {
-    $sms_messages = $event->getMessages();
-
-    // Create a identifier so we are creating a meta relationship between the
-    // chunked messages.
-    $generator = new \Drupal\Component\Uuid\Php();
-    $relationship_uuid = $generator->generate();
-
-    $total_recipients = 0;
-    $total_messages = count($sms_messages);
-    foreach ($sms_messages as &$sms_message) {
-      $total_recipients += count($sms_message->getRecipients());
-      $sms_message->setOption('almaudoh_foobar', $relationship_uuid);
-    }
-
-    \Drupal::logger(__FUNCTION__)->info('This message has a total of @total_recipients recipients, and was chunked into @total_messages', [
-      '@total_recipients' => $total_recipients,
-      '@total_messages' => $total_messages,
-    ]);
-  }
-
-  public function testAddGateway(RecipientGatewayEvent $event) {
-//    $event->addGateway(SmsGateway::load('log'));
-  }
-
-  /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
     $events['sms.message.preprocess'][] = ['ensureGateways', 1024];
     $events['sms.message.preprocess'][] = ['deliveryReportUrl'];
     $events['sms.message.preprocess'][] = ['chunkMaxRecipients', -1024];
-    // Do it last.
-    $events['sms.message.preprocess'][] = ['almaudohTest', -9999];
-    $events['sms.message.gateway'][] = ['testAddGateway'];
     return $events;
   }
 

@@ -24,7 +24,7 @@ interface SmsProviderInterface {
    *   A SMS message entity.
    *
    * @return \Drupal\sms\Entity\SmsMessageInterface[]
-   *   some messages @todo
+   *   The queued messages. A single message may be transformed into many.
    */
   public function queue(SmsMessageEntityInterface $sms_message);
 
