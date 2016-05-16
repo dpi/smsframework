@@ -94,7 +94,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
       $base->removeRecipients($recipients_all);
 
       foreach ($gateways as $gateway_id => $recipients) {
-        $new = $sms_message instanceof SmsMessageInterface ? $sms_message->createDuplicate() : (clone $sms_message);
+        $new = $base instanceof SmsMessageInterface ? $base->createDuplicate() : (clone $base);
         $result[] = $new
           ->addRecipients($recipients)
           ->setGateway(SmsGateway::load($gateway_id));
