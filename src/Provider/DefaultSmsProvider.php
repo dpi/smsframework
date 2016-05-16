@@ -7,6 +7,7 @@
 
 namespace Drupal\sms\Provider;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\sms\Entity\SmsMessage;
@@ -50,16 +51,17 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * Creates a new instance of the default SMS provider.
    *
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   *   The event dispatcher.
    * @param \Drupal\Core\Config\ConfigFactoryInterface
    *   The gateway manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface
    *   The module handler.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler) {
+  public function __construct(EventDispatcherInterface $event_dispatcher, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler) {
+    $this->eventDispatcher = $event_dispatcher;
     $this->configFactory = $config_factory;
     $this->moduleHandler = $module_handler;
-    // @todo inject
-    $this->eventDispatcher = \Drupal::service('event_dispatcher');
   }
 
   /**
@@ -68,6 +70,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   public function queue(SmsMessageEntityInterface $sms_message) {
     $sms_messages = $this->dispatch('sms.message.preprocess', [$sms_message]);
 
+    /** @var SmsMessageEntityInterface[] $sms_messages */
     foreach ($sms_messages as $gateway_id => &$sms_message) {
       // Tag so 'sms.message.*process' are not dispatched again.
       $sms_message->setOption('_no_dispatch_events', TRUE);
