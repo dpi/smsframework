@@ -120,7 +120,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    */
   public function send(SmsMessageInterface $sms) {
     $dispatch = !$sms->getOption('_no_dispatch_events');
-    $sms_messages = $this->dispatch('sms.message.preprocess', [$sms], $dispatch);
+    $sms_messages = $dispatch ? $this->dispatch('sms.message.preprocess', [$sms]) : [$sms];
 
     $results = [];
     foreach ($sms_messages as &$sms_message) {
@@ -142,7 +142,9 @@ class DefaultSmsProvider implements SmsProviderInterface {
       $results[] = $result;
     }
 
-    $this->dispatch('sms.message.postprocess', $sms_messages, $dispatch);
+    if ($dispatch) {
+      $this->dispatch('sms.message.postprocess', $sms_messages);
+    }
 
     return $results;
   }
@@ -152,7 +154,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    */
   public function incoming(SmsMessageInterface $sms_message) {
     $dispatch = !$sms_message->getOption('_no_dispatch_events');
-    $sms_messages = $this->dispatch('sms.message.preprocess', [$sms_message], $dispatch);
+    $sms_messages = $dispatch ? $this->dispatch('sms.message.preprocess', [$sms_message]) : [$sms_message];
 
     foreach ($sms_messages as $sms_message) {
       $this->moduleHandler->invokeAll('sms_incoming_preprocess', [$sms_message]);
@@ -169,7 +171,9 @@ class DefaultSmsProvider implements SmsProviderInterface {
       $this->moduleHandler->invokeAll('sms_incoming_postprocess', [$sms_message, $result]);
     }
 
-    $this->dispatch('sms.message.postprocess', $sms_messages, $dispatch);
+    if ($dispatch) {
+      $this->dispatch('sms.message.postprocess', $sms_messages);
+    }
   }
 
   /**
@@ -235,20 +239,14 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *   The event to trigger.
    * @param \Drupal\sms\Message\SmsMessageInterface[] $sms_messages
    *   The messages to dispatch.
-   * @param boolean $dispatch_events
-   *   Provide ability to cancel dispatching events if the message was already
-   *   processed by the queue system. Prevents double dispatching.
    *
    * @return \Drupal\sms\Message\SmsMessageInterface[]
    */
-  protected function dispatch($event_name, array $sms_messages, $dispatch_events = TRUE) {
-    if ($dispatch_events) {
-      $event = new SmsMessageEvent($sms_messages);
-      $event = $this->eventDispatcher
-        ->dispatch($event_name, $event);
-      return $event->getMessages();
-    }
-    return $sms_messages;
+  protected function dispatch($event_name, array $sms_messages) {
+    $event = new SmsMessageEvent($sms_messages);
+    $event = $this->eventDispatcher
+      ->dispatch($event_name, $event);
+    return $event->getMessages();
   }
 
 }
