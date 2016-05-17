@@ -11,14 +11,19 @@ use Drupal\sms\Entity\SmsGatewayInterface;
 class RecipientGatewayEvent extends Event {
 
   /**
-   * The recipient.
+   * The recipient phone number.
    *
-   * @var \Drupal\sms\Message\SmsMessageInterface[]
+   * @var string
    */
   protected $recipient;
 
   /**
-   * The gateways.
+   * An array of gateway doubles.
+   *
+   * @var array
+   *   The array of gateway/priority doubles where:
+   *     - Key 0: SmsGatewayInterface $gateway
+   *     - Key 1: integer $priority
    */
   protected $gateways = [];
 
@@ -60,7 +65,7 @@ class RecipientGatewayEvent extends Event {
    * Get the gateways for this event.
    *
    * @return array
-   *   An array of gateway + priority pairs.
+   *   An array of doubles gateway/priority doubles.
    */
   public function getGateways() {
     return $this->gateways;
@@ -82,8 +87,8 @@ class RecipientGatewayEvent extends Event {
     });
 
     $gateways = [];
-    foreach ($this->gateways as $pair) {
-      list($gateway, ) = $pair;
+    foreach ($this->gateways as $tuple) {
+      list($gateway, ) = $tuple;
       $gateways[] = $gateway;
     }
 
@@ -120,8 +125,8 @@ class RecipientGatewayEvent extends Event {
    *   Return this event for chaining.
    */
   public function removeGateway($gateway_id, $priority = NULL) {
-    foreach ($this->gateways as $k => $pair) {
-      list($gateway, $gateway_priority) = $pair;
+    foreach ($this->gateways as $k => $tuple) {
+      list($gateway, $gateway_priority) = $tuple;
       if ($gateway_id == $gateway->id()) {
         if (!isset($priority) || ($priority == $gateway_priority)) {
           unset($this->gateways[$k]);

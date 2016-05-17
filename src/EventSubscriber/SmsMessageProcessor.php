@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Url;
 use Drupal\sms\Entity\SmsGatewayInterface;
-use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Event\RecipientGatewayEvent;
 use Drupal\sms\Event\SmsMessageEvent;
 use Drupal\sms\Exception\RecipientRouteException;
@@ -90,11 +90,11 @@ class SmsMessageProcessor implements EventSubscriberInterface {
       }
 
       // Recreate SMS messages depending on the gateway.
-      $base = $sms_message instanceof SmsMessageInterface ? $sms_message->createDuplicate() : (clone $sms_message);
+      $base = $sms_message instanceof EntityInterface ? $sms_message->createDuplicate() : (clone $sms_message);
       $base->removeRecipients($recipients_all);
 
       foreach ($gateways as $gateway_id => $recipients) {
-        $new = $base instanceof SmsMessageInterface ? $base->createDuplicate() : (clone $base);
+        $new = $base instanceof EntityInterface ? $base->createDuplicate() : (clone $base);
         $result[] = $new
           ->addRecipients($recipients)
           ->setGateway(SmsGateway::load($gateway_id));
