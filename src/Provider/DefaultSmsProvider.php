@@ -188,17 +188,6 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function receipt(array $reports, array $options = []) {
-    // @todo Implement rules event integration here delivery report receipts.
-    // Execute three phases.
-    $this->moduleHandler->invokeAll('sms_receipt', array('pre process', $reports, $options));
-    $this->moduleHandler->invokeAll('sms_receipt', array('process', $reports, $options));
-    $this->moduleHandler->invokeAll('sms_receipt', array('post process', $reports, $options));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function processDeliveryReport(Request $request, SmsGatewayInterface $sms_gateway, array $options = []) {
     // The response that will be sent back to the server API. The gateway plugin
     // can alter this response as needed.
