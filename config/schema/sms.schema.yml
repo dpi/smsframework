@@ -7,11 +7,6 @@ sms.settings:
     default_gateway:
       type: string
       label: 'Entity ID of default SMS Gateway'
-    country_codes:
-      type: sequence
-      label: 'International Country Codes'
-      sequence:
-        - type: string
     flood:
       label: 'SMS Framework flood settings'
       type: mapping

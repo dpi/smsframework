@@ -10,7 +10,6 @@ namespace Drupal\Tests\sms_user\Kernel;
 use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\sms\Entity\SmsMessage;
-use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -18,6 +17,7 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\sms\Entity\PhoneNumberSettings;
 use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Direction;
 
 /**
  * Tests account registration.
@@ -516,7 +516,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     /** @var \Drupal\sms\Entity\SmsMessage $incoming */
     $incoming = SmsMessage::create()
       ->setSenderNumber($sender_number)
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING)
+      ->setDirection(Direction::INCOMING)
       ->setMessage($message)
       ->addRecipients($this->randomPhoneNumbers(1));
     $this->smsProvider->queue($incoming);

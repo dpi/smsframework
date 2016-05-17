@@ -20,7 +20,7 @@ use Drupal\sms\Entity\PhoneNumberSettings;
  */
 class SmsBlastWebTest extends SmsFrameworkWebTestBase {
 
-  public static $modules = ['sms_user', 'sms_blast'];
+  public static $modules = ['sms', 'user', 'sms_blast'];
 
   /**
    * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface

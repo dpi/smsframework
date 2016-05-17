@@ -10,6 +10,7 @@ namespace Drupal\sms\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\sms\Plugin\SmsGatewayPluginCollection;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
+use Drupal\sms\Direction;
 
 /**
  * Defines storage for an SMS Gateway instance.
@@ -160,9 +161,9 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
    */
   public function getRetentionDuration($direction) {
     switch ($direction) {
-      case SmsMessageInterface::DIRECTION_INCOMING:
+      case Direction::INCOMING:
         return (int)$this->retention_duration_incoming;
-      case SmsMessageInterface::DIRECTION_OUTGOING:
+      case Direction::OUTGOING:
         return (int)$this->retention_duration_outgoing;
       default:
         throw new \Exception('%s is not a valid direction.', $direction);
@@ -174,10 +175,10 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
    */
   public function setRetentionDuration($direction, $retention_duration) {
     switch ($direction) {
-      case SmsMessageInterface::DIRECTION_INCOMING:
+      case Direction::INCOMING:
         $this->retention_duration_incoming = $retention_duration;
         break;
-      case SmsMessageInterface::DIRECTION_OUTGOING:
+      case Direction::OUTGOING:
         $this->retention_duration_outgoing = $retention_duration;
         break;
     }

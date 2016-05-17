@@ -11,6 +11,7 @@ use Drupal\sms\Message\SmsMessage as StandardSmsMessage;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Entity\SmsGateway;
+use Drupal\sms\Direction;
 
 /**
  * Tests SMS Framework provider service.
@@ -100,7 +101,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->assertEquals(1, count($sms_messages), 'There is one SMS message in the queue.');
 
     $sms_message_loaded = reset($sms_messages);
-    $this->assertEquals(SmsMessageInterface::DIRECTION_INCOMING, $sms_message_loaded->getDirection());
+    $this->assertEquals(Direction::INCOMING, $sms_message_loaded->getDirection());
   }
 
   /**
@@ -118,7 +119,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->assertEquals(1, count($sms_messages), 'There is one SMS message in the queue.');
 
     $sms_message_loaded = reset($sms_messages);
-    $this->assertEquals(SmsMessageInterface::DIRECTION_OUTGOING, $sms_message_loaded->getDirection());
+    $this->assertEquals(Direction::OUTGOING, $sms_message_loaded->getDirection());
   }
 
   /**
@@ -180,7 +181,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
     $sms_message = $this->createSmsMessage()
       ->setGateway($this->gateway)
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING)
+      ->setDirection(Direction::INCOMING)
       ->addRecipients($this->randomPhoneNumbers());
 
     $this->smsProvider->queue($sms_message);
@@ -197,7 +198,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
     $sms_message = $this->createSmsMessage()
       ->setGateway($this->gateway)
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING)
+      ->setDirection(Direction::INCOMING)
       ->addRecipients($this->randomPhoneNumbers());
 
     $this->smsProvider->queue($sms_message);
@@ -214,7 +215,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
     $sms_message = $this->createSmsMessage()
       ->setGateway($this->gateway)
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING)
+      ->setDirection(Direction::INCOMING)
       ->addRecipients($this->randomPhoneNumbers());
 
     $this->smsProvider->queue($sms_message);
@@ -231,7 +232,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    */
   protected function createSmsMessage(array $values = []) {
     return SmsMessage::create($values)
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
+      ->setDirection(Direction::OUTGOING)
       ->setMessage($this->randomString());
   }
 
