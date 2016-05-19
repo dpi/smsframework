@@ -88,7 +88,7 @@ class RecipientGatewayEvent extends Event {
     });
 
     $gateways = [];
-    foreach ($this->gateways as $tuple) {
+    foreach ($gateways as $tuple) {
       list($gateway, ) = $tuple;
       $gateways[] = $gateway;
     }
