@@ -137,8 +137,11 @@ function sms_actions_send_action_form($context) {
     $context['message'] = '';
   }
 
-  $form = sms_send_form(NULL, NULL, FALSE);
-  $form['number']['#default_value'] = $context['number'];
+  $form['number'] = [
+    '#type' => 'tel',
+    '#title' => $this->t('Phone number'),
+    '#default_value' => $context['number'],
+  ];
 
   $form['author'] = array(
     '#type' => 'checkbox',

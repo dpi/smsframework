@@ -12,7 +12,7 @@ use Drupal\Core\Utility\Token;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\sms\Provider\PhoneNumberProviderInterface;
 use Drupal\sms\Message\SmsMessageInterface;
-use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
+use Drupal\sms\Direction;
 use Drupal\user\Entity\User;
 use Drupal\Component\Utility\Random;
 use Drupal\sms\Entity\SmsMessage;
@@ -247,7 +247,7 @@ class AccountRegistration implements AccountRegistrationInterface {
     $sms_message = SmsMessage::create();
     $sms_message
       ->addRecipient($sender_number)
-      ->setDirection(SmsMessageEntityInterface::DIRECTION_OUTGOING);
+      ->setDirection(Direction::OUTGOING);
 
     $data['sms-message'] = $sms_message;
     $data['user'] = $user;

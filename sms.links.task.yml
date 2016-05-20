@@ -4,9 +4,3 @@ sms.gateway.list:
   route_name: sms.gateway.list
   base_route: sms.gateway.list
   weight: -10
-
-sms.bootstrap_admin:
-  title: 'Incoming SMS bootstrap'
-  description: 'Review settings for incoming SMS bootstrap by-pass'
-  route_name: sms.bootstrap_admin
-  base_route: sms.bootstrap_admin

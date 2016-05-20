@@ -11,6 +11,7 @@ use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\Core\Render\RenderContext;
+use Drupal\sms\Direction;
 
 /**
  * Tests SMS Framework integration with Views.
@@ -86,7 +87,7 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     $message1
       ->setSenderEntity($user1)
       ->addRecipients($this->randomPhoneNumbers(2))
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
+      ->setDirection(Direction::OUTGOING)
       ->setMessage($this->randomMachineName())
       ->setSenderNumber('+123123123')
       ->setQueued(TRUE);
@@ -97,7 +98,7 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
       ->setRecipientEntity($user1)
       ->setSenderEntity($user2)
       ->addRecipients($this->randomPhoneNumbers(1))
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING)
+      ->setDirection(Direction::INCOMING)
       ->setMessage($this->randomMachineName())
       ->setAutomated(FALSE)
       ->setProcessedTime(499488280);

@@ -9,7 +9,7 @@ namespace Drupal\sms\Provider;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Queue\QueueFactory;
-use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 
 /**
  * The SMS Queue Processor.
@@ -97,8 +97,8 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
    */
   public function garbageCollection() {
     $directions = [
-      SmsMessageInterface::DIRECTION_INCOMING,
-      SmsMessageInterface::DIRECTION_OUTGOING,
+      Direction::INCOMING,
+      Direction::OUTGOING,
     ];
 
     $ids = [];

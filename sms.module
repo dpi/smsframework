@@ -135,42 +135,6 @@ function _sms_entity_postsave(EntityInterface $entity) {
 }
 
 /**
- * Queue worker callback for queued incoming messages.
- *
- * @param array $item
- *   An array containing arguments for sending queued message.
- *
- * @see sms_cron_queue_info().
- */
-function sms_incoming_queue_worker(array $item) {
-  sms_incoming($item['number'], $item['message'], $item['options']);
-}
-
-/**
- * Handles incoming messages.
- *
- * Allows gateways modules to pass messages in a standard format for processing.
- * Every implementation of hook_sms_incoming() will be invoked by this method.
- *
- * Additionally, 'sms_incoming' rules event will be invoked if rules module is
- * enabled.
- *
- * @param string $number
- *   The sender's mobile number.
- * @param string $message
- *   The content of the text message.
- * @param array $options
- *   An array of additional options.
- *
- * @deprecated use \Drupal\sms\Provider\SmsProviderInterface::incoming() instead.
- */
-function sms_incoming($number, $message, array $options = array()) {
-  $sender = isset($options['sender']) ? $options['sender'] : '';
-  $sms = new SmsMessage($sender, explode(',', $number), $message, $options, \Drupal::currentUser()->id());
-  \Drupal::service('sms_provider')->incoming($sms);
-}
-
-/**
  * Handles responses to message transactions.
  *
  * @see \Drupal\sms\Gateway\SmsProviderInterface::receipt
@@ -179,81 +143,6 @@ function sms_incoming($number, $message, array $options = array()) {
  */
 function sms_receipt(array $reports, array $options = []) {
   \Drupal::service('sms_provider')->receipt($reports, $options);
-}
-
-/**
- * Form builder for send sms form.
- *
- * Generates a SMS sending form and adds gateway defined elements. The form
- * array that is returned can be merged with an existing form using
- * array_merge().
- *
- * @param bool $required
- *   (optional) true if phone number field is required, false otherwise.
- *
- * @see sms_send_form_submit_validate()
- * @see sms_send_form_submit_submit()
- */
-function sms_send_form($required = FALSE) {
-  /** @var \Drupal\sms\Provider\DefaultSmsProvider $provider */
-  $provider = \Drupal::service('sms_provider.default');
-
-  if ($gateway = $provider->getDefaultGateway()) {
-    $instance = $gateway->getPlugin();
-
-    $form['number'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Phone number'),
-      '#size' => 40,
-      '#maxlength' => 16,
-      '#required' => $required,
-    );
-
-    // Add gateway defined fields
-    $form_state = new FormState();
-    $form['gateway']['#tree'] = TRUE;
-    $form['gateway'] = array_merge($instance->sendForm($form, $form_state), $form['gateway']);
-
-    return $form;
-  }
-
-  return NULL;
-}
-
-/**
- * Form validation handler for sms_send_form().
- *
- * @see sms_send_form()
- * @see sms_send_form_submit()
- */
-function sms_send_form_validate($form, FormStateInterface $form_state) {
-  $number = sms_formatter($form_state->getValue('number'));
-  $errors = sms_validate_number($number, $form_state->getValue('gateway', array()));
-  if ($errors) {
-    $form_state->setErrorByName('number', implode("<br />", $errors));
-  }
-}
-
-/**
- * Form submission handler for sms_send_form().
- *
- * @see sms_send_form()
- * @see sms_send_form_validate()
- */
-function sms_send_form_submit($form, FormStateInterface $form_state) {
-  $sms_message = SmsMessageEntity::create()
-    ->addRecipient(sms_formatter($form_state->getValue('number')))
-    ->setMessage($form_state->getValue('message'))
-    ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
-
-  // Gateway plugin form options
-  foreach ($form_state->getValue('gateway', []) as $key => $value) {
-    $sms_message->setOption($key, $value);
-  }
-
-  /** @var \Drupal\sms\Provider\SmsProviderInterface $provider */
-  $provider = \Drupal::service('sms_provider');
-  $provider->queue($sms_message);
 }
 
 /******************************************************************************
@@ -401,14 +290,4 @@ function sms_dir($out, $in) {
     return SMS_DIR_NONE;
   }
   return SMS_DIR_NONE;
-}
-
-/**
- * Returns an array of E.164 international country calling codes
- *
- * @return array
- *   Associative array of country calling codes and country names.
- */
-function sms_country_codes() {
-  return \Drupal::config('sms.settings')->get('country_codes');
 }

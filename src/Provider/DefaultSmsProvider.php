@@ -20,6 +20,7 @@ use Drupal\sms\Plugin\SmsGatewayPluginIncomingInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\sms\Exception\SmsException;
+use Drupal\sms\Direction;
 
 /**
  * The SMS provider that provides default messaging functionality.
@@ -63,10 +64,10 @@ class DefaultSmsProvider implements SmsProviderInterface {
 
     if ($sms_message->getGateway()->getSkipQueue()) {
       switch ($sms_message->getDirection()) {
-        case SmsMessageEntityInterface::DIRECTION_INCOMING:
+        case Direction::INCOMING:
           $this->incoming($sms_message);
           return;
-        case SmsMessageEntityInterface::DIRECTION_OUTGOING:
+        case Direction::OUTGOING:
           $this->send($sms_message);
           return;
       }
@@ -88,14 +89,14 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * {@inheritdoc}
    */
   public function queueIn(SmsMessageInterface $sms_message) {
-    $this->plainMessageQueue($sms_message, SmsMessageEntityInterface::DIRECTION_INCOMING);
+    $this->plainMessageQueue($sms_message, Direction::INCOMING);
   }
 
   /**
    * {@inheritdoc}
    */
   public function queueOut(SmsMessageInterface $sms_message) {
-    $this->plainMessageQueue($sms_message, SmsMessageEntityInterface::DIRECTION_OUTGOING);
+    $this->plainMessageQueue($sms_message, Direction::OUTGOING);
   }
 
   /**
@@ -187,17 +188,6 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function receipt(array $reports, array $options = []) {
-    // @todo Implement rules event integration here delivery report receipts.
-    // Execute three phases.
-    $this->moduleHandler->invokeAll('sms_receipt', array('pre process', $reports, $options));
-    $this->moduleHandler->invokeAll('sms_receipt', array('process', $reports, $options));
-    $this->moduleHandler->invokeAll('sms_receipt', array('post process', $reports, $options));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function processDeliveryReport(Request $request, SmsGatewayInterface $sms_gateway, array $options = []) {
     // The response that will be sent back to the server API. The gateway plugin
     // can alter this response as needed.
@@ -247,7 +237,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   protected function plainMessageQueue(SmsMessageInterface $sms_message, $direction) {
     $gateway = $sms_message->getGateway() ?: $this->getDefaultGateway();
 
-    if ($gateway->getSkipQueue() && $direction == SmsMessageEntityInterface::DIRECTION_OUTGOING) {
+    if ($gateway->getSkipQueue() && $direction == Direction::OUTGOING) {
       $this->send($sms_message);
       return;
     }

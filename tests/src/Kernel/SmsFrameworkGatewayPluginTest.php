@@ -3,7 +3,7 @@
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\SmsMessage;
-use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 
 /**
  * Tests SMS Framework gateway plugins.
@@ -40,7 +40,7 @@ class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
     $this->smsProvider->setDefaultGateway($gateway);
 
     $sms_message = SmsMessage::create()
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING)
+      ->setDirection(Direction::INCOMING)
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers());
 
@@ -60,7 +60,7 @@ class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
     $this->smsProvider->setDefaultGateway($gateway);
 
     $sms_message = SmsMessage::create()
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING)
+      ->setDirection(Direction::INCOMING)
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers());
 

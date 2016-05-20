@@ -11,7 +11,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
 use Drupal\user\Entity\User;
-use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 
 /**
  * Tests active hours service.
@@ -229,7 +229,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
     $user = $this->createUser();
     $sms_message = SmsMessage::create()
       ->setMessage($this->randomString())
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
+      ->setDirection(Direction::OUTGOING)
       ->setRecipientEntity($user)
       ->setAutomated(TRUE);
     $this->smsProvider->queue($sms_message);
@@ -250,7 +250,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
     $user = $this->createUser();
     $sms_message = SmsMessage::create()
       ->setMessage($this->randomString())
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
+      ->setDirection(Direction::OUTGOING)
       ->setRecipientEntity($user)
       ->setAutomated(FALSE);
     $this->smsProvider->queue($sms_message);
