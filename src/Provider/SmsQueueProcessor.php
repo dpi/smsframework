@@ -65,12 +65,21 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
    * @inheritdoc
    */
   public function processUnqueued() {
-    $ids = $this->smsMessageStorage
-      ->getQuery()
-      ->condition('queued', 0, '=')
-      ->condition('processed', NULL, 'IS NULL')
-      ->condition('send_on', REQUEST_TIME, '<=')
-      ->execute();
+    /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
+    $ids = [];
+    foreach ($this->smsGatewayStorage->loadMultiple() as $sms_gateway) {
+      $query = $this->smsMessageStorage
+        ->getQuery()
+        ->condition('gateway', $sms_gateway->id(), '=')
+        ->condition('queued', 0, '=')
+        ->condition('processed', NULL, 'IS NULL');
+
+      if (!$sms_gateway->isScheduleAware()) {
+        $query->condition('send_on', REQUEST_TIME, '<=');
+      }
+
+      $ids += $query->execute();
+    }
 
     /** @var \Drupal\sms\Entity\SmsMessageInterface $sms_message */
     foreach ($this->smsMessageStorage->loadMultiple($ids) as $sms_message) {
