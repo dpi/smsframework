@@ -90,7 +90,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    *
    * @covers ::send
    */
-  public function testQeueueNoFallbackGateway() {
+  public function testQueueNoFallbackGateway() {
     $this->smsProvider->setDefaultGateway(NULL);
     $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class);
     $sms_message = $this->createSmsMessage();

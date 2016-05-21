@@ -24,7 +24,7 @@ class SmsFrameworkSettingsTest extends SmsFrameworkWebTestBase {
     $account = $this->drupalCreateUser([
       'administer smsframework',
     ]);
-    $this->drupalLogin($account);;
+    $this->drupalLogin($account);
   }
 
   /**
