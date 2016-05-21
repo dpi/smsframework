@@ -66,12 +66,35 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Test message is not sent because no gateway is set.
+   *
+   * @covers ::send
+   */
+  public function testSendNoFallbackGateway() {
+    $this->smsProvider->setDefaultGateway(NULL);
+    $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class);
+    $this->smsProvider->send($this->createSmsMessage());
+  }
+
+  /**
    * Test message is saved.
    */
   public function testQueueBasic() {
     $sms_message = $this->createSmsMessage();
     $this->smsProvider->queue($sms_message);
     $this->assertEquals(1, count(SmsMessage::loadMultiple()), 'SMS message saved.');
+  }
+
+  /**
+   * Test message is not queued because no gateway is set.
+   *
+   * @covers ::send
+   */
+  public function testQeueueNoFallbackGateway() {
+    $this->smsProvider->setDefaultGateway(NULL);
+    $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class);
+    $sms_message = $this->createSmsMessage();
+    $this->smsProvider->queue($sms_message);
   }
 
   /**
@@ -220,6 +243,44 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
     $this->smsProvider->queue($sms_message);
     $this->assertTrue(\Drupal::state()->get('sms_test_gateway.memory.incoming_hook_temporary'));
+  }
+
+  /**
+   * Test get default gateway.
+   */
+  public function testGetDefaultGateway() {
+    $gateway = $this->createMemoryGateway();
+    $this->config('sms.settings')
+      ->set('default_gateway', $gateway->id())
+      ->save();
+    $this->assertEquals($gateway->id(), $this->smsProvider->getDefaultGateway()->id());
+  }
+
+  /**
+   * Test get default gateway not set.
+   */
+  public function testGetDefaultGatewayNotSet() {
+    $this->config('sms.settings')
+      ->set('default_gateway', NULL)
+      ->save();
+    $this->assertNull($this->smsProvider->getDefaultGateway());
+  }
+
+  /**
+   * Test set default gateway.
+   */
+  public function testSetDefaultGateway() {
+    $gateway = $this->createMemoryGateway();
+    $this->smsProvider->setDefaultGateway($gateway);
+    $this->assertEquals($gateway->id(), $this->config('sms.settings')->get('default_gateway'));
+  }
+
+  /**
+   * Test unset default gateway.
+   */
+  public function testSetDefaultGatewayToNull() {
+    $this->smsProvider->setDefaultGateway(NULL);
+    $this->assertNull($this->config('sms.settings')->get('default_gateway'));
   }
 
   /**

@@ -14,6 +14,7 @@ use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
+use Drupal\sms\Exception\RecipientRouteException;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginIncomingInterface;
@@ -59,7 +60,11 @@ class DefaultSmsProvider implements SmsProviderInterface {
    */
   public function queue(SmsMessageEntityInterface &$sms_message) {
     if (!$sms_message->getGateway()) {
-      $sms_message->setGateway($this->getDefaultGateway());
+      $default = $this->getDefaultGateway();
+      if (!$default instanceof SmsGatewayInterface) {
+        throw new RecipientRouteException('No gateway could be found for this message.');
+      }
+      $sms_message->setGateway($default);
     }
 
     if ($sms_message->getGateway()->getSkipQueue()) {
@@ -104,7 +109,11 @@ class DefaultSmsProvider implements SmsProviderInterface {
    */
   public function send(SmsMessageInterface $sms) {
     if (!$sms->getGateway()) {
-      $sms->setGateway($this->getDefaultGateway());
+      $default = $this->getDefaultGateway();
+      if (!$default instanceof SmsGatewayInterface) {
+        throw new RecipientRouteException('No gateway could be found for this message.');
+      }
+      $sms->setGateway($default);
     }
 
     $results = [];
@@ -202,7 +211,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * Gets the gateway that will be used by default for sending SMS.
    *
-   * @return \Drupal\sms\Entity\SmsGatewayInterface|null
+   * @return \Drupal\sms\Entity\SmsGatewayInterface|NULL
    *   A SmsGateway config entity, or NULL if default gateway is not set or
    *   invalid.
    */
@@ -210,19 +219,20 @@ class DefaultSmsProvider implements SmsProviderInterface {
     $gateway_id = $this->configFactory
       ->get('sms.settings')
       ->get('default_gateway');
-    return SmsGateway::load($gateway_id);
+    return $gateway_id ? SmsGateway::load($gateway_id) : NULL;
   }
 
   /**
    * Sets the Gateway that will be used by default to send SMS.
    *
-   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
-   *   The new site default SMS Gateway.
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
+   *   The new site default SMS Gateway, or NULL to unset.
    */
-  public function setDefaultGateway(SmsGatewayInterface $sms_gateway) {
+  public function setDefaultGateway(SmsGatewayInterface $sms_gateway = NULL) {
+    $default_gateway = $sms_gateway ? $sms_gateway->id() : NULL;
     $this->configFactory
       ->getEditable('sms.settings')
-      ->set('default_gateway', $sms_gateway->id())
+      ->set('default_gateway', $default_gateway)
       ->save();
   }
 
