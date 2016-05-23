@@ -241,25 +241,27 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
 
     // $items can be unassigned because field_name is not configured, or is NULL
     // because there is no items.
-    if (isset($items)) {
-      $numbers = [];
-      foreach ($items as &$item) {
-        $phone_number = $item->value;
-        $numbers[] = $phone_number;
+    if (!isset($items)) {
+      return;
+    }
 
-        if (!$this->getPhoneVerificationByEntity($entity, $phone_number)) {
-          $this->newPhoneVerification($entity, $phone_number);
-        }
+    $numbers = [];
+    foreach ($items as &$item) {
+      $phone_number = $item->value;
+      $numbers[] = $phone_number;
+
+      if (!$this->getPhoneVerificationByEntity($entity, $phone_number)) {
+        $this->newPhoneVerification($entity, $phone_number);
       }
+    }
 
-      if (isset($items_original) && !$items->equals($items_original)) {
-        foreach ($items_original as $item) {
-          $phone_number = $item->value;
-          // A phone number was deleted.
-          if (!in_array($phone_number, $numbers)) {
-            if ($phone_verification = $this->getPhoneVerificationByEntity($entity, $phone_number)) {
-              $phone_verification->delete();
-            }
+    if (isset($items_original) && !$items->equals($items_original)) {
+      foreach ($items_original as $item) {
+        $phone_number = $item->value;
+        // A phone number was deleted.
+        if (!in_array($phone_number, $numbers)) {
+          if ($phone_verification = $this->getPhoneVerificationByEntity($entity, $phone_number)) {
+            $phone_verification->delete();
           }
         }
       }
@@ -275,13 +277,12 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
     // delete entities. Which would otherwise error on non-existent tables.
     try {
       $this->getPhoneNumberSettingsForEntity($entity);
-      $verification_storage = \Drupal::entityTypeManager()
-        ->getStorage('sms_phone_number_verification');
-      $verification_entities = $verification_storage->loadByProperties([
-        'entity__target_id' => $entity->id(),
-        'entity__target_type' => $entity->getEntityTypeId(),
-      ]);
-      $verification_storage->delete($verification_entities);
+      $verification_entities = $this->phoneNumberVerificationStorage
+        ->loadByProperties([
+          'entity__target_id' => $entity->id(),
+          'entity__target_type' => $entity->getEntityTypeId(),
+        ]);
+      $this->phoneNumberVerificationStorage->delete($verification_entities);
     }
     catch (PhoneNumberSettingsException $e) {
     }
