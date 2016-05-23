@@ -1,7 +1,0 @@
-name: SMS Validation
-type: module
-description: Provides number validation features to the SMS Framework.
-core: 8.x
-package: SMS Framework
-dependencies:
-  - sms
