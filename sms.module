@@ -17,12 +17,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\sms\Entity\SmsMessageInterface;
 
-// Direction codes.
-define('SMS_DIR_NONE',  0);
-define('SMS_DIR_OUT',   1);
-define('SMS_DIR_IN',    2);
-define('SMS_DIR_ALL',   4);
-
 /**
  * Implements hook_cron().
  */
@@ -261,33 +255,4 @@ function sms_validate_number(&$number, array $options = array()) {
   }
 
   return $errors;
-}
-
-/**
- * Returns a direction code
- *
- * Direction codes are one of the SMS_DIR_* constants defined in this module.
- *
- * @param bool $out
- *   Outgoing allowed or not
- * @param bool $in
- *   Incoming allowed or not
- *
- * @return int
- *   The constant that defines this direction combination.
- */
-function sms_dir($out, $in) {
-  if ( $out &&   $in) {
-    return SMS_DIR_ALL;
-  }
-  if ( $out && !$in) {
-    return SMS_DIR_OUT;
-  }
-  if (!$out &&   $in) {
-    return SMS_DIR_IN;
-  }
-  if (!$out && !$in) {
-    return SMS_DIR_NONE;
-  }
-  return SMS_DIR_NONE;
 }
