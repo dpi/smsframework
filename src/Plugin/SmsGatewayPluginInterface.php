@@ -113,7 +113,7 @@ interface SmsGatewayPluginInterface extends ConfigurablePluginInterface, PluginF
   const STATUS_ERR_OTHER = 500;
 
   /**
-   * Sends an SMS and invokes the corresponding sms receipt method.
+   * Sends an SMS.
    *
    * @param \Drupal\sms\Message\SmsMessageInterface $sms
    *   The sms to be sent.

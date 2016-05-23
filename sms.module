@@ -128,17 +128,6 @@ function _sms_entity_postsave(EntityInterface $entity) {
   }
 }
 
-/**
- * Handles responses to message transactions.
- *
- * @see \Drupal\sms\Gateway\SmsProviderInterface::receipt
- *
- * @deprecated use \Drupal\sms\Provider\SmsProviderInterface::receipt() instead.
- */
-function sms_receipt(array $reports, array $options = []) {
-  \Drupal::service('sms_provider')->receipt($reports, $options);
-}
-
 /******************************************************************************
  * HELPER FUNCTIONS
  */
