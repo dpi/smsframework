@@ -17,12 +17,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\sms\Entity\SmsMessageInterface;
 
-// Direction codes.
-define('SMS_DIR_NONE',  0);
-define('SMS_DIR_OUT',   1);
-define('SMS_DIR_IN',    2);
-define('SMS_DIR_ALL',   4);
-
 /**
  * Implements hook_cron().
  */
@@ -132,53 +126,6 @@ function _sms_entity_postsave(EntityInterface $entity) {
       }
     }
   }
-}
-
-/**
- * Queue worker callback for queued incoming messages.
- *
- * @param array $item
- *   An array containing arguments for sending queued message.
- *
- * @see sms_cron_queue_info().
- */
-function sms_incoming_queue_worker(array $item) {
-  sms_incoming($item['number'], $item['message'], $item['options']);
-}
-
-/**
- * Handles incoming messages.
- *
- * Allows gateways modules to pass messages in a standard format for processing.
- * Every implementation of hook_sms_incoming() will be invoked by this method.
- *
- * Additionally, 'sms_incoming' rules event will be invoked if rules module is
- * enabled.
- *
- * @param string $number
- *   The sender's mobile number.
- * @param string $message
- *   The content of the text message.
- * @param array $options
- *   An array of additional options.
- *
- * @deprecated use \Drupal\sms\Provider\SmsProviderInterface::incoming() instead.
- */
-function sms_incoming($number, $message, array $options = array()) {
-  $sender = isset($options['sender']) ? $options['sender'] : '';
-  $sms = new SmsMessage($sender, explode(',', $number), $message, $options, \Drupal::currentUser()->id());
-  \Drupal::service('sms_provider')->incoming($sms);
-}
-
-/**
- * Handles responses to message transactions.
- *
- * @see \Drupal\sms\Gateway\SmsProviderInterface::receipt
- *
- * @deprecated use \Drupal\sms\Provider\SmsProviderInterface::receipt() instead.
- */
-function sms_receipt(array $reports, array $options = []) {
-  \Drupal::service('sms_provider')->receipt($reports, $options);
 }
 
 /******************************************************************************
@@ -297,33 +244,4 @@ function sms_validate_number(&$number, array $options = array()) {
   }
 
   return $errors;
-}
-
-/**
- * Returns a direction code
- *
- * Direction codes are one of the SMS_DIR_* constants defined in this module.
- *
- * @param bool $out
- *   Outgoing allowed or not
- * @param bool $in
- *   Incoming allowed or not
- *
- * @return int
- *   The constant that defines this direction combination.
- */
-function sms_dir($out, $in) {
-  if ( $out &&   $in) {
-    return SMS_DIR_ALL;
-  }
-  if ( $out && !$in) {
-    return SMS_DIR_OUT;
-  }
-  if (!$out &&   $in) {
-    return SMS_DIR_IN;
-  }
-  if (!$out && !$in) {
-    return SMS_DIR_NONE;
-  }
-  return SMS_DIR_NONE;
 }

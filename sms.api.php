@@ -37,6 +37,21 @@ function hook_sms_incoming_postprocess(\Drupal\sms\Message\SmsMessageInterface $
 }
 
 /**
+ * Called after SMS delivery reports are processed by the SMS provider.
+ *
+ * This hook allows gateways to customize responses that would be returned to
+ * the gateway server.
+ *
+ * @param \Drupal\sms\Message\SmsDeliveryReportInterface[] $reports
+ *   Delivery reports received from the SMS gateway.
+ * @param \Symfony\Component\HttpFoundation\Response $response
+ *   The HTTP response that will be sent back to the server.
+ */
+function hook_sms_delivery_report(array $reports, \Symfony\Component\HttpFoundation\Response $response) {
+  $response->setContent('OK');
+}
+
+/**
  * Event subscribers for SMS Framework.
  *
  * Service definition:
@@ -124,4 +139,3 @@ class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSu
   }
 
 }
-

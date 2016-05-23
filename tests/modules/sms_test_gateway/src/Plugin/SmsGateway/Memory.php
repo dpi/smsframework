@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
  *   id = "memory",
  *   label = @Translation("Memory"),
  *   outgoing_message_max_recipients = -1,
+ *   schedule_aware = FALSE,
  * )
  */
 class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInterface{

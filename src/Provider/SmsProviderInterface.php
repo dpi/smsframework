@@ -72,26 +72,6 @@ interface SmsProviderInterface {
   public function incoming(SmsMessageInterface $sms_message);
 
   /**
-   * Handles responses to the SMS provider from gateways.
-   *
-   * Allows gateways modules to pass message receipts and other responses to
-   * messages in a standard format for processing, and provides a basic set of
-   * status codes for common code handling.
-   *
-   * Allowed message status codes are defined as constants in
-   * @link \Drupal\sms\Plugin\SmsGatewayPluginInterface @endlink
-   *
-   * The original gateway code and string will often be provided in the $options
-   * array as 'gateway_message_status' and 'gateway_message_status_text'.
-   *
-   * @param \Drupal\sms\Message\SmsDeliveryReportInterface[] $reports
-   *   An array of the delivery reports that have been received.
-   * @param array $options
-   *   (optional) Extended options passed by the receipt receiver.
-   */
-  public function receipt(array $reports, array $options = []);
-
-  /**
    * Handles delivery reports returning to the SMS provider from gateways.
    *
    * Allows gateways plugins to correctly parse delivery reports and return a

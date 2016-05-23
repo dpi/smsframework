@@ -1,5 +1,0 @@
-sms_valid.admin:
-  title: 'Number validation'
-  description: 'Configure number validation and rulesets.'
-  route_name: sms_valid.admin
-  parent: sms.admin

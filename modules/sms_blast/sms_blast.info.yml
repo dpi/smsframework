@@ -4,4 +4,5 @@ type: module
 core: 8.x
 package: SMS Framework
 dependencies:
- - sms_user
+ - sms
+ - user

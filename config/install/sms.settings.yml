@@ -1,5 +1,4 @@
 default_gateway: log
-bootstrap_queue: { }
 flood:
   verify_limit: 5
   verify_window: 21600

@@ -23,7 +23,7 @@ use Drupal\sms\Entity\PhoneNumberSettings;
  */
 class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
 
-  public static $modules = ['sms', 'sms_user', 'sms_sendtophone', 'sms_test_gateway', 'node', 'field', 'field_ui'];
+  public static $modules = ['sms', 'sms_sendtophone', 'sms_test_gateway', 'node', 'field', 'field_ui'];
 
   /**
    * @var \Drupal\field\FieldStorageConfigInterface
