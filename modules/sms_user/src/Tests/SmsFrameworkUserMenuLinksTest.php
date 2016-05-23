@@ -37,7 +37,6 @@ class SmsFrameworkUserMenuLinksTest extends SmsFrameworkWebTestBase {
   public function testDynamicMenuLinks() {
     entity_get_form_display('user', 'user', 'default')->save();
     $this->createPhoneNumberSettings('user', 'user');
-    $this->rebuildAll();
     $this->drupalGet(Url::fromRoute('user.admin_index'));
     $this->assertLink('User phone number');
   }
