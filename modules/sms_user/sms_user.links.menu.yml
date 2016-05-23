@@ -1,5 +1,10 @@
 sms_user.options:
-  title: 'SMS User Options'
-  description: 'Edit options for SMS and user integration.'
+  title: 'User SMS settings'
+  description: 'Edit options for user integration with SMS Framework.'
   route_name: sms_user.options
-  parent: sms.admin
+  parent: user.admin_index
+  weight: 20
+
+sms_user.deriver:
+  class: Drupal\Core\Menu\MenuLinkDefault
+  deriver: \Drupal\sms_user\Plugin\Derivative\SmsUserMenuLink
