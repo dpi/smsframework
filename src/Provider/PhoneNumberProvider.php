@@ -227,6 +227,27 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   /**
    * {@inheritdoc}
    */
+  function deletePhoneVerificationByEntity(EntityInterface $entity) {
+    // Check the entity uses phone numbers. To save on a SQL call, and to prevent
+    // having to install phone number verification for SMS Framework tests which
+    // delete entities. Which would otherwise error on non-existent tables.
+    try {
+      $this->getPhoneNumberSettingsForEntity($entity);
+      $verification_storage = \Drupal::entityTypeManager()
+        ->getStorage('sms_phone_number_verification');
+      $verification_entities = $verification_storage->loadByProperties([
+        'entity__target_id' => $entity->id(),
+        'entity__target_type' => $entity->getEntityTypeId(),
+      ]);
+      $verification_storage->delete($verification_entities);
+    }
+    catch (PhoneNumberSettingsException $e) {
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function purgeExpiredVerifications() {
     $current_time = \Drupal::request()->server->get('REQUEST_TIME');
 
