@@ -137,6 +137,26 @@ interface PhoneNumberProviderInterface {
   public function newPhoneVerification(EntityInterface $entity, $phone_number);
 
   /**
+   * Detect modifications to phone numbers on an entity.
+   *
+   * Detects if phone numbers are modified on an entity. If new phone numbers
+   * are detected, new phone number verifications are created. If phone numbers
+   * are removed, the associated phone number verification is deleted.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   Update phone number verifications for this entity.
+   */
+  function updatePhoneVerificationByEntity(EntityInterface $entity);
+
+  /**
+   * Deletes phone number verifications for an entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   Delete phone number verifications for this entity.
+   */
+  function deletePhoneVerificationByEntity(EntityInterface $entity);
+
+  /**
    * Cleans up expired phone number verifications
    *
    * Removes phone numbers from entities if setting is verification expires, and

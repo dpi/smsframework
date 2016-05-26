@@ -13,7 +13,6 @@ use Drupal\Core\Utility\Token;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
-use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
 use Drupal\sms\Entity\SmsMessage as SmsMessageEntity;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessage;
@@ -222,6 +221,71 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
     }
 
     return $phone_verification;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function updatePhoneVerificationByEntity(EntityInterface $entity) {
+    try {
+      $phone_number_settings = $this->getPhoneNumberSettingsForEntity($entity);
+      $field_name = $phone_number_settings->getFieldName('phone_number');
+      if (!empty($field_name)) {
+        $items_original = &$entity->original->{$field_name};
+        $items = &$entity->{$field_name};
+      }
+    }
+    catch (PhoneNumberSettingsException $e) {
+      // Missing phone number configuration for this entity.
+    }
+
+    // $items can be unassigned because field_name is not configured, or is NULL
+    // because there is no items.
+    if (!isset($items)) {
+      return;
+    }
+
+    $numbers = [];
+    foreach ($items as &$item) {
+      $phone_number = $item->value;
+      $numbers[] = $phone_number;
+
+      if (!$this->getPhoneVerificationByEntity($entity, $phone_number)) {
+        $this->newPhoneVerification($entity, $phone_number);
+      }
+    }
+
+    if (isset($items_original) && !$items->equals($items_original)) {
+      foreach ($items_original as $item) {
+        $phone_number = $item->value;
+        // A phone number was deleted.
+        if (!in_array($phone_number, $numbers)) {
+          if ($phone_verification = $this->getPhoneVerificationByEntity($entity, $phone_number)) {
+            $phone_verification->delete();
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function deletePhoneVerificationByEntity(EntityInterface $entity) {
+    // Check the entity uses phone numbers. To save on a SQL call, and to prevent
+    // having to install phone number verification for SMS Framework tests which
+    // delete entities. Which would otherwise error on non-existent tables.
+    try {
+      $this->getPhoneNumberSettingsForEntity($entity);
+      $verification_entities = $this->phoneNumberVerificationStorage
+        ->loadByProperties([
+          'entity__target_id' => $entity->id(),
+          'entity__target_type' => $entity->getEntityTypeId(),
+        ]);
+      $this->phoneNumberVerificationStorage->delete($verification_entities);
+    }
+    catch (PhoneNumberSettingsException $e) {
+    }
   }
 
   /**
