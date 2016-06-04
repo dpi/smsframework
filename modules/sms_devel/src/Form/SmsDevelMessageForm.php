@@ -10,6 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Direction;
+use Drupal\sms\Exception\SmsException;
 
 /**
  * Simulate a message being sent or received.
@@ -185,13 +186,20 @@ class SmsDevelMessageForm extends FormBase {
   function submitSend(array &$form, FormStateInterface $form_state) {
     $this->message->setDirection(Direction::OUTGOING);
 
-    if ($form_state->getValue('skip_queue')) {
-      $this->smsProvider->send($this->message);
-      drupal_set_message($this->t('Message sent.'));
+    try {
+      if ($form_state->getValue('skip_queue')) {
+        $this->smsProvider->send($this->message);
+        drupal_set_message($this->t('Message sent.'));
+      }
+      else {
+        $this->smsProvider->queue($this->message);
+        drupal_set_message($this->t('Message added to the outgoing queue.'));
+      }
     }
-    else {
-      $this->smsProvider->queue($this->message);
-      drupal_set_message($this->t('Message added to the outgoing queue.'));
+    catch (SmsException $e) {
+      drupal_set_message($this->t('Message could not be sent: @error', [
+        '@error' => $e->getMessage(),
+      ]), 'error');
     }
   }
 

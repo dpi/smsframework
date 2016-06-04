@@ -177,9 +177,16 @@ class SendToPhoneForm extends FormBase {
       ->setMessage($message)
       ->setSenderEntity($user)
       ->addRecipient($number);
-    $this->smsProvider->queue($sms_message);
 
-    drupal_set_message($this->t('Message has been sent.'));
+    try {
+      $this->smsProvider->queue($sms_message);
+      drupal_set_message($this->t('Message has been sent.'));
+    }
+    catch (\Exception $e) {
+      drupal_set_message($this->t('Message could not be sent: @error', [
+        '@error' => $e->getMessage(),
+      ]), 'error');
+    }
   }
 
 }

@@ -86,7 +86,7 @@ class SmsSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Default gateway'),
       '#options' => $gateways,
       '#default_value' => $sms_settings->get('default_gateway'),
-      '#required' => TRUE,
+      '#empty_option' => $this->t(' - No Default - '),
     ];
 
     $form['pages']['#tree'] = TRUE;

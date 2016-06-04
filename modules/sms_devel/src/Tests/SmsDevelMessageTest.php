@@ -160,4 +160,25 @@ class SmsDevelMessageTest extends SmsFrameworkWebTestBase {
     $this->assertEqual($date->format('U'), $message->getSendTime(), 'Message has send time.');
   }
 
+  /**
+   * Tests error shown if gateway found for message.
+   */
+  public function testNoFallbackGateway() {
+    // Unset default gateway.
+    $this->config('sms.settings')
+      ->set('default_gateway', NULL)
+      ->save();
+
+    $edit['number'] = $this->randomPhoneNumbers(1)[0];
+    $edit['message'] = $this->randomString();
+    $edit['skip_queue'] = TRUE;
+
+    $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
+    $this->assertResponse(200);
+    $this->assertRaw('Message could not be sent');
+
+    $messages = $this->getTestMessages($this->gateway);
+    $this->assertEqual(0, count($messages), 'No messages sent.');
+  }
+
 }
