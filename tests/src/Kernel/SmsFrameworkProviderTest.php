@@ -86,7 +86,9 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   public function testSendNoFallbackGateway() {
     $this->smsProvider->setDefaultGateway(NULL);
     $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class);
-    $this->smsProvider->send($this->createSmsMessage());
+    $message = $this->createSmsMessage()
+      ->addRecipients($this->randomPhoneNumbers());
+    $this->smsProvider->send($message);
   }
 
   /**
@@ -109,8 +111,9 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   public function testQueueNoFallbackGateway() {
     $this->smsProvider->setDefaultGateway(NULL);
     $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class);
-    $sms_message = $this->createSmsMessage();
-    $this->smsProvider->queue($sms_message);
+    $message = $this->createSmsMessage()
+      ->addRecipients($this->randomPhoneNumbers());
+    $this->smsProvider->queue($message);
   }
 
   /**
