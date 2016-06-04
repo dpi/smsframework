@@ -250,6 +250,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
 
     $user = $this->createUser();
     $sms_message = SmsMessage::create()
+      ->addRecipients($this->randomPhoneNumbers(1))
       ->setMessage($this->randomString())
       ->setDirection(Direction::OUTGOING)
       ->setRecipientEntity($user)

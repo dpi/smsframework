@@ -74,6 +74,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::OUTGOING)
       ->setMessage($this->randomString());
+    $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class, 'There are no recipients');
     $this->smsProvider->send($sms_message);
     $this->assertEquals(0, count($this->getTestMessages($this->gateway)));
   }
