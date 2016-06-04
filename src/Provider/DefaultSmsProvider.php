@@ -196,8 +196,6 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * @return \Drupal\sms\Entity\SmsGatewayInterface|NULL
    *   A SmsGateway config entity, or NULL if default gateway is not set or
    *   invalid.
-   *
-   * @deprecated remove. shouldnt rely on this since its really a fallback.
    */
   public function getDefaultGateway() {
     $gateway_id = $this->configFactory
@@ -211,8 +209,6 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *
    * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
    *   The new site default SMS Gateway, or NULL to unset.
-   *
-   * @deprecated  remove. shouldnt rely on this since its really a fallback / dont need a helper to set default. This should be only set on the global config form.
    */
   public function setDefaultGateway(SmsGatewayInterface $sms_gateway = NULL) {
     $default_gateway = $sms_gateway ? $sms_gateway->id() : NULL;
