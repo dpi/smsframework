@@ -255,8 +255,15 @@ class AccountRegistration implements AccountRegistrationInterface {
 
     // Use queue(), instead of phone number provider sendMessage()
     // because the phone number is not confirmed.
-    $this->smsProvider
-      ->queue($sms_message);
+    try {
+      $this->smsProvider->queue($sms_message);
+    }
+    catch (\Exception $e) {
+      $t_args['%recipient'] = $sender_number;
+      $t_args['%error'] = $e->getMessage();
+      \Drupal::logger('sms_user.account_registration.formatted')
+        ->warning('Reply message could not be sent to recipient %recipient: %error', $t_args);
+    }
   }
 
   /**

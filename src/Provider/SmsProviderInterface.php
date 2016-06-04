@@ -22,6 +22,9 @@ interface SmsProviderInterface {
    *
    * @param \Drupal\sms\Entity\SmsMessageInterface $sms_message
    *   A SMS message entity.
+   *
+   * @throws \Drupal\sms\Exception\RecipientRouteException
+   *   Thrown if no gateway could be determined for the message.
    */
   public function queue(SmsMessageEntityInterface &$sms_message);
 
@@ -57,6 +60,9 @@ interface SmsProviderInterface {
    *   The results of the message sending operation. The message sent can be
    *   transformed into multiple messages depending on gateway implementation.
    *   Therefore this function can return multiple results.
+   *
+   * @throws \Drupal\sms\Exception\RecipientRouteException
+   *   Thrown if no gateway could be determined for the message.
    */
   public function send(SmsMessageInterface $sms);
 
