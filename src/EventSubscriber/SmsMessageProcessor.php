@@ -49,6 +49,23 @@ class SmsMessageProcessor implements EventSubscriberInterface {
   }
 
   /**
+   * Ensures there is at least one recipient on the message.
+   *
+   * @param \Drupal\sms\Event\SmsMessageEvent $event
+   *   The SMS message preprocess event.
+   */
+  public function ensureRecipients(SmsMessageEvent $event) {
+    $sms_messages = $event->getMessages();
+
+    foreach ($sms_messages as $sms_message) {
+      $recipients = $sms_message->getRecipients();
+      if (!count($recipients)) {
+        throw new RecipientRouteException(sprintf('There are no recipients.'));
+      }
+    }
+  }
+
+  /**
    * Ensure all recipients are routed to a gateway.
    *
    * Messages will be split into multiple if recipients need to be routed to
@@ -171,6 +188,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
+    $events['sms.message.preprocess'][] = ['ensureRecipients', 1024];
     $events['sms.message.preprocess'][] = ['ensureGateways', 1024];
     $events['sms.message.preprocess'][] = ['deliveryReportUrl'];
     $events['sms.message.preprocess'][] = ['chunkMaxRecipients', -1024];

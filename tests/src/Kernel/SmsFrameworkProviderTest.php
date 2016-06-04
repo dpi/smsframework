@@ -183,6 +183,17 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Test an exception is thrown if a message has no recipients
+   */
+  public function testNoRecipients() {
+    $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class, 'There are no recipients.');
+    $sms_message = SmsMessage::create()
+      ->setDirection(Direction::OUTGOING)
+      ->setMessage($this->randomString());
+    $this->smsProvider->send($sms_message);
+  }
+
+  /**
    * Test message is split into multiple messages if gateway demands it.
    */
   public function testChunking() {
