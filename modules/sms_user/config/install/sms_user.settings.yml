@@ -10,7 +10,7 @@ account_registration:
   formatted:
     status: false
     incoming_messages:
-      - |
+      - |-
         E [email]
         U [username]
     activation_email: true
