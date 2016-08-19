@@ -95,10 +95,10 @@ class AccountRegistration implements AccountRegistrationInterface {
       $entities = $this->phoneNumberProvider
         ->getPhoneVerificationByPhoneNumber($sender_number, NULL, 'user');
       if (!count($entities)) {
-        if (!empty($this->settings('all_unknown_numbers.status'))) {
+        if (!empty($this->settings('unrecognized_sender.status'))) {
           $this->allUnknownNumbers($sms_message);
         }
-        if (!empty($this->settings('formatted.status'))) {
+        if (!empty($this->settings('incoming_pattern.status'))) {
           $this->preFormattedMessage($sms_message);
         }
       }
@@ -136,19 +136,19 @@ class AccountRegistration implements AccountRegistrationInterface {
 
       $t_args['%name'] = $user->label();
       $t_args['%uid'] = $user->id();
-      \Drupal::logger('sms_user.account_registration.all_unknown_numbers')
+      \Drupal::logger('sms_user.account_registration.unrecognized_sender')
         ->info('Creating new account for %sender_phone_number. Username: %name. User ID: %uid', $t_args);
 
       // Optionally send a reply.
-      if (!empty($this->settings('all_unknown_numbers.reply.status'))) {
-        $message = $this->settings('all_unknown_numbers.reply.message');
+      if (!empty($this->settings('unrecognized_sender.reply.status'))) {
+        $message = $this->settings('unrecognized_sender.reply.message');
         $message = str_replace('[user:password]', $password, $message);
         $this->sendReply($sender_number, $user, $message);
       }
     }
     else {
       $t_args['@error'] = $this->buildError($validate);
-      \Drupal::logger('sms_user.account_registration.all_unknown_numbers')
+      \Drupal::logger('sms_user.account_registration.unrecognized_sender')
         ->error('Could not create new account for %sender_phone_number because there was a problem with validation: @error', $t_args);
     }
   }
@@ -161,8 +161,8 @@ class AccountRegistration implements AccountRegistrationInterface {
    *   An incoming SMS message.
    */
   protected function preFormattedMessage(SmsMessageInterface $sms_message) {
-    if (!empty($this->settings('formatted.incoming_messages.0'))) {
-      $incoming_form = $this->settings('formatted.incoming_messages.0');
+    if (!empty($this->settings('incoming_pattern.incoming_messages.0'))) {
+      $incoming_form = $this->settings('incoming_pattern.incoming_messages.0');
       $incoming_form = str_replace("\r\n", "\n", $incoming_form);
       $compiled = $this->compileFormRegex($incoming_form, '/');
       $matches = [];
@@ -198,34 +198,34 @@ class AccountRegistration implements AccountRegistrationInterface {
           // @todo autoconfirm the number?
           // @see https://www.drupal.org/node/2709911
 
-          $message = $this->settings('formatted.reply.message');
+          $message = $this->settings('incoming_pattern.reply.message');
           $message = str_replace('[user:password]', $password, $message);
 
-          \Drupal::logger('sms_user.account_registration.formatted')
+          \Drupal::logger('sms_user.account_registration.incoming_pattern')
             ->info('Creating new account for %sender_phone_number. Username: %name. User ID: %uid', $t_args + [
               '%uid' => $user->id(),
               '%name' => $user->label(),
             ]);
 
           // Send an activation email if no password placeholder is found.
-          if (!$contains_password && !empty($this->settings('formatted.activation_email'))) {
+          if (!$contains_password && !empty($this->settings('incoming_pattern.send_activation_email'))) {
             _user_mail_notify('register_no_approval_required', $user);
           }
         }
         else {
-          $message = $this->settings('formatted.reply.message_failure');
+          $message = $this->settings('incoming_pattern.reply.message_failure');
 
           $error = $this->buildError($validate);
           $message = str_replace('[error]', $error, $message);
 
-          \Drupal::logger('sms_user.account_registration.formatted')
+          \Drupal::logger('sms_user.account_registration.incoming_pattern')
             ->warning('Could not create new account for %sender_phone_number because there was a problem with validation: @error', $t_args + [
               '@error' => $error,
             ]);
         }
 
         // Optionally send a reply.
-        if (!empty($this->settings('formatted.reply.status'))) {
+        if (!empty($this->settings('incoming_pattern.reply.status'))) {
           $this->sendReply($sender_number, $user, $message);
         }
       }
@@ -261,7 +261,7 @@ class AccountRegistration implements AccountRegistrationInterface {
     catch (\Exception $e) {
       $t_args['%recipient'] = $sender_number;
       $t_args['%error'] = $e->getMessage();
-      \Drupal::logger('sms_user.account_registration.formatted')
+      \Drupal::logger('sms_user.account_registration.incoming_pattern')
         ->warning('Reply message could not be sent to recipient %recipient: %error', $t_args);
     }
   }
