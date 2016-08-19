@@ -68,7 +68,6 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * {@inheritdoc}
    */
   public function queue(SmsMessageInterface $sms_message) {
-    $sms_message = SmsMessage::convertFromSmsMessage($sms_message);
     $sms_messages = $this->dispatch('sms.message.preprocess', [$sms_message]);
 
     /** @var SmsMessageEntityInterface[] $sms_messages */
@@ -76,7 +75,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
       // Tag so 'sms.message.*process' are not dispatched again.
       $sms_message->setOption('_no_dispatch_events', TRUE);
 
-      if ($count = $sms_message->validate()->count()) {
+      if ($sms_message instanceof SmsMessageEntityInterface && ($count = $sms_message->validate()->count())) {
         throw new SmsException(sprintf('Can not queue SMS message because there are %s validation error(s).', $count));
       }
 
@@ -92,6 +91,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
         continue;
       }
 
+      $sms_message = SmsMessage::convertFromSmsMessage($sms_message);
       $sms_message->save();
     }
 
