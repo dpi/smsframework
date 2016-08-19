@@ -73,8 +73,8 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
   public function testProcessUnqueued() {
     $sms_message = $this->createSmsMessage();
 
-    $this->smsProvider->queue($sms_message);
-    $id = $sms_message->id();
+    $result = $this->smsProvider->queue($sms_message);
+    $id = $result[0]->id();
 
     // Call processUnqueued manually so cron does not send the message with
     // queue workers.
@@ -216,7 +216,8 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
   protected function createSmsMessage(array $values = []) {
     return SmsMessage::create($values)
       ->setDirection(Direction::OUTGOING)
-      ->setMessage($this->randomString());
+      ->setMessage($this->randomString())
+      ->addRecipients($this->randomPhoneNumbers(1));
   }
 
 }

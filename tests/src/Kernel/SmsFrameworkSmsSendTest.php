@@ -23,7 +23,7 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
    *
    * @var array
    */
-  public static $modules = ['sms', 'sms_test_gateway'];
+  public static $modules = ['sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference'];
 
   /**
    * The default SMS provider service.

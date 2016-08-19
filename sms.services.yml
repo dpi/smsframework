@@ -3,7 +3,7 @@ services:
     alias: sms_provider.default
   sms_provider.default:
     class: Drupal\sms\Provider\DefaultSmsProvider
-    arguments: ['@config.factory', '@module_handler']
+    arguments: ['@event_dispatcher', '@config.factory', '@module_handler']
   plugin.manager.sms_gateway:
     class: Drupal\sms\Plugin\SmsGatewayPluginManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
@@ -13,3 +13,8 @@ services:
   sms.queue:
     class: Drupal\sms\Provider\SmsQueueProcessor
     arguments: ['@entity_type.manager', '@queue', '@sms_provider']
+  sms.sms_message_processor:
+    class: Drupal\sms\EventSubscriber\SmsMessageProcessor
+    arguments: ['@event_dispatcher', '@config.factory']
+    tags:
+      - { name: event_subscriber }

@@ -23,10 +23,13 @@ interface SmsProviderInterface {
    * @param \Drupal\sms\Entity\SmsMessageInterface $sms_message
    *   A SMS message entity.
    *
+   * @return \Drupal\sms\Entity\SmsMessageInterface[]
+   *   The queued messages. A single message may be transformed into many.
+   *
    * @throws \Drupal\sms\Exception\RecipientRouteException
    *   Thrown if no gateway could be determined for the message.
    */
-  public function queue(SmsMessageEntityInterface &$sms_message);
+  public function queue(SmsMessageEntityInterface $sms_message);
 
   /**
    * Queue a standard SMS message for receiving.

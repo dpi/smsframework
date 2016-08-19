@@ -229,12 +229,13 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
     $user = $this->createUser();
     $sms_message = SmsMessage::create()
       ->setMessage($this->randomString())
+      ->addRecipients($this->randomPhoneNumbers())
       ->setDirection(Direction::OUTGOING)
       ->setRecipientEntity($user)
       ->setAutomated(TRUE);
-    $this->smsProvider->queue($sms_message);
+    $return = $this->smsProvider->queue($sms_message);
 
-    $this->assertEquals($timestamp, $sms_message->getSendTime());
+    $this->assertEquals($timestamp, $return[0]->getSendTime());
   }
 
   /**
@@ -249,6 +250,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
 
     $user = $this->createUser();
     $sms_message = SmsMessage::create()
+      ->addRecipients($this->randomPhoneNumbers(1))
       ->setMessage($this->randomString())
       ->setDirection(Direction::OUTGOING)
       ->setRecipientEntity($user)

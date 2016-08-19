@@ -7,16 +7,15 @@
 
 namespace Drupal\sms\Provider;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Url;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
-use Drupal\sms\Exception\RecipientRouteException;
+use Drupal\sms\Event\SmsMessageEvent;
 use Drupal\sms\Message\SmsMessageInterface;
-use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginIncomingInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,6 +26,13 @@ use Drupal\sms\Direction;
  * The SMS provider that provides default messaging functionality.
  */
 class DefaultSmsProvider implements SmsProviderInterface {
+
+  /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
 
   /**
    * Configuration factory for this SMS provider.
@@ -45,12 +51,15 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * Creates a new instance of the default SMS provider.
    *
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   *   The event dispatcher.
    * @param \Drupal\Core\Config\ConfigFactoryInterface
    *   The gateway manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface
    *   The module handler.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler) {
+  public function __construct(EventDispatcherInterface $event_dispatcher, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler) {
+    $this->eventDispatcher = $event_dispatcher;
     $this->configFactory = $config_factory;
     $this->moduleHandler = $module_handler;
   }
@@ -58,140 +67,113 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function queue(SmsMessageEntityInterface &$sms_message) {
-    if (!$sms_message->getGateway()) {
-      $default = $this->getDefaultGateway();
-      if (!$default instanceof SmsGatewayInterface) {
-        throw new RecipientRouteException('No gateway could be found for this message.');
+  public function queue(SmsMessageEntityInterface $sms_message) {
+    $sms_messages = $this->dispatch('sms.message.preprocess', [$sms_message]);
+
+    /** @var SmsMessageEntityInterface[] $sms_messages */
+    foreach ($sms_messages as $gateway_id => &$sms_message) {
+      // Tag so 'sms.message.*process' are not dispatched again.
+      $sms_message->setOption('_no_dispatch_events', TRUE);
+
+      if ($count = $sms_message->validate()->count()) {
+        throw new SmsException(sprintf('Can not queue SMS message because there are %s validation error(s).', $count));
       }
-      $sms_message->setGateway($default);
-    }
 
-    if ($sms_message->getGateway()->getSkipQueue()) {
-      switch ($sms_message->getDirection()) {
-        case Direction::INCOMING:
-          $this->incoming($sms_message);
-          return;
-        case Direction::OUTGOING:
-          $this->send($sms_message);
-          return;
+      if ($sms_message->getGateway()->getSkipQueue()) {
+        switch ($sms_message->getDirection()) {
+          case Direction::INCOMING:
+            $this->incoming($sms_message);
+            continue;
+          case Direction::OUTGOING:
+            $this->send($sms_message);
+            continue;
+        }
+        continue;
       }
-      return;
-    }
 
-    if ($count = $sms_message->validate()->count()) {
-      throw new SmsException(sprintf('Can not queue SMS message because there are %s validation error(s).', $count));
-    }
-
-    // Split messages to overcome gateway limits.
-    $max = $sms_message->getGateway()->getMaxRecipientsOutgoing();
-    foreach ($sms_message->chunkByRecipients($max) as $sms_message) {
       $sms_message->save();
     }
+
+    return $this->dispatch('sms.message.postprocess', $sms_messages);
   }
 
   /**
    * {@inheritdoc}
    */
   public function queueIn(SmsMessageInterface $sms_message) {
-    $this->plainMessageQueue($sms_message, Direction::INCOMING);
+    $sms_message = SmsMessage::convertFromSmsMessage($sms_message)
+      ->setDirection(Direction::INCOMING);
+    $this->queue($sms_message);
   }
 
   /**
    * {@inheritdoc}
    */
   public function queueOut(SmsMessageInterface $sms_message) {
-    $this->plainMessageQueue($sms_message, Direction::OUTGOING);
+    $sms_message = SmsMessage::convertFromSmsMessage($sms_message)
+      ->setDirection(Direction::OUTGOING);
+    $this->queue($sms_message);
   }
 
   /**
    * {@inheritdoc}
    */
   public function send(SmsMessageInterface $sms) {
-    if (!$sms->getGateway()) {
-      $default = $this->getDefaultGateway();
-      if (!$default instanceof SmsGatewayInterface) {
-        throw new RecipientRouteException('No gateway could be found for this message.');
-      }
-      $sms->setGateway($default);
-    }
+    $dispatch = !$sms->getOption('_no_dispatch_events');
+    $sms_messages = $dispatch ? $this->dispatch('sms.message.preprocess', [$sms]) : [$sms];
 
     $results = [];
-    $max = $sms->getGateway()->getMaxRecipientsOutgoing();
-    foreach ($sms->chunkByRecipients($max) as $sms_message) {
-      if ($this->preProcess($sms_message)) {
-        $this->moduleHandler->invokeAll('sms_send', [$sms_message]);
-        $result = $this->process($sms_message);
-        $this->postProcess($sms_message, $result);
-        $results[] = $result;
+    foreach ($sms_messages as &$sms_message) {
+      $preprocess = $this->moduleHandler
+        ->invokeAll('sms_outgoing_preprocess', [$sms_message]);
+
+      if (in_array(FALSE, $preprocess, TRUE)) {
+        continue;
       }
+
+      // Processes the SMS message and returns the response from the gateway.
+      $result = $sms_message->getGateway()
+        ->getPlugin()
+        ->send($sms_message);
+
+      $this->moduleHandler
+        ->invokeAll('sms_outgoing_postprocess', [$sms_message, $result]);
+
+      $results[] = $result;
+    }
+
+    if ($dispatch) {
+      $this->dispatch('sms.message.postprocess', $sms_messages);
     }
 
     return $results;
   }
 
   /**
-   * Processes the SMS message and returns the response from the gateway.
-   *
-   * @param \Drupal\sms\Message\SmsMessageInterface $sms
-   *   The SMS to be sent.
-   *
-   * @return \Drupal\sms\Message\SmsMessageResultInterface
-   *   The message result from the gateway.
-   */
-  protected function process(SmsMessageInterface $sms) {
-    if (!$delivery_report_url = $sms->getOption('delivery_report_url')) {
-      $url = Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $sms->getGateway()->id()])
-        ->setAbsolute()->toString();
-      $sms->setOption('delivery_report_url', $url);
-    }
-    return $sms->getGateway()
-      ->getPlugin()
-      ->send($sms);
-  }
-
-  /**
-   * Calls pre-process hooks and ensures that the action is still permitted.
-   *
-   * @param \Drupal\sms\Message\SmsMessageInterface $sms
-   *   The SMS to be sent.
-   *
-   * @return bool|null
-   *   Whether to continue sending or not.
-   */
-  protected function preProcess(SmsMessageInterface $sms) {
-    $return = $this->moduleHandler->invokeAll('sms_send_process', ['pre process', $sms, NULL]);
-    // Return FALSE if any of the hooks returned FALSE.
-    return !in_array(FALSE, $return, TRUE);
-  }
-
-  /**
-   * Calls post process hooks.
-   *
-   * @param \Drupal\sms\Message\SmsMessageInterface $sms
-   *   The SMS that was sent.
-   * @param \Drupal\sms\Message\SmsMessageResultInterface $result
-   *   The message result from the gateway.
-   */
-  protected function postProcess(SmsMessageInterface $sms, SmsMessageResultInterface $result) {
-    $this->moduleHandler->invokeAll('sms_send_process', ['post process', $sms, $result]);
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function incoming(SmsMessageInterface $sms_message) {
-    $this->moduleHandler->invokeAll('sms_incoming_preprocess', [$sms_message]);
+    $dispatch = !$sms_message->getOption('_no_dispatch_events');
+    $sms_messages = $dispatch ? $this->dispatch('sms.message.preprocess', [$sms_message]) : [$sms_message];
 
-    // Process the SMS message with the gateway plugin.
-    if ($sms_message instanceof SmsMessageEntityInterface) {
-      $plugin = $sms_message->getGateway()->getPlugin();
-      if ($plugin instanceof SmsGatewayPluginIncomingInterface) {
-        $plugin->incoming($sms_message);
+    foreach ($sms_messages as $sms_message) {
+      $this->moduleHandler->invokeAll('sms_incoming_preprocess', [$sms_message]);
+
+      // Process the SMS message with the gateway plugin.
+      $result = NULL;
+      if ($sms_message instanceof SmsMessageEntityInterface) {
+        $plugin = $sms_message->getGateway()->getPlugin();
+        if ($plugin instanceof SmsGatewayPluginIncomingInterface) {
+          $result = $plugin->incoming($sms_message);
+        }
       }
+
+      $this->moduleHandler->invokeAll('sms_incoming_postprocess', [$sms_message, $result]);
     }
 
-    $this->moduleHandler->invokeAll('sms_incoming_postprocess', [$sms_message]);
+    if ($dispatch) {
+      $this->dispatch('sms.message.postprocess', $sms_messages);
+    }
   }
 
   /**
@@ -237,26 +219,20 @@ class DefaultSmsProvider implements SmsProviderInterface {
   }
 
   /**
-   * Queues a standard SMS message object and converts it to an entity.
+   * Dispatch an event for messages.
    *
-   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
-   *   A standard SMS message object.
-   * @param $direction
-   *   Value of SmsMessageEntityInterface::DIRECTION_* constants.
+   * @param string $event_name
+   *   The event to trigger.
+   * @param \Drupal\sms\Message\SmsMessageInterface[] $sms_messages
+   *   The messages to dispatch.
+   *
+   * @return \Drupal\sms\Message\SmsMessageInterface[]
    */
-  protected function plainMessageQueue(SmsMessageInterface $sms_message, $direction) {
-    $gateway = $sms_message->getGateway() ?: $this->getDefaultGateway();
-
-    if ($gateway->getSkipQueue() && $direction == Direction::OUTGOING) {
-      $this->send($sms_message);
-      return;
-    }
-
-    // Convert SMS message to an entity.
-    $sms_message = SmsMessage::convertFromSmsMessage($sms_message)
-      ->setDirection($direction);
-
-    $this->queue($sms_message);
+  protected function dispatch($event_name, array $sms_messages) {
+    $event = new SmsMessageEvent($sms_messages);
+    $event = $this->eventDispatcher
+      ->dispatch($event_name, $event);
+    return $event->getMessages();
   }
 
 }
