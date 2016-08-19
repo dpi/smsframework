@@ -14,26 +14,6 @@ use Drupal\Core\Entity\EntityInterface;
 interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInterface {
 
   /**
-   * Get direction of the message.
-   *
-   * @return int
-   *   See \Drupal\sms\Entity\SmsMessageInterface::DIRECTION_* constants for
-   *   potential values.
-   */
-  public function getDirection();
-
-  /**
-   * Set direction of the message.
-   *
-   * @param int $direction
-   *   Any of \Drupal\sms\Entity\SmsMessageInterface::DIRECTION_* constants
-   *
-   * @return $this
-   *   Return SMS message for chaining.
-   */
-  public function setDirection($direction);
-
-  /**
    * Gets the name of the sender of this SMS message.
    *
    * @return string|NULL

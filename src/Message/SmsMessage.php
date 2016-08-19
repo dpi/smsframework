@@ -48,6 +48,15 @@ class SmsMessage implements SmsMessageInterface {
   protected $gateway;
 
   /**
+   * The direction of the message.
+   *
+   * See \Drupal\sms\Direction constants for potential values.
+   *
+   * @var integer
+   */
+  protected $direction;
+
+  /**
    * @var string
    *   Other options to be used for the sms.
    */
@@ -176,6 +185,21 @@ class SmsMessage implements SmsMessageInterface {
    */
   public function setGateway(SmsGatewayInterface $gateway) {
     $this->gateway = $gateway;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDirection() {
+    return $this->direction;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDirection($direction) {
+    $this->direction = $direction;
     return $this;
   }
 

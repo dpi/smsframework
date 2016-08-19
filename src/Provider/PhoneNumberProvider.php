@@ -19,6 +19,7 @@ use Drupal\sms\Message\SmsMessage;
 use Drupal\Component\Utility\Random;
 use Drupal\sms\Exception\NoPhoneNumberException;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\sms\Direction;
 
 /**
  * Phone number provider.
@@ -120,10 +121,11 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
 
     $sms_message = SmsMessageEntity::convertFromSmsMessage($sms_message)
       ->addRecipient(reset($phone_numbers))
-      ->setRecipientEntity($entity);
+      ->setRecipientEntity($entity)
+      ->setDirection(Direction::OUTGOING);
 
     $this->smsProvider
-      ->queueOut($sms_message);
+      ->queue($sms_message);
   }
 
   /**
@@ -207,7 +209,8 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       $sms_message = new SmsMessage();
       $sms_message
         ->addRecipient($phone_number)
-        ->setMessage($message);
+        ->setMessage($message)
+        ->setDirection(Direction::OUTGOING);
 
       $data['sms-message'] = $sms_message;
       $data['sms_verification_code'] = $phone_verification->getCode();
@@ -217,7 +220,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
         ->setAutomated(FALSE);
 
       $this->smsProvider
-        ->queueOut($sms_message);
+        ->queue($sms_message);
     }
 
     return $phone_verification;

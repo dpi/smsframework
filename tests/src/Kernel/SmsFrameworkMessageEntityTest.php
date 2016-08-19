@@ -99,23 +99,15 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Tests direction of SMS messages.
+   * Tests entity validation for direction property of SMS message entity.
    *
    * @covers ::getDirection
    * @covers ::setDirection
    */
-  public function testDirection() {
+  public function testDirectionEntityValidation() {
     // Check for validation violation for missing direction.
     $sms_message1 = $this->createSmsMessage();
     $this->assertTrue(in_array('direction', $sms_message1->validate()->getFieldNames()));
-
-    $sms_message2 = $this->createSmsMessage()
-      ->setDirection(Direction::OUTGOING);
-    $this->assertEquals(Direction::OUTGOING, $sms_message2->getDirection());
-
-    $sms_message3 = $this->createSmsMessage()
-      ->setDirection(Direction::INCOMING);
-    $this->assertEquals(Direction::INCOMING, $sms_message3->getDirection());
   }
 
   /**

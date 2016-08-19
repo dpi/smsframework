@@ -29,6 +29,13 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   public static $modules = ['sms', 'sms_test', 'sms_test_gateway', 'field', 'telephone', 'dynamic_entity_reference'];
 
   /**
+   * SMS message entity storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $smsStorage;
+
+  /**
    * @var \Drupal\sms\Provider\SmsProviderInterface
    *
    * The default SMS provider.
@@ -51,6 +58,8 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->installEntitySchema('sms');
 
     $this->gateway = $this->createMemoryGateway();
+    $this->smsStorage = $this->container->get('entity_type.manager')
+      ->getStorage('sms');
     $this->smsProvider = $this->container->get('sms_provider');
     $this->smsProvider->setDefaultGateway($this->gateway);
   }
@@ -134,15 +143,22 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    * Test sending standard SMS object queue in.
    */
   public function testQueueIn() {
-    $sms_message = new StandardSmsMessage('', [], '', [], NULL);
+    $sms_message = new StandardSmsMessage();
     $sms_message
       ->addRecipients($this->randomPhoneNumbers())
-      ->setMessage($this->randomString());
+      ->setMessage($this->randomString())
+      ->setDirection(Direction::INCOMING);
 
-    $this->smsProvider->queueIn($sms_message);
+    $sms_messages = $this->smsStorage
+      ->loadByProperties(['direction' => Direction::INCOMING]);
+    $this->assertEquals(0, count($sms_messages), 'There is zero SMS message in the incoming queue.');
 
-    $sms_messages = SmsMessage::loadMultiple();
-    $this->assertEquals(1, count($sms_messages), 'There is one SMS message in the queue.');
+    $this->smsProvider
+      ->queue($sms_message);
+
+    $sms_messages = $this->smsStorage
+      ->loadByProperties(['direction' => Direction::INCOMING]);
+    $this->assertEquals(1, count($sms_messages), 'There is one SMS message in the incoming queue.');
 
     $sms_message_loaded = reset($sms_messages);
     $this->assertEquals(Direction::INCOMING, $sms_message_loaded->getDirection());
@@ -152,15 +168,21 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    * Test sending standard SMS object queue out.
    */
   public function testQueueOut() {
-    $sms_message = new StandardSmsMessage('', [], '', [], NULL);
+    $sms_message = new StandardSmsMessage();
     $sms_message
       ->addRecipients($this->randomPhoneNumbers())
-      ->setMessage($this->randomString());
+      ->setMessage($this->randomString())
+      ->setDirection(Direction::OUTGOING);
 
-    $this->smsProvider->queueOut($sms_message);
+    $sms_messages = $this->smsStorage
+      ->loadByProperties(['direction' => Direction::OUTGOING]);
+    $this->assertEquals(0, count($sms_messages), 'There is zero SMS message in the outgoing queue.');
 
-    $sms_messages = SmsMessage::loadMultiple();
-    $this->assertEquals(1, count($sms_messages), 'There is one SMS message in the queue.');
+    $this->smsProvider->queue($sms_message);
+
+    $sms_messages = $this->smsStorage
+      ->loadByProperties(['direction' => Direction::OUTGOING]);
+    $this->assertEquals(1, count($sms_messages), 'There is one SMS message in the outgoing queue.');
 
     $sms_message_loaded = reset($sms_messages);
     $this->assertEquals(Direction::OUTGOING, $sms_message_loaded->getDirection());
@@ -177,9 +199,10 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message = new StandardSmsMessage('', [], '', [], NULL);
     $sms_message
       ->addRecipients($this->randomPhoneNumbers())
-      ->setMessage($this->randomString());
+      ->setMessage($this->randomString())
+      ->setDirection(Direction::OUTGOING);
 
-    $this->smsProvider->queueOut($sms_message);
+    $this->smsProvider->queue($sms_message);
     $this->assertEquals(1, count($this->getTestMessages($this->gateway)), 'One standard SMS send skipped queue.');
   }
 
