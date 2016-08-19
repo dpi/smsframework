@@ -20,8 +20,8 @@ interface SmsProviderInterface {
   /**
    * Queue a SMS message for sending or receiving.
    *
-   * @param \Drupal\sms\Entity\SmsMessageInterface $sms_message
-   *   A SMS message entity.
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
+   *   A SMS message.
    *
    * @return \Drupal\sms\Entity\SmsMessageInterface[]
    *   The queued messages. A single message may be transformed into many.
@@ -29,27 +29,7 @@ interface SmsProviderInterface {
    * @throws \Drupal\sms\Exception\RecipientRouteException
    *   Thrown if no gateway could be determined for the message.
    */
-  public function queue(SmsMessageEntityInterface $sms_message);
-
-  /**
-   * Queue a standard SMS message for receiving.
-   *
-   * @todo Remove if standard message gets a direction property.
-   *
-   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
-   *   A standard SMS message.
-   */
-  public function queueIn(SmsMessageInterface $sms_message);
-
-  /**
-   * Queue a standard SMS message for sending.
-   *
-   * @todo Remove if standard message gets a direction property.
-   *
-   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
-   *   A standard SMS message.
-   */
-  public function queueOut(SmsMessageInterface $sms_message);
+  public function queue(SmsMessageInterface $sms_message);
 
   /**
    * Sends an SMS using the active gateway.

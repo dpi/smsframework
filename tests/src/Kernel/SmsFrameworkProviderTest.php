@@ -137,9 +137,11 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message = new StandardSmsMessage('', [], '', [], NULL);
     $sms_message
       ->addRecipients($this->randomPhoneNumbers())
-      ->setMessage($this->randomString());
+      ->setMessage($this->randomString())
+      ->setDirection(Direction::INCOMING);
 
-    $this->smsProvider->queueIn($sms_message);
+    $this->smsProvider
+      ->queue($sms_message);
 
     $sms_messages = SmsMessage::loadMultiple();
     $this->assertEquals(1, count($sms_messages), 'There is one SMS message in the queue.');
@@ -152,12 +154,13 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    * Test sending standard SMS object queue out.
    */
   public function testQueueOut() {
-    $sms_message = new StandardSmsMessage('', [], '', [], NULL);
+    $sms_message = new StandardSmsMessage();
     $sms_message
       ->addRecipients($this->randomPhoneNumbers())
-      ->setMessage($this->randomString());
+      ->setMessage($this->randomString())
+      ->setDirection(Direction::OUTGOING);
 
-    $this->smsProvider->queueOut($sms_message);
+    $this->smsProvider->queue($sms_message);
 
     $sms_messages = SmsMessage::loadMultiple();
     $this->assertEquals(1, count($sms_messages), 'There is one SMS message in the queue.');
@@ -177,9 +180,10 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message = new StandardSmsMessage('', [], '', [], NULL);
     $sms_message
       ->addRecipients($this->randomPhoneNumbers())
-      ->setMessage($this->randomString());
+      ->setMessage($this->randomString())
+      ->setDirection(Direction::OUTGOING);
 
-    $this->smsProvider->queueOut($sms_message);
+    $this->smsProvider->queue($sms_message);
     $this->assertEquals(1, count($this->getTestMessages($this->gateway)), 'One standard SMS send skipped queue.');
   }
 

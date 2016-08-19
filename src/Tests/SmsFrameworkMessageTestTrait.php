@@ -7,6 +7,8 @@
 
 namespace Drupal\sms\Tests;
 
+use Drupal\sms\Direction;
+
 /**
  * SMS Message object test trait.
  *
@@ -129,6 +131,22 @@ trait SmsFrameworkMessageTestTrait {
     $sms_message
       ->removeRecipients(['123123123', '234234234']);
     $this->assertEquals(['456456456'], $sms_message->getRecipients());
+  }
+
+  /**
+   * Tests direction of SMS messages.
+   *
+   * @covers ::getDirection
+   * @covers ::setDirection
+   */
+  public function testDirection() {
+    $sms_message2 = $this->createSmsMessage()
+      ->setDirection(Direction::OUTGOING);
+    $this->assertEquals(Direction::OUTGOING, $sms_message2->getDirection());
+
+    $sms_message3 = $this->createSmsMessage()
+      ->setDirection(Direction::INCOMING);
+    $this->assertEquals(Direction::INCOMING, $sms_message3->getDirection());
   }
 
   /**

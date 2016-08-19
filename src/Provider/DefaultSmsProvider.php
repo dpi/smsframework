@@ -67,7 +67,8 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function queue(SmsMessageEntityInterface $sms_message) {
+  public function queue(SmsMessageInterface $sms_message) {
+    $sms_message = SmsMessage::convertFromSmsMessage($sms_message);
     $sms_messages = $this->dispatch('sms.message.preprocess', [$sms_message]);
 
     /** @var SmsMessageEntityInterface[] $sms_messages */
@@ -95,24 +96,6 @@ class DefaultSmsProvider implements SmsProviderInterface {
     }
 
     return $this->dispatch('sms.message.postprocess', $sms_messages);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function queueIn(SmsMessageInterface $sms_message) {
-    $sms_message = SmsMessage::convertFromSmsMessage($sms_message)
-      ->setDirection(Direction::INCOMING);
-    $this->queue($sms_message);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function queueOut(SmsMessageInterface $sms_message) {
-    $sms_message = SmsMessage::convertFromSmsMessage($sms_message)
-      ->setDirection(Direction::OUTGOING);
-    $this->queue($sms_message);
   }
 
   /**

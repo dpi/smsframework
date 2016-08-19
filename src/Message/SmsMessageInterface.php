@@ -138,6 +138,25 @@ interface SmsMessageInterface {
   public function setGateway(SmsGatewayInterface $gateway);
 
   /**
+   * Get direction of the message.
+   *
+   * @return int
+   *   See \Drupal\sms\Direction constants for potential values.
+   */
+  public function getDirection();
+
+  /**
+   * Set direction of the message.
+   *
+   * @param int $direction
+   *   Any of \Drupal\sms\Direction constants.
+   *
+   * @return $this
+   *   Return SMS message for chaining.
+   */
+  public function setDirection($direction);
+
+  /**
    * Gets the options for building or sending this SMS message.
    *
    * @return array
