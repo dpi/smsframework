@@ -15,7 +15,7 @@ use Drupal\sms\Tests\SmsFrameworkMessageTestTrait;
 /**
  * Unit Tests for SmsMessage.
  *
- * @group SmsFramework
+ * @group SMS Framework
  * @coversDefaultClass \Drupal\sms\Message\SmsMessage
  */
 class SmsMessageTest extends UnitTestCase {
