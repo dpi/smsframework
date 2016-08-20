@@ -37,19 +37,6 @@ class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Test no gateways want to handle this message.
-   */
-  public function testNoGateways() {
-    $sms_message = SmsMessage::create()
-      ->setDirection(Direction::OUTGOING)
-      ->setMessage($this->randomString())
-      ->addRecipients($this->randomPhoneNumbers());
-
-    $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class);
-    $this->smsProvider->queue($sms_message);
-  }
-
-  /**
    * Test gateways are applied from the test event subscriber.
    *
    * @see \Drupal\sms_test\EventSubscriber\SmsTestEventSubscriber
