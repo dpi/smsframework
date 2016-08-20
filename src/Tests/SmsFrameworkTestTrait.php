@@ -28,7 +28,7 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Entity\SmsGatewayInterface
    */
   protected function createMemoryGateway($values = []) {
-    $id = Unicode::strtolower($this->randomMachineName(16));
+    $id = isset($values['id']) ? $values['id'] : Unicode::strtolower($this->randomMachineName(16));
     $gateway = SmsGateway::create($values + [
       'plugin' => 'memory',
       'id' => $id,
