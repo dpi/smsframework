@@ -149,6 +149,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
    * Test account registrations for unrecognised numbers saves to config.
    */
   public function testAccountRegistrationUnrecognised() {
+    $this->createPhoneNumberSettings('user', 'user');
+
     $reply_message = $this->randomString();
     $edit = [
       'account_registration[behaviour]' => 'all',
@@ -173,6 +175,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
    * Test account registrations for preformatted saves to config.
    */
   public function testAccountRegistrationPreformatted() {
+    $this->createPhoneNumberSettings('user', 'user');
+
     $incoming_message = '[email] ' . $this->randomString();
     $reply_message_success = $this->randomString();
     $reply_message_failure = $this->randomString();
@@ -205,6 +209,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
    * Test account registrations validation failures on empty replies.
    */
   public function testAccountRegistrationValidationEmptyReplies() {
+    $this->createPhoneNumberSettings('user', 'user');
+
     $edit = [
       'account_registration[behaviour]' => 'all',
       'account_registration[all_options][reply_status]' => TRUE,
@@ -234,6 +240,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
    * Test account registrations validation failures on empty replies.
    */
   public function testAccountRegistrationValidationPreformatted() {
+    $this->createPhoneNumberSettings('user', 'user');
+
     $edit = [
       'account_registration[behaviour]' => 'formatted',
       'account_registration[formatted_options][incoming_message]' => '',
@@ -265,6 +273,39 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
     ];
     $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
     $this->assertRaw('There must be a separator between placeholders.');
+  }
+
+  /**
+   * Test if notice is displayed and some form elements and disabled if no
+   * phone number settings exist for user entity type.
+   */
+  public function testFormNoUserPhoneNumberSettings() {
+    $this->drupalGet(Url::fromRoute('sms_user.options'));
+    $this->assertRaw(t('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings. <a href=":add">Add phone number settings</a>.', [
+      ':add' => Url::fromRoute('entity.phone_number_settings.add')->toString(),
+    ]), 'Warning message displayed for no phone number settings.');
+
+    $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="all"]');
+    $this->assertTrue(count($input) === 1, "The 'All unrecognised phone numbers' radio is disabled.");
+
+    $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="formatted"]');
+    $this->assertTrue(count($input) === 1, "The 'Pre-formatted message' radio is disabled.");
+  }
+
+  /**
+   * Test if notice is not displayed if phone number settings exist for user
+   * entity type.
+   */
+  public function testFormUserPhoneNumberSettings() {
+    $this->createPhoneNumberSettings('user', 'user');
+    $this->drupalGet(Url::fromRoute('sms_user.options'));
+    $this->assertNoRaw(t('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings.'), 'Warning message displayed for no phone number settings.');
+
+    $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="all"]');
+    $this->assertTrue(count($input) === 0, "The 'All unrecognised phone numbers' radio is not disabled.");
+
+    $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="formatted"]');
+    $this->assertTrue(count($input) === 0, "The 'Pre-formatted message' radio is not disabled.");
   }
 
 }

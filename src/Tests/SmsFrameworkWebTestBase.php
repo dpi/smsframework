@@ -9,6 +9,7 @@ namespace Drupal\sms\Tests;
 
 use Drupal\simpletest\WebTestBase;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 
 /**
  * Provides commonly used functionality for tests.
@@ -73,9 +74,17 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
       ])->save();
 
     /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
-    $entity_form_display = $entity_type_manager
-      ->getStorage('entity_form_display')
-      ->load($entity_type_id . '.' . $bundle . '.default');
+    $entity_form_display = EntityFormDisplay::load($entity_type_id . '.' . $bundle . '.default');
+    if (!$entity_form_display) {
+      $entity_form_display = EntityFormDisplay::create([
+        'targetEntityType' => $entity_type_id,
+        'bundle' => $bundle,
+        'mode' => 'default',
+        'status' => TRUE,
+      ]);
+    }
+    $entity_form_display->save();
+
     $entity_form_display
       ->setComponent($field_storage->getName(), ['type' => 'sms_telephone'])
       ->save();
