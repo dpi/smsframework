@@ -7,15 +7,51 @@
 
 namespace Drupal\sms_user\Form;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Url;
+use Drupal\sms\Entity\PhoneNumberSettingsInterface;
+use Drupal\sms\Provider\PhoneNumberProviderInterface;
 
 /**
  * Provides a general settings form for SMS User.
  */
 class AdminSettingsForm extends ConfigFormBase {
+
+  /**
+   * Phone number provider.
+   *
+   * @var \Drupal\sms\Provider\PhoneNumberProviderInterface
+   */
+  protected $phoneNumberProvider;
+
+  /**
+   * Constructs a \Drupal\sms_user\Form\AdminSettingsForm object.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The factory for configuration objects.
+   * @param \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider
+   *   The phone number provider.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory, PhoneNumberProviderInterface $phone_number_provider) {
+    parent::__construct($config_factory);
+    $this->phoneNumberProvider = $phone_number_provider;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('sms.phone_number')
+    );
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -146,6 +182,14 @@ class AdminSettingsForm extends ConfigFormBase {
       $radio_value = 'none';
     }
 
+    $user_phone_settings_exist = $this->phoneNumberProvider
+      ->getPhoneNumberSettings('user', 'user') instanceof PhoneNumberSettingsInterface;
+    if (!$user_phone_settings_exist) {
+      drupal_set_message($this->t('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings. <a href=":add">Add phone number settings</a>.', [
+        ':add' => Url::fromRoute('entity.phone_number_settings.add')->toString(),
+      ]), 'warning');
+    }
+
     $form['account_registration']['behaviour'] = [
       '#type' => 'radios',
       '#options' => NULL,
@@ -172,6 +216,7 @@ class AdminSettingsForm extends ConfigFormBase {
       '#return_value' => 'all',
       '#parents' => ['account_registration', 'behaviour'],
       '#default_value' => $radio_value,
+      '#disabled' => !$user_phone_settings_exist,
     ];
 
     $form['account_registration']['all_options'] = [
@@ -222,6 +267,7 @@ class AdminSettingsForm extends ConfigFormBase {
       '#return_value' => 'incoming_pattern',
       '#parents' => ['account_registration', 'behaviour'],
       '#default_value' => $radio_value,
+      '#disabled' => !$user_phone_settings_exist,
     ];
 
     $form['account_registration']['incoming_pattern_options'] = [

@@ -77,8 +77,8 @@ class RecipientGatewayEvent extends Event {
    * @return \Drupal\sms\Entity\SmsGatewayInterface[]
    */
   public function getGatewaysSorted() {
-    $gateways = $this->gateways;
-    uasort($gateways, function($a, $b) {
+    $sorted = $this->gateways;
+    uasort($sorted, function($a, $b) {
       list(, $priority_a) = $a;
       list(, $priority_b) = $b;
       if ($priority_a == $priority_b) {
@@ -87,8 +87,9 @@ class RecipientGatewayEvent extends Event {
       return ($priority_a > $priority_b) ? -1 : 1;
     });
 
+    // Return the gateway object instead of tuples.
     $gateways = [];
-    foreach ($gateways as $tuple) {
+    foreach ($sorted as $tuple) {
       list($gateway, ) = $tuple;
       $gateways[] = $gateway;
     }
