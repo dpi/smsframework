@@ -132,8 +132,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
     $this->assertRaw(t('The configuration options have been saved.'));
 
     $settings = $this->config('sms_user.settings')->get('account_registration');
-    $this->assertFalse($settings['all_unknown_numbers']['status']);
-    $this->assertFalse($settings['formatted']['status']);
+    $this->assertFalse($settings['unrecognized_sender']['status']);
+    $this->assertFalse($settings['incoming_pattern']['status']);
   }
 
   /**
@@ -163,30 +163,30 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
     $settings = $this->config('sms_user.settings')->get('account_registration');
 
     // Status
-    $this->assertTrue($settings['all_unknown_numbers']['status']);
-    $this->assertFalse($settings['formatted']['status']);
+    $this->assertTrue($settings['unrecognized_sender']['status']);
+    $this->assertFalse($settings['incoming_pattern']['status']);
 
     // Settings
-    $this->assertTrue($settings['all_unknown_numbers']['reply']['status']);
-    $this->assertEqual($reply_message, $settings['all_unknown_numbers']['reply']['message']);
+    $this->assertTrue($settings['unrecognized_sender']['reply']['status']);
+    $this->assertEqual($reply_message, $settings['unrecognized_sender']['reply']['message']);
   }
 
   /**
-   * Test account registrations for preformatted saves to config.
+   * Test account registrations for incoming pattern saves to config.
    */
-  public function testAccountRegistrationPreformatted() {
+  public function testAccountRegistrationIncomingPattern() {
     $this->createPhoneNumberSettings('user', 'user');
 
     $incoming_message = '[email] ' . $this->randomString();
     $reply_message_success = $this->randomString();
     $reply_message_failure = $this->randomString();
     $edit = [
-      'account_registration[behaviour]' => 'formatted',
-      'account_registration[formatted_options][incoming_message]' => $incoming_message,
-      'account_registration[formatted_options][activation_email]' => TRUE,
-      'account_registration[formatted_options][reply_status]' => TRUE,
-      'account_registration[formatted_options][reply][message_success]' => $reply_message_success,
-      'account_registration[formatted_options][reply][message_failure]' => $reply_message_failure,
+      'account_registration[behaviour]' => 'incoming_pattern',
+      'account_registration[incoming_pattern_options][incoming_message]' => $incoming_message,
+      'account_registration[incoming_pattern_options][send_activation_email]' => TRUE,
+      'account_registration[incoming_pattern_options][reply_status]' => TRUE,
+      'account_registration[incoming_pattern_options][reply][message_success]' => $reply_message_success,
+      'account_registration[incoming_pattern_options][reply][message_failure]' => $reply_message_failure,
     ];
     $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
     $this->assertRaw(t('The configuration options have been saved.'));
@@ -194,15 +194,15 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
     $settings = $this->config('sms_user.settings')->get('account_registration');
 
     // Status
-    $this->assertFalse($settings['all_unknown_numbers']['status']);
-    $this->assertTrue($settings['formatted']['status']);
+    $this->assertFalse($settings['unrecognized_sender']['status']);
+    $this->assertTrue($settings['incoming_pattern']['status']);
 
     // Settings
-    $this->assertEqual($incoming_message, $settings['formatted']['incoming_messages'][0]);
-    $this->assertTrue($settings['formatted']['activation_email']);
-    $this->assertTrue($settings['formatted']['reply']['status']);
-    $this->assertEqual($reply_message_success, $settings['formatted']['reply']['message']);
-    $this->assertEqual($reply_message_failure, $settings['formatted']['reply']['message_failure']);
+    $this->assertEqual($incoming_message, $settings['incoming_pattern']['incoming_messages'][0]);
+    $this->assertTrue($settings['incoming_pattern']['send_activation_email']);
+    $this->assertTrue($settings['incoming_pattern']['reply']['status']);
+    $this->assertEqual($reply_message_success, $settings['incoming_pattern']['reply']['message']);
+    $this->assertEqual($reply_message_failure, $settings['incoming_pattern']['reply']['message_failure']);
   }
 
   /**
@@ -220,47 +220,47 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
     $this->assertRaw('Reply message must have a value if reply is enabled.', 'Validation failed for message on all unrecognised numbers when reply status is enabled.');
 
     $edit = [
-      'account_registration[behaviour]' => 'formatted',
-      'account_registration[formatted_options][reply_status]' => TRUE,
-      'account_registration[formatted_options][reply][message_success]' => '',
+      'account_registration[behaviour]' => 'incoming_pattern',
+      'account_registration[incoming_pattern_options][reply_status]' => TRUE,
+      'account_registration[incoming_pattern_options][reply][message_success]' => '',
     ];
     $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
-    $this->assertRaw('Reply message must have a value if reply is enabled.', 'Validation failed for message_success on formatted when reply status is enabled.');
+    $this->assertRaw('Reply message must have a value if reply is enabled.', 'Validation failed for message_success on incoming_pattern when reply status is enabled.');
 
     $edit = [
-      'account_registration[behaviour]' => 'formatted',
-      'account_registration[formatted_options][reply_status]' => TRUE,
-      'account_registration[formatted_options][reply][message_failure]' => '',
+      'account_registration[behaviour]' => 'incoming_pattern',
+      'account_registration[incoming_pattern_options][reply_status]' => TRUE,
+      'account_registration[incoming_pattern_options][reply][message_failure]' => '',
     ];
     $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
-    $this->assertRaw('Reply message must have a value if reply is enabled.', 'Validation failed for message_failure on formatted when reply status is enabled.');
+    $this->assertRaw('Reply message must have a value if reply is enabled.', 'Validation failed for message_failure on incoming_pattern when reply status is enabled.');
   }
 
   /**
    * Test account registrations validation failures on empty replies.
    */
-  public function testAccountRegistrationValidationPreformatted() {
+  public function testAccountRegistrationValidationIncomingPattern() {
     $this->createPhoneNumberSettings('user', 'user');
 
     $edit = [
-      'account_registration[behaviour]' => 'formatted',
-      'account_registration[formatted_options][incoming_message]' => '',
+      'account_registration[behaviour]' => 'incoming_pattern',
+      'account_registration[incoming_pattern_options][incoming_message]' => '',
     ];
     $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
-    $this->assertRaw('Incoming message must be filled if using pre-formatted option');
+    $this->assertRaw('Incoming message must be filled if using pre-incoming_pattern option');
 
     $edit = [
-      'account_registration[behaviour]' => 'formatted',
-      'account_registration[formatted_options][activation_email]' => TRUE,
-      'account_registration[formatted_options][incoming_message]' => $this->randomString(),
+      'account_registration[behaviour]' => 'incoming_pattern',
+      'account_registration[incoming_pattern_options][send_activation_email]' => TRUE,
+      'account_registration[incoming_pattern_options][incoming_message]' => $this->randomString(),
     ];
     $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
     $this->assertRaw('Activation email cannot be sent if [email] placeholder is missing.');
 
     $edit = [
-      'account_registration[behaviour]' => 'formatted',
-      'account_registration[formatted_options][activation_email]' => TRUE,
-      'account_registration[formatted_options][incoming_message]' => 'E [email] P [password]',
+      'account_registration[behaviour]' => 'incoming_pattern',
+      'account_registration[incoming_pattern_options][send_activation_email]' => TRUE,
+      'account_registration[incoming_pattern_options][incoming_message]' => 'E [email] P [password]',
     ];
     $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
     $this->assertRaw('Activation email cannot be sent if [password] placeholder is present.');
@@ -268,8 +268,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
     // Placeholder seperation.
     // Tests separator so regex doesn't have problems.
     $edit = [
-      'account_registration[behaviour]' => 'formatted',
-      'account_registration[formatted_options][incoming_message]' => 'Email [email][password]',
+      'account_registration[behaviour]' => 'incoming_pattern',
+      'account_registration[incoming_pattern_options][incoming_message]' => 'Email [email][password]',
     ];
     $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
     $this->assertRaw('There must be a separator between placeholders.');
@@ -288,8 +288,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="all"]');
     $this->assertTrue(count($input) === 1, "The 'All unrecognised phone numbers' radio is disabled.");
 
-    $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="formatted"]');
-    $this->assertTrue(count($input) === 1, "The 'Pre-formatted message' radio is disabled.");
+    $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="incoming_pattern"]');
+    $this->assertTrue(count($input) === 1, "The 'incoming_pattern' radio is disabled.");
   }
 
   /**
@@ -304,8 +304,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="all"]');
     $this->assertTrue(count($input) === 0, "The 'All unrecognised phone numbers' radio is not disabled.");
 
-    $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="formatted"]');
-    $this->assertTrue(count($input) === 0, "The 'Pre-formatted message' radio is not disabled.");
+    $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="incoming_pattern"]');
+    $this->assertTrue(count($input) === 0, "The 'incoming_pattern' radio is not disabled.");
   }
 
 }

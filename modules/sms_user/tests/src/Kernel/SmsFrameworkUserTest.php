@@ -61,8 +61,8 @@ class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
    */
   public function testAccountRegistrationNoPhoneSettings() {
     $this->config('sms_user.settings')
-      ->set('account_registration.all_unknown_numbers.status', 1)
-      ->set('account_registration.all_unknown_numbers.reply.status', 1)
+      ->set('account_registration.unrecognized_sender.status', 1)
+      ->set('account_registration.unrecognized_sender.reply.status', 1)
       ->save();
 
     $message = $this->randomString();
