@@ -288,8 +288,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="all"]');
     $this->assertTrue(count($input) === 1, "The 'All unrecognised phone numbers' radio is disabled.");
 
-    $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="formatted"]');
-    $this->assertTrue(count($input) === 1, "The 'Pre-formatted message' radio is disabled.");
+    $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="incoming_pattern"]');
+    $this->assertTrue(count($input) === 1, "The 'incoming_pattern' radio is disabled.");
   }
 
   /**
@@ -304,8 +304,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="all"]');
     $this->assertTrue(count($input) === 0, "The 'All unrecognised phone numbers' radio is not disabled.");
 
-    $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="formatted"]');
-    $this->assertTrue(count($input) === 0, "The 'Pre-formatted message' radio is not disabled.");
+    $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="incoming_pattern"]');
+    $this->assertTrue(count($input) === 0, "The 'incoming_pattern' radio is not disabled.");
   }
 
 }

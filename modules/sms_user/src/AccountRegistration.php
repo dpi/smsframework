@@ -99,7 +99,7 @@ class AccountRegistration implements AccountRegistrationInterface {
           $this->allUnknownNumbers($sms_message);
         }
         if (!empty($this->settings('incoming_pattern.status'))) {
-          $this->preFormattedMessage($sms_message);
+          $this->incomingPatternMessage($sms_message);
         }
       }
     }
@@ -157,10 +157,10 @@ class AccountRegistration implements AccountRegistrationInterface {
    * Process an incoming message and create a user if the message matches
    * the incoming message format.
    *
-   * @param \Drupal\sms\Entity\SmsMessageInterface $sms_message
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
    *   An incoming SMS message.
    */
-  protected function preFormattedMessage(SmsMessageInterface $sms_message) {
+  protected function incomingPatternMessage(SmsMessageInterface $sms_message) {
     if (!empty($this->settings('incoming_pattern.incoming_messages.0'))) {
       $incoming_form = $this->settings('incoming_pattern.incoming_messages.0');
       $incoming_form = str_replace("\r\n", "\n", $incoming_form);
