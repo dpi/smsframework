@@ -172,9 +172,9 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
   }
 
   /**
-   * Test account registrations for preincoming_pattern saves to config.
+   * Test account registrations for incoming pattern saves to config.
    */
-  public function testAccountRegistrationPreincoming_pattern() {
+  public function testAccountRegistrationIncomingPattern() {
     $this->createPhoneNumberSettings('user', 'user');
 
     $incoming_message = '[email] ' . $this->randomString();
@@ -239,7 +239,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
   /**
    * Test account registrations validation failures on empty replies.
    */
-  public function testAccountRegistrationValidationPreincoming_pattern() {
+  public function testAccountRegistrationValidationIncomingPattern() {
     $this->createPhoneNumberSettings('user', 'user');
 
     $edit = [
