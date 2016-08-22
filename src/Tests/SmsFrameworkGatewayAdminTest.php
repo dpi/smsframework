@@ -62,7 +62,7 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
     // Delete all gateways.
     $this->smsGatewayStorage->delete($this->smsGatewayStorage->loadMultiple());
     $this->drupalGet(Url::fromRoute('sms.gateway.list'));
-    $this->assertRaw(t('No SMS Gateways found.'));
+    $this->assertRaw(t('No gateways found.'));
   }
 
   /**
