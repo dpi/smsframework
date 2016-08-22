@@ -5,8 +5,9 @@ namespace Drupal\sms\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Event fired when a new SMS message is being processed before or after send or
- * queue.
+ * Event fired SMS messages should be processed.
+ *
+ * @see \Drupal\sms\Event\SmsEvents
  */
 class SmsMessageEvent extends Event {
 

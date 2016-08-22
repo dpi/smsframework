@@ -48,6 +48,13 @@ class SmsMessageResult implements SmsMessageResultInterface {
   public $reports;
 
   /**
+   * The messages associated with this result.
+   *
+   * @var \Drupal\sms\Message\SmsMessageInterface[]
+   */
+  public $messages = [];
+
+  /**
    * Create a new message result based on data supplied in the array.
    *
    * @param array $data
@@ -133,6 +140,21 @@ class SmsMessageResult implements SmsMessageResultInterface {
       'credit_balance' => 0,
       'reports' => [],
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMessages() {
+    return $this->messages;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setMessages(array $messages) {
+    $this->messages = $messages;
+    return $this;
   }
 
 }

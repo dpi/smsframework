@@ -7,6 +7,7 @@
 
 namespace Drupal\sms\Provider;
 
+use Drupal\sms\Event\SmsMessageProcessedEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -22,6 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Direction;
 use Drupal\sms\Event\SmsEvents;
+use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
  * The SMS provider that provides default messaging functionality.
@@ -69,12 +71,12 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * {@inheritdoc}
    */
   public function queue(SmsMessageInterface $sms_message) {
-    $sms_messages = $this->dispatch(SmsEvents::MESSAGE_PRE_PROCESS, [$sms_message]);
+    $sms_messages = $this->dispatch(SmsEvents::MESSAGE_PRE_PROCESS, [$sms_message])->getMessages();
+    $sms_messages = $this->dispatch(SmsEvents::MESSAGE_QUEUE_PRE_PROCESS, $sms_messages)->getMessages();
 
-    /** @var SmsMessageEntityInterface[] $sms_messages */
     foreach ($sms_messages as $gateway_id => &$sms_message) {
-      // Tag so 'sms.message.*process' are not dispatched again.
-      $sms_message->setOption('_no_dispatch_events', TRUE);
+      // Tag so SmsEvents::MESSAGE_PRE_PROCESS is not dispatched again.
+      $sms_message->setOption('_skip_preprocess_event', TRUE);
 
       if ($sms_message instanceof SmsMessageEntityInterface && ($count = $sms_message->validate()->count())) {
         throw new SmsException(sprintf('Can not queue SMS message because there are %s validation error(s).', $count));
@@ -84,10 +86,10 @@ class DefaultSmsProvider implements SmsProviderInterface {
         switch ($sms_message->getDirection()) {
           case Direction::INCOMING:
             $this->incoming($sms_message);
-            continue;
+            break;
           case Direction::OUTGOING:
             $this->send($sms_message);
-            continue;
+            break;
         }
         continue;
       }
@@ -96,38 +98,28 @@ class DefaultSmsProvider implements SmsProviderInterface {
       $sms_message->save();
     }
 
-    return $this->dispatch(SmsEvents::MESSAGE_POST_PROCESS, $sms_messages);
+    // Queue has different post-process events because there is no result.
+    return $this->dispatch(SmsEvents::MESSAGE_QUEUE_POST_PROCESS, $sms_messages)->getMessages();
   }
 
   /**
    * {@inheritdoc}
    */
   public function send(SmsMessageInterface $sms) {
-    $dispatch = !$sms->getOption('_no_dispatch_events');
-    $sms_messages = $dispatch ? $this->dispatch(SmsEvents::MESSAGE_PRE_PROCESS, [$sms]) : [$sms];
+    $dispatch = !$sms->getOption('_skip_preprocess_event');
+    $sms_messages = $dispatch ? $this->dispatch(SmsEvents::MESSAGE_PRE_PROCESS, [$sms])->getMessages() : [$sms];
+    $sms_messages = $this->dispatch(SmsEvents::MESSAGE_OUTGOING_PRE_PROCESS, $sms_messages)->getMessages();
 
     $results = [];
     foreach ($sms_messages as &$sms_message) {
-      $preprocess = $this->moduleHandler
-        ->invokeAll('sms_outgoing_preprocess', [$sms_message]);
+      $plugin = $sms_message->getGateway()->getPlugin();
 
-      if (in_array(FALSE, $preprocess, TRUE)) {
-        continue;
-      }
-
-      // Processes the SMS message and returns the response from the gateway.
-      $result = $sms_message->getGateway()
-        ->getPlugin()
-        ->send($sms_message);
-
-      $this->moduleHandler
-        ->invokeAll('sms_outgoing_postprocess', [$sms_message, $result]);
-
+      $result = $plugin->send($sms_message);
+      $result->setMessages([$sms_message]);
       $results[] = $result;
-    }
 
-    if ($dispatch) {
-      $this->dispatch(SmsEvents::MESSAGE_PRE_PROCESS, $sms_messages);
+      $this->dispatch(SmsEvents::MESSAGE_OUTGOING_POST_PROCESS, [$sms_message], $result);
+      $this->dispatch(SmsEvents::MESSAGE_POST_PROCESS, [$sms_message], $result);
     }
 
     return $results;
@@ -137,27 +129,26 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * {@inheritdoc}
    */
   public function incoming(SmsMessageInterface $sms_message) {
-    $dispatch = !$sms_message->getOption('_no_dispatch_events');
-    $sms_messages = $dispatch ? $this->dispatch(SmsEvents::MESSAGE_PRE_PROCESS, [$sms_message]) : [$sms_message];
+    $dispatch = !$sms_message->getOption('_skip_preprocess_event');
+    $sms_messages = $dispatch ? $this->dispatch(SmsEvents::MESSAGE_PRE_PROCESS, [$sms_message])->getMessages() : [$sms_message];
+    $sms_messages = $this->dispatch(SmsEvents::MESSAGE_INCOMING_PRE_PROCESS, $sms_messages)->getMessages();
 
-    foreach ($sms_messages as $sms_message) {
-      $this->moduleHandler->invokeAll('sms_incoming_preprocess', [$sms_message]);
-
-      // Process the SMS message with the gateway plugin.
-      $result = NULL;
-      if ($sms_message instanceof SmsMessageEntityInterface) {
-        $plugin = $sms_message->getGateway()->getPlugin();
-        if ($plugin instanceof SmsGatewayPluginIncomingInterface) {
-          $result = $plugin->incoming($sms_message);
-        }
+    $results = [];
+    foreach ($sms_messages as &$sms_message) {
+      $plugin = $sms_message->getGateway()->getPlugin();
+      if (!$plugin instanceof SmsGatewayPluginIncomingInterface) {
+        throw new SmsException(sprintf('Gateway plugin `%s` does not support incoming messages', $plugin->getPluginId()));
       }
 
-      $this->moduleHandler->invokeAll('sms_incoming_postprocess', [$sms_message, $result]);
+      $result = $plugin->incoming($sms_message);
+      $result->setMessages([$sms_message]);
+      $results[] = $result;
+
+      $this->dispatch(SmsEvents::MESSAGE_INCOMING_POST_PROCESS, [$sms_message], $result);
+      $this->dispatch(SmsEvents::MESSAGE_POST_PROCESS, [$sms_message], $result);
     }
 
-    if ($dispatch) {
-      $this->dispatch(SmsEvents::MESSAGE_PRE_PROCESS, $sms_messages);
-    }
+    return $results;
   }
 
   /**
@@ -209,14 +200,24 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *   The event to trigger.
    * @param \Drupal\sms\Message\SmsMessageInterface[] $sms_messages
    *   The messages to dispatch.
+   * @param \Drupal\sms\Message\SmsMessageResultInterface $result
+   *   (optional) an SMS result to use on post process events.
    *
-   * @return \Drupal\sms\Message\SmsMessageInterface[]
+   * @return \Drupal\sms\Event\SmsMessageEvent|\Drupal\sms\Event\SmsMessageProcessedEvent
    */
-  protected function dispatch($event_name, array $sms_messages) {
-    $event = new SmsMessageEvent($sms_messages);
+  protected function dispatch($event_name, array $sms_messages, SmsMessageResultInterface $result = NULL) {
+    if ($result) {
+      $event = new SmsMessageProcessedEvent($sms_messages);
+      $event->setResults([$result]);
+    }
+    else {
+      $event = new SmsMessageEvent($sms_messages);
+    }
+
     $event = $this->eventDispatcher
       ->dispatch($event_name, $event);
-    return $event->getMessages();
+
+    return $event;
   }
 
 }

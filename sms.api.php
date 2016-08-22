@@ -19,24 +19,6 @@ function hook_sms_gateway_info_alter(&$gateways) {
 }
 
 /**
- * Called before the SMS message is processed by the gateway plugin.
- *
- * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
- *   A SMS message.
- */
-function hook_sms_incoming_preprocess(\Drupal\sms\Message\SmsMessageInterface $sms_message) {
-}
-
-/**
- * Called after the SMS message is processed by the gateway plugin.
- *
- * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
- *   A SMS message.
- */
-function hook_sms_incoming_postprocess(\Drupal\sms\Message\SmsMessageInterface $sms_message) {
-}
-
-/**
  * Called after SMS delivery reports are processed by the SMS provider.
  *
  * This hook allows gateways to customize responses that would be returned to
