@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Direction;
+use Drupal\sms\Event\SmsEvents;
 
 /**
  * The SMS provider that provides default messaging functionality.
@@ -68,7 +69,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * {@inheritdoc}
    */
   public function queue(SmsMessageInterface $sms_message) {
-    $sms_messages = $this->dispatch('sms.message.preprocess', [$sms_message]);
+    $sms_messages = $this->dispatch(SmsEvents::MESSAGE_PRE_PROCESS, [$sms_message]);
 
     /** @var SmsMessageEntityInterface[] $sms_messages */
     foreach ($sms_messages as $gateway_id => &$sms_message) {
@@ -95,7 +96,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
       $sms_message->save();
     }
 
-    return $this->dispatch('sms.message.postprocess', $sms_messages);
+    return $this->dispatch(SmsEvents::MESSAGE_POST_PROCESS, $sms_messages);
   }
 
   /**
@@ -103,7 +104,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    */
   public function send(SmsMessageInterface $sms) {
     $dispatch = !$sms->getOption('_no_dispatch_events');
-    $sms_messages = $dispatch ? $this->dispatch('sms.message.preprocess', [$sms]) : [$sms];
+    $sms_messages = $dispatch ? $this->dispatch(SmsEvents::MESSAGE_PRE_PROCESS, [$sms]) : [$sms];
 
     $results = [];
     foreach ($sms_messages as &$sms_message) {
@@ -126,7 +127,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
     }
 
     if ($dispatch) {
-      $this->dispatch('sms.message.postprocess', $sms_messages);
+      $this->dispatch(SmsEvents::MESSAGE_PRE_PROCESS, $sms_messages);
     }
 
     return $results;
@@ -137,7 +138,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    */
   public function incoming(SmsMessageInterface $sms_message) {
     $dispatch = !$sms_message->getOption('_no_dispatch_events');
-    $sms_messages = $dispatch ? $this->dispatch('sms.message.preprocess', [$sms_message]) : [$sms_message];
+    $sms_messages = $dispatch ? $this->dispatch(SmsEvents::MESSAGE_PRE_PROCESS, [$sms_message]) : [$sms_message];
 
     foreach ($sms_messages as $sms_message) {
       $this->moduleHandler->invokeAll('sms_incoming_preprocess', [$sms_message]);
@@ -155,7 +156,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
     }
 
     if ($dispatch) {
-      $this->dispatch('sms.message.postprocess', $sms_messages);
+      $this->dispatch(SmsEvents::MESSAGE_PRE_PROCESS, $sms_messages);
     }
   }
 

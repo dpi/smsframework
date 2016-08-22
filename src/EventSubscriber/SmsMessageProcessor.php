@@ -12,6 +12,7 @@ use Drupal\sms\Event\RecipientGatewayEvent;
 use Drupal\sms\Event\SmsMessageEvent;
 use Drupal\sms\Exception\RecipientRouteException;
 use Drupal\sms\Entity\SmsGateway;
+use Drupal\sms\Event\SmsEvents;
 
 /**
  * Handles messages before they are processed by queue(), send(), or incoming().
@@ -133,7 +134,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
     $event = new RecipientGatewayEvent($recipient);
     /** @var RecipientGatewayEvent $event */
     $event = $this->eventDispatcher
-      ->dispatch('sms.message.gateway', $event);
+      ->dispatch(SmsEvents::MESSAGE_GATEWAY, $event);
 
     $gateways = $event->getGatewaysSorted();
     // Use the gateway with the greatest weight.
@@ -188,10 +189,10 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events['sms.message.preprocess'][] = ['ensureRecipients', 1024];
-    $events['sms.message.preprocess'][] = ['ensureGateways', 1024];
-    $events['sms.message.preprocess'][] = ['deliveryReportUrl'];
-    $events['sms.message.preprocess'][] = ['chunkMaxRecipients', -1024];
+    $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['ensureRecipients', 1024];
+    $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['ensureGateways', 1024];
+    $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['deliveryReportUrl'];
+    $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['chunkMaxRecipients', -1024];
     return $events;
   }
 
