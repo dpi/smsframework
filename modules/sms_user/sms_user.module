@@ -7,8 +7,6 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
-use Drupal\sms\Message\SmsMessageInterface;
-use Drupal\sms\Entity\SmsMessage as SmsMessageEntity;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
 
 /**
