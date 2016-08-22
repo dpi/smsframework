@@ -81,12 +81,13 @@ class SmsSettingsForm extends ConfigFormBase {
       $gateways[$gateway->id()] = $gateway->label();
     }
 
-    $form['default_gateway'] = [
+    $form['fallback_gateway'] = [
       '#type' => 'select',
-      '#title' => $this->t('Default gateway'),
+      '#title' => $this->t('Fallback gateway'),
+      '#description' => $this->t('Gateway to use if no other module sets a gateway for a message.'),
       '#options' => $gateways,
-      '#default_value' => $sms_settings->get('default_gateway'),
-      '#empty_option' => $this->t(' - No Default - '),
+      '#default_value' => $sms_settings->get('fallback_gateway'),
+      '#empty_option' => $this->t(' - No Gateways - '),
     ];
 
     $form['pages']['#tree'] = TRUE;
@@ -126,7 +127,7 @@ class SmsSettingsForm extends ConfigFormBase {
     }
 
     $this->config('sms.settings')
-      ->set('default_gateway', $form_state->getValue('default_gateway'))
+      ->set('fallback_gateway', $form_state->getValue('fallback_gateway'))
       ->set('page.verify', $path_verify)
       ->save();
 

@@ -10,6 +10,7 @@ namespace Drupal\sms\Tests;
 use Drupal\Core\Url;
 use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Direction;
+use Drupal\sms\Entity\SmsGateway;
 
 /**
  * Tests gateway administration user interface.
@@ -65,26 +66,26 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
   }
 
   /**
-   * Tests setting up the default gateway.
+   * Tests setting up the fallback gateway.
    */
-  public function testDefaultGateway() {
+  public function testFallbackGateway() {
     $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
 
-    // Test initial default gateway.
-    $sms_gateway_default = $this->defaultSmsProvider->getDefaultGateway();
+    // Test initial fallback gateway.
+    $sms_gateway_fallback = SmsGateway::load($this->config('sms.settings')->get('fallback_gateway'));
 
-    $this->assertEqual($sms_gateway_default->id(), 'log', 'Initial default gateway is "log".');
+    $this->assertEqual($sms_gateway_fallback->id(), 'log', 'Initial fallback gateway is "log".');
 
     $this->drupalLogin($this->drupalCreateUser(['administer smsframework']));
 
-    // Change default gateway.
-    $this->drupalPostForm('admin/config/smsframework/settings', [
-      'default_gateway' => $test_gateway->id(),
+    // Change fallback gateway.
+    $this->drupalPostForm(Url::fromRoute('sms.settings'), [
+      'fallback_gateway' => $test_gateway->id(),
     ], 'Save configuration');
     $this->assertResponse(200);
 
-    $sms_gateway_default = $this->defaultSmsProvider->getDefaultGateway();
-    $this->assertEqual($sms_gateway_default->id(), $test_gateway->id(), 'Default gateway changed.');
+    $sms_gateway_fallback = SmsGateway::load($this->config('sms.settings')->get('fallback_gateway'));
+    $this->assertEqual($sms_gateway_fallback->id(), $test_gateway->id(), 'Fallback gateway changed.');
   }
 
   /**

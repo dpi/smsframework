@@ -4,9 +4,9 @@ sms.settings:
   type: config_object
   label: 'SMS Framework settings'
   mapping:
-    default_gateway:
+    fallback_gateway:
       type: string
-      label: 'Entity ID of default SMS Gateway'
+      label: 'Entity ID of fallback SMS Gateway'
     flood:
       label: 'SMS Framework flood settings'
       type: mapping
