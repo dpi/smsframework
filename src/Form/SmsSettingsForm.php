@@ -87,7 +87,7 @@ class SmsSettingsForm extends ConfigFormBase {
       '#description' => $this->t('Gateway to use if no other module sets a gateway for a message.'),
       '#options' => $gateways,
       '#default_value' => $sms_settings->get('fallback_gateway'),
-      '#empty_option' => $this->t(' - No Gateways - '),
+      '#empty_option' => $this->t('- No Fallback Gateway -'),
     ];
 
     $form['pages']['#tree'] = TRUE;
