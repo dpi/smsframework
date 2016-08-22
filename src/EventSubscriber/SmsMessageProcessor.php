@@ -147,7 +147,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
     // available.
     $gateway_id = $this->configFactory
       ->get('sms.settings')
-      ->get('default_gateway');
+      ->get('fallback_gateway');
 
     return isset($gateway_id) ? SmsGateway::load($gateway_id) : NULL;
   }

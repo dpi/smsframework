@@ -67,7 +67,7 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
     $message_counts = [0, 0, 0];
     for ($a = 0; $a < 3; $a++) {
       foreach ($gateways as $i => &$gateway) {
-        $this->defaultSmsProvider->setDefaultGateway($gateway);
+        $this->setFallbackGateway($gateway);
 
         $sms_message = (new SmsMessage())
           ->addRecipients($this->randomPhoneNumbers(1))
@@ -89,7 +89,7 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
   public function testSmsSendSpecified() {
     $test_gateway1 = $this->createMemoryGateway(['skip_queue' => TRUE]);
     $test_gateway2 = $this->createMemoryGateway(['skip_queue' => TRUE]);
-    $this->defaultSmsProvider->setDefaultGateway($test_gateway1);
+    $this->setFallbackGateway($test_gateway1);
 
     $sms_message = (new SmsMessage())
       ->addRecipients($this->randomPhoneNumbers(1))

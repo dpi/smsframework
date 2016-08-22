@@ -34,8 +34,7 @@ class SmsDevelMessageTest extends SmsFrameworkWebTestBase {
     $this->drupalLogin($user);
 
     $this->gateway = $this->createMemoryGateway();
-    $this->defaultSmsProvider
-      ->setDefaultGateway($this->gateway);
+    $this->setFallbackGateway($this->gateway);
   }
 
   /**
@@ -164,10 +163,7 @@ class SmsDevelMessageTest extends SmsFrameworkWebTestBase {
    * Tests error shown if gateway found for message.
    */
   public function testNoFallbackGateway() {
-    // Unset default gateway.
-    $this->config('sms.settings')
-      ->set('default_gateway', NULL)
-      ->save();
+    $this->setFallbackGateway(NULL);
 
     $edit['number'] = $this->randomPhoneNumbers(1)[0];
     $edit['message'] = $this->randomString();

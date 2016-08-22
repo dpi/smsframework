@@ -55,8 +55,7 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     }
 
     $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
-    $this->defaultSmsProvider
-      ->setDefaultGateway($this->gateway);
+    $this->setFallbackGateway($this->gateway);
 
     $this->phoneField = FieldStorageConfig::create([
       'entity_type' => 'user',

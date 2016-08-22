@@ -166,34 +166,6 @@ class DefaultSmsProvider implements SmsProviderInterface {
   }
 
   /**
-   * Gets the gateway that will be used by default for sending SMS.
-   *
-   * @return \Drupal\sms\Entity\SmsGatewayInterface|NULL
-   *   A SmsGateway config entity, or NULL if default gateway is not set or
-   *   invalid.
-   */
-  public function getDefaultGateway() {
-    $gateway_id = $this->configFactory
-      ->get('sms.settings')
-      ->get('default_gateway');
-    return $gateway_id ? SmsGateway::load($gateway_id) : NULL;
-  }
-
-  /**
-   * Sets the Gateway that will be used by default to send SMS.
-   *
-   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
-   *   The new site default SMS Gateway, or NULL to unset.
-   */
-  public function setDefaultGateway(SmsGatewayInterface $sms_gateway = NULL) {
-    $default_gateway = $sms_gateway ? $sms_gateway->id() : NULL;
-    $this->configFactory
-      ->getEditable('sms.settings')
-      ->set('default_gateway', $default_gateway)
-      ->save();
-  }
-
-  /**
    * Dispatch an event for messages.
    *
    * @param string $event_name
