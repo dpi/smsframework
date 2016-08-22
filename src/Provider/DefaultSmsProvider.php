@@ -10,8 +10,6 @@ namespace Drupal\sms\Provider;
 use Drupal\sms\Event\SmsDeliveryReportEvent;
 use Drupal\sms\Event\SmsMessageProcessedEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
@@ -37,33 +35,13 @@ class DefaultSmsProvider implements SmsProviderInterface {
   protected $eventDispatcher;
 
   /**
-   * Configuration factory for this SMS provider.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * Creates a new instance of the default SMS provider.
    *
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface
-   *   The gateway manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface
-   *   The module handler.
    */
-  public function __construct(EventDispatcherInterface $event_dispatcher, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler) {
+  public function __construct(EventDispatcherInterface $event_dispatcher) {
     $this->eventDispatcher = $event_dispatcher;
-    $this->configFactory = $config_factory;
-    $this->moduleHandler = $module_handler;
   }
 
   /**
