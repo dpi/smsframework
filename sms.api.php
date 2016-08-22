@@ -73,10 +73,7 @@ function hook_sms_delivery_report(array $reports, \Symfony\Component\HttpFoundat
 class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSubscriberInterface {
 
   /**
-   * Process and chunk a SMS message before it is queued, sent, or received.
-   *
-   * @param \Drupal\sms\Event\SmsMessageEvent $event
-   *   The SmsMessageEvent event.
+   * @see \Drupal\sms\Event\SmsEvents::MESSAGE_PRE_PROCESS
    */
   public function mySmsMessagePreprocess(\Drupal\sms\Event\SmsMessageEvent $event) {
     $result = [];
@@ -88,10 +85,7 @@ class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSu
   }
 
   /**
-   * Process and chunk a SMS message after it is queued, sent, or received.
-   *
-   * @param \Drupal\sms\Event\SmsMessageEvent $event
-   *   The SmsMessageEvent event.
+   * @see \Drupal\sms\Event\SmsEvents::MESSAGE_POST_PROCESS
    */
   public function mySmsMessagePostProcess(\Drupal\sms\Event\SmsMessageEvent $event) {
     $result = [];
@@ -103,20 +97,7 @@ class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSu
   }
 
   /**
-   * Determines valid gateways for a recipient phone number.
-   *
-   * This event is not always dispatched. It is only dispatch if no other
-   * preprocessors have added a gateway to a message.
-   *
-   * If you don't know whether you should add a gateway for a recipient, then
-   * it is best to not do anything at all. Let the rest of the framework
-   * continue to try to find a gateway.
-   *
-   * Only one gateway will be applied to the message for this recipient. The
-   * gateway with the largest priority wins.
-   *
-   * @param \Drupal\sms\Event\RecipientGatewayEvent $event
-   *   The RecipientGatewayEvent event.
+   * @see \Drupal\sms\Event\SmsEvents::MESSAGE_GATEWAY
    */
   public function mySmsMessageGateway(\Drupal\sms\Event\RecipientGatewayEvent $event) {
     // The recipient phone number.
@@ -132,9 +113,9 @@ class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSu
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events['sms.message.preprocess'][] = ['mySmsMessagePreprocess'];
-    $events['sms.message.postprocess'][] = ['mySmsMessagePostprocess'];
-    $events['sms.message.gateway'][] = ['mySmsMessageGateway'];
+    $events[\Drupal\sms\Event\SmsEvents::MESSAGE_PRE_PROCESS][] = ['mySmsMessagePreprocess'];
+    $events[\Drupal\sms\Event\SmsEvents::MESSAGE_POST_PROCESS][] = ['mySmsMessagePostprocess'];
+    $events[\Drupal\sms\Event\SmsEvents::MESSAGE_GATEWAY][] = ['mySmsMessageGateway'];
     return $events;
   }
 

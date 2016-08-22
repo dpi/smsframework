@@ -4,6 +4,7 @@ namespace Drupal\sms_test\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\sms\Entity\SmsGateway;
+use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Event\RecipientGatewayEvent;
 
 /**
@@ -41,8 +42,8 @@ class SmsTestEventSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events['sms.message.gateway'][] = ['testAddGateway200'];
-    $events['sms.message.gateway'][] = ['testAddGateway400'];
+    $events[SmsEvents::MESSAGE_GATEWAY][] = ['testAddGateway200'];
+    $events[SmsEvents::MESSAGE_GATEWAY][] = ['testAddGateway400'];
     return $events;
   }
 
