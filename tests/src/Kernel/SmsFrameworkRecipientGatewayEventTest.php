@@ -33,7 +33,7 @@ class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase {
     parent::setUp();
     $this->installEntitySchema('sms');
     $this->smsProvider = $this->container->get('sms_provider');
-    $this->smsProvider->setDefaultGateway(NULL);
+    $this->setFallbackGateway(NULL);
   }
 
   /**

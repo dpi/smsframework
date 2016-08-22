@@ -20,6 +20,19 @@ use Drupal\sms\Message\SmsMessage;
 trait SmsFrameworkTestTrait {
 
   /**
+   * Sets the fallback gateway.
+   *
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
+   *   The new site fallback SMS Gateway, or NULL to unset.
+   */
+  protected function setFallbackGateway(SmsGatewayInterface $sms_gateway = NULL) {
+    $sms_gateway = $sms_gateway ? $sms_gateway->id() : NULL;
+    $this->config('sms.settings')
+      ->set('fallback_gateway', $sms_gateway)
+      ->save();
+  }
+
+  /**
    * Creates a memory gateway.
    *
    * @param array $values

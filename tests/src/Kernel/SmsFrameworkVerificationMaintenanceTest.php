@@ -69,9 +69,8 @@ class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
       ->setVerificationMessage($this->randomString())
       ->save();
 
-    /** @var \Drupal\sms\Provider\DefaultSmsProvider $provider */
-    $provider = \Drupal::service('sms_provider');
-    $provider->setDefaultGateway($this->createMemoryGateway(['skip_queue' => TRUE]));
+    $gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
+    $this->setFallbackGateway($gateway);
 
     $this->testEntity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, ['+123123123']);
   }

@@ -54,7 +54,7 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     $this->smsProvider = $this->container->get('sms_provider');
 
     $this->gateway = $this->createMemoryGateway();
-    $this->smsProvider->setDefaultGateway($this->gateway);
+    $this->setFallbackGateway($this->gateway);
 
     ViewTestData::createTestViews(get_class($this), ['sms_test_views']);
   }

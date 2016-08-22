@@ -25,8 +25,7 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
   protected function setUp() {
     parent::setUp();
     $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
-    $this->defaultSmsProvider
-      ->setDefaultGateway($test_gateway);
+    $this->setFallbackGateway($test_gateway);
   }
 
   /**
@@ -56,8 +55,7 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
    */
   public function testPhoneNumberVerificationMessage() {
     $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
-    $this->defaultSmsProvider
-      ->setDefaultGateway($test_gateway);
+    $this->setFallbackGateway($test_gateway);
 
     $phone_numbers = ['+123123123'];
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');

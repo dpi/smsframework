@@ -37,7 +37,7 @@ class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
       'plugin' => 'memory',
     ])->setSkipQueue(TRUE);
     $gateway->save();
-    $this->smsProvider->setDefaultGateway($gateway);
+    $this->setFallbackGateway($gateway);
 
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::INCOMING)
@@ -57,7 +57,7 @@ class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
       'plugin' => 'memory_noincoming',
     ])->setSkipQueue(TRUE);
     $gateway->save();
-    $this->smsProvider->setDefaultGateway($gateway);
+    $this->setFallbackGateway($gateway);
 
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::INCOMING)

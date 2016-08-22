@@ -79,7 +79,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     $this->smsProvider = $this->container->get('sms_provider');
 
     $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
-    $this->smsProvider->setDefaultGateway($this->gateway);
+    $this->setFallbackGateway($this->gateway);
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('sms');

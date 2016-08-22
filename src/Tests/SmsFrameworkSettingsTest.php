@@ -31,7 +31,7 @@ class SmsFrameworkSettingsTest extends SmsFrameworkWebTestBase {
    * Test setting form without gateway.
    */
   public function testSettingsForm() {
-    $edit['default_gateway'] = '';
+    $edit['fallback_gateway'] = '';
     $edit['pages[verify]'] = '/' . $this->randomMachineName();
     $this->drupalPostForm(Url::fromRoute('sms.settings'), $edit, 'Save configuration');
     $this->assertRaw(t('SMS settings saved.'));
@@ -42,7 +42,7 @@ class SmsFrameworkSettingsTest extends SmsFrameworkWebTestBase {
    */
   public function testGatewaySet() {
     $gateway = $this->createMemoryGateway();
-    $edit['default_gateway'] = $gateway->id();
+    $edit['fallback_gateway'] = $gateway->id();
     $edit['pages[verify]'] = '/' . $this->randomMachineName();
     $this->drupalPostForm(Url::fromRoute('sms.settings'), $edit, 'Save configuration');
     $this->assertRaw(t('SMS settings saved.'));

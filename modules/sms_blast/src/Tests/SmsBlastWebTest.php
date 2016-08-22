@@ -35,8 +35,7 @@ class SmsBlastWebTest extends SmsFrameworkWebTestBase {
     $this->drupalLogin($this->drupalCreateUser(['Send SMS Blast']));
 
     $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
-    $this->defaultSmsProvider
-      ->setDefaultGateway($this->gateway);
+    $this->setFallbackGateway($this->gateway);
 
     $phone_field = FieldStorageConfig::create([
       'entity_type' => 'user',
