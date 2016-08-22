@@ -101,4 +101,16 @@ final class SmsEvents {
    */
   const MESSAGE_INCOMING_POST_PROCESS = 'sms.message.incoming.post_process';
 
+  /**
+   * Process delivery reports after they are created by the gateway plugin.
+   *
+   * This event grants an opportunity to modify the HTTP response if the
+   * delivery reports were pushed to the site.
+   *
+   * @Event
+   *
+   * @see \Drupal\sms\Event\SmsDeliveryReportEvent
+   */
+  const DELIVERY_REPORT_POST_PROCESS = 'sms.report.post_process';
+
 }

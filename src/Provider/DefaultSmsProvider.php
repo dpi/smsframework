@@ -7,6 +7,7 @@
 
 namespace Drupal\sms\Provider;
 
+use Drupal\sms\Event\SmsDeliveryReportEvent;
 use Drupal\sms\Event\SmsMessageProcessedEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -152,15 +153,19 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function processDeliveryReport(Request $request, SmsGatewayInterface $sms_gateway, array $options = []) {
-    // The response that will be sent back to the server API. The gateway plugin
-    // can alter this response as needed.
-    $response = new Response('');
+  public function processDeliveryReport(Request $request, SmsGatewayInterface $sms_gateway) {
+    $response = new Response();
     $reports = $sms_gateway->getPlugin()
       ->parseDeliveryReports($request, $response);
-    // Invoke the delivery report hook so other modules can alter the response.
-    $this->moduleHandler->invokeAll('sms_delivery_report', [$reports, $response]);
-    return $response;
+
+    $event = new SmsDeliveryReportEvent();
+    $event
+      ->setResponse($response)
+      ->setReports($reports);
+    $this->eventDispatcher
+      ->dispatch(SmsEvents::DELIVERY_REPORT_POST_PROCESS, $event);
+
+    return $event->getResponse();
   }
 
   /**
