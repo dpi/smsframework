@@ -10,7 +10,6 @@ namespace Drupal\sms\Plugin;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -154,28 +153,5 @@ interface SmsGatewayPluginInterface extends ConfigurablePluginInterface, PluginF
    *   An array of the delivery reports which have been pulled.
    */
   public function getDeliveryReports(array $message_ids = NULL);
-
-  /**
-   * Gets the last error message from the gateway.
-   *
-   * @return array
-   *   An array of values containing the following:
-   *   - code: the error code.
-   *   - message: the error message.
-   */
-  public function getError();
-
-  /**
-   * Carry out gateway-specific number validation.
-   *
-   * @param array $numbers
-   *   The list of phone numbers to be validated.
-   * @param array $options
-   *   Options to be considered for validation.
-   *
-   * @return array
-   *   An array containing an error message for each validation failure.
-   */
-  public function validateNumbers(array $numbers, array $options = []);
 
 }
