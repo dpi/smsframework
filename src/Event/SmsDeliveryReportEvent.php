@@ -22,7 +22,7 @@ class SmsDeliveryReportEvent extends Event {
   /**
    * The SMS delivery reports.
    *
-   * @var \Drupal\sms\Message\SmsDeliveryReport[]
+   * @var \Drupal\sms\Message\SmsDeliveryReportInterface[]
    */
   protected $reports;
 
@@ -53,7 +53,7 @@ class SmsDeliveryReportEvent extends Event {
   /**
    * Get all delivery reports on this event.
    *
-   * @return \Drupal\sms\Message\SmsDeliveryReport[]
+   * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
    *   The delivery reports on this event.
    */
   public function getReports() {
@@ -63,7 +63,7 @@ class SmsDeliveryReportEvent extends Event {
   /**
    * Set the delivery reports on this event.
    *
-   * @param \Drupal\sms\Message\SmsDeliveryReport[] $reports
+   * @param \Drupal\sms\Message\SmsDeliveryReportInterface[] $reports
    *   The delivery reports to set on this event.
    *
    * @return $this

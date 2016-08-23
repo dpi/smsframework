@@ -19,7 +19,7 @@ class SmsMessageProcessedEvent extends Event {
   protected $results;
 
   /**
-   * Set the results for this this event.
+   * Set the results for this event.
    *
    * @return \Drupal\sms\Message\SmsMessageResultInterface[]
    *   The results for this event.
@@ -29,7 +29,7 @@ class SmsMessageProcessedEvent extends Event {
   }
 
   /**
-   * Set the results on this event.
+   * Sets the results on this event.
    *
    * @param \Drupal\sms\Message\SmsMessageResultInterface[] $results
    *   The results to set on this event.

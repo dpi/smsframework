@@ -5,7 +5,10 @@ namespace Drupal\sms\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Event fired SMS messages should be processed.
+ * Event fired when SMS messages are processed.
+ *
+ * This event can be used for both pre- and post- process events. See
+ * {@link \Drupal\sms\Event\SmsEvents} to see where this event is used.
  *
  * @see \Drupal\sms\Event\SmsEvents
  */
