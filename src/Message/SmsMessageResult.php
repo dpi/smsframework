@@ -13,32 +13,18 @@ namespace Drupal\sms\Message;
 class SmsMessageResult implements SmsMessageResultInterface {
 
   /**
-   * The status of the message.
+   * The status of the message, or NULL if unknown.
    *
-   * @var boolean|NULL
+   * @var string|NULL
    */
   public $status = NULL;
 
   /**
-   * The error message if status was negative.
+   * The status message as provided by the gateway API.
    *
    * @var string
    */
-  public $errorMessage = '';
-
-  /**
-   * The credits used for this message.
-   *
-   * @var integer
-   */
-  public $creditsUsed = 0;
-
-  /**
-   * The credit balance after this message is sent.
-   *
-   * @var integer
-   */
-  public $creditBalance = 0;
+  protected $statusMessage = '';
 
   /**
    * The message delivery reports keyed by recipient number.
@@ -46,6 +32,31 @@ class SmsMessageResult implements SmsMessageResultInterface {
    * @var \Drupal\sms\Message\SmsDeliveryReportInterface[]
    */
   public $reports = [];
+
+  /**
+   * The credit balance after this message is sent, or NULL if unknown.
+   *
+   * This number is in the SMS gateway's chosen denomination.
+   *
+   * @var float|NULL
+   */
+  public $creditBalance = NULL;
+
+  /**
+   * The credits consumed to process this message, or NULL if unknown.
+   *
+   * This number is in the SMS gateway's chosen denomination.
+   *
+   * @var float|NULL
+   */
+  public $creditsUsed = NULL;
+
+  /**
+   * The messages associated with this result.
+   *
+   * @var \Drupal\sms\Message\SmsMessageInterface[]
+   */
+  public $messages = [];
 
   /**
    * {@inheritdoc}
@@ -65,27 +76,38 @@ class SmsMessageResult implements SmsMessageResultInterface {
   /**
    * {@inheritdoc}
    */
-  public function getErrorMessage() {
-    return $this->errorMessage;
+  public function getStatusMessage() {
+    return $this->statusMessage;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setErrorMessage($error_message) {
-    return $this->errorMessage;
+  public function setStatusMessage($message) {
+    $this->statusMessage = $message;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMessages() {
+    return $this->messages;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setMessages(array $messages) {
+    $this->messages = $messages;
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getReport($recipient) {
-    if (isset($this->reports[$recipient])) {
-      return $this->reports[$recipient];
-    }
-    else {
-      return NULL;
-    }
+    return isset($this->reports[$recipient]) ? $this->reports[$recipient] : NULL;
   }
 
   /**
@@ -106,14 +128,14 @@ class SmsMessageResult implements SmsMessageResultInterface {
   /**
    * {@inheritdoc}
    */
-  public function getBalance() {
+  public function getCreditsBalance() {
     return $this->creditBalance;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setBalance($balance) {
+  public function setCreditsBalance($balance) {
     $this->creditBalance = $balance;
     return $this;
   }

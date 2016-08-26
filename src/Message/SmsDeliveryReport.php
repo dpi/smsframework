@@ -20,67 +20,40 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
   protected $messageId = '';
 
   /**
-   * The UNIX timestamp when the message was sent.
+   * The recipients of the message.
    *
-   * @var string|NULL
+   * @var string[]
    */
-  protected $timeSent = NULL;
+  protected $recipients = [];
 
   /**
-   * The UNIX timestamp when the message was delivered.
-   *
-   * @var string|NULL
-   */
-  protected $timeDelivered = NULL;
-
-  /**
-   * The recipient of the message.
-   *
-   * @var string
-   */
-  protected $recipient = NULL;
-
-  /**
-   * The error code sent from the gateway.
-   *
-   * @var string
-   */
-  protected $gatewayErrorCode = NULL;
-
-  /**
-   * The error message sent from the gateway.
-   *
-   * @var string
-   */
-  protected $gatewayErrorMessage = NULL;
-
-  /**
-   * The SMS delivery status sent from the gateway.
-   *
-   * @var string
-   */
-  protected $gatewayStatus = NULL;
-
-  /**
-   * The standardized error code.
-   *
-   * @var string
-   */
-  protected $errorCode = NULL;
-
-  /**
-   * The standardized error message.
-   *
-   * @var string
-   */
-  protected $errorMessage = NULL;
-
-  /**
-   * The standardized SMS delivery status.
+   * A status code from \Drupal\sms\Message\SmsMessageStatus, or NULL if
+   * unknown.
    *
    * @var string
    */
   protected $status = NULL;
+
+  /**
+   * The status message as provided by the gateway API.
+   *
+   * @var string
+   */
+  protected $statusMessage = '';
+
+  /**
+   * The timestamp when the message was queued, or NULL if unknown.
+   *
+   * @var string|NULL
+   */
+  protected $timeQueued = NULL;
+
+  /**
+   * The timestamp when the message was delivered, or NULL if unknown.
+   *
+   * @var string|NULL
+   */
+  protected $timeDelivered = NULL;
 
   /**
    * {@inheritdoc}
@@ -100,45 +73,15 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRecipient() {
-    return $this->recipient;
+  public function getRecipients() {
+    return $this->recipients;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setRecipient($recipient) {
-    $this->recipient = $recipient;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getTimeDelivered() {
-    return $this->timeDelivered;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setTimeDelivered($time) {
-    $this->timeDelivered = $time;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getTimeSent() {
-    return $this->timeSent;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setTimeSent($time) {
-    $this->timeSent = $time;
+  public function setRecipients(array $recipients) {
+    $this->recipients = $recipients;
     return $this;
   }
 
@@ -160,75 +103,45 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
   /**
    * {@inheritdoc}
    */
-  public function getError() {
-    return $this->errorCode;
+  public function getStatusMessage() {
+    return $this->statusMessage;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setError($error) {
-    $this->errorCode = $error;
+  public function setStatusMessage($message) {
+    $this->statusMessage = $message;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getErrorMessage() {
-    return $this->errorMessage;
+  public function getTimeQueued() {
+    return $this->timeQueued;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setErrorMessage($error_message) {
-    $this->errorMessage = $error_message;
+  public function setTimeQueued($time) {
+    $this->timeQueued = $time;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getGatewayStatus() {
-    return $this->gatewayStatus;
+  public function getTimeDelivered() {
+    return $this->timeDelivered;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setGatewayStatus($status) {
-    $this->gatewayStatus = $status;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getGatewayError() {
-    return $this->gatewayErrorCode;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setGatewayError($error) {
-    $this->gatewayErrorCode = $error;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getGatewayErrorMessage() {
-    return $this->gatewayErrorMessage;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setGatewayErrorMessage($error_message) {
-    $this->gatewayErrorMessage = $error_message;
+  public function setTimeDelivered($time) {
+    $this->timeDelivered = $time;
     return $this;
   }
 

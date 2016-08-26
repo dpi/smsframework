@@ -83,7 +83,7 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
     \Drupal::state()->set('sms_test_gateway.memory.report', $reports);
 
     return (new SmsMessageResult())
-      ->setStatus(TRUE)
+      ->setStatus(SmsMessageStatus::QUEUED)
       ->setReports($latest_reports);
   }
 
@@ -108,14 +108,12 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
     foreach ($data['reports'] as $report) {
       $message_id = $report['message_id'];
       $latest_reports[$message_id] = (new SmsDeliveryReport())
-        ->setRecipient($report['recipient'])
+        ->setRecipients([$report['recipient']])
         ->setMessageId($message_id)
-        ->setTimeSent($report['time_sent'])
-        ->setTimeDelivered($report['time_delivered'])
-        ->setStatus($report['status'])
-        ->setGatewayStatus($report['gateway_status'])
-        ->setGatewayStatus($report['gateway_status_code'])
-        ->setGatewayErrorMessage($report['gateway_status_description']);
+        ->setStatus(SmsMessageStatus::DELIVERED)
+        ->setStatusMessage($report['status'])
+        ->setTimeQueued($report['time_sent'])
+        ->setTimeDelivered($report['time_delivered']);
     }
 
     // Update the latest delivery reports in \Drupal::state().
@@ -136,22 +134,19 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
    *   The SMS message
    *
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
-   *   An array of delivery reports.
+   *   An array of delivery reports keyed by recipient number.
    */
   protected function randomDeliveryReports(SmsMessageInterface $sms_message) {
     $random = new Random();
     $reports = [];
     foreach ($sms_message->getRecipients() as $number) {
-      $message_id = $random->name(16);
-      $reports[$message_id] = (new SmsDeliveryReport())
-        ->setRecipient($number)
-        ->setMessageId($message_id)
-        ->setTimeSent(time())
-        ->setTimeDelivered(time() + rand(0, 10))
-        ->setStatus(SmsMessageStatus::SENT)
-        ->setGatewayStatus('SENT')
-        ->setGatewayStatus('200')
-        ->setGatewayErrorMessage('Sent to memory gateway');
+      $reports[$number] = (new SmsDeliveryReport())
+        ->setRecipients([$number])
+        ->setMessageId($random->name(16))
+        ->setStatus(SmsMessageStatus::QUEUED)
+        ->setStatusMessage('Sent to memory gateway')
+        ->setTimeQueued(time())
+        ->setTimeDelivered(time() + rand(0, 10));
     }
     return $reports;
   }

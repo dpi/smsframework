@@ -8,109 +8,63 @@ namespace Drupal\sms\Message;
 class SmsMessageStatus {
 
   /**
-   * Status Unknown.
-   *
-   * A message would have this to indicate unknown status.
+   * Message was queued for sending.
    */
- const UNKNOWN = 0;
+  const QUEUED = 'queued';
 
   /**
-   * Status OK.
-   *
-   * A message with this status indicates it was successfully sent.
+   * Message was successfully delivered to the recipient.
    */
- const OK = 200;
+  const DELIVERED = 'delivered';
 
   /**
-   * Status DELIVERED.
-   *
-   * A message with this status indicates it was successfully delivered.
+   * Message could not be processed due to an unknown problem with the gateway.
    */
- const DELIVERED = 202;
+  const ERROR = 'error';
 
   /**
-   * Status QUEUED.
-   *
-   * A message with this status indicates it was successfully queued for sending.
+   * Message could not be processed due to low credit.
    */
- const QUEUED = 302;
+  const NO_CREDIT = 'no_credit';
 
   /**
-   * Status ERROR.
-   *
-   * A message with this status indicates it could not be sent (routing reasons).
+   * Message expired and was not sent.
    */
- const ERROR = 400;
+  const EXPIRED = 'expired';
 
   /**
-   * Status NO_CREDIT.
-   *
-   * A message with this status indicates it could not be sent due to low credit
-   * balance.
+   * Message is pending delivery.
    */
- const NO_CREDIT = 402;
+  const PENDING = 'pending';
 
   /**
-   * Status EXPIRED.
-   *
-   * A message with this status indicates it has expired and has not been sent.
+   * Message was rejected by the gateway.
    */
- const EXPIRED = 408;
+  const REJECTED = 'rejected';
 
   /**
-   * Status SENT.
-   *
-   * A message with this status indicates it was successfully sent.
+   * Indicates a recipient of the message is invalid.
    */
- const SENT = 200;
+  const INVALID_RECIPIENT = 'invalid_recipient';
 
   /**
-   * Status PENDING.
-   *
-   * A message with this status indicates it is pending delivery.
+   * Indicates the sender ID is invalid.
    */
- const PENDING = 302;
+  const INVALID_SENDER = 'invalid_sender';
 
   /**
-   * Status NOT_SENT.
-   *
-   * A message with this status indicates it was not sent.
+   * Failed to authenticate with gateway.
    */
- const NOT_SENT = 404;
+  const AUTHENTICATION = 'authentication';
 
   /**
-   * Status NOT_DELIVERED.
-   *
-   * A message with this status indicates it was sent but not delivered.
+   * Too many requests.
    */
- const NOT_DELIVERED = 406;
+  const EXCESSIVE_REQUESTS = 'flooded';
 
   /**
-   * Status REJECTED.
-   *
-   * A message with this status indicates it was rejected by the network.
+   * Content of message invalid or not supported by gateway.
    */
- const REJECTED = 410;
-
-  /**
-   * Status INVALID_RECIPIENT.
-   *
-   * A message with this status indicates the recipient number was invalid.
-   */
- const INVALID_RECIPIENT = 412;
-
-  /**
-   * Status INVALID_SENDER.
-   *
-   * A message with this status indicates the sender ID was invalid.
-   */
- const INVALID_SENDER = 414;
-
-  /**
-   * Status ERROR_ROUTING.
-   *
-   * A message with this status there was a routing error.
-   */
- const ERROR_ROUTING = 420;
+  const CONTENT_INVALID = 'content_invalid';
 
 }
