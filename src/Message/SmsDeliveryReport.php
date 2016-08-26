@@ -15,128 +15,86 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
   /**
    * The unique identifier for the message assigned by the gateway.
    *
-   * Usually message IDs are returned by the gateway to identify a message sent
-   * and should be unique for a particular combination of message and recipient.
-   *
    * @var string
    */
-  protected $messageId;
+  protected $messageId = '';
 
   /**
    * The UNIX timestamp when the message was sent.
    *
-   * @var string
+   * @var string|NULL
    */
-  protected $timeSent;
+  protected $timeSent = NULL;
 
   /**
    * The UNIX timestamp when the message was delivered.
    *
-   * @var string
+   * @var string|NULL
    */
-  protected $timeDelivered;
+  protected $timeDelivered = NULL;
 
   /**
    * The recipient of the message.
    *
    * @var string
    */
-  protected $recipient;
+  protected $recipient = NULL;
 
   /**
    * The error code sent from the gateway.
    *
    * @var string
    */
-  protected $gatewayErrorCode;
+  protected $gatewayErrorCode = NULL;
 
   /**
    * The error message sent from the gateway.
    *
    * @var string
    */
-  protected $gatewayErrorMessage;
+  protected $gatewayErrorMessage = NULL;
 
   /**
    * The SMS delivery status sent from the gateway.
    *
    * @var string
    */
-  protected $gatewayStatus;
+  protected $gatewayStatus = NULL;
 
   /**
    * The standardized error code.
    *
    * @var string
    */
-  protected $errorCode;
+  protected $errorCode = NULL;
 
   /**
    * The standardized error message.
    *
    * @var string
    */
-  protected $errorMessage;
+  protected $errorMessage = NULL;
 
   /**
    * The standardized SMS delivery status.
    *
    * @var string
    */
-  protected $status;
-
-  /**
-   * Default values.
-   *
-   * @var array
-   */
-  protected static $defaults = [
-    'message_id' => '',
-    'recipient' => '',
-    'status' => self::STATUS_SENT,
-    'error_code' => 0,
-    'error_message' => '',
-    'gateway_status' => 'SENT',
-    'gateway_error_code' => '',
-    'gateway_error_message' => '',
-    'time_sent' => REQUEST_TIME,
-    'time_delivered' => REQUEST_TIME,
-  ];
-
-  /**
-   * Creates a new instance of an SMS delivery report.
-   *
-   * @param array $data
-   *   The data to instantiate the delivery report with. It should have the
-   *   following keys.
-   *   - message_id: the essage ID from the gateway (default is '')
-   *   - recipient: the recipient number (single number, default is '')
-   *   - status: the delivery status (default is
-   *     SmsDeliveryReportInterface::STATUS_SENT)
-   *   - gateway_status: the delivery status from the gateway (default is 'SENT')
-   *   - send_time: the time the message was sent (default is REQUEST_TIME)
-   *   - delivered_time: the time the message was delivered (default is
-   *     REQUEST_TIME)
-   */
-  public function __construct($data) {
-    $data += static::$defaults;
-    $this->messageId = $data['message_id'];
-    $this->recipient = $data['recipient'];
-    $this->timeDelivered = $data['time_delivered'];
-    $this->timeSent = $data['time_sent'];
-    $this->status = $data['status'];
-    $this->errorCode = $data['error_code'];
-    $this->errorMessage = $data['error_message'];
-    $this->gatewayStatus = $data['gateway_status'];
-    $this->gatewayErrorCode = $data['gateway_error_code'];
-    $this->gatewayErrorMessage = $data['gateway_error_message'];
-  }
+  protected $status = NULL;
 
   /**
    * {@inheritdoc}
    */
   public function getMessageId() {
     return $this->messageId;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setMessageId($message_id) {
+    $this->messageId = $message_id;
+    return $this;
   }
 
   /**
@@ -149,8 +107,24 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
   /**
    * {@inheritdoc}
    */
+  public function setRecipient($recipient) {
+    $this->recipient = $recipient;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getTimeDelivered() {
     return $this->timeDelivered;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTimeDelivered($time) {
+    $this->timeDelivered = $time;
+    return $this;
   }
 
   /**
@@ -163,8 +137,24 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
   /**
    * {@inheritdoc}
    */
+  public function setTimeSent($time) {
+    $this->timeSent = $time;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getStatus() {
     return $this->status;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setStatus($status) {
+    $this->status = $status;
+    return $this;
   }
 
   /**
@@ -177,8 +167,24 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
   /**
    * {@inheritdoc}
    */
+  public function setError($error) {
+    $this->errorCode = $error;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getErrorMessage() {
     return $this->errorMessage;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setErrorMessage($error_message) {
+    $this->errorMessage = $error_message;
+    return $this;
   }
 
   /**
@@ -191,8 +197,24 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
   /**
    * {@inheritdoc}
    */
+  public function setGatewayStatus($status) {
+    $this->gatewayStatus = $status;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getGatewayError() {
     return $this->gatewayErrorCode;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setGatewayError($error) {
+    $this->gatewayErrorCode = $error;
+    return $this;
   }
 
   /**
@@ -202,8 +224,12 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
     return $this->gatewayErrorMessage;
   }
 
-  public function getArray() {
-    return (array) $this;
+  /**
+   * {@inheritdoc}
+   */
+  public function setGatewayErrorMessage($error_message) {
+    $this->gatewayErrorMessage = $error_message;
+    return $this;
   }
 
 }

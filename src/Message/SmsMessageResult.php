@@ -15,52 +15,37 @@ class SmsMessageResult implements SmsMessageResultInterface {
   /**
    * The status of the message.
    *
-   * @var bool
+   * @var boolean|NULL
    */
-  public $status;
+  public $status = NULL;
 
   /**
-   * The translated error message if status is FALSE.
+   * The error message if status was negative.
    *
    * @var string
    */
-  public $errorMessage;
+  public $errorMessage = '';
 
   /**
    * The credits used for this message.
    *
    * @var integer
    */
-  public $creditsUsed;
+  public $creditsUsed = 0;
 
   /**
    * The credit balance after this message is sent.
    *
    * @var integer
    */
-  public $creditBalance;
+  public $creditBalance = 0;
 
   /**
    * The message delivery reports keyed by recipient number.
    *
    * @var \Drupal\sms\Message\SmsDeliveryReportInterface[]
    */
-  public $reports;
-
-  /**
-   * Create a new message result based on data supplied in the array.
-   *
-   * @param array $data
-   *   Information to be used to instantiate the SmsMessageResult.
-   */
-  public function __construct($data) {
-    $data += $this->defaultData();
-    $this->status = $data['status'];
-    $this->creditBalance = $data['credit_balance'];
-    $this->creditsUsed = $data['credits_used'];
-    $this->errorMessage = $data['error_message'];
-    $this->reports = $data['reports'];
-  }
+  public $reports = [];
 
   /**
    * {@inheritdoc}
@@ -72,35 +57,9 @@ class SmsMessageResult implements SmsMessageResultInterface {
   /**
    * {@inheritdoc}
    */
-  public function getReports() {
-    return $this->reports;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBalance() {
-    return $this->creditBalance;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCreditsUsed() {
-    return $this->creditsUsed;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toArray() {
-    return array(
-      'status' => $this->status,
-      'error_message' => $this->errorMessage,
-      'credits_used' => $this->creditsUsed,
-      'credit_balance' => $this->creditBalance,
-      'reports' => $this->reports,
-    );
+  public function setStatus($status) {
+    $this->status = $status;
+    return $this;
   }
 
   /**
@@ -113,26 +72,65 @@ class SmsMessageResult implements SmsMessageResultInterface {
   /**
    * {@inheritdoc}
    */
+  public function setErrorMessage($error_message) {
+    return $this->errorMessage;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getReport($recipient) {
     if (isset($this->reports[$recipient])) {
       return $this->reports[$recipient];
     }
     else {
-      return null;
+      return NULL;
     }
   }
 
   /**
-   * Returns default data for initializing the value object.
+   * {@inheritdoc}
    */
-  protected function defaultData() {
-    return array(
-      'status' => '',
-      'error_message' => '',
-      'credits_used' => 0,
-      'credit_balance' => 0,
-      'reports' => [],
-    );
+  public function getReports() {
+    return $this->reports;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setReports(array $reports) {
+    $this->reports = $reports;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBalance() {
+    return $this->creditBalance;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setBalance($balance) {
+    $this->creditBalance = $balance;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCreditsUsed() {
+    return $this->creditsUsed;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCreditsUsed($credits_used) {
+    $this->creditsUsed = $credits_used;
+    return $this;
   }
 
 }
