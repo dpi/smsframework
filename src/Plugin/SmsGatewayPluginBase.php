@@ -91,13 +91,6 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
   /**
    * {@inheritdoc}
    */
-  public function validateNumbers(array $numbers, array $options = []) {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function balance() {
     return 0;
   }
@@ -113,13 +106,6 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
    * {@inheritdoc}
    */
   public function getDeliveryReports(array $message_ids = NULL) {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getError() {
     return [];
   }
 
