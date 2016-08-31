@@ -45,27 +45,7 @@ class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
       ->addRecipients($this->randomPhoneNumbers());
 
     $this->smsProvider->queue($sms_message);
-    $this->assertTrue(\Drupal::state()->get('sms_test_gateway.memory.incoming_hook_temporary'));
-  }
-
-  /**
-   * Ensure SMS provider does not crash and burn if the gateway does not
-   * implement SmsGatewayPluginIncomingInterface.
-   */
-  public function testIncomingMissing() {
-    $gateway = $this->createMemoryGateway([
-      'plugin' => 'memory_noincoming',
-    ])->setSkipQueue(TRUE);
-    $gateway->save();
-    $this->setFallbackGateway($gateway);
-
-    $sms_message = SmsMessage::create()
-      ->setDirection(Direction::INCOMING)
-      ->setMessage($this->randomString())
-      ->addRecipients($this->randomPhoneNumbers());
-
-    $this->smsProvider->queue($sms_message);
-    $this->assertTrue(\Drupal::state()->get('sms_test_sms_incoming_preprocess'));
+    $this->assertTrue(\Drupal::state()->get('sms_test_gateway.memory.incoming'));
   }
 
 }

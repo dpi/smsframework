@@ -2,6 +2,8 @@
 
 namespace Drupal\sms_test\EventSubscriber;
 
+use Drupal\sms\Event\SmsMessageEvent;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Event\SmsEvents;
@@ -39,11 +41,35 @@ class SmsTestEventSubscriber implements EventSubscriberInterface {
   }
 
   /**
+   * Adds event name to execution order when a message is processed.
+   *
+   * @param \Symfony\Component\EventDispatcher\Event $event
+   *   The event.
+   * @param string $eventName
+   *   The event name
+   */
+  public function testExecutionOrder(Event $event, $eventName) {
+    $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
+    $execution_order[] = $eventName;
+    \Drupal::state()->set('sms_test_event_subscriber__execution_order', $execution_order);
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
     $events[SmsEvents::MESSAGE_GATEWAY][] = ['testAddGateway200'];
     $events[SmsEvents::MESSAGE_GATEWAY][] = ['testAddGateway400'];
+
+    $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['testExecutionOrder'];
+    $events[SmsEvents::MESSAGE_POST_PROCESS][] = ['testExecutionOrder'];
+    $events[SmsEvents::MESSAGE_QUEUE_PRE_PROCESS][] = ['testExecutionOrder'];
+    $events[SmsEvents::MESSAGE_QUEUE_POST_PROCESS][] = ['testExecutionOrder'];
+    $events[SmsEvents::MESSAGE_INCOMING_PRE_PROCESS][] = ['testExecutionOrder'];
+    $events[SmsEvents::MESSAGE_INCOMING_POST_PROCESS][] = ['testExecutionOrder'];
+    $events[SmsEvents::MESSAGE_OUTGOING_PRE_PROCESS][] = ['testExecutionOrder'];
+    $events[SmsEvents::MESSAGE_OUTGOING_POST_PROCESS][] = ['testExecutionOrder'];
+
     return $events;
   }
 

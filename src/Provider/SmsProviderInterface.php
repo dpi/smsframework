@@ -54,22 +54,22 @@ interface SmsProviderInterface {
    *
    * @param \Drupal\sms\Message\SmsMessageInterface
    *   The message received.
+   *
+   * @return \Drupal\sms\Message\SmsMessageResultInterface[]
+   *   The results of the message sending operation. The message sent can be
+   *   transformed into multiple messages depending on gateway implementation.
+   *   Therefore this function can return multiple results.
    */
   public function incoming(SmsMessageInterface $sms_message);
 
   /**
-   * Handles delivery reports returning to the SMS provider from gateways.
-   *
-   * Allows gateways plugins to correctly parse delivery reports and return a
-   * standard format for processing and storage.
+   * Handles delivery reports pushed to the site.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The HTTP request that contains the delivery report.
    * @param \Drupal\sms\Entity\SmsGatewayInterface $gateway
-   *   The SMS Gateway designated to process the delivery report.
-   * @param array $options
-   *   (optional) Additional options required for parsing the Delivery Report.
+   *   The gateway designated to process the delivery report.
    */
-  public function processDeliveryReport(Request $request, SmsGatewayInterface $gateway, array $options = []);
+  public function processDeliveryReport(Request $request, SmsGatewayInterface $gateway);
 
 }

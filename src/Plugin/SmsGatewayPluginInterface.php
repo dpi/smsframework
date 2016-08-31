@@ -130,16 +130,19 @@ interface SmsGatewayPluginInterface extends ConfigurablePluginInterface, PluginF
   public function balance();
 
   /**
-   * Parses incoming delivery reports and returns the DeliveryReport objects.
+   * Parses incoming delivery reports and returns the created delivery reports.
+   *
+   * The request contains delivery reports pushed to the site in a format
+   * supplied by the gateway API. This method transforms the raw request into
+   * delivery report objects usable by SMS Framework.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
-   *   Request object containing the delivery report in raw format.
+   *   Request object containing the unprocessed delivery reports.
    * @param \Symfony\Component\HttpFoundation\Response $response
-   *   A HTTP response that will be sent back to the SMSC. The plugin can alter
-   *   the content of the response by @code$response->setContent()@endcode.
+   *   HTTP response to return to the server pushing the raw delivery reports.
    *
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
-   *   An array of the delivery reports which have been received.
+   *   An array of delivery reports created from the request.
    */
   public function parseDeliveryReports(Request $request, Response $response);
 
