@@ -19,39 +19,6 @@ function hook_sms_gateway_info_alter(&$gateways) {
 }
 
 /**
- * Called before the SMS message is processed by the gateway plugin.
- *
- * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
- *   A SMS message.
- */
-function hook_sms_incoming_preprocess(\Drupal\sms\Message\SmsMessageInterface $sms_message) {
-}
-
-/**
- * Called after the SMS message is processed by the gateway plugin.
- *
- * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
- *   A SMS message.
- */
-function hook_sms_incoming_postprocess(\Drupal\sms\Message\SmsMessageInterface $sms_message) {
-}
-
-/**
- * Called after SMS delivery reports are processed by the SMS provider.
- *
- * This hook allows gateways to customize responses that would be returned to
- * the gateway server.
- *
- * @param \Drupal\sms\Message\SmsDeliveryReportInterface[] $reports
- *   Delivery reports received from the SMS gateway.
- * @param \Symfony\Component\HttpFoundation\Response $response
- *   The HTTP response that will be sent back to the server.
- */
-function hook_sms_delivery_report(array $reports, \Symfony\Component\HttpFoundation\Response $response) {
-  $response->setContent('OK');
-}
-
-/**
  * Event subscribers for SMS Framework.
  *
  * Service definition:
@@ -69,6 +36,8 @@ function hook_sms_delivery_report(array $reports, \Symfony\Component\HttpFoundat
  * namespace Drupal\my_module\EventSubscriber;
  * ?>
  * </code>
+ *
+ * @see \Drupal\sms_test\EventSubscriber\SmsTestEventSubscriber
  */
 class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSubscriberInterface {
 
@@ -110,12 +79,20 @@ class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSu
   }
 
   /**
+   * @see \Drupal\sms\Event\SmsEvents::DELIVERY_REPORT_POST_PROCESS
+   */
+  public function myDeliveryReportPostProcessor(\Drupal\sms\Event\SmsDeliveryReportEvent $event) {
+    $event->getReports();
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
     $events[\Drupal\sms\Event\SmsEvents::MESSAGE_PRE_PROCESS][] = ['mySmsMessagePreprocess'];
     $events[\Drupal\sms\Event\SmsEvents::MESSAGE_POST_PROCESS][] = ['mySmsMessagePostprocess'];
     $events[\Drupal\sms\Event\SmsEvents::MESSAGE_GATEWAY][] = ['mySmsMessageGateway'];
+    $events[\Drupal\sms\Event\SmsEvents::DELIVERY_REPORT_POST_PROCESS][] = ['myDeliveryReportPostProcessor'];
     return $events;
   }
 

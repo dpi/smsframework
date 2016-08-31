@@ -96,7 +96,11 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
 
     // Set state so we test this method is executed, remove this after above is
     // addressed.
-    \Drupal::state()->set('sms_test_gateway.memory.incoming_hook_temporary', TRUE);
+    \Drupal::state()->set('sms_test_gateway.memory.incoming', TRUE);
+
+    return new SmsMessageResult([
+      'status' => TRUE,
+    ]);
   }
 
   /**

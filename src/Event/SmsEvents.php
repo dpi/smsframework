@@ -27,7 +27,7 @@ final class SmsEvents {
   const MESSAGE_GATEWAY = 'sms.message.gateway';
 
   /**
-   * Process and chunk a SMS message before it is queued, sent, or received.
+   * Process a SMS message before it is queued, sent, or received.
    *
    * @Event
    *
@@ -36,12 +36,81 @@ final class SmsEvents {
   const MESSAGE_PRE_PROCESS = 'sms.message.pre_process';
 
   /**
-   * Process and chunk a SMS message after it is queued, sent, or received.
+   * Process an SMS message after it is sent or received.
+   *
+   * Unlike its counterpart, MESSAGE_PRE_PROCESS, this event is not triggered
+   * for queued messages because there is associated result.
+   *
+   * @Event
+   *
+   * @see \Drupal\sms\Event\SmsMessageProcessedEvent
+   */
+  const MESSAGE_POST_PROCESS = 'sms.message.post_process';
+
+  /**
+   * Process a SMS message after it is queued.
    *
    * @Event
    *
    * @see \Drupal\sms\Event\SmsMessageEvent
    */
-  const MESSAGE_POST_PROCESS = 'sms.message.post_process';
+  const MESSAGE_QUEUE_PRE_PROCESS = 'sms.message.queue.pre_process';
+
+  /**
+   * Process a SMS message after it is queued.
+   *
+   * @Event
+   *
+   * @see \Drupal\sms\Event\SmsMessageEvent
+   */
+  const MESSAGE_QUEUE_POST_PROCESS = 'sms.message.queue.post_process';
+
+  /**
+   * Process a SMS message before it is sent.
+   *
+   * @Event
+   *
+   * @see \Drupal\sms\Event\SmsMessageEvent
+   */
+  const MESSAGE_OUTGOING_PRE_PROCESS = 'sms.message.outgoing.pre_process';
+
+  /**
+   * Process a SMS message after it is sent.
+   *
+   * @Event
+   *
+   * @see \Drupal\sms\Event\SmsMessageProcessedEvent
+   */
+  const MESSAGE_OUTGOING_POST_PROCESS = 'sms.message.outgoing.post_process';
+
+  /**
+   * Process a SMS message before it is received.
+   *
+   * @Event
+   *
+   * @see \Drupal\sms\Event\SmsMessageEvent
+   */
+  const MESSAGE_INCOMING_PRE_PROCESS = 'sms.message.incoming.pre_process';
+
+  /**
+   * Process a SMS message after it is received.
+   *
+   * @Event
+   *
+   * @see \Drupal\sms\Event\SmsMessageProcessedEvent
+   */
+  const MESSAGE_INCOMING_POST_PROCESS = 'sms.message.incoming.post_process';
+
+  /**
+   * Process delivery reports after they are created by the gateway plugin.
+   *
+   * This event grants an opportunity to modify the HTTP response if the
+   * delivery reports were pushed to the site.
+   *
+   * @Event
+   *
+   * @see \Drupal\sms\Event\SmsDeliveryReportEvent
+   */
+  const DELIVERY_REPORT_POST_PROCESS = 'sms.report.post_process';
 
 }
