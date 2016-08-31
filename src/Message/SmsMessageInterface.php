@@ -8,7 +8,6 @@
 namespace Drupal\sms\Message;
 
 use Drupal\sms\Entity\SmsGatewayInterface;
-use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
  * Contains information about an SMS message.

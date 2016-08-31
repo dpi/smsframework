@@ -24,9 +24,9 @@ class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase {
     $sms_message = $this->randomSmsMessage($user->id())
       ->setGateway($test_gateway);
 
-    $result = $this->defaultSmsProvider->send($sms_message);
+    $sms_messages = $this->defaultSmsProvider->send($sms_message);
 
-    $result = reset($result);
+    $result = $sms_messages[0]->getResult();
     $this->assertTrue($result instanceof SmsMessageResultInterface);
     $this->assertEqual(count($sms_message->getRecipients()), count($result->getReports()));
     $reports = $result->getReports();

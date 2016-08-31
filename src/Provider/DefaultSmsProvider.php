@@ -86,18 +86,18 @@ class DefaultSmsProvider implements SmsProviderInterface {
     $sms_messages = $dispatch ? $this->dispatchEvent(SmsEvents::MESSAGE_PRE_PROCESS, [$sms])->getMessages() : [$sms];
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_OUTGOING_PRE_PROCESS, $sms_messages)->getMessages();
 
-    $results = [];
     foreach ($sms_messages as &$sms_message) {
       $plugin = $sms_message->getGateway()->getPlugin();
 
       $result = $plugin->send($sms_message);
       $sms_message->setResult($result);
+      $results[] = $result;
 
       $this->dispatchEvent(SmsEvents::MESSAGE_OUTGOING_POST_PROCESS, [$sms_message]);
       $this->dispatchEvent(SmsEvents::MESSAGE_POST_PROCESS, [$sms_message]);
     }
 
-    return $results;
+    return $sms_messages;
   }
 
   /**
@@ -108,7 +108,6 @@ class DefaultSmsProvider implements SmsProviderInterface {
     $sms_messages = $dispatch ? $this->dispatchEvent(SmsEvents::MESSAGE_PRE_PROCESS, [$sms_message])->getMessages() : [$sms_message];
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_INCOMING_PRE_PROCESS, $sms_messages)->getMessages();
 
-    $results = [];
     foreach ($sms_messages as &$sms_message) {
       $plugin = $sms_message->getGateway()->getPlugin();
       if (!$plugin instanceof SmsGatewayPluginIncomingInterface) {
@@ -122,7 +121,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
       $this->dispatchEvent(SmsEvents::MESSAGE_POST_PROCESS, [$sms_message]);
     }
 
-    return $results;
+    return $sms_messages;
   }
 
   /**

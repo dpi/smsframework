@@ -30,7 +30,7 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
   /**
    * The default SMS provider service.
    *
-   * @var \Drupal\sms\Provider\DefaultSmsProvider
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $defaultSmsProvider;
 
