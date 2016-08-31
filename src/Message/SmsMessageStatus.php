@@ -58,6 +58,14 @@ class SmsMessageStatus {
   const AUTHENTICATION = 'authentication';
 
   /**
+   * Account error.
+   *
+   * Some configuration is required that can only be resolved on the gateway
+   * end.
+   */
+  const ACCOUNT_ERROR = 'account_error';
+
+  /**
    * Too many requests.
    */
   const EXCESSIVE_REQUESTS = 'flooded';
