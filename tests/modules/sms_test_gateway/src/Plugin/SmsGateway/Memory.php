@@ -107,7 +107,7 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
     $latest_reports = [];
     foreach ($data['reports'] as $report) {
       $message_id = $report['message_id'];
-      $latest_reports[$message_id] = (new SmsDeliveryReport())
+      $latest_reports[] = (new SmsDeliveryReport())
         ->setRecipients([$report['recipient']])
         ->setMessageId($message_id)
         ->setStatus(SmsMessageStatus::DELIVERED)
@@ -134,13 +134,13 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
    *   The SMS message
    *
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
-   *   An array of delivery reports keyed by recipient number.
+   *   An array of delivery reports.
    */
   protected function randomDeliveryReports(SmsMessageInterface $sms_message) {
     $random = new Random();
     $reports = [];
     foreach ($sms_message->getRecipients() as $number) {
-      $reports[$number] = (new SmsDeliveryReport())
+      $reports[] = (new SmsDeliveryReport())
         ->setRecipients([$number])
         ->setMessageId($random->name(16))
         ->setStatus(SmsMessageStatus::QUEUED)

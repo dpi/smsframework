@@ -27,7 +27,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
   protected $statusMessage = '';
 
   /**
-   * The message delivery reports keyed by recipient number.
+   * The message delivery reports.
    *
    * @var \Drupal\sms\Message\SmsDeliveryReportInterface[]
    */
@@ -107,7 +107,12 @@ class SmsMessageResult implements SmsMessageResultInterface {
    * {@inheritdoc}
    */
   public function getReport($recipient) {
-    return isset($this->reports[$recipient]) ? $this->reports[$recipient] : NULL;
+    foreach ($this->reports as $report) {
+      if (in_array($report->getRecipients(), $recipient)) {
+        return $report;
+      }
+    }
+    return NULL;
   }
 
   /**

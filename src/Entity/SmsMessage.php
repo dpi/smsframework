@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\sms\Message\SmsMessageInterface as StdSmsMessageInterface;
+use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
  * Defines the SMS message entity.
@@ -36,6 +37,13 @@ use Drupal\sms\Message\SmsMessageInterface as StdSmsMessageInterface;
  * )
  */
 class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
+
+  /**
+   * The result associated with this SMS message.
+   *
+   * @var \Drupal\sms\Message\SmsMessageResultInterface|NULL
+   */
+  protected $result;
 
   /**
    * Following are implementors of plain SmsMessage interface.
@@ -130,6 +138,21 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     $options = $this->getOptions();
     unset($options[$name]);
     $this->set('options', $options);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getResult() {
+    return $this->result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setResult(SmsMessageResultInterface $result = NULL) {
+    $this->result = $result;
     return $this;
   }
 

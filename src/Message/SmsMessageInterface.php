@@ -8,6 +8,7 @@
 namespace Drupal\sms\Message;
 
 use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
  * Contains information about an SMS message.
@@ -144,6 +145,27 @@ interface SmsMessageInterface {
    *   The called SMS message object.
    */
   public function removeOption($name);
+
+  /**
+   * Get the result associated with this SMS message.
+   *
+   * @return \Drupal\sms\Message\SmsMessageResultInterface|NULL
+   *   The result associated with this SMS message, or NULL if there is no
+   *   result.
+   */
+  public function getResult();
+
+  /**
+   * Set the result associated with this SMS message.
+   *
+   * @param \Drupal\sms\Message\SmsMessageResultInterface|NULL $result
+   *   The result to associate with this SMS message, or NULL if there is no
+   *   result.
+   *
+   * @return $this
+   *   The called SMS message object.
+   */
+  public function setResult(SmsMessageResultInterface $result = NULL);
 
   /**
    * Get phone number of the sender.

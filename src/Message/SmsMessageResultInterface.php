@@ -89,8 +89,7 @@ interface SmsMessageResultInterface {
    * Gets the delivery reports for all recipients.
    *
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
-   *   An array of delivery reports for all recipients keyed by the recipients'
-   *   number.
+   *   An array of delivery reports.
    */
   public function getReports();
 
@@ -98,8 +97,7 @@ interface SmsMessageResultInterface {
    * Sets the delivery reports for all recipients.
    *
    * @param \Drupal\sms\Message\SmsDeliveryReportInterface[] $reports
-   *   An array of delivery reports for all recipients keyed by the recipients'
-   *   number.
+   *   An array of delivery reports.
    *
    * @return $this
    *   Returns this result object for chaining.
