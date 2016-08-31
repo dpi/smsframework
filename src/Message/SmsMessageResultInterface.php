@@ -53,25 +53,6 @@ interface SmsMessageResultInterface {
   public function setStatusMessage($message);
 
   /**
-   * Get all messages associated with this result.
-   *
-   * @return \Drupal\sms\Message\SmsMessageInterface[]
-   *   The messages associated with this result.
-   */
-  public function getMessages();
-
-  /**
-   * Set the messages on this result.
-   *
-   * @param \Drupal\sms\Message\SmsMessageInterface[]
-   *   The messages to associate with this result.
-   *
-   * @return $this
-   *   Returns this result for chaining.
-   */
-  public function setMessages(array $messages);
-
-  /**
    * Gets the delivery report for a particular recipient.
    *
    * @param string $recipient

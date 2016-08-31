@@ -52,13 +52,6 @@ class SmsMessageResult implements SmsMessageResultInterface {
   public $creditsUsed = NULL;
 
   /**
-   * The messages associated with this result.
-   *
-   * @var \Drupal\sms\Message\SmsMessageInterface[]
-   */
-  public $messages = [];
-
-  /**
    * {@inheritdoc}
    */
   public function getStatus() {
@@ -85,21 +78,6 @@ class SmsMessageResult implements SmsMessageResultInterface {
    */
   public function setStatusMessage($message) {
     $this->statusMessage = $message;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getMessages() {
-    return $this->messages;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setMessages(array $messages) {
-    $this->messages = $messages;
     return $this;
   }
 
