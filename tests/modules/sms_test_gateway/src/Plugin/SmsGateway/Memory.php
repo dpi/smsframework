@@ -106,28 +106,33 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
    * {@inheritdoc}
    */
   public function parseDeliveryReports(Request $request, Response $response) {
+    $gateway_id = $this->configuration['gateway_id'];
+    $memory_reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
+
     $data = Json::decode($request->request->get('delivery_report'));
-    $latest_reports = [];
+    $return = [];
     foreach ($data['reports'] as $report) {
       $message_id = $report['message_id'];
-      $latest_reports[] = (new SmsDeliveryReport())
-        ->setRecipients([$report['recipient']])
+      $new_report = (new SmsDeliveryReport())
+        ->setRecipient($report['recipient'])
         ->setMessageId($message_id)
         ->setStatus(SmsMessageReportStatus::DELIVERED)
-        ->setStatusMessage($report['status'])
+        ->setStatusMessage($report['status_message'])
         ->setTimeQueued($report['time_sent'])
         ->setTimeDelivered($report['time_delivered']);
+
+      // Set separately since this method should not have meaningful keys.
+      $return[] = $new_report;
+      // Reports in state must be keyed by message ID.
+      $memory_reports[$gateway_id][$message_id] = $new_report;
     }
 
-    // Update the latest delivery reports in \Drupal::state().
-    $gateway_id = $this->configuration['gateway_id'];
-    $reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
-    $reports[$gateway_id] = $latest_reports + $reports;
-    \Drupal::state()->set('sms_test_gateway.memory.report', $reports);
+    \Drupal::state()->set('sms_test_gateway.memory.report', $memory_reports);
 
     // Set the response.
     $response->setContent('custom response content');
-    return $latest_reports;
+
+    return $return;
   }
 
   /**
@@ -144,7 +149,7 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
     $reports = [];
     foreach ($sms_message->getRecipients() as $number) {
       $reports[] = (new SmsDeliveryReport())
-        ->setRecipients([$number])
+        ->setRecipient($number)
         ->setMessageId($random->name(16))
         ->setStatus(SmsMessageReportStatus::QUEUED)
         ->setStatusMessage('Sent to memory gateway')

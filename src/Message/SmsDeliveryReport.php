@@ -20,11 +20,11 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
   protected $messageId = '';
 
   /**
-   * The recipients of the message.
+   * The recipient of the message.
    *
-   * @var string[]
+   * @var string
    */
-  protected $recipients = [];
+  protected $recipient = '';
 
   /**
    * A status code from \Drupal\sms\Message\SmsMessageStatus, or NULL if
@@ -73,15 +73,15 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRecipients() {
-    return $this->recipients;
+  public function getRecipient() {
+    return $this->recipient;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setRecipients(array $recipients) {
-    $this->recipients = $recipients;
+  public function setRecipient($recipient) {
+    $this->recipient = $recipient;
     return $this;
   }
 

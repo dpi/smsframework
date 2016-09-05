@@ -33,7 +33,7 @@ class LogGateway extends SmsGatewayPluginBase {
     $reports = [];
     foreach ($sms->getRecipients() as $number) {
       $reports[] = (new SmsDeliveryReport())
-        ->setRecipients([$number])
+        ->setRecipient($number)
         ->setStatus(SmsMessageReportStatus::DELIVERED)
         ->setStatusMessage('DELIVERED')
         ->setTimeDelivered(REQUEST_TIME);

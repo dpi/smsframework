@@ -86,7 +86,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
    */
   public function getReport($recipient) {
     foreach ($this->reports as $report) {
-      if (in_array($report->getRecipients(), $recipient)) {
+      if ($report->getRecipient() == $recipient) {
         return $report;
       }
     }

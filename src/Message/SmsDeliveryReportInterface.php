@@ -34,23 +34,23 @@ interface SmsDeliveryReportInterface {
   public function setMessageId($message_id);
 
   /**
-   * Gets the recipients for the message.
+   * Gets the recipient for the message.
    *
-   * @return string[]
-   *   The recipients for the message.
+   * @return string
+   *   The recipient for the message.
    */
-  public function getRecipients();
+  public function getRecipient();
 
   /**
-   * Sets the recipients for the message.
+   * Sets the recipient for the message.
    *
-   * @param string[] $recipients
-   *   The recipients for the message.
+   * @param string $recipient
+   *   The recipient for the message.
    *
    * @return $this
    *   Returns this report object for chaining.
    */
-  public function setRecipients(array $recipients);
+  public function setRecipient($recipient);
 
   /**
    * Gets the status of the message.
