@@ -26,11 +26,6 @@ SMS Devel
 Development and testing tools to assist developers and site builders working 
 with SMS Framework.
 
-SMS International
------------------
-
-Status: Not upgraded for Drupal 8. See https://www.drupal.org/node/331629
-
 SMS Send to Phone
 -----------------
 
@@ -38,24 +33,10 @@ Status: Not upgraded for Drupal 8. See https://www.drupal.org/node/331629
 
 Provides ways to share nodes via SMS.
 
-SMS Track
----------
-
-Status: May be deprecated
-
-Message archiving and delivery tracking for the SMS Framework.
-
 SMS User
 --------
 
 Provides integration with Drupal users.
-
-SMS Valid
----------
-
-Status: May be deprecated. See https://www.drupal.org/node/2642946
-
-Provides number validation features to the SMS Framework.
 
 Gateways
 --------
@@ -88,7 +69,9 @@ Documentation
 
 Documentation for site builders and developers is available in the Drupal.org
 handbook pages: http://drupal.org/node/362258
-The `sms.api.php` file contains information about available hooks.
+The `sms.api.php` file and `\Drupal\sms\Event\SmsEvents` class contain
+information about events which third parties can hook into. There are examples
+of operation in the included test modules.
 
 Support
 -------
