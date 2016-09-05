@@ -56,7 +56,7 @@ interface SmsDeliveryReportInterface {
    * Gets the status of the message.
    *
    * @return string|NULL
-   *   A status code from \Drupal\sms\Message\SmsMessageStatus, or NULL if
+   *   A status code from \Drupal\sms\Message\SmsMessageReportStatus, or NULL if
    *   unknown.
    */
   public function getStatus();
@@ -65,7 +65,7 @@ interface SmsDeliveryReportInterface {
    * Sets the status of the message.
    *
    * @param string|NULL $status
-   *   A status code from \Drupal\sms\Message\SmsMessageStatus, or NULL if
+   *   A status code from \Drupal\sms\Message\SmsMessageReportStatus, or NULL if
    *   unknown.
    *
    * @return $this

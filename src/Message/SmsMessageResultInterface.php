@@ -16,7 +16,7 @@ interface SmsMessageResultInterface {
    * Gets the status of the message.
    *
    * @return string|NULL
-   *   A status code from \Drupal\sms\Message\SmsMessageStatus, or NULL if
+   *   A status code from \Drupal\sms\Message\SmsMessageResultStatus, or NULL if
    *   unknown.
    */
   public function getStatus();
@@ -24,8 +24,11 @@ interface SmsMessageResultInterface {
   /**
    * Sets the status of the message.
    *
+   * Usually a setting a status on a result indicates something went wrong with
+   * the entire transaction.
+   *
    * @param string $status|NULL
-   *   A status code from \Drupal\sms\Message\SmsMessageStatus, or NULL if
+   *   A status code from \Drupal\sms\Message\SmsMessageResultStatus, or NULL if
    *   unknown.
    *
    * @return $this
