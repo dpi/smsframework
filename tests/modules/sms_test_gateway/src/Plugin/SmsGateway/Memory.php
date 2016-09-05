@@ -10,7 +10,6 @@ namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Random;
 use Drupal\sms\Message\SmsDeliveryReport;
-use Drupal\sms\Message\SmsMessageStatus;
 use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Drupal\sms\Plugin\SmsGatewayPluginIncomingInterface;
 use Drupal\sms\Message\SmsMessageInterface;
@@ -18,6 +17,7 @@ use Drupal\sms\Message\SmsMessageResult;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Drupal\sms\Message\SmsMessageReportStatus;
 
 /**
  * Defines a gateway storing transmitted SMS in memory.
@@ -83,7 +83,6 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
     \Drupal::state()->set('sms_test_gateway.memory.report', $reports);
 
     return (new SmsMessageResult())
-      ->setStatus(SmsMessageStatus::QUEUED)
       ->setReports($latest_reports);
   }
 
@@ -114,7 +113,7 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
       $latest_reports[] = (new SmsDeliveryReport())
         ->setRecipients([$report['recipient']])
         ->setMessageId($message_id)
-        ->setStatus(SmsMessageStatus::DELIVERED)
+        ->setStatus(SmsMessageReportStatus::DELIVERED)
         ->setStatusMessage($report['status'])
         ->setTimeQueued($report['time_sent'])
         ->setTimeDelivered($report['time_delivered']);
@@ -147,7 +146,7 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
       $reports[] = (new SmsDeliveryReport())
         ->setRecipients([$number])
         ->setMessageId($random->name(16))
-        ->setStatus(SmsMessageStatus::QUEUED)
+        ->setStatus(SmsMessageReportStatus::QUEUED)
         ->setStatusMessage('Sent to memory gateway')
         ->setTimeQueued(time())
         ->setTimeDelivered(time() + rand(0, 10));

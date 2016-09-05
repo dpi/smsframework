@@ -4,6 +4,7 @@ namespace Drupal\sms\Tests;
 
 use Drupal\Core\Url;
 use Drupal\sms\Message\SmsDeliveryReportInterface;
+use Drupal\sms\Message\SmsMessageReportStatus;
 use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
@@ -32,7 +33,7 @@ class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase {
     $reports = $result->getReports();
     $first_report = reset($reports);
     $this->assertTrue($first_report instanceof SmsDeliveryReportInterface);
-    $this->assertEqual($first_report->getStatus(), SmsDeliveryReportInterface::STATUS_SENT);
+    $this->assertEqual($first_report->getStatus(), SmsMessageReportStatus::QUEUED);
 
     // Get the delivery reports url and simulate push delivery report.
     $url = Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $test_gateway->id()], ['absolute' => TRUE])->toString();
