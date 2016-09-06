@@ -29,7 +29,7 @@ use Drupal\sms\Message\SmsMessageReportStatus;
  *   schedule_aware = FALSE,
  * )
  */
-class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInterface{
+class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInterface {
 
   /**
    * {@inheritdoc}

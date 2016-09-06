@@ -98,7 +98,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
     $this->assertEquals($message, sms_test_gateway_get_incoming()['message'], 'Message was received.');
     $this->assertEquals(1, count($sms_messages), 'Return value contains 1 item.');
-    $this->assertTrue($sms_messages[0] instanceof StandardSmsMessageInterface, 'Return value is a SMS report.');
+    $this->assertTrue($sms_messages[0] instanceof StandardSmsMessageInterface, 'Return value is a SMS message.');
   }
 
   /**

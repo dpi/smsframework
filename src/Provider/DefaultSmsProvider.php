@@ -91,7 +91,6 @@ class DefaultSmsProvider implements SmsProviderInterface {
 
       $result = $plugin->send($sms_message);
       $sms_message->setResult($result);
-      $results[] = $result;
 
       $this->dispatchEvent(SmsEvents::MESSAGE_OUTGOING_POST_PROCESS, [$sms_message]);
       $this->dispatchEvent(SmsEvents::MESSAGE_POST_PROCESS, [$sms_message]);

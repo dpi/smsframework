@@ -5,10 +5,10 @@ namespace Drupal\sms\Message;
 /**
  * Defines states for SMS message results.
  *
- * Usually a setting a status on a result indicates something went wrong with
- * the entire transaction.
+ * Usually setting a status on a result indicates something went wrong with the
+ * entire transaction.
  */
-class SmsMessageResultStatus extends SmsMessageStatus{
+class SmsMessageResultStatus extends SmsMessageStatus {
 
   /**
    * Account error.
