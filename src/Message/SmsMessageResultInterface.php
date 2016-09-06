@@ -104,6 +104,9 @@ interface SmsMessageResultInterface {
    *
    * @return $this
    *   Returns this result object for chaining.
+   *
+   * @throws \Drupal\sms\Exception\SmsException
+   *   Thrown if balance set is an invalid variable type.
    */
   public function setCreditsBalance($balance);
 
@@ -123,6 +126,9 @@ interface SmsMessageResultInterface {
    *
    * @return $this
    *   Returns this result object for chaining.
+   *
+   * @throws \Drupal\sms\Exception\SmsException
+   *   Thrown if credits set is an invalid variable type.
    */
   public function setCreditsUsed($credits_used);
 

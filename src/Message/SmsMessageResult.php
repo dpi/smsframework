@@ -7,6 +7,8 @@
 
 namespace Drupal\sms\Message;
 
+use Drupal\sms\Exception\SmsException;
+
 /**
  * The result of an SMS messaging transaction.
  */
@@ -17,7 +19,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
    *
    * @var string|NULL
    */
-  public $status = NULL;
+  protected $status = NULL;
 
   /**
    * The status message as provided by the gateway API.
@@ -31,7 +33,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
    *
    * @var \Drupal\sms\Message\SmsDeliveryReportInterface[]
    */
-  public $reports = [];
+  protected $reports = [];
 
   /**
    * The credit balance after this message is sent, or NULL if unknown.
@@ -40,7 +42,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
    *
    * @var float|NULL
    */
-  public $creditBalance = NULL;
+  protected $creditBalance = NULL;
 
   /**
    * The credits consumed to process this message, or NULL if unknown.
@@ -49,7 +51,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
    *
    * @var float|NULL
    */
-  public $creditsUsed = NULL;
+  protected $creditsUsed = NULL;
 
   /**
    * {@inheritdoc}
@@ -119,7 +121,12 @@ class SmsMessageResult implements SmsMessageResultInterface {
    * {@inheritdoc}
    */
   public function setCreditsBalance($balance) {
-    $this->creditBalance = $balance;
+    if (is_float($balance) || is_null($balance)) {
+      $this->creditBalance = $balance;
+    }
+    else {
+      throw new SmsException(sprintf('Credit balance set is a %s', gettype($balance)));
+    }
     return $this;
   }
 
@@ -134,7 +141,12 @@ class SmsMessageResult implements SmsMessageResultInterface {
    * {@inheritdoc}
    */
   public function setCreditsUsed($credits_used) {
-    $this->creditsUsed = $credits_used;
+    if (is_float($credits_used) || is_null($credits_used)) {
+      $this->creditsUsed = $credits_used;
+    }
+    else {
+      throw new SmsException(sprintf('Credit used is a %s', gettype($credits_used)));
+    }
     return $this;
   }
 
