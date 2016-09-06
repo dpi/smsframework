@@ -53,7 +53,7 @@ class SmsFrameworkResultUnitTest extends UnitTestCase {
   /**
    * Tests get result.
    *
-   * @covers ::getResult
+   * @covers ::getReport
    */
   public function testGetResult() {
     $result = $this->createResult();
@@ -70,8 +70,8 @@ class SmsFrameworkResultUnitTest extends UnitTestCase {
   /**
    * Tests set results.
    *
-   * @covers ::getResults
-   * @covers ::setResults
+   * @covers ::getReports
+   * @covers ::setReports
    */
   public function testResults() {
     $result = $this->createResult();
@@ -79,7 +79,8 @@ class SmsFrameworkResultUnitTest extends UnitTestCase {
 
     $report = (new SmsDeliveryReport())
       ->setRecipient($recipient);
-    $result->setReports([$report]);
+    $return = $result->setReports([$report]);
+    $this->assertTrue($return instanceof SmsMessageResultInterface);
 
     $reports = $result->getReports();
     $this->assertEquals(1, count($reports));
@@ -97,7 +98,8 @@ class SmsFrameworkResultUnitTest extends UnitTestCase {
     $this->assertNull($result->getCreditsBalance(), 'No credit balance set');
 
     $balance = 13.37;
-    $result->setCreditsBalance($balance);
+    $return = $result->setCreditsBalance($balance);
+    $this->assertTrue($return instanceof SmsMessageResultInterface);
     $this->assertEquals($balance, $result->getCreditsBalance());
   }
 
@@ -125,7 +127,8 @@ class SmsFrameworkResultUnitTest extends UnitTestCase {
     $this->assertNull($result->getCreditsUsed(), 'No credits used set');
 
     $used = 13.37;
-    $result->setCreditsUsed($used);
+    $return = $result->setCreditsUsed($used);
+    $this->assertTrue($return instanceof SmsMessageResultInterface);
     $this->assertEquals($used, $result->getCreditsUsed());
   }
 

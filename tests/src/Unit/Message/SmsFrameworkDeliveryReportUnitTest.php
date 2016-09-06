@@ -10,7 +10,7 @@ use Drupal\sms\Message\SmsDeliveryReportInterface;
  * Unit tests for delivery reports.
  *
  * @group SMS Framework
- * @coversDefaultClass \Drupal\sms\Message\SmsMessageResult
+ * @coversDefaultClass \Drupal\sms\Message\SmsDeliveryReport
  */
 class SmsFrameworkDeliveryReportUnitTest extends UnitTestCase {
 
@@ -20,7 +20,7 @@ class SmsFrameworkDeliveryReportUnitTest extends UnitTestCase {
    * @covers ::getMessageId
    * @covers ::setMessageId
    */
-  public function testSenderNumber() {
+  public function testMessageId() {
     $report = $this->createDeliveryReport();
     $this->assertEquals('', $report->getMessageId(), 'Default value is empty string');
 
