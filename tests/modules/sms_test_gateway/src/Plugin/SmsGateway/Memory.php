@@ -70,20 +70,22 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
    * {@inheritdoc}
    */
   public function send(SmsMessageInterface $sms_message) {
-    $state = \Drupal::state()->get('sms_test_gateway.memory.send', []);
-
     $gateway_id = $this->configuration['gateway_id'];
+
+    // Message.
+    $state = \Drupal::state()->get('sms_test_gateway.memory.send', []);
     $state[$gateway_id][] = $sms_message;
     \Drupal::state()->set('sms_test_gateway.memory.send', $state);
 
+    // Reports.
     $reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
-    $latest_reports = $this->randomDeliveryReports($sms_message);
-    // Update the delivery reports.
-    $reports[$gateway_id] = $latest_reports + $reports;
+    $gateway_reports = isset($reports[$gateway_id]) ? $reports[$gateway_id] : [];
+    $new_reports = $this->randomDeliveryReports($sms_message);
+    $reports[$gateway_id] = array_merge($gateway_reports, $new_reports);
     \Drupal::state()->set('sms_test_gateway.memory.report', $reports);
 
     return (new SmsMessageResult())
-      ->setReports($latest_reports);
+      ->setReports($new_reports);
   }
 
   /**
@@ -97,9 +99,7 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
     // addressed.
     \Drupal::state()->set('sms_test_gateway.memory.incoming', TRUE);
 
-    return new SmsMessageResult([
-      'status' => TRUE,
-    ]);
+    return new SmsMessageResult();
   }
 
   /**

@@ -14,6 +14,7 @@ use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Direction;
 use Drupal\sms\Event\SmsEvents;
+use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
  * Tests SMS Framework provider service.
@@ -80,6 +81,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->assertEquals(1, count($sms_messages), 'Return value contains 1 item.');
     $this->assertTrue($sms_messages[0] instanceof StandardSmsMessageInterface, 'Return value is a SMS message.');
     $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
+    $this->assertTrue($sms_messages[0]->getResult() instanceof SmsMessageResultInterface);
   }
 
   /**
@@ -99,6 +101,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->assertEquals($message, sms_test_gateway_get_incoming()['message'], 'Message was received.');
     $this->assertEquals(1, count($sms_messages), 'Return value contains 1 item.');
     $this->assertTrue($sms_messages[0] instanceof StandardSmsMessageInterface, 'Return value is a SMS message.');
+    $this->assertTrue($sms_messages[0]->getResult() instanceof SmsMessageResultInterface);
   }
 
   /**
