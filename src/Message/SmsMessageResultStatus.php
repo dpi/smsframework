@@ -38,4 +38,9 @@ class SmsMessageResultStatus extends SmsMessageStatus {
    */
   const AUTHENTICATION = 'authentication';
 
+  /**
+   * Invalid or missing request parameters.
+   */
+  const PARAMETERS = 'parameters';
+
 }

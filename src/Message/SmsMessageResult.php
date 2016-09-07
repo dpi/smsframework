@@ -42,7 +42,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
    *
    * @var float|NULL
    */
-  protected $creditBalance = NULL;
+  protected $creditsBalance = NULL;
 
   /**
    * The credits consumed to process this message, or NULL if unknown.
@@ -114,7 +114,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
    * {@inheritdoc}
    */
   public function getCreditsBalance() {
-    return $this->creditBalance;
+    return $this->creditsBalance;
   }
 
   /**
@@ -122,7 +122,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
    */
   public function setCreditsBalance($balance) {
     if (is_float($balance) || is_null($balance)) {
-      $this->creditBalance = $balance;
+      $this->creditsBalance = $balance;
     }
     else {
       throw new SmsException(sprintf('Credit balance set is a %s', gettype($balance)));
