@@ -17,37 +17,37 @@ use Drupal\sms\Message\SmsDeliveryReport;
 class SmsFrameworkResultUnitTest extends UnitTestCase {
 
   /**
-   * Tests status.
+   * Tests error.
    *
-   * @covers ::getStatus
-   * @covers ::setStatus
+   * @covers ::getError
+   * @covers ::setError
    */
-  public function testStatus() {
+  public function testError() {
     $result = $this->createResult();
-    $this->assertNull($result->getStatus(), 'Default value is NULL');
+    $this->assertNull($result->getError(), 'Default value is NULL');
 
-    $status = $this->getRandomGenerator()->string();
-    $return = $result->setStatus($status);
+    $error = $this->getRandomGenerator()->string();
+    $return = $result->setError($error);
 
     $this->assertTrue($return instanceof SmsMessageResultInterface);
-    $this->assertEquals($status, $result->getStatus());
+    $this->assertEquals($error, $result->getError());
   }
 
   /**
-   * Tests status message.
+   * Tests error message.
    *
-   * @covers ::getStatusMessage
-   * @covers ::setStatusMessage
+   * @covers ::getErrorMessage
+   * @covers ::setErrorMessage
    */
-  public function testStatusMessage() {
+  public function testErrorMessage() {
     $result = $this->createResult();
-    $this->assertEquals('', $result->getStatusMessage(), 'Default value is empty string');
+    $this->assertEquals('', $result->getErrorMessage(), 'Default value is empty string');
 
-    $status_message = $this->getRandomGenerator()->string();
-    $return = $result->setStatusMessage($status_message);
+    $error_message = $this->getRandomGenerator()->string();
+    $return = $result->setErrorMessage($error_message);
 
     $this->assertTrue($return instanceof SmsMessageResultInterface);
-    $this->assertEquals($status_message, $result->getStatusMessage());
+    $this->assertEquals($error_message, $result->getErrorMessage());
   }
 
   /**

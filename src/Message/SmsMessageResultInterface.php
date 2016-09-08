@@ -13,47 +13,47 @@ namespace Drupal\sms\Message;
 interface SmsMessageResultInterface {
 
   /**
-   * Gets the status of the message.
+   * Gets the error of the message.
    *
    * @return string|NULL
-   *   A status code from \Drupal\sms\Message\SmsMessageResultStatus, or NULL if
-   *   unknown.
+   *   A error code from \Drupal\sms\Message\SmsMessageResultError, or NULL if
+   *   there was no error.
    */
-  public function getStatus();
+  public function getError();
 
   /**
-   * Sets the status of the message.
+   * Sets the error of the message.
    *
-   * Usually a setting a status on a result indicates something went wrong with
+   * Usually a setting an error on a result indicates something went wrong with
    * the entire transaction.
    *
-   * @param string $status|NULL
-   *   A status code from \Drupal\sms\Message\SmsMessageResultStatus, or NULL if
+   * @param string $error|NULL
+   *   A error code from \Drupal\sms\Message\SmsMessageResultError, or NULL if
    *   unknown.
    *
    * @return $this
    *   Returns this result object for chaining.
    */
-  public function setStatus($status);
+  public function setError($error);
 
   /**
-   * Gets the status message.
+   * Gets the error message.
    *
    * @return string
-   *   The status message as provided by the gateway API.
+   *   The error message as provided by the gateway API.
    */
-  public function getStatusMessage();
+  public function getErrorMessage();
 
   /**
-   * Sets the status message.
+   * Sets the error message.
    *
    * @param string $message
-   *   The status message as provided by the gateway API.
+   *   The error message as provided by the gateway API.
    *
    * @return $this
    *   Returns this report object for chaining.
    */
-  public function setStatusMessage($message);
+  public function setErrorMessage($message);
 
   /**
    * Gets the delivery report for a particular recipient.

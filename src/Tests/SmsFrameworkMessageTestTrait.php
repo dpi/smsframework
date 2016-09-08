@@ -185,16 +185,16 @@ trait SmsFrameworkMessageTestTrait {
    * @covers ::setResult
    */
   public function testResults() {
-    $status_message = $this->getRandomGenerator()->string();
+    $error_message = $this->getRandomGenerator()->string();
     $result = (new SmsMessageResult())
-      ->setStatusMessage($status_message);
+      ->setErrorMessage($error_message);
 
     $sms_message = $this->createSmsMessage();
     $sms_message->setResult($result);
 
     $result_actual = $sms_message->getResult();
     $this->assertSame($result, $result_actual);
-    $this->assertSame($status_message, $result_actual->getStatusMessage());
+    $this->assertSame($error_message, $result_actual->getErrorMessage());
   }
 
   /**

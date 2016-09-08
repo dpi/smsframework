@@ -15,18 +15,18 @@ use Drupal\sms\Exception\SmsException;
 class SmsMessageResult implements SmsMessageResultInterface {
 
   /**
-   * The status of the message, or NULL if unknown.
+   * The error of the message, or NULL if unknown.
    *
    * @var string|NULL
    */
-  protected $status = NULL;
+  protected $error = NULL;
 
   /**
-   * The status message as provided by the gateway API.
+   * The error message as provided by the gateway API.
    *
    * @var string
    */
-  protected $statusMessage = '';
+  protected $errorMessage = '';
 
   /**
    * The message delivery reports.
@@ -56,30 +56,30 @@ class SmsMessageResult implements SmsMessageResultInterface {
   /**
    * {@inheritdoc}
    */
-  public function getStatus() {
-    return $this->status;
+  public function getError() {
+    return $this->error;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setStatus($status) {
-    $this->status = $status;
+  public function setError($error) {
+    $this->error = $error;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getStatusMessage() {
-    return $this->statusMessage;
+  public function getErrorMessage() {
+    return $this->errorMessage;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setStatusMessage($message) {
-    $this->statusMessage = $message;
+  public function setErrorMessage($message) {
+    $this->errorMessage = $message;
     return $this;
   }
 

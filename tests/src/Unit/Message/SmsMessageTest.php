@@ -25,7 +25,7 @@ class SmsMessageTest extends UnitTestCase {
   /**
    * Create a SMS message object for testing.
    *
-   * @return \Drupal\Tests\sms\Unit\Message\TestSmsMessage
+   * @return \Drupal\sms\Message\SmsMessageInterface
    */
   protected function createSmsMessage() {
     return new TestSmsMessage();
