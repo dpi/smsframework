@@ -99,7 +99,9 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
     // addressed.
     \Drupal::state()->set('sms_test_gateway.memory.incoming', TRUE);
 
-    return new SmsMessageResult();
+    $new_reports = $this->randomDeliveryReports($sms_message);
+    return (new SmsMessageResult())
+      ->setReports($new_reports);
   }
 
   /**
