@@ -25,7 +25,7 @@ class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
   protected function setUp() {
     parent::setUp();
     $this->installEntitySchema('sms');
-    $this->smsProvider = $this->container->get('sms_provider');
+    $this->smsProvider = $this->container->get('sms.provider');
   }
 
   /**

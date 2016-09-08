@@ -50,7 +50,7 @@ class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('sms');
     $this->installEntitySchema('sms_phone_number_verification');
-    $this->smsProvider = $this->container->get('sms_provider');
+    $this->smsProvider = $this->container->get('sms.provider');
     $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
     $this->setFallbackGateway($this->gateway);
   }
