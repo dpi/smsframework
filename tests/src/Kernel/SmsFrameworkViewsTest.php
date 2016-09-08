@@ -51,7 +51,7 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('sms');
 
-    $this->smsProvider = $this->container->get('sms_provider');
+    $this->smsProvider = $this->container->get('sms.provider');
 
     $this->gateway = $this->createMemoryGateway();
     $this->setFallbackGateway($this->gateway);

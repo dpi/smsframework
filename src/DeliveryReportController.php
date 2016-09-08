@@ -51,7 +51,7 @@ class DeliveryReportController implements ContainerInjectionInterface {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('request_stack'),
-      $container->get('sms_provider')
+      $container->get('sms.provider')
     );
   }
 

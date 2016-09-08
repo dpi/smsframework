@@ -76,7 +76,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     $this->installConfig('sms_user');
 
     $this->accountRegistration = $this->container->get('sms_user.account_registration');
-    $this->smsProvider = $this->container->get('sms_provider');
+    $this->smsProvider = $this->container->get('sms.provider');
 
     $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
     $this->setFallbackGateway($this->gateway);

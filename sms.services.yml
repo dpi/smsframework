@@ -1,7 +1,7 @@
 services:
-  sms_provider:
-    alias: sms_provider.default
-  sms_provider.default:
+  sms.provider:
+    alias: sms.provider.default
+  sms.provider.default:
     class: Drupal\sms\Provider\DefaultSmsProvider
     arguments: ['@event_dispatcher']
   plugin.manager.sms_gateway:
@@ -9,10 +9,10 @@ services:
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
   sms.phone_number:
     class: Drupal\sms\Provider\PhoneNumberProvider
-    arguments: ['@entity_type.manager', '@config.factory', '@token', '@sms_provider']
+    arguments: ['@entity_type.manager', '@config.factory', '@token', '@sms.provider']
   sms.queue:
     class: Drupal\sms\Provider\SmsQueueProcessor
-    arguments: ['@entity_type.manager', '@queue', '@sms_provider']
+    arguments: ['@entity_type.manager', '@queue', '@sms.provider']
   sms.sms_message_processor:
     class: Drupal\sms\EventSubscriber\SmsMessageProcessor
     arguments: ['@event_dispatcher', '@config.factory']

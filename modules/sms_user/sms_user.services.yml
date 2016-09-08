@@ -4,7 +4,7 @@ services:
     arguments: ['@config.factory']
   sms_user.account_registration:
     class: Drupal\sms_user\AccountRegistration
-    arguments: ['@config.factory', '@token', '@sms_provider', '@sms.phone_number']
+    arguments: ['@config.factory', '@token', '@sms.provider', '@sms.phone_number']
   sms_user.sms_events:
     class: Drupal\sms_user\EventSubscriber\SmsEventSubscriber
     arguments: ['@sms_user.account_registration']
