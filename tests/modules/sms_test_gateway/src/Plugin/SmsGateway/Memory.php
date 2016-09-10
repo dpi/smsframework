@@ -161,21 +161,4 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
     return $reports;
   }
 
-  public function validateNumber($numbers) {
-    $errors = array();
-    foreach ($numbers as $number) {
-      $code = substr($number, 0, 3);
-      if (preg_match('/[^0-9]/', $number)) {
-        $errors[] = t('Non-numeric character found in number.');
-      }
-      if (strlen($number) > 15 || strlen($number) < 10) {
-        $errors[] = t('Number longer than 15 digits or shorter than 10 digits.');
-      }
-      if ($code == '990' || $code == '997' || $code == '999') {
-        $errors[] = t('Country code not allowed');
-      }
-    }
-    return $errors;
-  }
-
 }
