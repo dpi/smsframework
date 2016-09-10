@@ -72,13 +72,56 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Tests 'supports pushed reports' annotation custom value.
+   */
+  public function testSupportsReportsPushCustom() {
+    $gateway = $this->createGateway([
+      'plugin' => 'memory',
+    ]);
+    $this->assertTrue($gateway->supportsReportsPush());
+  }
+
+  /**
+   * Tests 'supports credit balance' annotation default value.
+   */
+  public function testSupportsReportsPushDefault() {
+    $gateway = $this->createGateway([
+      'plugin' => 'capabilities_default',
+    ]);
+    $this->assertFalse($gateway->supportsReportsPush());
+  }
+
+  /**
+   * Tests 'supports pulling reports' annotation custom value.
+   */
+  public function testSupportsReportsPullCustom() {
+    $gateway = $this->createGateway([
+      'plugin' => 'memory',
+    ]);
+    $this->assertTrue($gateway->supportsReportsPull());
+  }
+
+  /**
+   * Tests 'supports pulling balance' annotation default value.
+   */
+  public function testSupportsReportsPullDefault() {
+    $gateway = $this->createGateway([
+      'plugin' => 'capabilities_default',
+    ]);
+    $this->assertFalse($gateway->supportsReportsPull());
+  }
+
+  /**
    * Create a new gateway.
+   *
+   * @param array $values
+   *   Custom values to pass to the gateway.
    *
    * @return \Drupal\sms\Entity\SmsGatewayInterface
    *   An unsaved gateway config entity.
    */
-  protected function createGateway() {
-    return SmsGateway::create([
+  protected function createGateway($values = []) {
+    return SmsGateway::create($values + [
       'plugin' => 'memory',
     ]);
   }

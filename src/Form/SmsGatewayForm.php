@@ -7,6 +7,7 @@
 
 namespace Drupal\sms\Form;
 
+use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
@@ -23,6 +24,13 @@ use Drupal\sms\Direction;
 class SmsGatewayForm extends EntityForm {
 
   /**
+   * The access manager service.
+   *
+   * @var \Drupal\Core\Access\AccessManagerInterface
+   */
+  protected $accessManager;
+
+  /**
    * @var \Drupal\Core\Entity\Query\QueryFactory
    */
   protected $entityQueryFactory;
@@ -35,10 +43,13 @@ class SmsGatewayForm extends EntityForm {
   protected $gatewayManager;
 
   /**
+   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
+   *   The access manager.
    * @param \Drupal\sms\Plugin\SmsGatewayPluginManagerInterface $gateway_manager
    *   The gateway manager service.
    */
-  public function __construct(QueryFactory $query_factory, SmsGatewayPluginManagerInterface $gateway_manager) {
+  public function __construct(AccessManagerInterface $access_manager, QueryFactory $query_factory, SmsGatewayPluginManagerInterface $gateway_manager) {
+    $this->accessManager = $access_manager;
     $this->entityQueryFactory = $query_factory;
     $this->gatewayManager = $gateway_manager;
   }
@@ -48,6 +59,7 @@ class SmsGatewayForm extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
+      $container->get('access_manager'),
       $container->get('entity.query'),
       $container->get('plugin.manager.sms_gateway')
     );
@@ -148,11 +160,16 @@ class SmsGatewayForm extends EntityForm {
     ];
 
     if (!$sms_gateway->isNew()) {
-      $form['delivery_report_path'] = [
-        '#type' => 'item',
-        '#title' => $this->t('Delivery report URL'),
-        '#markup' => Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $sms_gateway->id()], ['absolute' => TRUE])->toString(),
-      ];
+      $url = Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $sms_gateway->id()])->setAbsolute();
+      $access = $this->accessManager->checkNamedRoute($url->getRouteName(), $url->getRouteParameters());
+      if ($access) {
+        $form['delivery_report_path'] = [
+          '#type' => 'item',
+          '#title' => $this->t('Delivery report URL'),
+          '#markup' => $url->toString(),
+        ];
+      }
+
       $instance = $sms_gateway->getPlugin();
       $form += $instance->buildConfigurationForm($form, $form_state);
     }

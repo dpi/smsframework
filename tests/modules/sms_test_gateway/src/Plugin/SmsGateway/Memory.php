@@ -27,6 +27,8 @@ use Symfony\Component\HttpFoundation\Response;
  *   label = @Translation("Memory"),
  *   outgoing_message_max_recipients = -1,
  *   schedule_aware = FALSE,
+ *   reports_pull = TRUE,
+ *   reports_push = TRUE,
  * )
  */
 class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInterface{
@@ -131,6 +133,13 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
     // Set the response.
     $response->setContent('custom response content');
     return $latest_reports;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getDeliveryReports(array $message_ids = NULL) {
+    return [];
   }
 
   /**

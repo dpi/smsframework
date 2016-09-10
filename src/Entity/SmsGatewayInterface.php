@@ -91,4 +91,24 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    */
   public function isScheduleAware();
 
+  /**
+   * Gets whether this gateway can pull reports.
+   *
+   * @return boolean
+   *   Whether this gateway can pull reports.
+   *
+   * @see \Drupal\sms\Annotation\SmsGateway::reports_pull
+   */
+  public function supportsReportsPull();
+
+  /**
+   * Gets whether this gateway can handle reports pushed to the site.
+   *
+   * @return boolean
+   *   Whether this gateway can handle reports pushed to the site.
+   *
+   * @see \Drupal\sms\Annotation\SmsGateway::reports_push
+   */
+  public function supportsReportsPush();
+
 }

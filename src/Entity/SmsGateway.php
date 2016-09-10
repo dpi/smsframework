@@ -203,4 +203,22 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
     return !empty($definition['schedule_aware']);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function supportsReportsPull() {
+    $definition = $this->getPlugin()
+      ->getPluginDefinition();
+    return isset($definition['reports_pull']) ? (boolean) $definition['reports_pull'] : FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function supportsReportsPush() {
+    $definition = $this->getPlugin()
+      ->getPluginDefinition();
+    return isset($definition['reports_push']) ? (boolean) $definition['reports_push'] : FALSE;
+  }
+
 }

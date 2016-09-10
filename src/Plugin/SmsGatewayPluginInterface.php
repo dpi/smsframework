@@ -147,10 +147,11 @@ interface SmsGatewayPluginInterface extends ConfigurablePluginInterface, PluginF
   public function parseDeliveryReports(Request $request, Response $response);
 
   /**
-   * Gets the latest available delivery reports from the SMS gateway server.
+   * Gets delivery reports from the gateway.
    *
-   * @param string[]|null $message_ids
-   *   The list of specific message_ids to poll. NULL to get all reports.
+   * @param string[]|NULL $message_ids
+   *   A list of specific message ID's to pull, or NULL to get any reports which
+   *   have not been requested previously.
    *
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
    *   An array of the delivery reports which have been pulled.

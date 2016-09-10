@@ -50,4 +50,22 @@ class SmsGateway extends Plugin {
    */
   protected $schedule_aware;
 
+  /**
+   * Whether the gateway can pull reports.
+   *
+   * @see \Drupal\sms\Entity\SmsGatewayInterface::supportsReportsPull()
+   *
+   * @var boolean
+   */
+  protected $reports_pull;
+
+  /**
+   * Whether the gateway can handle reports pushed to the site.
+   *
+   * @see \Drupal\sms\Entity\SmsGatewayInterface::supportsReportsPush()
+   *
+   * @var boolean
+   */
+  protected $reports_push;
+
 }
