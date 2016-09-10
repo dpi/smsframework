@@ -57,6 +57,6 @@ class SmsGateway extends Plugin {
    *
    * @var boolean
    */
-  protected $credit_balance_query;
+  protected $credit_balance_available;
 
 }

@@ -209,7 +209,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   public function supportsCreditBalanceQuery() {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
-    return isset($definition['credit_balance_query']) ? (boolean) $definition['credit_balance_query'] : FALSE;
+    return isset($definition['credit_balance_available']) ? (boolean) $definition['credit_balance_available'] : FALSE;
   }
 
 }

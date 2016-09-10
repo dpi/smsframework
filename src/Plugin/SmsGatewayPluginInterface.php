@@ -125,8 +125,8 @@ interface SmsGatewayPluginInterface extends ConfigurablePluginInterface, PluginF
   /**
    * Returns the credit balance available on this gateway.
    *
-   * The 'credit_balance_query' plugin annotation should be set to inform the
-   * framework whether this gateway supports balance queries.
+   * The 'credit_balance_available' plugin annotation should be set to inform
+   * the framework whether this gateway supports balance queries.
    *
    * @return float|NULL
    *   The credit balance of the gateway, or NULL if unknown.

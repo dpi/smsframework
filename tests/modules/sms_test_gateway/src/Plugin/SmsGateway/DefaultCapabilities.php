@@ -6,9 +6,9 @@ use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Drupal\sms\Message\SmsMessageInterface;
 
 /**
- * Defines a gateway for testing default capabilities defined by annotation.
+ * A gateway for testing undefined capability annotation values.
  *
- * This gateway does not provide any annotation details other than required
+ * This gateway does not provide any annotation values other than required
  * properties: 'id' and 'label'.
  *
  * @SmsGateway(

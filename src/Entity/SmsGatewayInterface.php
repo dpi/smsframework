@@ -97,7 +97,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    * @return boolean
    *   Whether this gateway supports credit balance queries.
    *
-   * @see \Drupal\sms\Annotation\SmsGateway::credit_balance_query
+   * @see \Drupal\sms\Annotation\SmsGateway::credit_balance_available
    */
   public function supportsCreditBalanceQuery();
 
