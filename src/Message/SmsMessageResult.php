@@ -121,7 +121,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
    * {@inheritdoc}
    */
   public function setCreditsBalance($balance) {
-    if (is_float($balance) || is_null($balance)) {
+    if (is_numeric($balance) || is_null($balance)) {
       $this->creditsBalance = $balance;
     }
     else {
@@ -141,7 +141,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
    * {@inheritdoc}
    */
   public function setCreditsUsed($credits_used) {
-    if (is_float($credits_used) || is_null($credits_used)) {
+    if (is_numeric($credits_used) || is_null($credits_used)) {
       $this->creditsUsed = $credits_used;
     }
     else {
