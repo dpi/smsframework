@@ -29,3 +29,10 @@ sms_gateway.settings.memory_schedule_aware:
   mapping:
     gateway_id:
       type: string
+
+sms_gateway.settings.capabilities_default:
+  type: sms_gateway_settings
+  label: 'Default annotation capabilities'
+  mapping:
+    gateway_id:
+      type: string

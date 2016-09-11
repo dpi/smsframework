@@ -91,8 +91,8 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
   /**
    * {@inheritdoc}
    */
-  public function balance() {
-    return 0;
+  public function getCreditsBalance() {
+    return NULL;
   }
 
   /**
