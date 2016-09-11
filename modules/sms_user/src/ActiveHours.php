@@ -20,10 +20,11 @@ class ActiveHours implements ActiveHoursInterface {
   protected $configFactory;
 
   /**
-   * Whether active hours is enabled in configuration, or NULL if configuration
-   * has not been built yet.
+   * Whether active hours is enabled in configuration.
    *
    * @var boolean|NULL
+   *   Whether active hours is enabled in configuration or NULL if configuration
+   *   has not been built yet.
    */
   protected $status = NULL;
 
@@ -47,7 +48,7 @@ class ActiveHours implements ActiveHoursInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function inHours(UserInterface $user, $now = 'now') {
     $this->build();
@@ -69,7 +70,7 @@ class ActiveHours implements ActiveHoursInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function findNextTime(UserInterface $user, $now = 'now') {
     $timezone = $user->getTimeZone();
@@ -85,7 +86,7 @@ class ActiveHours implements ActiveHoursInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function delaySmsMessage(SmsMessageInterface &$sms_message) {
     $recipient = $sms_message->getRecipientEntity();
@@ -97,7 +98,7 @@ class ActiveHours implements ActiveHoursInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getRanges($timezone) {
     $this->build();

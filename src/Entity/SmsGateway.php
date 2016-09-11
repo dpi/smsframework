@@ -87,14 +87,14 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   /**
    * How many seconds to hold messages after they are received.
    *
-   * @var integer
+   * @var int
    */
   protected $retention_duration_incoming;
 
   /**
    * How many seconds to hold messages after they are sent.
    *
-   * @var integer
+   * @var int
    */
   protected $retention_duration_outgoing;
 

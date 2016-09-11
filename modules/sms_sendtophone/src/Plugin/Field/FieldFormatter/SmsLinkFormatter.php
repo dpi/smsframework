@@ -7,6 +7,8 @@ use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Url;
 
 /**
+ * Defines a SMS field formatter.
+ *
  * @FieldFormatter(
  *   id = "sms_link",
  *   label = @Translation("SMS Link"),

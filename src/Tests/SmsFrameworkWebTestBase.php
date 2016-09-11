@@ -13,7 +13,12 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
 
   use SmsFrameworkTestTrait;
 
-  public static $modules = ['sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = [
+    'sms',
+    'sms_test_gateway',
+    'telephone',
+    'dynamic_entity_reference',
+  ];
 
   /**
    * The gateway manager.

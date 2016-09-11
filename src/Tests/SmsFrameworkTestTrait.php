@@ -34,6 +34,7 @@ trait SmsFrameworkTestTrait {
    *   Additional values to use when creating the gateway.
    *
    * @return \Drupal\sms\Entity\SmsGatewayInterface
+   *   A saved memory gateway.
    */
   protected function createMemoryGateway($values = []) {
     $id = isset($values['id']) ? $values['id'] : Unicode::strtolower($this->randomMachineName(16));
@@ -55,6 +56,7 @@ trait SmsFrameworkTestTrait {
    *   A gateway plugin instance.
    *
    * @return \Drupal\sms\Message\SmsMessageInterface[]
+   *   An array of SMS messages sent to a 'Memory' gateway.
    */
   function getTestMessages(SmsGatewayInterface $sms_gateway) {
     $gateway_id = $sms_gateway->id();
@@ -80,7 +82,7 @@ trait SmsFrameworkTestTrait {
   /**
    * Resets SMS messages stored in memory by 'Memory' gateway.
    *
-   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
+   * @param \Drupal\sms\Entity\SmsGatewayInterface|NULL $sms_gateway
    *   A gateway plugin, or NULL to reset all messages.
    */
   public function resetTestMessages(SmsGatewayInterface $sms_gateway = NULL) {
@@ -101,6 +103,7 @@ trait SmsFrameworkTestTrait {
    *   A gateway plugin.
    *
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
+   *   An array of SMS reports for messages sent to 'Memory' gateway.
    */
   protected function getTestMessageReports(SmsGatewayInterface $sms_gateway) {
     $gateway_id = $sms_gateway->id();
@@ -180,7 +183,7 @@ trait SmsFrameworkTestTrait {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   An entity to verify phone number.
-   * @param $phone_number
+   * @param string $phone_number
    *   A phone number.
    */
   protected function verifyPhoneNumber(EntityInterface $entity, $phone_number) {
@@ -222,6 +225,7 @@ trait SmsFrameworkTestTrait {
    *   (optional) The user ID to generate the message as. Defaults to 1.
    *
    * @return \Drupal\sms\Message\SmsMessageInterface
+   *   A random SMS message by the specified user.
    */
   protected function randomSmsMessage($uid = 1) {
     $phone_numbers = $this->randomPhoneNumbers(1);

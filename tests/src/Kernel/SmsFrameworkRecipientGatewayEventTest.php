@@ -13,11 +13,12 @@ use Drupal\sms\Direction;
 class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = ['sms', 'sms_test', 'sms_test_gateway', 'field', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = [
+    'sms', 'sms_test', 'sms_test_gateway', 'field', 'telephone',
+    'dynamic_entity_reference',
+  ];
 
   /**
    * @var \Drupal\sms\Provider\SmsProviderInterface

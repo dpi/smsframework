@@ -135,7 +135,7 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getDeliveryReports(array $message_ids = NULL) {
     return [];
@@ -166,7 +166,7 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getCreditsBalance() {
     return 13.36;

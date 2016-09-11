@@ -126,7 +126,6 @@ class FilterInlineSms extends FilterBase {
       ),
       'query' => array(
         'text' => urlencode($text),
-        drupal_get_destination(),
       ),
       'html' => TRUE,
     );
@@ -143,6 +142,7 @@ class FilterInlineSms extends FilterBase {
    * Encapsulates the renderer service for unit testing purposes.
    *
    * @return \Drupal\Core\Render\RendererInterface
+   *   Returns the renderer service.
    */
   protected function renderer() {
     return \Drupal::service('renderer');

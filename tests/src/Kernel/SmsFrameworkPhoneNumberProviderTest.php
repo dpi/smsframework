@@ -22,16 +22,30 @@ use Drupal\sms\Entity\PhoneNumberSettingsInterface;
 class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
 
   /**
+   * {@inheritdoc}
+   */
+  public static $modules = [
+    'sms', 'entity_test', 'user', 'field', 'telephone',
+    'dynamic_entity_reference', 'sms_test_gateway',
+  ];
+
+  /**
+   * The phone number provider.
+   *
    * @var \Drupal\sms\Provider\PhoneNumberProviderInterface
    */
   protected $phoneNumberProvider;
 
   /**
+   * A telephone field for testing.
+   *
    * @var \Drupal\field\FieldStorageConfigInterface
    */
   protected $phoneField;
 
   /**
+   * Phone number settings for entity_test entity type.
+   *
    * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
    */
   protected $phoneNumberSettings;
@@ -42,13 +56,6 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
    * @var \Drupal\sms\Entity\SmsGatewayInterface
    */
   protected $gateway;
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = ['sms', 'entity_test', 'user', 'field', 'telephone', 'dynamic_entity_reference', 'sms_test_gateway'];
 
   /**
    * {@inheritdoc}

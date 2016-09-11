@@ -26,11 +26,12 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = ['sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference', 'user', 'entity_test'];
+  public static $modules = [
+    'sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference', 'user',
+    'entity_test',
+  ];
 
   /**
    * {@inheritdoc}
@@ -49,6 +50,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    *   An mixed array of values to pass when creating the SMS message entity.
    *
    * @return \Drupal\sms\Entity\SmsMessageInterface
+   *   A SMS message object for testing.
    */
   protected function createSmsMessage(array $values = []) {
     return SmsMessage::create($values);
@@ -63,7 +65,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function testUid() {
     // User must exist or setUid will throw an exception.

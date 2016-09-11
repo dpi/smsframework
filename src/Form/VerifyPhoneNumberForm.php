@@ -79,7 +79,7 @@ class VerifyPhoneNumberForm extends FormBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $flood_window = $this->config('sms.settings')->get('flood.verify_window');

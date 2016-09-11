@@ -16,7 +16,7 @@ class SmsMessageDirection extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  function render(ResultRow $values) {
+  public function render(ResultRow $values) {
     switch ($this->getValue($values)) {
       case Direction::INCOMING:
         return $this->t('Incoming');

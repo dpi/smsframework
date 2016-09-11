@@ -44,7 +44,7 @@ class SmsMessageEvent extends Event {
   /**
    * Set the messages on this event.
    *
-   * @param $messages
+   * @param \Drupal\sms\Message\SmsMessageInterface[] $messages
    *   The messages to set on this event.
    *
    * @return $this

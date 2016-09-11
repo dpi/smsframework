@@ -17,14 +17,25 @@ use Drupal\sms\Entity\PhoneNumberSettings;
  */
 class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
 
-  public static $modules = ['sms', 'sms_sendtophone', 'sms_test_gateway', 'node', 'field', 'field_ui'];
+  public static $modules = [
+    'sms',
+    'sms_sendtophone',
+    'sms_test_gateway',
+    'node',
+    'field',
+    'field_ui',
+  ];
 
   /**
+   * The phone field for testing.
+   *
    * @var \Drupal\field\FieldStorageConfigInterface
    */
   protected $phoneField;
 
   /**
+   * Phone number settings for user entity type.
+   *
    * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
    */
   protected $phoneNumberSettings;
@@ -192,11 +203,13 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
       'entity_type' => 'node',
       'bundle' => $bundles[0],
       // Need to verify this.
-    //      'display' => array(
-    //        'teaser' => array(
-    //          'type' => 'sms_link',
-    //        )
-    //      ),.
+      /*
+          'display' => array(
+            'teaser' => array(
+              'type' => 'sms_link',
+            )
+          ),
+      */
     );
     $field_storage = FieldStorageConfig::create(array(
       'field_name' => $field_name,
@@ -225,7 +238,8 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
       ],
       ],
     ]);
-    // This is a quick-fix. Need to find out how to add display filters from code.
+
+    // This is a quick-fix. Need to find out how to add display filters in code.
     $this->drupalLogin($this->rootUser);
     $this->drupalPostForm('admin/structure/types/manage/article/display', ['fields[' . $field_name . '][type]' => 'sms_link'], 'Save');
 

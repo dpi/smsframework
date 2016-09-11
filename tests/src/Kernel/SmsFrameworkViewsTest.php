@@ -21,7 +21,13 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
 
   use SmsFrameworkTestTrait;
 
-  public static $modules = ['user', 'sms', 'sms_test_gateway', 'sms_test_views', 'telephone', 'dynamic_entity_reference', 'field'];
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = [
+    'user', 'sms', 'sms_test_gateway', 'sms_test_views', 'telephone',
+    'dynamic_entity_reference', 'field',
+  ];
 
   /**
    * Views used by this test.
@@ -114,7 +120,11 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
 
     $this->assertEquals(2, $view->total_rows);
 
-    $cols = ['direction_1', 'sender_phone_number', 'recipient_phone_number', 'message', 'created', 'gateway', 'sender_entity__target_id', 'recipient_entity__target_id', 'automated', 'processed', 'queued'];
+    $cols = [
+      'direction_1', 'sender_phone_number', 'recipient_phone_number',
+      'message', 'created', 'gateway', 'sender_entity__target_id',
+      'recipient_entity__target_id', 'automated', 'processed', 'queued',
+    ];
     $this->assertEquals($cols, array_keys($view->field));
 
     /** @var \Drupal\Core\Render\RendererInterface $renderer */

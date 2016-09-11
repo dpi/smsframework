@@ -21,11 +21,12 @@ use Drupal\sms\Message\SmsMessageResultInterface;
 class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = ['sms', 'sms_test', 'sms_test_gateway', 'field', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = [
+    'sms', 'sms_test', 'sms_test_gateway', 'field', 'telephone',
+    'dynamic_entity_reference',
+  ];
 
   /**
    * SMS message entity storage.
@@ -35,9 +36,9 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   protected $smsStorage;
 
   /**
-   * @var \Drupal\sms\Provider\SmsProviderInterface
+   * The SMS provider.
    *
-   * The default SMS provider.
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $smsProvider;
 
@@ -306,6 +307,8 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Test events for outgoing queue skip queue.
+   *
    * Ensure events are executed when a message added to the outgoing queue and
    * the gateway is set to skip queue.
    */
@@ -365,6 +368,8 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Tests events for incoming queue skip queue.
+   *
    * Ensure events are executed when a message added to the incoming queue and
    * the gateway is set to skip queue.
    */
@@ -458,6 +463,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    *   An mixed array of values to pass when creating the SMS message entity.
    *
    * @return \Drupal\sms\Entity\SmsMessageInterface
+   *   A SMS message entity for testing.
    */
   protected function createSmsMessage(array $values = []) {
     return SmsMessage::create($values)

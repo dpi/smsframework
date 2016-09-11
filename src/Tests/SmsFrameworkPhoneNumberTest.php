@@ -37,7 +37,8 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
 
       $this->assertEqual($quantity, $this->countVerificationCodes($test_entity), 'There is ' . $quantity . ' verification code.');
 
-      // Ensure postsave did not create verification codes if one already exists.
+      // Ensure post-save did not create verification codes if one already
+      // exists.
       $test_entity->save();
       $this->assertEqual($quantity, $this->countVerificationCodes($test_entity), 'Additional verification codes were not created.');
     }

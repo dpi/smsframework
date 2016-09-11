@@ -57,7 +57,7 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function processUnqueued() {
     /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
@@ -88,7 +88,7 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function garbageCollection() {
     $directions = [

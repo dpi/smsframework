@@ -26,6 +26,8 @@ class SmsGatewayForm extends EntityForm {
   protected $accessManager;
 
   /**
+   * The entity query factory.
+   *
    * @var \Drupal\Core\Entity\Query\QueryFactory
    */
   protected $entityQueryFactory;
@@ -38,8 +40,12 @@ class SmsGatewayForm extends EntityForm {
   protected $gatewayManager;
 
   /**
+   * Constructs a new SmsGatewayForm object.
+   *
    * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
    *   The access manager.
+   * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
+   *   The entity query factory.
    * @param \Drupal\sms\Plugin\SmsGatewayPluginManagerInterface $gateway_manager
    *   The gateway manager service.
    */

@@ -90,7 +90,7 @@ interface SmsDeliveryReportInterface {
   /**
    * Gets the time the message was queued.
    *
-   * @return integer|NULL
+   * @return int|NULL
    *   The timestamp when the message was queued, or NULL if unknown.
    */
   public function getTimeQueued();
@@ -109,7 +109,7 @@ interface SmsDeliveryReportInterface {
   /**
    * Gets the time the message was delivered to the recipient.
    *
-   * @return integer|NULL
+   * @return int|NULL
    *   The timestamp when the message was delivered to the recipient, or NULL if
    *   unknown.
    */

@@ -66,14 +66,12 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    return;
   }
 
   /**
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    return;
   }
 
   /**

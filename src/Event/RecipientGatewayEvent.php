@@ -23,7 +23,7 @@ class RecipientGatewayEvent extends Event {
    * @var array
    *   The array of gateway/priority doubles where:
    *     - Key 0: SmsGatewayInterface $gateway
-   *     - Key 1: integer $priority
+   *     - Key 1: int $priority
    */
   protected $gateways = [];
 
@@ -75,6 +75,7 @@ class RecipientGatewayEvent extends Event {
    * Return gateways ordered by priority from highest to lowest.
    *
    * @return \Drupal\sms\Entity\SmsGatewayInterface[]
+   *   An array of gateways ordered by priority from highest to lowest.
    */
   public function getGatewaysSorted() {
     $sorted = $this->gateways;
@@ -116,9 +117,8 @@ class RecipientGatewayEvent extends Event {
   /**
    * Remove a gateway from this event.
    *
-   * @param $gateway_id
+   * @param string $gateway_id
    *   A gateway plugin ID.
-   *
    * @param int|NULL $priority
    *   The priority of the gateway to remove, or NULL to remove all gateways
    *   with the identifier.

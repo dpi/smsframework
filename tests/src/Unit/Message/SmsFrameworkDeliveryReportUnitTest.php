@@ -120,6 +120,7 @@ class SmsFrameworkDeliveryReportUnitTest extends UnitTestCase {
    * Create a delivery report for testing.
    *
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface
+   *   A delivery report for testing.
    */
   protected function createDeliveryReport() {
     return new SmsDeliveryReport();

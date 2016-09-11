@@ -271,8 +271,9 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
   }
 
   /**
-   * Test if notice is displayed and some form elements and disabled if no
-   * phone number settings exist for user entity type.
+   * Test form state when no phone number settings exist for user entity type.
+   *
+   * Tests notice is displayed and some form elements are disabled.
    */
   public function testFormNoUserPhoneNumberSettings() {
     $this->drupalGet(Url::fromRoute('sms_user.options'));
@@ -288,8 +289,9 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
   }
 
   /**
-   * Test if notice is not displayed if phone number settings exist for user
-   * entity type.
+   * Test form state when phone number settings exist for user entity type.
+   *
+   * Tests notice is not displayed and form elements are not disabled.
    */
   public function testFormUserPhoneNumberSettings() {
     $this->createPhoneNumberSettings('user', 'user');

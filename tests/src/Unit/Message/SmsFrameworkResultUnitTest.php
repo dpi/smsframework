@@ -150,6 +150,7 @@ class SmsFrameworkResultUnitTest extends UnitTestCase {
    * Create a result for testing.
    *
    * @return \Drupal\sms\Message\SmsMessageResultInterface
+   *   A result for testing.
    */
   protected function createResult() {
     return new SmsMessageResult();

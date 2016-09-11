@@ -13,11 +13,12 @@ use Drupal\Component\Utility\Html;
 class SmsFrameworkTokenTest extends SmsFrameworkKernelBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = ['system', 'sms', 'entity_test', 'user', 'field', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = [
+    'system', 'sms', 'entity_test', 'user', 'field', 'telephone',
+    'dynamic_entity_reference',
+  ];
 
   /**
    * The token service.

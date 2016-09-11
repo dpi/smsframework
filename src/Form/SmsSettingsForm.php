@@ -59,7 +59,7 @@ class SmsSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormID() {
+  public function getFormId() {
     return 'sms_settings_form';
   }
 

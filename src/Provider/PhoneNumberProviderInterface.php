@@ -46,9 +46,9 @@ interface PhoneNumberProviderInterface {
   /**
    * Gets read only phone number settings config object for a bundle.
    *
-   * @param $entity_type_id
+   * @param string $entity_type_id
    *   The entity type ID of the bundle.
-   * @param $bundle
+   * @param string $bundle
    *   An entity bundle.
    *
    * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|NULL
@@ -112,6 +112,7 @@ interface PhoneNumberProviderInterface {
    *   A phone number.
    *
    * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|NULL
+   *   The phone number verification for an entity and phone number pair.
    */
   public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number);
 
@@ -141,7 +142,7 @@ interface PhoneNumberProviderInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   Update phone number verifications for this entity.
    */
-  function updatePhoneVerificationByEntity(EntityInterface $entity);
+  public function updatePhoneVerificationByEntity(EntityInterface $entity);
 
   /**
    * Deletes phone number verifications for an entity.
@@ -149,7 +150,7 @@ interface PhoneNumberProviderInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   Delete phone number verifications for this entity.
    */
-  function deletePhoneVerificationByEntity(EntityInterface $entity);
+  public function deletePhoneVerificationByEntity(EntityInterface $entity);
 
   /**
    * Cleans up expired phone number verifications.

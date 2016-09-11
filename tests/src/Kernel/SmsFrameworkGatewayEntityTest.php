@@ -13,11 +13,11 @@ use Drupal\sms\Direction;
 class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = ['sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = [
+    'sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference',
+  ];
 
   /**
    * Tests skip queue.

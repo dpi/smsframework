@@ -50,7 +50,7 @@ class AdminSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormID() {
+  public function getFormId() {
     return 'sms_user_admin_settings';
   }
 
@@ -117,10 +117,10 @@ class AdminSettingsForm extends ConfigFormBase {
     for ($i = 0; $i < 24; $i++) {
       $hours[$i] = DrupalDateTime::datePad($i) . ':00';
     }
-    $hours[0] = $this->t(' - Start of day - ');
+    $hours[0] = $this->t('- Start of day -');
     $end_hours = $hours;
     unset($end_hours[0]);
-    $end_hours[24] = $this->t(' - End of day - ');
+    $end_hours[24] = $this->t('- End of day -');
 
     $timestamp = strtotime('next Sunday');
     for ($i = 0; $i < 7; $i++) {
@@ -138,7 +138,7 @@ class AdminSettingsForm extends ConfigFormBase {
         '#title_display' => 'invisible',
         '#default_value' => isset($day_defaults[$day_lower]['start']) ? $day_defaults[$day_lower]['start'] : -1,
         '#options' => $hours,
-        '#empty_option' => $this->t(' - Suspend messages for this day - '),
+        '#empty_option' => $this->t('- Suspend messages for this day -'),
         '#empty_value' => -1,
       ];
       $row['end'] = [
@@ -447,8 +447,8 @@ class AdminSettingsForm extends ConfigFormBase {
       ->set('account_registration.incoming_pattern.send_activation_email', $account_registration['incoming_pattern_options']['send_activation_email'])
       // Active Hours.
       ->set('active_hours.status', (boolean) $form_state->getValue(['active_hours', 'status']))
-      // Days make sense for this form, however storage uses generic 'range' term.
-      // Remove keys so it is a raw sequence.
+      // Days make sense for this form, however storage uses generic 'range'
+      // term. Remove keys so it is a raw sequence.
       ->set('active_hours.ranges', array_values($form_state->getValue(['active_hours', 'days'])))
       ->save();
 

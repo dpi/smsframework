@@ -224,7 +224,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   /**
    * {@inheritdoc}
    */
-  function updatePhoneVerificationByEntity(EntityInterface $entity) {
+  public function updatePhoneVerificationByEntity(EntityInterface $entity) {
     try {
       $phone_number_settings = $this->getPhoneNumberSettingsForEntity($entity);
       $field_name = $phone_number_settings->getFieldName('phone_number');
@@ -269,10 +269,11 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   /**
    * {@inheritdoc}
    */
-  function deletePhoneVerificationByEntity(EntityInterface $entity) {
-    // Check the entity uses phone numbers. To save on a SQL call, and to prevent
-    // having to install phone number verification for SMS Framework tests which
-    // delete entities. Which would otherwise error on non-existent tables.
+  public function deletePhoneVerificationByEntity(EntityInterface $entity) {
+    // Check the entity uses phone numbers. To save on a SQL call, and to
+    // prevent having to install phone number verification for SMS Framework
+    // tests which delete entities. Which would otherwise error on non-existent
+    // tables.
     try {
       $this->getPhoneNumberSettingsForEntity($entity);
       $verification_entities = $this->phoneNumberVerificationStorage

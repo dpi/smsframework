@@ -30,7 +30,7 @@ interface SmsProviderInterface {
    *
    * It is preferred to use queue method over directly invoking send().
    *
-   * @param \Drupal\sms\Message\SmsMessageInterface
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms
    *   The message to be sent.
    *
    * @return \Drupal\sms\Message\SmsMessageInterface[]
@@ -46,7 +46,7 @@ interface SmsProviderInterface {
   /**
    * Handles a message received by the server.
    *
-   * @param \Drupal\sms\Message\SmsMessageInterface
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
    *   The message received.
    *
    * @return \Drupal\sms\Message\SmsMessageInterface[]

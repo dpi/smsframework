@@ -13,6 +13,7 @@ use Drupal\Component\Utility\Random;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\Core\Entity\EntityConstraintViolationListInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Defines the account registration service.
@@ -74,7 +75,7 @@ class AccountRegistration implements AccountRegistrationInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function createAccount(SmsMessageInterface $sms_message) {
     $this->userPhoneNumberSettings = $this->phoneNumberProvider
@@ -101,8 +102,7 @@ class AccountRegistration implements AccountRegistrationInterface {
   }
 
   /**
-   * Process an incoming message and create a user if the phone number is
-   * unrecognised.
+   * Process incoming message and create a user if the phone number is unknown.
    *
    * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
    *   An incoming SMS message.
@@ -149,8 +149,7 @@ class AccountRegistration implements AccountRegistrationInterface {
   }
 
   /**
-   * Process an incoming message and create a user if the message matches
-   * the incoming message format.
+   * Creates a user if an incoming message contents matches a pattern.
    *
    * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
    *   An incoming SMS message.
@@ -230,15 +229,15 @@ class AccountRegistration implements AccountRegistrationInterface {
   /**
    * Send a reply message to the sender of a message.
    *
-   * @param $sender_number
+   * @param string $sender_number
    *   Phone number of sender of incoming message. And if a user was created,
    *   this number was used.
-   * @param $user
+   * @param \Drupal\user\UserInterface $user
    *   A user account. The account may not be saved.
-   * @param $message
+   * @param string $message
    *   Message to send as a reply.
    */
-  protected function sendReply($sender_number, $user, $message) {
+  protected function sendReply($sender_number, UserInterface $user, $message) {
     $sms_message = SmsMessage::create();
     $sms_message
       ->addRecipient($sender_number)
@@ -288,9 +287,9 @@ class AccountRegistration implements AccountRegistrationInterface {
     $regex = '/(' . implode('|', $regex_placeholders) . '+)/';
     $words = preg_split($regex, $form_string, NULL, PREG_SPLIT_DELIM_CAPTURE);
 
-    // Track if a placeholder was used, so subsequent usages create a named
-    // back reference. This allows you to use placeholders more than once as a form of
-    // confirmation. e.g: 'U [username] P [password] [password]'.
+    // Track if a placeholder was used, so subsequent usages create a named back
+    // reference. This allows you to use placeholders more than once as a form
+    // of confirmation. e.g: 'U [username] P [password] [password]'.
     $placeholder_usage = [];
 
     $compiled = '';
@@ -356,8 +355,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    *
    * @param \Drupal\Core\Entity\EntityConstraintViolationListInterface $violations
    *   A violation list.
-   *
-   * @param string|NULL
+   * @param string|NULL $incoming_form
    *   Incoming form, if applicable.
    *
    * @return \Drupal\Core\Entity\EntityConstraintViolationListInterface
@@ -384,7 +382,8 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @param string $name
    *   The configuration name.
    *
-   * @return array|mixed|NULL
+   * @return array|NULL
+   *   The values for the requested configuration.
    */
   protected function settings($name) {
     return $this->configFactory

@@ -22,6 +22,8 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
   public static $modules = ['block'];
 
   /**
+   * SMS Gateway entity storage.
+   *
    * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
    */
   protected $smsGatewayStorage;

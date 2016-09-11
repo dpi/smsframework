@@ -71,7 +71,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
   /**
    * Get whether the SMS message is in the queue to be processed.
    *
-   * @return boolean
+   * @return bool
    *   Whether the SMS message is in the queue to be processed.
    */
   public function isQueued();

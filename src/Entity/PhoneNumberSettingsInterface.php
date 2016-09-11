@@ -86,6 +86,8 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
   public function setVerificationCodeLifetime($lifetime);
 
   /**
+   * Whether phone numbers are purged when verifications expire.
+   *
    * Determines if phone number field values are removed when phone number
    * verifications expire.
    *
@@ -95,6 +97,8 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
   public function getPurgeVerificationPhoneNumber();
 
   /**
+   * Whether phone numbers should be purged when verifications expire.
+   *
    * Sets if phone number field values are removed when phone number
    * verifications expire.
    *
