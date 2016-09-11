@@ -18,3 +18,7 @@ services:
     arguments: ['@event_dispatcher', '@config.factory']
     tags:
       - { name: event_subscriber }
+  access_check.sms.gateway_supports_pushed_reports:
+    class: Drupal\sms\Access\SupportsPushedReportsAccessCheck
+    tags:
+      - { name: access_check, applies_to: _sms_gateway_supports_pushed_reports }

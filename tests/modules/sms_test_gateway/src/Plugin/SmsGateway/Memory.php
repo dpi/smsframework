@@ -27,6 +27,8 @@ use Drupal\sms\Message\SmsMessageReportStatus;
  *   label = @Translation("Memory"),
  *   outgoing_message_max_recipients = -1,
  *   schedule_aware = FALSE,
+ *   reports_pull = TRUE,
+ *   reports_push = TRUE,
  *   credit_balance_available = TRUE,
  * )
  */
@@ -136,6 +138,13 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
     $response->setContent('custom response content');
 
     return $return;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getDeliveryReports(array $message_ids = NULL) {
+    return [];
   }
 
   /**

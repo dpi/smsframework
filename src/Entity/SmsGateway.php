@@ -206,6 +206,24 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   /**
    * {@inheritdoc}
    */
+  public function supportsReportsPull() {
+    $definition = $this->getPlugin()
+      ->getPluginDefinition();
+    return isset($definition['reports_pull']) ? (boolean) $definition['reports_pull'] : FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function supportsReportsPush() {
+    $definition = $this->getPlugin()
+      ->getPluginDefinition();
+    return isset($definition['reports_push']) ? (boolean) $definition['reports_push'] : FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function supportsCreditBalanceQuery() {
     $definition = $this->getPlugin()
       ->getPluginDefinition();

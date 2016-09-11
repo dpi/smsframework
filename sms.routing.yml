@@ -89,4 +89,4 @@ sms.process_delivery_report:
   defaults:
     _controller: '\Drupal\sms\DeliveryReportController::processDeliveryReport'
   requirements:
-    _access: 'TRUE'
+    _sms_gateway_supports_pushed_reports: 'TRUE'

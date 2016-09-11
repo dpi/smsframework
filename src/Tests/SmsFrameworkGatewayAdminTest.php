@@ -135,6 +135,11 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
     $this->assertFieldByName('retention_duration_incoming', '0');
     $this->assertFieldByName('retention_duration_outgoing', '0');
 
+    // Memory gateway supports pushed reports, so the URL should display.
+    $url = Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $test_gateway->id()])->setAbsolute();
+    $this->assertRaw(t('Delivery report URL'));
+    $this->assertRaw($url->toString(), 'Delivery report URL is visible');
+
     // Memory gateway has a decoy configuration form.
     $edit = [
       'widget' => $this->randomString(),
@@ -164,6 +169,22 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
   }
 
   /**
+   * Tests a gateway edit form does not display delivery report URL.
+   */
+  public function testGatewayEditNoDeliveryUrl() {
+    $this->drupalLogin($this->drupalCreateUser(['administer smsframework']));
+    $test_gateway = $this->createMemoryGateway(['plugin' => 'capabilities_default']);
+
+    $this->drupalGet(Url::fromRoute('entity.sms_gateway.edit_form', [
+      'sms_gateway' => $test_gateway->id(),
+    ]));
+    $this->assertResponse(200);
+    $this->assertRaw('Edit gateway');
+
+    $this->assertNoRaw(t('Delivery report URL'));
+  }
+
+    /**
    * Tests deleting a gateway.
    */
   public function testGatewayDelete() {
