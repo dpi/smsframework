@@ -10,7 +10,6 @@ namespace Drupal\sms\Provider;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
 
 /**
  * Provides an interface for sending messages
@@ -39,10 +38,10 @@ interface SmsProviderInterface {
    * @param \Drupal\sms\Message\SmsMessageInterface
    *   The message to be sent.
    *
-   * @return \Drupal\sms\Message\SmsMessageResultInterface[]
-   *   The results of the message sending operation. The message sent can be
-   *   transformed into multiple messages depending on gateway implementation.
-   *   Therefore this function can return multiple results.
+   * @return \Drupal\sms\Message\SmsMessageInterface[]
+   *   The messages sent in this sending operation. The message sent can be
+   *   transformed into multiple messages depending on gateway and event
+   *   subscribers. Therefore this function can return multiple messages.
    *
    * @throws \Drupal\sms\Exception\RecipientRouteException
    *   Thrown if no gateway could be determined for the message.
@@ -55,10 +54,10 @@ interface SmsProviderInterface {
    * @param \Drupal\sms\Message\SmsMessageInterface
    *   The message received.
    *
-   * @return \Drupal\sms\Message\SmsMessageResultInterface[]
-   *   The results of the message sending operation. The message sent can be
-   *   transformed into multiple messages depending on gateway implementation.
-   *   Therefore this function can return multiple results.
+   * @return \Drupal\sms\Message\SmsMessageInterface[]
+   *   The messages received in this incoming operation. The message received
+   *   can be transformed into multiple messages depending on gateway and event
+   *   subscribers. Therefore this function can return multiple results.
    */
   public function incoming(SmsMessageInterface $sms_message);
 

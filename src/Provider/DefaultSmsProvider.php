@@ -8,7 +8,6 @@
 namespace Drupal\sms\Provider;
 
 use Drupal\sms\Event\SmsDeliveryReportEvent;
-use Drupal\sms\Event\SmsMessageProcessedEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsGatewayInterface;
@@ -87,19 +86,17 @@ class DefaultSmsProvider implements SmsProviderInterface {
     $sms_messages = $dispatch ? $this->dispatchEvent(SmsEvents::MESSAGE_PRE_PROCESS, [$sms])->getMessages() : [$sms];
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_OUTGOING_PRE_PROCESS, $sms_messages)->getMessages();
 
-    $results = [];
     foreach ($sms_messages as &$sms_message) {
       $plugin = $sms_message->getGateway()->getPlugin();
 
       $result = $plugin->send($sms_message);
-      $result->setMessages([$sms_message]);
-      $results[] = $result;
+      $sms_message->setResult($result);
 
-      $this->dispatchProcessedEvent(SmsEvents::MESSAGE_OUTGOING_POST_PROCESS, [$result]);
-      $this->dispatchProcessedEvent(SmsEvents::MESSAGE_POST_PROCESS, [$result]);
+      $this->dispatchEvent(SmsEvents::MESSAGE_OUTGOING_POST_PROCESS, [$sms_message]);
+      $this->dispatchEvent(SmsEvents::MESSAGE_POST_PROCESS, [$sms_message]);
     }
 
-    return $results;
+    return $sms_messages;
   }
 
   /**
@@ -110,7 +107,6 @@ class DefaultSmsProvider implements SmsProviderInterface {
     $sms_messages = $dispatch ? $this->dispatchEvent(SmsEvents::MESSAGE_PRE_PROCESS, [$sms_message])->getMessages() : [$sms_message];
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_INCOMING_PRE_PROCESS, $sms_messages)->getMessages();
 
-    $results = [];
     foreach ($sms_messages as &$sms_message) {
       $plugin = $sms_message->getGateway()->getPlugin();
       if (!$plugin instanceof SmsGatewayPluginIncomingInterface) {
@@ -118,14 +114,13 @@ class DefaultSmsProvider implements SmsProviderInterface {
       }
 
       $result = $plugin->incoming($sms_message);
-      $result->setMessages([$sms_message]);
-      $results[] = $result;
+      $sms_message->setResult($result);
 
-      $this->dispatchProcessedEvent(SmsEvents::MESSAGE_INCOMING_POST_PROCESS, [$result]);
-      $this->dispatchProcessedEvent(SmsEvents::MESSAGE_POST_PROCESS, [$result]);
+      $this->dispatchEvent(SmsEvents::MESSAGE_INCOMING_POST_PROCESS, [$sms_message]);
+      $this->dispatchEvent(SmsEvents::MESSAGE_POST_PROCESS, [$sms_message]);
     }
 
-    return $results;
+    return $sms_messages;
   }
 
   /**
@@ -160,21 +155,6 @@ class DefaultSmsProvider implements SmsProviderInterface {
   protected function dispatchEvent($event_name, array $sms_messages) {
     $event = new SmsMessageEvent($sms_messages);
     return $this->eventDispatcher
-      ->dispatch($event_name, $event);
-  }
-
-  /**
-   * Dispatch a SmsMessageProcessedEvent for post-processed messages.
-   *
-   * @param string $event_name
-   *   The event to trigger.
-   * @param \Drupal\sms\Message\SmsMessageResultInterface[] $results
-   *   SMS results to dispatch.
-   */
-  protected function dispatchProcessedEvent($event_name, array $results) {
-    $event = new SmsMessageProcessedEvent();
-    $event->setResults($results);
-    $this->eventDispatcher
       ->dispatch($event_name, $event);
   }
 

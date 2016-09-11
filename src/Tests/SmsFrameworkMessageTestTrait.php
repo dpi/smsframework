@@ -8,6 +8,7 @@
 namespace Drupal\sms\Tests;
 
 use Drupal\sms\Direction;
+use Drupal\sms\Message\SmsMessageResult;
 
 /**
  * SMS Message object test trait.
@@ -175,6 +176,25 @@ trait SmsFrameworkMessageTestTrait {
     $sms_message1->removeOption('foo');
     unset($options['foo']);
     $this->assertEquals($options, $sms_message1->getOptions());
+  }
+
+  /**
+   * Tests result for SMS messages.
+   *
+   * @covers ::getResult
+   * @covers ::setResult
+   */
+  public function testResults() {
+    $error_message = $this->getRandomGenerator()->string();
+    $result = (new SmsMessageResult())
+      ->setErrorMessage($error_message);
+
+    $sms_message = $this->createSmsMessage();
+    $sms_message->setResult($result);
+
+    $result_actual = $sms_message->getResult();
+    $this->assertSame($result, $result_actual);
+    $this->assertSame($error_message, $result_actual->getErrorMessage());
   }
 
   /**

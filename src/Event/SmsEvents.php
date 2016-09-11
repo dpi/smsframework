@@ -43,7 +43,7 @@ final class SmsEvents {
    *
    * @Event
    *
-   * @see \Drupal\sms\Event\SmsMessageProcessedEvent
+   * @see \Drupal\sms\Event\SmsMessageEvent
    */
   const MESSAGE_POST_PROCESS = 'sms.message.post_process';
 
@@ -79,7 +79,7 @@ final class SmsEvents {
    *
    * @Event
    *
-   * @see \Drupal\sms\Event\SmsMessageProcessedEvent
+   * @see \Drupal\sms\Event\SmsMessageEvent
    */
   const MESSAGE_OUTGOING_POST_PROCESS = 'sms.message.outgoing.post_process';
 
@@ -97,7 +97,7 @@ final class SmsEvents {
    *
    * @Event
    *
-   * @see \Drupal\sms\Event\SmsMessageProcessedEvent
+   * @see \Drupal\sms\Event\SmsMessageEvent
    */
   const MESSAGE_INCOMING_POST_PROCESS = 'sms.message.incoming.post_process';
 

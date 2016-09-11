@@ -63,6 +63,13 @@ class SmsMessage implements SmsMessageInterface {
   protected $options = array();
 
   /**
+   * The result associated with this SMS message.
+   *
+   * @var \Drupal\sms\Message\SmsMessageResultInterface|NULL
+   */
+  protected $result;
+
+  /**
    * The UID of the creator of the SMS message.
    *
    * @var int
@@ -233,6 +240,21 @@ class SmsMessage implements SmsMessageInterface {
    */
   public function removeOption($name) {
     unset($this->options[$name]);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getResult() {
+    return $this->result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setResult(SmsMessageResultInterface $result = NULL) {
+    $this->result = $result;
     return $this;
   }
 

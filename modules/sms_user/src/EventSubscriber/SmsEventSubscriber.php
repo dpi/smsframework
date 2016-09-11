@@ -4,7 +4,7 @@ namespace Drupal\sms_user\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\sms\Event\SmsEvents;
-use Drupal\sms\Event\SmsMessageProcessedEvent;
+use Drupal\sms\Event\SmsMessageEvent;
 use Drupal\sms_user\AccountRegistrationInterface;
 
 /**
@@ -32,14 +32,12 @@ class SmsEventSubscriber implements EventSubscriberInterface {
   /**
    * Process an incoming SMS to see if a new account should be created.
    *
-   * @param \Drupal\sms\Event\SmsMessageProcessedEvent $event
+   * @param \Drupal\sms\Event\SmsMessageEvent $event
    *   The event.
    */
-  public function createAccount(SmsMessageProcessedEvent $event) {
-    foreach ($event->getResults() as $result) {
-      foreach ($result->getMessages() as $sms_message) {
-        $this->accountRegistration->createAccount($sms_message);
-      }
+  public function createAccount(SmsMessageEvent $event) {
+    foreach ($event->getMessages() as $sms_message) {
+      $this->accountRegistration->createAccount($sms_message);
     }
   }
 
