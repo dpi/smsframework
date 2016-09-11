@@ -109,10 +109,10 @@ class SmsFrameworkResultUnitTest extends UnitTestCase {
    * @covers ::setCreditsBalance
    */
   public function testCreditsBalanceIncorrectType() {
-    $balance = 1337;
+    $balance = 'foobar';
     $result = $this->createResult();
 
-    $this->setExpectedException(\Drupal\sms\Exception\SmsException::class, 'Credit balance set is a integer');
+    $this->setExpectedException(\Drupal\sms\Exception\SmsException::class, 'Credit balance set is a string');
     $result->setCreditsBalance($balance);
   }
 
@@ -138,10 +138,10 @@ class SmsFrameworkResultUnitTest extends UnitTestCase {
    * @covers ::setCreditsUsed
    */
   public function testCreditsUsedIncorrectType() {
-    $used = 1337;
+    $used = 'foobar';
     $result = $this->createResult();
 
-    $this->setExpectedException(\Drupal\sms\Exception\SmsException::class, 'Credit used is a integer');
+    $this->setExpectedException(\Drupal\sms\Exception\SmsException::class, 'Credit used is a string');
     $result->setCreditsUsed($used);
   }
 
