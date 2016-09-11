@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_user\AccountRegistrationInterface.
- */
-
 namespace Drupal\sms_user;
 
 use Drupal\sms\Message\SmsMessageInterface;

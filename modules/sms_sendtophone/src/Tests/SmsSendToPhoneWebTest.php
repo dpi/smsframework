@@ -1,15 +1,9 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_sendtophone\Tests\SmsSendToPhoneWebTest
- */
-
 namespace Drupal\sms_sendtophone\Tests;
 
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
-use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
@@ -18,7 +12,7 @@ use Drupal\sms\Entity\PhoneNumberSettings;
 
 /**
  * Integration tests for the SMS SendToPhone Module.
- * 
+ *
  * @group SMS Framework
  */
 class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
@@ -50,7 +44,7 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
       ));
       $this->drupalCreateContentType(array(
         'type' => 'article',
-        'name' => 'Article'
+        'name' => 'Article',
       ));
     }
 
@@ -143,7 +137,7 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     $this->drupalLogin($user);
 
     $edit = array(
-      'filters[filter_inline_sms][status]' => true,
+      'filters[filter_inline_sms][status]' => TRUE,
       'filters[filter_inline_sms][settings][display]' => 'text',
     );
     $this->drupalPostForm('admin/config/content/formats/manage/plain_text', $edit, t('Save configuration'));
@@ -155,10 +149,11 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
       'body' => array(array(
         'value' => "[sms]{$node_body}[/sms]",
         'format' => 'plain_text',
-      )),
+      ),
+      ),
     ));
 
-    // Unconfirmed users
+    // Unconfirmed users.
     $this->drupalGet('sms/sendtophone/inline');
     $this->assertText('You need to set up and confirm your mobile phone to send messages');
 
@@ -197,11 +192,11 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
       'entity_type' => 'node',
       'bundle' => $bundles[0],
       // Need to verify this.
-//      'display' => array(
-//        'teaser' => array(
-//          'type' => 'sms_link',
-//        )
-//      ),
+    //      'display' => array(
+    //        'teaser' => array(
+    //          'type' => 'sms_link',
+    //        )
+    //      ),.
     );
     $field_storage = FieldStorageConfig::create(array(
       'field_name' => $field_name,
@@ -227,11 +222,12 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
       'type' => $bundles[0],
       $field_name => [[
         'value' => $random_text,
-      ]],
+      ],
+      ],
     ]);
     // This is a quick-fix. Need to find out how to add display filters from code.
     $this->drupalLogin($this->rootUser);
-    $this->drupalPostForm('admin/structure/types/manage/article/display', ['fields['. $field_name . '][type]' => 'sms_link'], 'Save');
+    $this->drupalPostForm('admin/structure/types/manage/article/display', ['fields[' . $field_name . '][type]' => 'sms_link'], 'Save');
 
     // Confirm phone number.
     $user = $this->drupalCreateUser();

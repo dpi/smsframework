@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Lists\SmsGatewayListBuilder.
- */
-
 namespace Drupal\sms\Lists;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;

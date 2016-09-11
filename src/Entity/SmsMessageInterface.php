@@ -1,16 +1,14 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Entity\SmsMessageInterface.
- */
-
 namespace Drupal\sms\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\sms\Message\SmsMessageInterface as PlainSmsMessageInterface;
 use Drupal\Core\Entity\EntityInterface;
 
+/**
+ * Interface for SMS message entity.
+ */
 interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInterface {
 
   /**

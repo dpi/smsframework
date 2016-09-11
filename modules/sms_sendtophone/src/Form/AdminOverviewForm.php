@@ -1,17 +1,14 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_sendtophone\Form\AdminOverviewForm.
- */
-
 namespace Drupal\sms_sendtophone\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
 use Drupal\node\Entity\NodeType;
 
+/**
+ * Defines admin overview form.
+ */
 class AdminOverviewForm extends ConfigFormBase {
 
   /**
@@ -21,7 +18,10 @@ class AdminOverviewForm extends ConfigFormBase {
     return 'sms_sendtophone_admin_overview';
   }
 
-  public function buildForm(array $form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  /**
+   * {@inheritdoc}
+   */
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $node_types = NodeType::loadMultiple();
     $types = [];
     foreach ($node_types as $type) {

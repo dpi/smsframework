@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains definition of \Drupal\sms\Provider\SmsProviderInterface
- */
-
 namespace Drupal\sms\Provider;
 
 use Drupal\sms\Entity\SmsGatewayInterface;
@@ -12,7 +7,7 @@ use Drupal\sms\Message\SmsMessageInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Provides an interface for sending messages
+ * Provides an interface for sending messages.
  */
 interface SmsProviderInterface {
 

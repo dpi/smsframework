@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_user\ActiveHoursDates.
- */
-
 namespace Drupal\sms_user;
 
 use Drupal\Core\Datetime\DrupalDateTime;

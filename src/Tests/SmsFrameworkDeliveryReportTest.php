@@ -41,7 +41,7 @@ class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase {
     // Get the delivery reports url and simulate push delivery report.
     $url = Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $test_gateway->id()], ['absolute' => TRUE])->toString();
     $delivered_time = REQUEST_TIME;
-    $delivery_report =<<<EOF
+    $delivery_report = <<<EOF
 {
    "reports":[
       {

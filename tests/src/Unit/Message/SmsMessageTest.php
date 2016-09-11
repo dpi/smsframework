@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Unit\Message\SmsMessageTest
- */
-
 namespace Drupal\Tests\sms\Unit\Message;
 
 use Drupal\Component\Uuid\Php;

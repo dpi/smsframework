@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Form\SmsSettingsForm
- */
-
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
@@ -109,7 +104,7 @@ class SmsSettingsForm extends ConfigFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $verify = $form_state->getValue(['pages', 'verify']);
-    if (substr($verify, 0 , 1) !== '/') {
+    if (substr($verify, 0, 1) !== '/') {
       $form_state->setError($form['pages']['verify'], $this->t("Path must begin with a '/' character."));
     }
   }

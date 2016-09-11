@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms_user\Kernel\SmsFrameworkUserTest.
- */
-
 namespace Drupal\Tests\sms_user\Kernel;
 
 use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;

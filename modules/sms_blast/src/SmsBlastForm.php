@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_blast\SmsBlastForm
- */
-
 namespace Drupal\sms_blast;
 
 use Drupal\Core\Form\FormBase;
@@ -14,6 +9,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\sms\Message\SmsMessage;
 
+/**
+ * Defines a form for sending mass messages.
+ */
 class SmsBlastForm extends FormBase {
 
   /**
@@ -105,4 +103,5 @@ class SmsBlastForm extends FormBase {
 
     drupal_set_message($this->formatPlural(count($entity_ids), 'Message sent to @count user.', 'Message sent to @count users.'));
   }
+
 }

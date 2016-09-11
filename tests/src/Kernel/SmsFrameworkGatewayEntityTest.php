@@ -1,14 +1,8 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkGatewayEntity.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\SmsGateway;
-use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Direction;
 
 /**
@@ -111,7 +105,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
     $this->assertFalse($gateway->supportsReportsPull());
   }
 
-  /*
+  /**
    * Tests 'max outgoing recipients' annotation custom value.
    */
   public function testGetMaxRecipientsOutgoingCustom() {

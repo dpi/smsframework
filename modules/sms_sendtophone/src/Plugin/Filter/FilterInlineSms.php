@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_sendtophone\Plugin\Filter\FilterInlineSms.
- */
-
 namespace Drupal\sms_sendtophone\Plugin\Filter;
 
 use Drupal\Core\Form\FormStateInterface;
@@ -55,6 +50,9 @@ class FilterInlineSms extends FilterBase {
     return $this->t('Text between [sms][/sms] tags will be highlighted and appended with a "send to phone" button.');
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $elements['display'] = array(
       '#type' => 'radios',
@@ -124,11 +122,11 @@ class FilterInlineSms extends FilterBase {
     $options = array(
       'attributes' => array(
         'title' => t('Send the highlighted text via SMS.'),
-        'class' => 'sms-sendtophone'
+        'class' => 'sms-sendtophone',
       ),
       'query' => array(
         'text' => urlencode($text),
-        drupal_get_destination()
+        drupal_get_destination(),
       ),
       'html' => TRUE,
     );
@@ -138,7 +136,7 @@ class FilterInlineSms extends FilterBase {
       '#title' => $markup,
       '#url' => Url::fromRoute('sms_sendtophone.page', ['type' => 'inline'], $options),
     ];
-    return  $this->renderer()->renderPlain($link);
+    return $this->renderer()->renderPlain($link);
   }
 
   /**

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Form\VerifyPhoneNumberForm.
- */
-
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -13,6 +8,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\sms\Provider\PhoneNumberProviderInterface;
 use Drupal\Core\Form\FormStateInterface;
 
+/**
+ * Form to accept a verification code.
+ */
 class VerifyPhoneNumberForm extends FormBase {
 
   /**
@@ -52,10 +50,16 @@ class VerifyPhoneNumberForm extends FormBase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId() {
     return 'sms_verify_phone_number';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildForm(array $form, FormStateInterface $form_state) {
 
     $form['code'] = [
@@ -109,6 +113,9 @@ class VerifyPhoneNumberForm extends FormBase {
       ->register('sms.verify_phone_number', $flood_window);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $code = $form_state->getValue('code');
     $phone_verification = $this->phoneNumberProvider

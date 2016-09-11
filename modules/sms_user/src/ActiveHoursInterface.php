@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_user\ActiveHoursInterface.
- */
-
 namespace Drupal\sms_user;
 
 use Drupal\user\UserInterface;

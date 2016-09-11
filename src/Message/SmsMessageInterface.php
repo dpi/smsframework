@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains definition of \Drupal\sms\Message\SmsMessageInterface
- */
-
 namespace Drupal\sms\Message;
 
 use Drupal\sms\Entity\SmsGatewayInterface;
@@ -43,7 +38,7 @@ interface SmsMessageInterface {
    */
   public function addRecipients(array $recipients);
 
-    /**
+  /**
    * Removes a single recipient from the SMS message.
    *
    * @param string $recipient
@@ -125,7 +120,7 @@ interface SmsMessageInterface {
    * Sets an option for this SMS message.
    *
    * @param string $name
-   *   The name of the option
+   *   The name of the option.
    * @param mixed $value
    *   The value of the option.
    *
@@ -220,7 +215,7 @@ interface SmsMessageInterface {
   public function getUid();
 
   /**
-   * Set the user who created the SMS message
+   * Set the user who created the SMS message.
    *
    * @param int $uid
    *   The ID of a user entity.

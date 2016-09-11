@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Provider\PhoneNumberProviderInterface.
- */
-
 namespace Drupal\sms\Provider;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -97,7 +92,7 @@ interface PhoneNumberProviderInterface {
    *
    * @param string $phone_number
    *   A phone number.
-   * @param boolean|NULL $verified
+   * @param bool|NULL $verified
    *   Whether the returned phone numbers must be verified, or NULL to get all
    *   regardless of status.
    * @param string $entity_type
@@ -157,7 +152,7 @@ interface PhoneNumberProviderInterface {
   function deletePhoneVerificationByEntity(EntityInterface $entity);
 
   /**
-   * Cleans up expired phone number verifications
+   * Cleans up expired phone number verifications.
    *
    * Removes phone numbers from entities if setting is verification expires, and
    * setting is enabled.

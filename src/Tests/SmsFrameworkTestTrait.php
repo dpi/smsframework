@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Tests\SmsFrameworkTestTrait.
- */
-
 namespace Drupal\sms\Tests;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -92,7 +87,8 @@ trait SmsFrameworkTestTrait {
     $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
     if ($sms_gateway) {
       $sms_messages[$sms_gateway->id()] = [];
-    } else {
+    }
+    else {
       $sms_messages = [];
     }
     \Drupal::state()->set('sms_test_gateway.memory.send', $sms_messages);

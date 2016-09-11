@@ -3,7 +3,7 @@
 namespace Drupal\sms;
 
 /**
- * Contains direction constants for SMS Framework
+ * Contains direction constants for SMS Framework.
  */
 final class Direction {
 

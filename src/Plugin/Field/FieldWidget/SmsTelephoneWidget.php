@@ -1,12 +1,8 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Plugin\Field\FieldWidget\SmsTelephoneWidget.
- */
-
 namespace Drupal\sms\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\telephone\Plugin\Field\FieldWidget\TelephoneDefaultWidget;
 use Drupal\Core\Routing\UrlGeneratorTrait;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -30,7 +26,7 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
     /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */

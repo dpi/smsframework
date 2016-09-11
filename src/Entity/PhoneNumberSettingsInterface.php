@@ -1,14 +1,12 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Entity\PhoneNumberSettingsInterface.
- */
-
 namespace Drupal\sms\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
+/**
+ * Interface for SMS Gateway configuration entity.
+ */
 interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
 
   /**
@@ -101,7 +99,7 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
    * verifications expire.
    *
    * @param bool $purge
-   *   Whether to remove phone number field values
+   *   Whether to remove phone number field values.
    *
    * @return $this
    *   Return phone number settings for chaining.

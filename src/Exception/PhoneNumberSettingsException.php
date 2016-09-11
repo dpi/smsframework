@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Exception\PhoneNumberSettingsException.
- */
-
 namespace Drupal\sms\Exception;
 
 /**

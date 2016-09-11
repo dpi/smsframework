@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Message\SmsDeliveryReportInterface.
- */
-
 namespace Drupal\sms\Message;
 
 /**
@@ -103,7 +98,7 @@ interface SmsDeliveryReportInterface {
   /**
    * Sets the time the message was queued.
    *
-   * @param integer|NULL $time
+   * @param int|NULL $time
    *   The timestamp when the message was queued, or NULL if unknown.
    *
    * @return $this
@@ -123,7 +118,7 @@ interface SmsDeliveryReportInterface {
   /**
    * Sets the time the message was delivered to the recipient.
    *
-   * @param integer|NULL $time
+   * @param int|NULL $time
    *   The timestamp when the message was delivered to the recipient, or NULL if
    *   unknown.
    *

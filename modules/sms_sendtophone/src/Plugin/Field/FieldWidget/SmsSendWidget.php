@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_sendtophone\Plugin\Field\FieldWidget\SmsSendWidget.
- */
-
 namespace Drupal\sms_sendtophone\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -48,10 +43,16 @@ class SmsSendWidget extends WidgetBase {
     return $element;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public static function defaultSettings() {
     return ['rows' => 1];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
     $form['rows'] = array(

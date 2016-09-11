@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Form\SmsGatewayForm.
- */
-
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Access\AccessManagerInterface;
@@ -16,7 +11,6 @@ use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginManagerInterface;
 use Drupal\sms\Entity\SmsGateway;
-use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Direction;
 
 /**

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Provider\PhoneNumberProvider.
- */
-
 namespace Drupal\sms\Provider;
 
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -102,7 +97,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
     }
 
     if (isset($verified)) {
-      return array_filter($phone_numbers, function($phone_number) use(&$entity, $verified) {
+      return array_filter($phone_numbers, function ($phone_number) use (&$entity, $verified) {
         $verification = $this->getPhoneVerificationByEntity($entity, $phone_number);
         return $verification && ($verification->getStatus() == $verified);
       });
@@ -166,7 +161,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
       $properties['entity__target_type'] = $entity_type;
     }
     if (isset($verified)) {
-      $properties['status'] = (int)$verified;
+      $properties['status'] = (int) $verified;
     }
     return $this->phoneNumberVerificationStorage
       ->loadByProperties($properties);
@@ -193,7 +188,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
     $message = $config->getVerificationMessage() ?: '';
 
     // @todo Replace with code generator.
-    $random = new Random;
+    $random = new Random();
     $code = strtoupper($random->name(6));
 
     /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $phone_verification */

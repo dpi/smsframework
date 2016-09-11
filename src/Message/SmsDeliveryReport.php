@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Message\SmsDeliveryReport.
- */
-
 namespace Drupal\sms\Message;
 
 /**

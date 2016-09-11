@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Provider\SmsQueueProcessor
- */
-
 namespace Drupal\sms\Provider;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;

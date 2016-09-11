@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Entity\PhoneNumberVerification.
- */
-
 namespace Drupal\sms\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;

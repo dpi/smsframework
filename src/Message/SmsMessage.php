@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Message\SmsMessage.
- */
-
 namespace Drupal\sms\Message;
 
 use Drupal\sms\Entity\SmsGatewayInterface;
@@ -93,7 +88,7 @@ class SmsMessage implements SmsMessageInterface {
    * @param string $message
    *   (optional) The actual SMS message to be sent.
    * @param array $options
-   *   (optional) Additional options to be considered in building the SMS message
+   *   (optional) Additional options to be considered in building the SMS message.
    * @param int $uid
    *   (optional) The user who created the SMS message.
    */

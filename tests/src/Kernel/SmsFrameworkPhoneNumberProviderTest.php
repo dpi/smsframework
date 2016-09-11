@@ -1,12 +1,9 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkPhoneNumberProviderTest.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\sms\Exception\PhoneNumberSettingsException;
+use Drupal\sms\Exception\NoPhoneNumberException;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -131,7 +128,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
       $phone_number_verified = array_slice($phone_numbers, 0, 1, TRUE);
       $phone_number_unverified = array_slice($phone_numbers, 1, $i, TRUE);
 
-      if (!empty($phone_number_verified))  {
+      if (!empty($phone_number_verified)) {
         $this->verifyPhoneNumber($entity, reset($phone_number_verified));
       }
 
@@ -159,7 +156,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $sms_message
       ->setSenderNumber('+999888777')
       ->setMessage($this->randomString());
-    $this->setExpectedException(\Drupal\sms\Exception\NoPhoneNumberException::class);
+    $this->setExpectedException(NoPhoneNumberException::class);
     $this->phoneNumberProvider->sendMessage($entity, $sms_message);
   }
 
@@ -230,7 +227,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
       'type' => $this->randomMachineName(),
     ]);
 
-    $this->setExpectedException(\Drupal\sms\Exception\PhoneNumberSettingsException::class);
+    $this->setExpectedException(PhoneNumberSettingsException::class);
     $this->phoneNumberProvider->getPhoneNumberSettingsForEntity($test_entity_random_bundle);
   }
 

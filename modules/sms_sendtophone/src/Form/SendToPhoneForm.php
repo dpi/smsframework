@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_sendtophone\Form\SendToPhoneForm.
- */
-
 namespace Drupal\sms_sendtophone\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -69,7 +64,8 @@ class SendToPhoneForm extends FormBase {
     try {
       $this->phone_numbers = $phone_number_provider->getPhoneNumbers($user);
     }
-    catch (PhoneNumberSettingsException $e) {}
+    catch (PhoneNumberSettingsException $e) {
+    }
 
     if ($user->hasPermission('send to any number') || count($this->phone_numbers)) {
       $form = $this->getForm($form, $form_state, $type, $extra);
@@ -81,7 +77,7 @@ class SendToPhoneForm extends FormBase {
           '#type' => 'markup',
           '#markup' => $this->t('You need to @setup and confirm your mobile phone to send messages.', [
             '@setup' => $user->toLink('set up', 'edit-form')->toString(),
-          ])
+          ]),
         ];
       }
       else {
@@ -124,6 +120,7 @@ class SendToPhoneForm extends FormBase {
           '#title' => t('Message preview'),
         );
         break;
+
       case 'node':
         if (is_numeric($extra)) {
           $node = Node::load($extra);

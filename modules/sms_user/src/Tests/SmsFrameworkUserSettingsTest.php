@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_user\Tests\SmsFrameworkUserSettingsTest.
- */
-
 namespace Drupal\sms_user\Tests;
 
 use Drupal\sms\Tests\SmsFrameworkWebTestBase;
@@ -162,11 +157,11 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
 
     $settings = $this->config('sms_user.settings')->get('account_registration');
 
-    // Status
+    // Status.
     $this->assertTrue($settings['unrecognized_sender']['status']);
     $this->assertFalse($settings['incoming_pattern']['status']);
 
-    // Settings
+    // Settings.
     $this->assertTrue($settings['unrecognized_sender']['reply']['status']);
     $this->assertEqual($reply_message, $settings['unrecognized_sender']['reply']['message']);
   }
@@ -193,11 +188,11 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
 
     $settings = $this->config('sms_user.settings')->get('account_registration');
 
-    // Status
+    // Status.
     $this->assertFalse($settings['unrecognized_sender']['status']);
     $this->assertTrue($settings['incoming_pattern']['status']);
 
-    // Settings
+    // Settings.
     $this->assertEqual($incoming_message, $settings['incoming_pattern']['incoming_messages'][0]);
     $this->assertTrue($settings['incoming_pattern']['send_activation_email']);
     $this->assertTrue($settings['incoming_pattern']['reply']['status']);

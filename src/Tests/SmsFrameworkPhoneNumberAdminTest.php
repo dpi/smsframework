@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Tests\SmsFrameworkPhoneNumberAdminTest.
- */
-
 namespace Drupal\sms\Tests;
 
 use Drupal\Component\Utility\Unicode;
@@ -47,7 +42,7 @@ class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkWebTestBase {
   }
 
   /**
-   * Tests phone number list
+   * Tests phone number list.
    */
   public function testPhoneNumberList() {
     $this->drupalGet('admin/config/smsframework/phone_number');
@@ -131,7 +126,6 @@ class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkWebTestBase {
       'code_lifetime' => '7777',
     ];
     $this->drupalPostForm('admin/config/smsframework/phone_number/entity_test.entity_test', $edit, t('Save'));
-    //
     $this->assertEqual(7777, $this->config('sms.phone.entity_test.entity_test')->get('verification_code_lifetime'));
 
     // Delete new phone number settings.

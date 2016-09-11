@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkQueueTest.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\SmsMessage;
@@ -46,7 +41,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
   protected $gateway;
 
   /**
-   * The cron service
+   * The cron service.
    *
    * @var \Drupal\Core\Cron;
    */
@@ -199,7 +194,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
       ->setProcessedTime(1)
       ->save();
 
-    // Garbage collect
+    // Garbage collect.
     $this->cronService->run();
 
     $this->assertEquals(1, count(SmsMessage::loadMultiple()), 'There are SMS entities in storage.');

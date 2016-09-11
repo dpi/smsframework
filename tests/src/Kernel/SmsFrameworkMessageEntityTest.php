@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkMessageEntityTest.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -14,8 +9,6 @@ use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Tests\SmsFrameworkMessageTestTrait;
 use Drupal\sms\Tests\SmsFrameworkTestTrait;
 use Drupal\user\Entity\User;
-use Drupal\sms\Entity\SmsMessageInterface;
-use Drupal\sms\Direction;
 
 /**
  * Tests SMS message entity.

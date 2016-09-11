@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Plugin\SmsGateway\LogGateway
- */
-
 namespace Drupal\sms\Plugin\SmsGateway;
 
 use Drupal\sms\Message\SmsDeliveryReport;

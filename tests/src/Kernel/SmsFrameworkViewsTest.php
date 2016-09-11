@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\sms\Kernel;
 
-use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Tests\SmsFrameworkTestTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
@@ -45,6 +44,9 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
    */
   protected $gateway;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp($import_test_views = TRUE) {
     parent::setUp($import_test_views);
 

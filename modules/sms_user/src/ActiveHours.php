@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_user\ActiveHours.
- */
-
 namespace Drupal\sms_user;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -25,7 +20,7 @@ class ActiveHours implements ActiveHoursInterface {
   protected $configFactory;
 
   /**
-   * Whether active hours is enabled in configuration, or null if configuration
+   * Whether active hours is enabled in configuration, or NULL if configuration
    * has not been built yet.
    *
    * @var boolean|NULL
@@ -118,7 +113,7 @@ class ActiveHours implements ActiveHoursInterface {
     // Sort so nearest date is closest.
     // Can't do this in build() since computed relative dates can be different
     // per timezone.
-    usort($dates, function($a, $b) {
+    usort($dates, function ($a, $b) {
       if ($a->getStartDate() == $b->getStartDate()) {
         return 0;
       }

@@ -96,9 +96,9 @@ class RecipientGatewayEventTest extends UnitTestCase {
 
     $gateways = $event->getGateways();
     $this->assertEquals('gateway_1', $gateways[0][0]->id());
-    $this->assertEquals(200,         $gateways[0][1]);
+    $this->assertEquals(200, $gateways[0][1]);
     $this->assertEquals('gateway_2', $gateways[1][0]->id());
-    $this->assertEquals(400,         $gateways[1][1]);
+    $this->assertEquals(400, $gateways[1][1]);
   }
 
   /**

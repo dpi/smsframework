@@ -78,7 +78,7 @@ class RecipientGatewayEvent extends Event {
    */
   public function getGatewaysSorted() {
     $sorted = $this->gateways;
-    uasort($sorted, function($a, $b) {
+    uasort($sorted, function ($a, $b) {
       list(, $priority_a) = $a;
       list(, $priority_b) = $b;
       if ($priority_a == $priority_b) {
@@ -90,7 +90,7 @@ class RecipientGatewayEvent extends Event {
     // Return the gateway object instead of tuples.
     $gateways = [];
     foreach ($sorted as $tuple) {
-      list($gateway, ) = $tuple;
+      list($gateway,) = $tuple;
       $gateways[] = $gateway;
     }
 
@@ -101,7 +101,7 @@ class RecipientGatewayEvent extends Event {
    * Add a gateway for the recipient on this event.
    *
    * @param \Drupal\sms\Entity\SmsGatewayInterface $gateway
-   *   The gateway for the recipient
+   *   The gateway for the recipient.
    * @param int $priority
    *   The priority for this gateway.
    *
@@ -119,7 +119,7 @@ class RecipientGatewayEvent extends Event {
    * @param $gateway_id
    *   A gateway plugin ID.
    *
-   * @param integer|NULL $priority
+   * @param int|NULL $priority
    *   The priority of the gateway to remove, or NULL to remove all gateways
    *   with the identifier.
    *

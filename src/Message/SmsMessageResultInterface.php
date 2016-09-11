@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\sms\Message\SmsMessageResultInterface
- */
-
 namespace Drupal\sms\Message;
 
 /**

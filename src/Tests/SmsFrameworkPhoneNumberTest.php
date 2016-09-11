@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Tests\SmsFrameworkPhoneNumberTest.
- */
-
 namespace Drupal\sms\Tests;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -31,7 +26,7 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
   /**
    * Test verification code creation on entity postsave.
    *
-   * @see _sms_entity_postsave().
+   * @see _sms_entity_postsave()
    */
   public function testPhoneNumberVerificationCreated() {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
@@ -51,7 +46,7 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
   /**
    * Ensure phone number verification SMS sent.
    *
-   * @see _sms_entity_postsave().
+   * @see _sms_entity_postsave()
    */
   public function testPhoneNumberVerificationMessage() {
     $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
@@ -77,7 +72,7 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
   /**
    * Ensure phone number verification are deleted.
    *
-   * @see sms_entity_delete().
+   * @see sms_entity_delete()
    */
   public function testPhoneNumberVerificationDeleted() {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');

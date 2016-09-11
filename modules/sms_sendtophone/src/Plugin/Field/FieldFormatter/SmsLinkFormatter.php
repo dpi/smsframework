@@ -1,13 +1,7 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_sendtophone\Plugin\Field\FieldFormatter\SmsLinkFormatter.
- */
-
 namespace Drupal\sms_sendtophone\Plugin\Field\FieldFormatter;
 
-use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Url;
@@ -41,10 +35,10 @@ class SmsLinkFormatter extends FormatterBase {
           '#prefix' => ' (',
           '#suffix' => ')',
           '#title' => $this->t('Send to phone'),
-          '#url' =>  Url::fromRoute('sms_sendtophone.page', ['type' => 'field'], ['query' => ['text' => $text, 'destination' => \Drupal::destination()->get()]]),
+          '#url' => Url::fromRoute('sms_sendtophone.page', ['type' => 'field'], ['query' => ['text' => $text, 'destination' => \Drupal::destination()->get()]]),
           '#attributes' => array(
             'title' => $this->t('Send this text via SMS.'),
-            'class' => 'sms-sendtophone'
+            'class' => 'sms-sendtophone',
           ),
         ),
       );

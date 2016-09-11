@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms_user\Kernel\SmsFrameworkUserActiveHoursServiceTest.
- */
-
 namespace Drupal\Tests\sms_user\Kernel;
 
 use Drupal\Core\Datetime\DrupalDateTime;

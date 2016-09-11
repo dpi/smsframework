@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Views\SmsMessageViewsData.
- */
-
 namespace Drupal\sms\Views;
 
 use Drupal\views\EntityViewsData;

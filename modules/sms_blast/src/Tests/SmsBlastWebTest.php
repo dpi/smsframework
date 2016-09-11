@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains tests for the sms_blast module.
- */
-
 namespace Drupal\sms_blast\Tests;
 
 use Drupal\sms\Tests\SmsFrameworkWebTestBase;

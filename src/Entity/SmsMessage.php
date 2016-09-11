@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Entity\SmsMessage.
- */
-
 namespace Drupal\sms\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
@@ -163,7 +158,8 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     $sender_name = $this->get('sender_name');
     if (isset($sender_name->value)) {
       return $sender_name->value;
-    } else {
+    }
+    else {
       return ($sender_entity = $this->getSenderEntity()) ? $sender_entity->label() : NULL;
     }
   }
@@ -320,7 +316,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function isQueued() {
-    return (boolean)$this->get('queued')->value;
+    return (boolean) $this->get('queued')->value;
   }
 
   /**

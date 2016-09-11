@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\DeliveryReportController
- */
-
 namespace Drupal\sms;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;

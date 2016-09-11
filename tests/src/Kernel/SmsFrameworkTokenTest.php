@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkTokenTest.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Message\SmsMessage;

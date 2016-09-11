@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_user\AccountRegistration.
- */
-
 namespace Drupal\sms_user;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -295,7 +290,7 @@ class AccountRegistration implements AccountRegistrationInterface {
 
     // Track if a placeholder was used, so subsequent usages create a named
     // back reference. This allows you to use placeholders more than once as a form of
-    // confirmation. e.g: 'U [username] P [password] [password]'
+    // confirmation. e.g: 'U [username] P [password] [password]'.
     $placeholder_usage = [];
 
     $compiled = '';
@@ -337,7 +332,7 @@ class AccountRegistration implements AccountRegistrationInterface {
   protected function buildError(ConstraintViolationListInterface $violations) {
     $error = '';
     foreach ($violations as $violation) {
-      $error .= (string)$violation->getMessage() . " ";
+      $error .= (string) $violation->getMessage() . " ";
     }
     return strip_tags($error);
   }
@@ -352,16 +347,16 @@ class AccountRegistration implements AccountRegistrationInterface {
     $random = new Random();
     do {
       $username = $random->name(8, TRUE);
-    }
-    while (user_validate_name($username) || user_load_by_name($username));
+    } while (user_validate_name($username) || user_load_by_name($username));
     return $username;
   }
 
   /**
    * Filter out acceptable validation errors.
-
+   *
    * @param \Drupal\Core\Entity\EntityConstraintViolationListInterface $violations
    *   A violation list.
+   *
    * @param string|NULL
    *   Incoming form, if applicable.
    *
@@ -385,11 +380,11 @@ class AccountRegistration implements AccountRegistrationInterface {
 
   /**
    * Get the account_registration configuration.
-
+   *
    * @param string $name
    *   The configuration name.
    *
-   * @return array|mixed|null
+   * @return array|mixed|NULL
    */
   protected function settings($name) {
     return $this->configFactory

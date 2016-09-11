@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Tests\SmsFrameworkWebTestBase.
- */
-
 namespace Drupal\sms\Tests;
 
 use Drupal\simpletest\WebTestBase;
@@ -44,7 +39,7 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
   }
 
   /**
-   * Utility to create phone number settings
+   * Utility to create phone number settings.
    *
    * Creates new field storage and field configs.
    *
@@ -62,7 +57,6 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
         'type' => 'telephone',
       ]);
     $field_storage
-//      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
       ->setCardinality(1)
       ->save();
 

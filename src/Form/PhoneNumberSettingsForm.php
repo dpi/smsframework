@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Form\PhoneNumberSettingsForm.
- */
-
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Entity\EntityForm;
@@ -153,7 +148,7 @@ class PhoneNumberSettingsForm extends EntityForm {
     ];
 
     // Form ID must be the same as found in $config->getFieldName().
-    // $config->getFieldName($config_key) == $form['field_mapping'][$config_key]
+    // $config->getFieldName($config_key) == $form['field_mapping'][$config_key].
     $form['field_mapping']['phone_number'] = [
       '#type' => 'select',
       '#title' => $this->t('Phone number'),
@@ -171,7 +166,6 @@ class PhoneNumberSettingsForm extends EntityForm {
       '#empty_option' => $this->t('- None -'),
       '#default_value' => $config->getFieldName('automated_opt_out'),
     ];
-
 
     $form['message'] = [
       '#type' => 'fieldset',
@@ -254,7 +248,6 @@ class PhoneNumberSettingsForm extends EntityForm {
       }
       else {
         // Use existing field.
-
         /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
         $entity_form_display = $field_storage_config = $this->entityTypeManager
           ->getStorage('entity_form_display')

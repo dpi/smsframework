@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Entity\SmsGateway.
- */
-
 namespace Drupal\sms\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
@@ -152,7 +147,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
    * {@inheritdoc}
    */
   public function setSkipQueue($skip_queue) {
-    $this->skip_queue = (boolean)$skip_queue;
+    $this->skip_queue = (boolean) $skip_queue;
     return $this;
   }
 
@@ -162,9 +157,11 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   public function getRetentionDuration($direction) {
     switch ($direction) {
       case Direction::INCOMING:
-        return (int)$this->retention_duration_incoming;
+        return (int) $this->retention_duration_incoming;
+
       case Direction::OUTGOING:
-        return (int)$this->retention_duration_outgoing;
+        return (int) $this->retention_duration_outgoing;
+
       default:
         throw new \Exception('%s is not a valid direction.', $direction);
     }
@@ -178,6 +175,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
       case Direction::INCOMING:
         $this->retention_duration_incoming = $retention_duration;
         break;
+
       case Direction::OUTGOING:
         $this->retention_duration_outgoing = $retention_duration;
         break;
@@ -191,7 +189,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   public function getMaxRecipientsOutgoing() {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
-    return isset($definition['outgoing_message_max_recipients']) ? (int)$definition['outgoing_message_max_recipients'] : 1;
+    return isset($definition['outgoing_message_max_recipients']) ? (int) $definition['outgoing_message_max_recipients'] : 1;
   }
 
   /**

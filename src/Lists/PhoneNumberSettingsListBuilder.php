@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Lists\PhoneNumberSettingsListBuilder.
- */
-
 namespace Drupal\sms\Lists;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
@@ -133,6 +128,17 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
     return $render;
   }
 
+  /**
+   * Builds a phone number verification query.
+   *
+   * @param string $entity_type_id
+   *   Entity type to query.
+   * @param string $bundle
+   *   Entity bundle to query.
+   *
+   * @return \Drupal\Core\Entity\Query\QueryInterface
+   *   A phone number entity query.
+   */
   protected function buildPhoneNumberVerificationQuery($entity_type_id, $bundle) {
     return $this->phoneNumberVerificationStorage
       ->getQuery()

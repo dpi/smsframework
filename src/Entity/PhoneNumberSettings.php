@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Entity\PhoneNumberSettings.
- */
-
 namespace Drupal\sms\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;

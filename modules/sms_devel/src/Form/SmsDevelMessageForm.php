@@ -150,7 +150,7 @@ class SmsDevelMessageForm extends FormBase {
     if (!empty($gateway)) {
       $this->message->setGateway(SmsGateway::load($gateway));
     }
-    else if ($triggering_element['#name'] == 'receive') {
+    elseif ($triggering_element['#name'] == 'receive') {
       $form_state->setError($form['gateway'], $this->t('Gateway must be selected if receiving a message.'));
     }
   }
@@ -220,7 +220,7 @@ class SmsDevelMessageForm extends FormBase {
    * Output a status message for a result object.
    *
    * @param \Drupal\sms\Message\SmsMessageResultInterface $result
-   *   An SMS result object
+   *   An SMS result object.
    */
   protected function resultMessage(SmsMessageResultInterface $result) {
     if ($status_code = $result->getError()) {
@@ -230,7 +230,7 @@ class SmsDevelMessageForm extends FormBase {
         '@message' => $status_message,
       ]), 'error');
     }
-    else if ($report_count = count($result->getReports())) {
+    elseif ($report_count = count($result->getReports())) {
       drupal_set_message($this->t('Message was processed, @count delivery reports were generated.', [
         '@count' => $report_count,
       ]));

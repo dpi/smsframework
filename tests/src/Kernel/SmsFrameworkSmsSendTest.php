@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkSmsSendTest.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\SmsGateway;

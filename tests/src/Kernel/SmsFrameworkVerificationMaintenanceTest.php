@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkVerificationMaintenanceTest.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\PhoneNumberSettings;

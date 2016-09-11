@@ -1,12 +1,8 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkProviderTest.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\sms\Exception\RecipientRouteException;
 use Drupal\sms\Message\SmsMessage as StandardSmsMessage;
 use Drupal\sms\Message\SmsMessageInterface as StandardSmsMessageInterface;
 use Drupal\sms\Entity\SmsMessage;
@@ -111,7 +107,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::OUTGOING)
       ->setMessage($this->randomString());
-    $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class, 'There are no recipients');
+    $this->setExpectedException(RecipientRouteException::class, 'There are no recipients');
     $this->smsProvider->send($sms_message);
     $this->assertEquals(0, count($this->getTestMessages($this->gateway)));
   }
@@ -123,7 +119,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    */
   public function testSendNoFallbackGateway() {
     $this->setFallbackGateway(NULL);
-    $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class);
+    $this->setExpectedException(RecipientRouteException::class);
     $message = $this->createSmsMessage()
       ->addRecipients($this->randomPhoneNumbers());
     $this->smsProvider->send($message);
@@ -148,7 +144,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    */
   public function testQueueNoFallbackGateway() {
     $this->setFallbackGateway(NULL);
-    $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class);
+    $this->setExpectedException(RecipientRouteException::class);
     $message = $this->createSmsMessage()
       ->addRecipients($this->randomPhoneNumbers());
     $this->smsProvider->queue($message);
@@ -235,10 +231,10 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Test an exception is thrown if a message has no recipients
+   * Test an exception is thrown if a message has no recipients.
    */
   public function testNoRecipients() {
-    $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class, 'There are no recipients.');
+    $this->setExpectedException(RecipientRouteException::class, 'There are no recipients.');
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::OUTGOING)
       ->setMessage($this->randomString());

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Provider\DefaultSmsProvider
- */
-
 namespace Drupal\sms\Provider;
 
 use Drupal\sms\Event\SmsDeliveryReportEvent;
@@ -63,6 +58,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
           case Direction::INCOMING:
             $this->incoming($sms_message);
             break;
+
           case Direction::OUTGOING:
             $this->send($sms_message);
             break;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms_user\Kernel\SmsFrameworkUserAccountRegistrationServiceTest.
- */
-
 namespace Drupal\Tests\sms_user\Kernel;
 
 use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
@@ -278,7 +273,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
-   * Test if a duplicated placeholder is not confirmed
+   * Test if a duplicated placeholder is not confirmed.
    */
   public function testIncomingPatternMultiplePlaceholderFailure() {
     $this->config('sms_user.settings')
@@ -316,7 +311,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
-   * Test if a user is created despite no placeholders
+   * Test if a user is created despite no placeholders.
    */
   public function testIncomingPatternNoPlaceholders() {
     $incoming_message = $this->randomString();
