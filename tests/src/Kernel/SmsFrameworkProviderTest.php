@@ -63,7 +63,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->gateway = $this->createMemoryGateway();
     $this->smsStorage = $this->container->get('entity_type.manager')
       ->getStorage('sms');
-    $this->smsProvider = $this->container->get('sms_provider');
+    $this->smsProvider = $this->container->get('sms.provider');
     $this->setFallbackGateway($this->gateway);
   }
 

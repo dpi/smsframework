@@ -69,7 +69,7 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
       $plugin_id,
       $plugin_definition,
       $container->get('entity_type.manager'),
-      $container->get('sms_provider')
+      $container->get('sms.provider')
     );
   }
 

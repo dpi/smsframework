@@ -23,7 +23,7 @@ class SmsFrameworkWebTest extends SmsFrameworkWebTestBase {
    */
   public function testQueueReport() {
     /** @var \Drupal\sms\Provider\SmsProviderInterface $provider */
-    $provider = \Drupal::service('sms_provider');
+    $provider = \Drupal::service('sms.provider');
 
     /** @var \Drupal\sms\Entity\SmsMessageInterface $sms_message */
     $sms_message = SmsMessage::create();

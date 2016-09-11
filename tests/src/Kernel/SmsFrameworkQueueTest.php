@@ -61,7 +61,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
     $this->installEntitySchema('sms');
 
     $this->gateway = $this->createMemoryGateway();
-    $this->smsProvider = $this->container->get('sms_provider');
+    $this->smsProvider = $this->container->get('sms.provider');
     $this->setFallbackGateway($this->gateway);
     $this->smsQueueProcessor = $this->container->get('sms.queue');
     $this->cronService = $this->container->get('cron');
