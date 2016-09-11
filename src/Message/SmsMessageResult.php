@@ -7,107 +7,65 @@
 
 namespace Drupal\sms\Message;
 
+use Drupal\sms\Exception\SmsException;
+
 /**
  * The result of an SMS messaging transaction.
  */
 class SmsMessageResult implements SmsMessageResultInterface {
 
   /**
-   * The status of the message.
+   * The error of the message, or NULL if unknown.
    *
-   * @var bool
+   * @var string|NULL
    */
-  public $status;
+  protected $error = NULL;
 
   /**
-   * The translated error message if status is FALSE.
+   * The error message as provided by the gateway API.
    *
    * @var string
    */
-  public $errorMessage;
+  protected $errorMessage = '';
 
   /**
-   * The credits used for this message.
-   *
-   * @var integer
-   */
-  public $creditsUsed;
-
-  /**
-   * The credit balance after this message is sent.
-   *
-   * @var integer
-   */
-  public $creditBalance;
-
-  /**
-   * The message delivery reports keyed by recipient number.
+   * The message delivery reports.
    *
    * @var \Drupal\sms\Message\SmsDeliveryReportInterface[]
    */
-  public $reports;
+  protected $reports = [];
 
   /**
-   * The messages associated with this result.
+   * The credit balance after this message is sent, or NULL if unknown.
    *
-   * @var \Drupal\sms\Message\SmsMessageInterface[]
-   */
-  public $messages = [];
-
-  /**
-   * Create a new message result based on data supplied in the array.
+   * This number is in the SMS gateway's chosen denomination.
    *
-   * @param array $data
-   *   Information to be used to instantiate the SmsMessageResult.
+   * @var float|NULL
    */
-  public function __construct($data) {
-    $data += $this->defaultData();
-    $this->status = $data['status'];
-    $this->creditBalance = $data['credit_balance'];
-    $this->creditsUsed = $data['credits_used'];
-    $this->errorMessage = $data['error_message'];
-    $this->reports = $data['reports'];
+  protected $creditsBalance = NULL;
+
+  /**
+   * The credits consumed to process this message, or NULL if unknown.
+   *
+   * This number is in the SMS gateway's chosen denomination.
+   *
+   * @var float|NULL
+   */
+  protected $creditsUsed = NULL;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getError() {
+    return $this->error;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getStatus() {
-    return $this->status;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getReports() {
-    return $this->reports;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBalance() {
-    return $this->creditBalance;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCreditsUsed() {
-    return $this->creditsUsed;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toArray() {
-    return array(
-      'status' => $this->status,
-      'error_message' => $this->errorMessage,
-      'credits_used' => $this->creditsUsed,
-      'credit_balance' => $this->creditBalance,
-      'reports' => $this->reports,
-    );
+  public function setError($error) {
+    $this->error = $error;
+    return $this;
   }
 
   /**
@@ -120,40 +78,75 @@ class SmsMessageResult implements SmsMessageResultInterface {
   /**
    * {@inheritdoc}
    */
+  public function setErrorMessage($message) {
+    $this->errorMessage = $message;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getReport($recipient) {
-    if (isset($this->reports[$recipient])) {
-      return $this->reports[$recipient];
+    foreach ($this->reports as $report) {
+      if ($report->getRecipient() == $recipient) {
+        return $report;
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getReports() {
+    return $this->reports;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setReports(array $reports) {
+    $this->reports = $reports;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCreditsBalance() {
+    return $this->creditsBalance;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCreditsBalance($balance) {
+    if (is_numeric($balance) || is_null($balance)) {
+      $this->creditsBalance = $balance;
     }
     else {
-      return null;
+      throw new SmsException(sprintf('Credit balance set is a %s', gettype($balance)));
     }
-  }
-
-  /**
-   * Returns default data for initializing the value object.
-   */
-  protected function defaultData() {
-    return array(
-      'status' => '',
-      'error_message' => '',
-      'credits_used' => 0,
-      'credit_balance' => 0,
-      'reports' => [],
-    );
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getMessages() {
-    return $this->messages;
+  public function getCreditsUsed() {
+    return $this->creditsUsed;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setMessages(array $messages) {
-    $this->messages = $messages;
+  public function setCreditsUsed($credits_used) {
+    if (is_numeric($credits_used) || is_null($credits_used)) {
+      $this->creditsUsed = $credits_used;
+    }
+    else {
+      throw new SmsException(sprintf('Credit used is a %s', gettype($credits_used)));
+    }
     return $this;
   }
 

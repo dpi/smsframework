@@ -14,59 +14,6 @@ use Drupal\sms\Entity\SmsGatewayInterface;
  */
 interface SmsMessageInterface {
 
-  // Message status codes
-  // 0=Unknown, 2xx=Positive, 3xx=Positive/Neutral (context-dependent), 4xx=Negative
-
-  /**
-   * Status Unknown.
-   *
-   * A message would have this to indicate unknown status.
-   */
-  const STATUS_UNKNOWN = 0;
-
-  /**
-   * Status OK.
-   *
-   * A message with this status indicates it was successfully sent.
-   */
-  const STATUS_OK = 200;
-
-  /**
-   * Status DELIVERED.
-   *
-   * A message with this status indicates it was successfully delivered.
-   */
-  const STATUS_DELIVERED = 202;
-
-  /**
-   * Status QUEUED.
-   *
-   * A message with this status indicates it was successfully queued for sending.
-   */
-  const STATUS_QUEUED = 302;
-
-  /**
-   * Status ERROR.
-   *
-   * A message with this status indicates it could not be sent (routing reasons).
-   */
-  const STATUS_ERROR = 400;
-
-  /**
-   * Status NO_CREDIT.
-   *
-   * A message with this status indicates it could not be sent due to low credit
-   * balance.
-   */
-  const STATUS_NO_CREDIT = 402;
-
-  /**
-   * Status EXPIRED.
-   *
-   * A message with this status indicates it has expired and has not been sent.
-   */
-  const STATUS_EXPIRED = 408;
-
   /**
    * Gets the list of recipients of this SMS message.
    *
@@ -197,6 +144,27 @@ interface SmsMessageInterface {
    *   The called SMS message object.
    */
   public function removeOption($name);
+
+  /**
+   * Get the result associated with this SMS message.
+   *
+   * @return \Drupal\sms\Message\SmsMessageResultInterface|NULL
+   *   The result associated with this SMS message, or NULL if there is no
+   *   result.
+   */
+  public function getResult();
+
+  /**
+   * Set the result associated with this SMS message.
+   *
+   * @param \Drupal\sms\Message\SmsMessageResultInterface|NULL $result
+   *   The result to associate with this SMS message, or NULL if there is no
+   *   result.
+   *
+   * @return $this
+   *   The called SMS message object.
+   */
+  public function setResult(SmsMessageResultInterface $result = NULL);
 
   /**
    * Get phone number of the sender.

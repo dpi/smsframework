@@ -8,6 +8,7 @@
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Message\SmsMessage as StandardSmsMessage;
+use Drupal\sms\Message\SmsMessageInterface as StandardSmsMessageInterface;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Entity\SmsGateway;
@@ -75,11 +76,12 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $message = $this->createSmsMessage()
       ->addRecipients($this->randomPhoneNumbers());
 
-    $results = $this->smsProvider->send($message);
+    $sms_messages = $this->smsProvider->send($message);
 
-    $this->assertEquals(1, count($results), 'Return value contains 1 item.');
-    $this->assertTrue($results[0] instanceof SmsMessageResultInterface, 'Return value is a SMS report.');
+    $this->assertEquals(1, count($sms_messages), 'Return value contains 1 item.');
+    $this->assertTrue($sms_messages[0] instanceof StandardSmsMessageInterface, 'Return value is a SMS message.');
     $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
+    $this->assertTrue($sms_messages[0]->getResult() instanceof SmsMessageResultInterface);
   }
 
   /**
@@ -94,11 +96,12 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
       ->setMessage($message)
       ->addRecipients($this->randomPhoneNumbers());
 
-    $results = $this->smsProvider->incoming($sms_message);
+    $sms_messages = $this->smsProvider->incoming($sms_message);
 
     $this->assertEquals($message, sms_test_gateway_get_incoming()['message'], 'Message was received.');
-    $this->assertEquals(1, count($results), 'Return value contains 1 item.');
-    $this->assertTrue($results[0] instanceof SmsMessageResultInterface, 'Return value is a SMS report.');
+    $this->assertEquals(1, count($sms_messages), 'Return value contains 1 item.');
+    $this->assertTrue($sms_messages[0] instanceof StandardSmsMessageInterface, 'Return value is a SMS message.');
+    $this->assertTrue($sms_messages[0]->getResult() instanceof SmsMessageResultInterface);
   }
 
   /**

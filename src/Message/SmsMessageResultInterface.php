@@ -13,54 +13,47 @@ namespace Drupal\sms\Message;
 interface SmsMessageResultInterface {
 
   /**
-   * Gets the status of the message.
+   * Gets the error of the message.
    *
-   * @return bool
-   *   True if message was sent without errors. False if message could not be
-   *     sent.
+   * @return string|NULL
+   *   A error code from \Drupal\sms\Message\SmsMessageResultError, or NULL if
+   *   there was no error.
    */
-  public function getStatus();
+  public function getError();
 
   /**
-   * Gets the translated error message for failed attempts.
+   * Sets the error of the message.
+   *
+   * Usually a setting an error on a result indicates something went wrong with
+   * the entire transaction.
+   *
+   * @param string $error|NULL
+   *   A error code from \Drupal\sms\Message\SmsMessageResultError, or NULL if
+   *   unknown.
+   *
+   * @return $this
+   *   Returns this result object for chaining.
+   */
+  public function setError($error);
+
+  /**
+   * Gets the error message.
    *
    * @return string
-   *  The translated error message if the status is FALSE.
+   *   The error message as provided by the gateway API.
    */
   public function getErrorMessage();
 
   /**
-   * Gets the delivery reports for all recipients.
+   * Sets the error message.
    *
-   * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
-   *   An array of delivery reports for all recipients keyed by the recipients'
-   *   number.
-   */
-  public function getReports();
-
-  /**
-   * Gets the credit balance after the SMS was sent.
+   * @param string $message
+   *   The error message as provided by the gateway API.
    *
-   * @return int
-   *   The value of the balance. This number is in the SMS gateway's chosen
-   *   denomination.
+   * @return $this
+   *   Returns this report object for chaining.
    */
-  public function getBalance();
-
-  /**
-   * Gets the SMS credits used for this transaction.
-   *
-   * @return int
-   *   The amount of SMS credits used in the gateway's chosen denomination.
-   */
-  public function getCreditsUsed();
-
-  /**
-   * Returns this result report as an array.
-   *
-   * @return array
-   */
-  public function toArray();
+  public function setErrorMessage($message);
 
   /**
    * Gets the delivery report for a particular recipient.
@@ -68,30 +61,75 @@ interface SmsMessageResultInterface {
    * @param string $recipient
    *   The number of the recipient for which the report is to be retrieved.
    *
-   * @return \Drupal\sms\Message\SmsDeliveryReportInterface
-   *   A delivery report object.
+   * @return \Drupal\sms\Message\SmsDeliveryReportInterface|NULL
+   *   A delivery report object, or NULL if there is no report for the
+   *   recipient.
    *
    * @see SmsMessageResultInterface::getReports()
    */
   public function getReport($recipient);
 
   /**
-   * Get all messages associated with this result.
+   * Gets the delivery reports for all recipients.
    *
-   * @return \Drupal\sms\Message\SmsMessageInterface[]
-   *   The messages associated with this result.
+   * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
+   *   An array of delivery reports.
    */
-  public function getMessages();
+  public function getReports();
 
   /**
-   * Set the messages on this result.
+   * Sets the delivery reports for all recipients.
    *
-   * @param \Drupal\sms\Message\SmsMessageInterface[]
-   *   The messages to associate with this result.
+   * @param \Drupal\sms\Message\SmsDeliveryReportInterface[] $reports
+   *   An array of delivery reports.
    *
    * @return $this
-   *   Returns this result for chaining.
+   *   Returns this result object for chaining.
    */
-  public function setMessages(array $messages);
+  public function setReports(array $reports);
+
+  /**
+   * Gets the credit balance after this transaction.
+   *
+   * @return float|NULL
+   *   The credit balance after the message is processed, or NULL if unknown.
+   */
+  public function getCreditsBalance();
+
+  /**
+   * Sets the credit balance after this transaction.
+   *
+   * @param float|NULL $balance
+   *   The credit balance after the message is processed, or NULL if unknown.
+   *
+   * @return $this
+   *   Returns this result object for chaining.
+   *
+   * @throws \Drupal\sms\Exception\SmsException
+   *   Thrown if balance set is an invalid variable type.
+   */
+  public function setCreditsBalance($balance);
+
+  /**
+   * Gets the credits consumed for this transaction.
+   *
+   * @return float|NULL
+   *   The credits consumed for this transaction, or NULL if unknown.
+   */
+  public function getCreditsUsed();
+
+  /**
+   * Sets the credits consumed for this transaction.
+   *
+   * @param float|NULL $credits_used
+   *   The credits consumed for this transaction, or NULL if unknown.
+   *
+   * @return $this
+   *   Returns this result object for chaining.
+   *
+   * @throws \Drupal\sms\Exception\SmsException
+   *   Thrown if credits set is an invalid variable type.
+   */
+  public function setCreditsUsed($credits_used);
 
 }

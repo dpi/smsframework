@@ -221,4 +221,13 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
     return isset($definition['reports_push']) ? (boolean) $definition['reports_push'] : FALSE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function supportsCreditBalanceQuery() {
+    $definition = $this->getPlugin()
+      ->getPluginDefinition();
+    return isset($definition['credit_balance_available']) ? (boolean) $definition['credit_balance_available'] : FALSE;
+  }
+
 }

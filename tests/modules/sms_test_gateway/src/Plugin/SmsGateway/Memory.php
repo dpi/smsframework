@@ -10,7 +10,6 @@ namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Random;
 use Drupal\sms\Message\SmsDeliveryReport;
-use Drupal\sms\Message\SmsDeliveryReportInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Drupal\sms\Plugin\SmsGatewayPluginIncomingInterface;
 use Drupal\sms\Message\SmsMessageInterface;
@@ -18,6 +17,7 @@ use Drupal\sms\Message\SmsMessageResult;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Drupal\sms\Message\SmsMessageReportStatus;
 
 /**
  * Defines a gateway storing transmitted SMS in memory.
@@ -29,9 +29,10 @@ use Symfony\Component\HttpFoundation\Response;
  *   schedule_aware = FALSE,
  *   reports_pull = TRUE,
  *   reports_push = TRUE,
+ *   credit_balance_available = TRUE,
  * )
  */
-class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInterface{
+class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInterface {
 
   /**
    * {@inheritdoc}
@@ -72,21 +73,22 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
    * {@inheritdoc}
    */
   public function send(SmsMessageInterface $sms_message) {
-    $state = \Drupal::state()->get('sms_test_gateway.memory.send', []);
-
     $gateway_id = $this->configuration['gateway_id'];
+
+    // Message.
+    $state = \Drupal::state()->get('sms_test_gateway.memory.send', []);
     $state[$gateway_id][] = $sms_message;
     \Drupal::state()->set('sms_test_gateway.memory.send', $state);
 
+    // Reports.
     $reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
-    $latest_reports = $this->randomDeliveryReports($sms_message);
-    // Update the delivery reports.
-    $reports[$gateway_id] = $latest_reports + $reports;
+    $gateway_reports = isset($reports[$gateway_id]) ? $reports[$gateway_id] : [];
+    $new_reports = $this->randomDeliveryReports($sms_message);
+    $reports[$gateway_id] = array_merge($gateway_reports, $new_reports);
     \Drupal::state()->set('sms_test_gateway.memory.report', $reports);
-    return new SmsMessageResult([
-      'status' => TRUE,
-      'reports' => $latest_reports,
-    ]);
+
+    return (new SmsMessageResult())
+      ->setReports($new_reports);
   }
 
   /**
@@ -100,39 +102,42 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
     // addressed.
     \Drupal::state()->set('sms_test_gateway.memory.incoming', TRUE);
 
-    return new SmsMessageResult([
-      'status' => TRUE,
-    ]);
+    $new_reports = $this->randomDeliveryReports($sms_message);
+    return (new SmsMessageResult())
+      ->setReports($new_reports);
   }
 
   /**
    * {@inheritdoc}
    */
   public function parseDeliveryReports(Request $request, Response $response) {
+    $gateway_id = $this->configuration['gateway_id'];
+    $memory_reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
+
     $data = Json::decode($request->request->get('delivery_report'));
-    $latest_reports = [];
+    $return = [];
     foreach ($data['reports'] as $report) {
-      $latest_reports[$report['message_id']] = new SmsDeliveryReport([
-        'recipient' => $report['recipient'],
-        'message_id' => $report['message_id'],
-        'time_sent' => $report['time_sent'],
-        'time_delivered' => $report['time_delivered'],
-        'status' => $report['status'],
-        'gateway_status' => $report['gateway_status'],
-        'gateway_status_code' => $report['gateway_status_code'],
-        'gateway_status_description' => $report['gateway_status_description'],
-      ]);
+      $message_id = $report['message_id'];
+      $new_report = (new SmsDeliveryReport())
+        ->setRecipient($report['recipient'])
+        ->setMessageId($message_id)
+        ->setStatus(SmsMessageReportStatus::DELIVERED)
+        ->setStatusMessage($report['status_message'])
+        ->setTimeQueued($report['time_sent'])
+        ->setTimeDelivered($report['time_delivered']);
+
+      // Set separately since this method should not have meaningful keys.
+      $return[] = $new_report;
+      // Reports in state must be keyed by message ID.
+      $memory_reports[$gateway_id][$message_id] = $new_report;
     }
 
-    // Update the latest delivery reports in \Drupal::state().
-    $gateway_id = $this->configuration['gateway_id'];
-    $reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
-    $reports[$gateway_id] = $latest_reports + $reports;
-    \Drupal::state()->set('sms_test_gateway.memory.report', $reports);
+    \Drupal::state()->set('sms_test_gateway.memory.report', $memory_reports);
 
     // Set the response.
     $response->setContent('custom response content');
-    return $latest_reports;
+
+    return $return;
   }
 
   /**
@@ -155,19 +160,22 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
     $random = new Random();
     $reports = [];
     foreach ($sms_message->getRecipients() as $number) {
-      $message_id = $random->name(16);
-      $reports[$message_id] = new SmsDeliveryReport([
-        'recipient' => $number,
-        'message_id' => $message_id,
-        'time_sent' => time(),
-        'time_delivered' => time() + rand(0, 10),
-        'status' => SmsDeliveryReportInterface::STATUS_SENT,
-        'gateway_status' => 'SENT',
-        'gateway_status_code' => '200',
-        'gateway_status_description' => 'Sent to memory gateway',
-      ]);
+      $reports[] = (new SmsDeliveryReport())
+        ->setRecipient($number)
+        ->setMessageId($random->name(16))
+        ->setStatus(SmsMessageReportStatus::QUEUED)
+        ->setStatusMessage('Sent to memory gateway')
+        ->setTimeQueued(time())
+        ->setTimeDelivered(time() + rand(0, 10));
     }
     return $reports;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getCreditsBalance() {
+    return 13.36;
   }
 
 }

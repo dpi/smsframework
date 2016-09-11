@@ -8,7 +8,7 @@
 namespace Drupal\sms\Plugin\SmsGateway;
 
 use Drupal\sms\Message\SmsDeliveryReport;
-use Drupal\sms\Message\SmsDeliveryReportInterface;
+use Drupal\sms\Message\SmsMessageReportStatus;
 use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
@@ -26,19 +26,20 @@ class LogGateway extends SmsGatewayPluginBase {
    * {@inheritdoc}
    */
   public function send(SmsMessageInterface $sms) {
-    // Log sms message to drupal logger.
     $this->logger()->notice('SMS message sent to %number with the text: @message',
       ['%number' => implode(', ', $sms->getRecipients()), '@message' => $sms->getMessage()]);
-    $return = ['status' => TRUE];
-    $return['reports'] = [];
+
+    $reports = [];
     foreach ($sms->getRecipients() as $number) {
-      $return['reports'][$number] = new SmsDeliveryReport([
-        'status' => SmsDeliveryReportInterface::STATUS_DELIVERED,
-        'recipient' => $number,
-        'gateway_status' => 'DELIVERED',
-      ]);
+      $reports[] = (new SmsDeliveryReport())
+        ->setRecipient($number)
+        ->setStatus(SmsMessageReportStatus::DELIVERED)
+        ->setStatusMessage('DELIVERED')
+        ->setTimeDelivered(REQUEST_TIME);
     }
-    return new SmsMessageResult($return);
+
+    return (new SmsMessageResult())
+      ->setReports($reports);
   }
 
 }

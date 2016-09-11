@@ -12,213 +12,124 @@ namespace Drupal\sms\Message;
  */
 interface SmsDeliveryReportInterface {
 
-  // Delivery report status codes
-  // 0=Unknown, 2xx=Positive, 3xx=Positive/Neutral (context-dependent), 4xx=Negative
-
   /**
-   * Status UNKNOWN.
+   * Gets the gateway tracking ID for the message.
    *
-   * A message would have this status to indicate unknown status.
-   */
-  const STATUS_UNKNOWN = 0;
-
-  /**
-   * Status SENT.
-   *
-   * A message with this status indicates it was successfully sent.
-   */
-  const STATUS_SENT = 200;
-
-  /**
-   * Status DELIVERED.
-   *
-   * A message with this status indicates it was successfully delivered.
-   */
-  const STATUS_DELIVERED = 202;
-
-  /**
-   * Status QUEUED.
-   *
-   * A message with this status indicates it was successfully queued for sending.
-   */
-  const STATUS_QUEUED = 300;
-
-  /**
-   * Status PENDING.
-   *
-   * A message with this status indicates it is pending delivery.
-   */
-  const STATUS_PENDING = 302;
-
-  /**
-   * Status ERROR.
-   *
-   * A message with this status indicates it could not be sent (routing reasons).
-   */
-  const STATUS_ERROR = 400;
-
-  /**
-   * Status NO_CREDIT.
-   *
-   * A message with this status indicates it was not sent due to low credit.
-   */
-  const STATUS_NO_CREDIT = 402;
-
-  /**
-   * Status NOT_SENT.
-   *
-   * A message with this status indicates it was not sent.
-   */
-  const STATUS_NOT_SENT = 404;
-
-  /**
-   * Status NOT_DELIVERED.
-   *
-   * A message with this status indicates it was sent but not delivered.
-   */
-  const STATUS_NOT_DELIVERED = 406;
-
-  /**
-   * Status EXPIRED.
-   *
-   * A message with this status indicates it was sent but expired in the SMSC.
-   */
-  const STATUS_EXPIRED = 408;
-
-  /**
-   * Status REJECTED.
-   *
-   * A message with this status indicates it was rejected by the network.
-   */
-  const STATUS_REJECTED = 410;
-
-  /**
-   * Status INVALID_RECIPIENT.
-   *
-   * A message with this status indicates the recipient number was invalid.
-   */
-  const STATUS_INVALID_RECIPIENT = 412;
-
-  /**
-   * Status INVALID_SENDER.
-   *
-   * A message with this status indicates the sender ID was invalid.
-   */
-  const STATUS_INVALID_SENDER = 414;
-
-  /**
-   * Status ERROR_ROUTING.
-   *
-   * A message with this status there was a routing error.
-   */
-  const STATUS_ERROR_ROUTING = 420;
-
-  /**
-   * Gets the message ID for the message.
-   *
-   * Usually message IDs are returned by the gateway to identify a message sent
-   * and should be unique for a particular combination of message and recipient.
-   *
-   * @return string
+   * @return string|NULL
+   *   The gateway tracking ID for the message, or NULL if there is no tracking
+   *   ID.
    */
   public function getMessageId();
 
   /**
-   * Gets the recipient for which the message was intended.
+   * Sets the gateway tracking ID for the message.
+   *
+   * @param string|NULL $message_id
+   *   The gateway tracking ID for the message, or NULL if there is no tracking
+   *   ID.
+   *
+   * @return $this
+   *   Returns this report object for chaining.
+   */
+  public function setMessageId($message_id);
+
+  /**
+   * Gets the recipient for the message.
    *
    * @return string
+   *   The recipient for the message.
    */
   public function getRecipient();
 
   /**
-   * Gets the normalized delivery status of the message.
+   * Sets the recipient for the message.
    *
-   * @return int
-   *   The status code which matches the codes used for HTTP.
+   * @param string $recipient
+   *   The recipient for the message.
+   *
+   * @return $this
+   *   Returns this report object for chaining.
+   */
+  public function setRecipient($recipient);
+
+  /**
+   * Gets the status of the message.
+   *
+   * @return string|NULL
+   *   A status code from \Drupal\sms\Message\SmsMessageReportStatus, or NULL if
+   *   unknown.
    */
   public function getStatus();
 
   /**
-   * Gets the original delivery status as known to the SMS gateway.
+   * Sets the status of the message.
+   *
+   * @param string|NULL $status
+   *   A status code from \Drupal\sms\Message\SmsMessageReportStatus, or NULL if
+   *   unknown.
+   *
+   * @return $this
+   *   Returns this report object for chaining.
+   */
+  public function setStatus($status);
+
+  /**
+   * Gets the status message.
    *
    * @return string
+   *   The status message as provided by the gateway API.
    */
-  public function getGatewayStatus();
+  public function getStatusMessage();
 
   /**
-   * Gets the time the message was sent.
+   * Sets the status message.
    *
-   * @return int
-   *   The UNIX timestamp when the message was sent.
+   * @param string $message
+   *   The status message as provided by the gateway API.
+   *
+   * @return $this
+   *   Returns this report object for chaining.
    */
-  public function getTimeSent();
+  public function setStatusMessage($message);
 
   /**
-   * Gets the time the message was delivered.
+   * Gets the time the message was queued.
    *
-   * @return int
-   *   The UNIX timestamp when the message was delivered.
+   * @return integer|NULL
+   *   The timestamp when the message was queued, or NULL if unknown.
+   */
+  public function getTimeQueued();
+
+  /**
+   * Sets the time the message was queued.
+   *
+   * @param integer|NULL $time
+   *   The timestamp when the message was queued, or NULL if unknown.
+   *
+   * @return $this
+   *   Returns this report object for chaining.
+   */
+  public function setTimeQueued($time);
+
+  /**
+   * Gets the time the message was delivered to the recipient.
+   *
+   * @return integer|NULL
+   *   The timestamp when the message was delivered to the recipient, or NULL if
+   *   unknown.
    */
   public function getTimeDelivered();
 
   /**
-   * Returns the delivery report as a keyed array.
+   * Sets the time the message was delivered to the recipient.
    *
-   * @return array
-   *   An array with the following keys:
-   *   - status: the actual delivery status of the message per the STATUS_*
-   *     constants in this class.
-   *   - message_id: The message id if the message was successfully sent to that
-   *       recipient. An empty string means the message was not sent.
-   *   - error_code: The error code number for a specific message.
-   *   - error_message: The description of the error message.
-   *   - gateway_status: The original delivery status from the SMS gateway.
-   *   - gateway_error_code: The original error code from the SMS gateway.
-   *   - gateway_error_message: The original error message from the SMS gateway.
-   * @return mixed
+   * @param integer|NULL $time
+   *   The timestamp when the message was delivered to the recipient, or NULL if
+   *   unknown.
+   *
+   * @return $this
+   *   Returns this report object for chaining.
    */
-  public function getArray();
-
-  /**
-   * Gets the standardized error code in the event there is an error.
-   *
-   * If there is no error, this method returns 0.
-   *
-   * @return int
-   *
-   * @see \Drupal\sms\Message\SmsMessageInterface for the constants.
-   */
-  public function getError();
-
-  /**
-   * Gets the standardized error message in the event there is an error.
-   *
-   * If there is no error, this method returns an empty string.
-   *
-   * @return string
-   *
-   * @see \Drupal\sms\Message\SmsMessageInterface for the constants.
-   */
-  public function getErrorMessage();
-
-  /**
-   * Gets the gateway error code in the event there is an error.
-   *
-   * If there is no error, this method returns an empty string. These values are
-   * gateway dependent and would likely differ across different gateways.
-   *
-   * @return string
-   */
-  public function getGatewayError();
-
-  /**
-   * Gets the gateway error message in the event there is an error.
-   *
-   * If there is no error, this method returns and empty string. These strings
-   * are gateway dependent and would likely differ across different gateways.
-   *
-   * @return string
-   */
-  public function getGatewayErrorMessage();
+  public function setTimeDelivered($time);
 
 }

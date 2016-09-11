@@ -47,7 +47,7 @@ class SmsDevelMessageTest extends SmsFrameworkWebTestBase {
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
     $this->assertResponse(200);
-    $this->assertRaw('Message sent.');
+    $this->assertRaw('Message was processed, 1 delivery reports were generated.');
 
     $messages = $this->getTestMessages($this->gateway);
     $this->assertEqual(1, count($messages));
@@ -83,7 +83,7 @@ class SmsDevelMessageTest extends SmsFrameworkWebTestBase {
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Receive'));
     $this->assertResponse(200);
-    $this->assertRaw('Message received.');
+    $this->assertRaw('Message was processed, 1 delivery reports were generated.');
 
     $this->assertEqual($edit['message'], sms_test_gateway_get_incoming()['message']);
   }

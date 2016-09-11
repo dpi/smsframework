@@ -68,4 +68,13 @@ class SmsGateway extends Plugin {
    */
   protected $reports_push;
 
+  /**
+   * Whether the gateway supports queries of current credit balance.
+   *
+   * @see \Drupal\sms\Entity\SmsGatewayInterface::supportsCreditBalanceQuery()
+   *
+   * @var boolean
+   */
+  protected $credit_balance_available;
+
 }
