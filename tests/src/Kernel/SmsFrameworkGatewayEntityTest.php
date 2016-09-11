@@ -72,13 +72,76 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Tests 'max outgoing recipients' annotation custom value.
+   */
+  public function testGetMaxRecipientsOutgoingCustom() {
+    $gateway = $this->createGateway([
+      'plugin' => 'memory',
+    ]);
+    $this->assertEquals(-1, $gateway->getMaxRecipientsOutgoing());
+  }
+
+  /**
+   * Tests 'max outgoing recipients' annotation default value.
+   */
+  public function testGetMaxRecipientsOutgoingDefault() {
+    $gateway = $this->createGateway([
+      'plugin' => 'capabilities_default',
+    ]);
+    $this->assertEquals(1, $gateway->getMaxRecipientsOutgoing());
+  }
+
+  /**
+   * Tests 'schedule aware annotation' custom value.
+   */
+  public function testIsScheduleAwareCustom() {
+    $gateway = $this->createGateway([
+      'plugin' => 'memory_schedule_aware',
+    ]);
+    $this->assertTrue($gateway->isScheduleAware());
+  }
+
+  /**
+   * Tests 'schedule aware annotation' default value.
+   */
+  public function testIsScheduleAwareDefault() {
+    $gateway = $this->createGateway([
+      'plugin' => 'capabilities_default',
+    ]);
+    $this->assertFalse($gateway->isScheduleAware());
+  }
+
+  /**
+   * Tests 'supports credit balance' annotation custom value.
+   */
+  public function testSupportsCreditBalanceQueryCustom() {
+    $gateway = $this->createGateway([
+      'plugin' => 'memory',
+    ]);
+    $this->assertTrue($gateway->supportsCreditBalanceQuery());
+  }
+
+  /**
+   * Tests 'supports credit balance' annotation default value.
+   */
+  public function testSupportsCreditBalanceQueryDefault() {
+    $gateway = $this->createGateway([
+      'plugin' => 'capabilities_default',
+    ]);
+    $this->assertFalse($gateway->supportsCreditBalanceQuery());
+  }
+
+  /**
    * Create a new gateway.
+   *
+   * @param array $values
+   *   Custom values to pass to the gateway.
    *
    * @return \Drupal\sms\Entity\SmsGatewayInterface
    *   An unsaved gateway config entity.
    */
-  protected function createGateway() {
-    return SmsGateway::create([
+  protected function createGateway($values = []) {
+    return SmsGateway::create($values + [
       'plugin' => 'memory',
     ]);
   }

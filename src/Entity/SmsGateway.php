@@ -203,4 +203,13 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
     return !empty($definition['schedule_aware']);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function supportsCreditBalanceQuery() {
+    $definition = $this->getPlugin()
+      ->getPluginDefinition();
+    return isset($definition['credit_balance_available']) ? (boolean) $definition['credit_balance_available'] : FALSE;
+  }
+
 }

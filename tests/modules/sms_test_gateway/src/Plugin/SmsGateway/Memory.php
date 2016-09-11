@@ -27,6 +27,7 @@ use Drupal\sms\Message\SmsMessageReportStatus;
  *   label = @Translation("Memory"),
  *   outgoing_message_max_recipients = -1,
  *   schedule_aware = FALSE,
+ *   credit_balance_available = TRUE,
  * )
  */
 class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInterface {
@@ -159,6 +160,13 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
         ->setTimeDelivered(time() + rand(0, 10));
     }
     return $reports;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getCreditsBalance() {
+    return 13.36;
   }
 
 }
