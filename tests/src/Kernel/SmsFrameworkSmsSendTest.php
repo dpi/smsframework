@@ -29,7 +29,7 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
   /**
    * The default SMS provider service.
    *
-   * @var \Drupal\sms\Provider\DefaultSmsProvider
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $defaultSmsProvider;
 
@@ -96,8 +96,8 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
       ->setMessage($this->randomString())
       ->setGateway($test_gateway2);
 
-    $results = $this->defaultSmsProvider->send($sms_message);
-    $this->assertTrue($results[0] instanceof SmsMessageResultInterface, 'Message successfully sent.');
+    $sms_messages = $this->defaultSmsProvider->send($sms_message);
+    $this->assertTrue($sms_messages[0]->getResult() instanceof SmsMessageResultInterface, 'Message successfully sent.');
     $this->assertEquals(0, count($this->getTestMessages($test_gateway1)), 'Message not sent to the default gateway.');
     $this->assertEquals(1, count($this->getTestMessages($test_gateway2)), 'Message sent to the specified gateway.');
   }
