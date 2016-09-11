@@ -3,6 +3,7 @@
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\Core\Url;
+use Drupal\Core\Session\AnonymousUserSession;
 
 /**
  * Tests pushing delivery reports to the site.
@@ -24,11 +25,19 @@ class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase {
   protected $accessManager;
 
   /**
+   * An anonymous user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $anonymous;
+
+  /**
    * @inheritdoc
    */
   protected function setUp() {
     parent::setUp();
     $this->accessManager = $this->container->get('access_manager');
+    $this->anonymous = new AnonymousUserSession();
   }
 
   /**
@@ -37,7 +46,7 @@ class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase {
   public function testDeliveryReportRoute() {
     $gateway = $this->createMemoryGateway();
     $url = Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $gateway->id()]);
-    $access = $this->accessManager->checkNamedRoute($url->getRouteName(), $url->getRouteParameters());
+    $access = $this->accessManager->checkNamedRoute($url->getRouteName(), $url->getRouteParameters(), $this->anonymous);
     $this->assertTrue($access, 'Access to delivery report URL is allowed.');
   }
 
@@ -47,7 +56,7 @@ class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase {
   public function testDeliveryReportRouteNoSupportPush() {
     $gateway = $this->createMemoryGateway(['plugin' => 'capabilities_default']);
     $url = Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $gateway->id()]);
-    $access = $this->accessManager->checkNamedRoute($url->getRouteName(), $url->getRouteParameters());
+    $access = $this->accessManager->checkNamedRoute($url->getRouteName(), $url->getRouteParameters(), $this->anonymous);
     $this->assertFalse($access, 'Access to delivery report URL is forbidden.');
   }
 

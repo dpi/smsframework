@@ -11,6 +11,7 @@ use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
+use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginManagerInterface;
@@ -160,8 +161,9 @@ class SmsGatewayForm extends EntityForm {
     ];
 
     if (!$sms_gateway->isNew()) {
+      $anonymous = new AnonymousUserSession();
       $url = Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $sms_gateway->id()])->setAbsolute();
-      $access = $this->accessManager->checkNamedRoute($url->getRouteName(), $url->getRouteParameters());
+      $access = $this->accessManager->checkNamedRoute($url->getRouteName(), $url->getRouteParameters(), $anonymous);
       if ($access) {
         $form['delivery_report_path'] = [
           '#type' => 'item',
