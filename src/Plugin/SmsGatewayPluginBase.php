@@ -13,14 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPluginInterface {
 
   /**
-   * The watchdog logger for this gateway.
-   *
-   * @var \Psr\Log\LoggerInterface.
-   */
-  protected $logger;
-
-  /**
-   * Construct a new SmsGateway plugin.
+   * Construct a new SmsGateway plugin
    *
    * @param array $configuration
    *   The configuration to use and build the sms gateway.
@@ -100,17 +93,6 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
    */
   public function getDeliveryReports(array $message_ids = NULL) {
     return [];
-  }
-
-  /**
-   * Gets the Psr logger for this gateway.
-   */
-  protected function logger() {
-    if (!isset($this->logger)) {
-      $definition = $this->getPluginDefinition();
-      $this->logger = \Drupal::logger($definition['provider'] . '.' . $definition['id']);
-    }
-    return $this->logger;
   }
 
 }
