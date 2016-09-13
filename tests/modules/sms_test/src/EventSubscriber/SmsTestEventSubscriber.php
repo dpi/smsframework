@@ -2,7 +2,6 @@
 
 namespace Drupal\sms_test\EventSubscriber;
 
-use Drupal\sms\Event\SmsMessageEvent;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\sms\Entity\SmsGateway;
@@ -46,7 +45,7 @@ class SmsTestEventSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\EventDispatcher\Event $event
    *   The event.
    * @param string $eventName
-   *   The event name
+   *   The event name.
    */
   public function testExecutionOrder(Event $event, $eventName) {
     $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);

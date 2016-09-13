@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Annotation\SmsGateway
- */
-
 namespace Drupal\sms\Annotation;
 
 use Drupal\Component\Annotation\Plugin;
@@ -25,6 +20,7 @@ class SmsGateway extends Plugin {
 
   /**
    * Translated user-readable label.
+   *
    * @var string
    */
   protected $label;

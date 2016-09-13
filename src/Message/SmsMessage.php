@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Message\SmsMessage.
- */
-
 namespace Drupal\sms\Message;
 
 use Drupal\sms\Entity\SmsGatewayInterface;
@@ -26,17 +21,19 @@ class SmsMessage implements SmsMessageInterface {
    *
    * @var string
    */
-  protected $sender_phone_number;
+  protected $senderPhoneNumber;
 
   /**
+   * The recipients of the message.
+   *
    * @var array
-   *   The recipients of the message.
    */
   protected $recipients = array();
 
   /**
+   * The content of the message to be sent.
+   *
    * @var string
-   *   The content of the message to be sent.
    */
   protected $message;
 
@@ -52,7 +49,9 @@ class SmsMessage implements SmsMessageInterface {
    *
    * See \Drupal\sms\Direction constants for potential values.
    *
-   * @var integer
+   * @see \Drupal\sms\Direction
+   *
+   * @var int
    */
   protected $direction;
 
@@ -93,7 +92,7 @@ class SmsMessage implements SmsMessageInterface {
    * @param string $message
    *   (optional) The actual SMS message to be sent.
    * @param array $options
-   *   (optional) Additional options to be considered in building the SMS message
+   *   (optional) Additional options.
    * @param int $uid
    *   (optional) The user who created the SMS message.
    */
@@ -111,14 +110,14 @@ class SmsMessage implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function getSenderNumber() {
-    return $this->sender_phone_number;
+    return $this->senderPhoneNumber;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setSenderNumber($number) {
-    $this->sender_phone_number = $number;
+    $this->senderPhoneNumber = $number;
     return $this;
   }
 
@@ -299,6 +298,7 @@ class SmsMessage implements SmsMessageInterface {
    * Gets the UUID generator.
    *
    * @return \Drupal\Component\Uuid\UuidInterface
+   *   The UUID generator.
    */
   protected function uuidGenerator() {
     return \Drupal::service('uuid');

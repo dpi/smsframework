@@ -1,11 +1,13 @@
 <?php
 
-
 namespace Drupal\sms\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 
+/**
+ * Interface for phone number verification entity.
+ */
 interface PhoneNumberVerificationInterface extends ContentEntityInterface {
 
   /**

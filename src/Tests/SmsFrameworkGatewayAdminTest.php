@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Tests\SmsFrameworkGatewayAdminTest.
- */
-
 namespace Drupal\sms\Tests;
 
 use Drupal\Core\Url;
@@ -27,6 +22,8 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
   public static $modules = ['block'];
 
   /**
+   * SMS Gateway entity storage.
+   *
    * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
    */
   protected $smsGatewayStorage;
@@ -184,7 +181,7 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
     $this->assertNoRaw(t('Delivery report URL'));
   }
 
-    /**
+  /**
    * Tests deleting a gateway.
    */
   public function testGatewayDelete() {

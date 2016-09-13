@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains definition of \Drupal\sms\Message\SmsMessageInterface
- */
-
 namespace Drupal\sms\Message;
 
 use Drupal\sms\Entity\SmsGatewayInterface;
@@ -18,6 +13,7 @@ interface SmsMessageInterface {
    * Gets the list of recipients of this SMS message.
    *
    * @return array
+   *   The list of recipients of this SMS message.
    */
   public function getRecipients();
 
@@ -43,7 +39,7 @@ interface SmsMessageInterface {
    */
   public function addRecipients(array $recipients);
 
-    /**
+  /**
    * Removes a single recipient from the SMS message.
    *
    * @param string $recipient
@@ -107,13 +103,14 @@ interface SmsMessageInterface {
    * Gets the options for building or sending this SMS message.
    *
    * @return array
+   *   The options for building or sending this SMS message.
    */
   public function getOptions();
 
   /**
    * Gets the option specified by the key $name.
    *
-   * @param string
+   * @param string $name
    *   The name of the option.
    *
    * @return mixed
@@ -125,7 +122,7 @@ interface SmsMessageInterface {
    * Sets an option for this SMS message.
    *
    * @param string $name
-   *   The name of the option
+   *   The name of the option.
    * @param mixed $value
    *   The value of the option.
    *
@@ -189,6 +186,7 @@ interface SmsMessageInterface {
    * Gets the message to be sent.
    *
    * @return string
+   *   The message to be sent.
    */
   public function getMessage();
 
@@ -207,6 +205,7 @@ interface SmsMessageInterface {
    * Gets the UUID of the SMS object.
    *
    * @return string
+   *   The UUID of the SMS object.
    */
   public function getUuid();
 
@@ -220,7 +219,7 @@ interface SmsMessageInterface {
   public function getUid();
 
   /**
-   * Set the user who created the SMS message
+   * Set the user who created the SMS message.
    *
    * @param int $uid
    *   The ID of a user entity.
@@ -253,7 +252,7 @@ interface SmsMessageInterface {
   /**
    * Split this SMS message into new messages by chunks of recipients.
    *
-   * @param $size
+   * @param int $size
    *   The quantity of recipients to chunk by.
    *
    * @return static[]

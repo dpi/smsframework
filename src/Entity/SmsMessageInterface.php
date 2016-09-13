@@ -1,16 +1,14 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Entity\SmsMessageInterface.
- */
-
 namespace Drupal\sms\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\sms\Message\SmsMessageInterface as PlainSmsMessageInterface;
 use Drupal\Core\Entity\EntityInterface;
 
+/**
+ * Interface for SMS message entity.
+ */
 interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInterface {
 
   /**
@@ -73,7 +71,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
   /**
    * Get whether the SMS message is in the queue to be processed.
    *
-   * @return boolean
+   * @return bool
    *   Whether the SMS message is in the queue to be processed.
    */
   public function isQueued();

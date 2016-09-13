@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Unit\Message\SmsMessageTest
- */
-
 namespace Drupal\Tests\sms\Unit\Message;
 
 use Drupal\Component\Uuid\Php;
@@ -26,6 +21,7 @@ class SmsMessageTest extends UnitTestCase {
    * Create a SMS message object for testing.
    *
    * @return \Drupal\sms\Message\SmsMessageInterface
+   *   A SMS message object for testing.
    */
   protected function createSmsMessage() {
     return new TestSmsMessage();

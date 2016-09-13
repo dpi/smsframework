@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_test_gateway\Plugin\SmsGateway\Memory
- */
-
 namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 
 use Drupal\Component\Serialization\Json;
@@ -97,7 +92,6 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
   public function incoming(SmsMessageInterface $sms_message) {
     // @todo Contents of this method are subject to proposals made in
     // https://www.drupal.org/node/2712579
-
     // Set state so we test this method is executed, remove this after above is
     // addressed.
     \Drupal::state()->set('sms_test_gateway.memory.incoming', TRUE);
@@ -141,7 +135,7 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getDeliveryReports(array $message_ids = NULL) {
     return [];
@@ -151,7 +145,7 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
    * Generates random delivery reports for each of the recipients of a message.
    *
    * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
-   *   The SMS message
+   *   The SMS message.
    *
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
    *   An array of delivery reports.
@@ -172,7 +166,7 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getCreditsBalance() {
     return 13.36;

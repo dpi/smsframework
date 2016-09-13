@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Tests\SmsFrameworkModuleInstallerTest.
- */
-
 namespace Drupal\sms\Tests;
 
 use Drupal\simpletest\WebTestBase;
@@ -18,6 +13,9 @@ class SmsFrameworkModuleInstallerTest extends WebTestBase {
 
   public static $modules = ['telephone', 'dynamic_entity_reference'];
 
+  /**
+   * Tests uninstall via UI.
+   */
   public function testUiInstallModule() {
     $edit = [
       'modules[SMS Framework][sms][enable]' => TRUE,

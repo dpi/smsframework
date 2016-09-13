@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms_user\Kernel\SmsFrameworkUserAccountRegistrationServiceTest.
- */
-
 namespace Drupal\Tests\sms_user\Kernel;
 
 use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
@@ -34,19 +29,28 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    *
    * @var array
    */
-  public static $modules = ['system', 'sms', 'sms_user', 'sms_test_gateway', 'user', 'telephone', 'dynamic_entity_reference', 'field'];
+  public static $modules = [
+    'system',
+    'sms',
+    'sms_user',
+    'sms_test_gateway',
+    'user',
+    'telephone',
+    'dynamic_entity_reference',
+    'field',
+  ];
 
   /**
-   * @var \Drupal\sms_user\AccountRegistrationInterface
-   *
    * The account registration service.
+   *
+   * @var \Drupal\sms_user\AccountRegistrationInterface
    */
   protected $accountRegistration;
 
   /**
-   * @var \Drupal\sms\Provider\SmsProviderInterface
-   *
    * The default SMS provider.
+   *
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $smsProvider;
 
@@ -58,11 +62,15 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   protected $gateway;
 
   /**
+   * A phone field ofr testing.
+   *
    * @var \Drupal\field\FieldStorageConfigInterface
    */
   protected $phoneField;
 
   /**
+   * Phone number settings for user entity type.
+   *
    * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
    */
   protected $phoneNumberSettings;
@@ -278,7 +286,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
-   * Test if a duplicated placeholder is not confirmed
+   * Test if a duplicated placeholder is not confirmed.
    */
   public function testIncomingPatternMultiplePlaceholderFailure() {
     $this->config('sms_user.settings')
@@ -316,7 +324,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
-   * Test if a user is created despite no placeholders
+   * Test if a user is created despite no placeholders.
    */
   public function testIncomingPatternNoPlaceholders() {
     $incoming_message = $this->randomString();
@@ -525,7 +533,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Count number of registered users.
    *
-   * @return integer
+   * @return int
    *   Number of users in database.
    */
   protected function countUsers() {
@@ -551,7 +559,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    * @param string $message
    *   The message to check.
    *
-   * @return boolean
+   * @return bool
    *   Whether message was found in any memory messages.
    */
   public function inTestMessages(SmsGatewayInterface $sms_gateway, $message) {

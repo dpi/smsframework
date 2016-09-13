@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Message\SmsMessageResult
- */
-
 namespace Drupal\sms\Message;
 
 use Drupal\sms\Exception\SmsException;

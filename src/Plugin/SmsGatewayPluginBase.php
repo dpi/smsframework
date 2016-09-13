@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Plugin\SmsGatewayPluginBase
- */
-
 namespace Drupal\sms\Plugin;
 
 use Drupal\Core\Form\FormStateInterface;
@@ -25,7 +20,7 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
   protected $logger;
 
   /**
-   * Construct a new SmsGateway plugin
+   * Construct a new SmsGateway plugin.
    *
    * @param array $configuration
    *   The configuration to use and build the sms gateway.
@@ -71,14 +66,12 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    return;
   }
 
   /**
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    return;
   }
 
   /**
@@ -115,7 +108,7 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
   protected function logger() {
     if (!isset($this->logger)) {
       $definition = $this->getPluginDefinition();
-      $this->logger = \Drupal::logger($definition['provider'] . '.' . $definition['id'] );
+      $this->logger = \Drupal::logger($definition['provider'] . '.' . $definition['id']);
     }
     return $this->logger;
   }

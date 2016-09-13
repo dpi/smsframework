@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Tests\SmsFrameworkSettingsTest.
- */
-
 namespace Drupal\sms\Tests;
 
 use Drupal\Core\Url;

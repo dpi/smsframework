@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Provider\SmsQueueProcessor
- */
-
 namespace Drupal\sms\Provider;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -62,7 +57,7 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function processUnqueued() {
     /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
@@ -93,7 +88,7 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function garbageCollection() {
     $directions = [

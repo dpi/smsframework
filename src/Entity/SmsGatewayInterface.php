@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Entity\SmsGatewayInterface.
- */
-
 namespace Drupal\sms\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -33,7 +28,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   /**
    * Get whether messages sent to this gateway should be sent immediately.
    *
-   * @return boolean
+   * @return bool
    *   Whether messages sent to this gateway should be sent immediately.
    */
   public function getSkipQueue();
@@ -41,7 +36,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   /**
    * Set whether messages sent to this gateway should be sent immediately.
    *
-   * @param boolean $skip_queue
+   * @param bool $skip_queue
    *   Whether messages sent to this gateway should be sent immediately.
    *
    * @return $this
@@ -54,7 +49,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    *
    * @param int $direction
    *   The direction of the message. See SmsMessageInterface::DIRECTION_*
-   *   constants
+   *   constants.
    *
    * @return int
    *   How long messages should persist in seconds. -1 to never expire.
@@ -66,7 +61,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    *
    * @param int $direction
    *   The direction of the message. See SmsMessageInterface::DIRECTION_*
-   *   constants
+   *   constants.
    * @param int $retention_duration
    *   How many seconds to hold messages, or use -1 to never expire.
    *
@@ -86,7 +81,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   /**
    * Get whether this gateway is schedule aware.
    *
-   * @return boolean
+   * @return bool
    *   Whether this gateway is schedule aware.
    */
   public function isScheduleAware();
@@ -94,7 +89,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   /**
    * Gets whether this gateway can pull reports.
    *
-   * @return boolean
+   * @return bool
    *   Whether this gateway can pull reports.
    *
    * @see \Drupal\sms\Annotation\SmsGateway::reports_pull
@@ -104,7 +99,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   /**
    * Gets whether this gateway can handle reports pushed to the site.
    *
-   * @return boolean
+   * @return bool
    *   Whether this gateway can handle reports pushed to the site.
    *
    * @see \Drupal\sms\Annotation\SmsGateway::reports_push
@@ -114,7 +109,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   /**
    * Get whether this gateway supports credit balance queries.
    *
-   * @return boolean
+   * @return bool
    *   Whether this gateway supports credit balance queries.
    *
    * @see \Drupal\sms\Annotation\SmsGateway::credit_balance_available

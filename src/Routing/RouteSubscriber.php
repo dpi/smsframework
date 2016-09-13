@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Routing\RouteSubscriber.
- */
-
 namespace Drupal\sms\Routing;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -27,9 +22,9 @@ class RouteSubscriber implements ContainerInjectionInterface {
   protected $configFactory;
 
   /**
-   * Constructs a new SMS Framework RouteSubscriber
+   * Constructs a new SMS Framework RouteSubscriber.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The gateway manager.
    */
   public function __construct(ConfigFactoryInterface $config_factory) {

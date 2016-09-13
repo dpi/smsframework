@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_sendtophone\Form\SendToPhoneForm.
- */
-
 namespace Drupal\sms_sendtophone\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -28,7 +23,7 @@ class SendToPhoneForm extends FormBase {
    *
    * @var array
    */
-  protected $phone_numbers = [];
+  protected $phoneNumbers = [];
 
   /**
    * The SMS Provider.
@@ -67,21 +62,22 @@ class SendToPhoneForm extends FormBase {
 
     // @todo This block should be a route access checker.
     try {
-      $this->phone_numbers = $phone_number_provider->getPhoneNumbers($user);
+      $this->phoneNumbers = $phone_number_provider->getPhoneNumbers($user);
     }
-    catch (PhoneNumberSettingsException $e) {}
+    catch (PhoneNumberSettingsException $e) {
+    }
 
-    if ($user->hasPermission('send to any number') || count($this->phone_numbers)) {
+    if ($user->hasPermission('send to any number') || count($this->phoneNumbers)) {
       $form = $this->getForm($form, $form_state, $type, $extra);
     }
     else {
-      if (!count($this->phone_numbers)) {
+      if (!count($this->phoneNumbers)) {
         // User has no phone number, or unconfirmed.
         $form['message'] = [
           '#type' => 'markup',
           '#markup' => $this->t('You need to @setup and confirm your mobile phone to send messages.', [
             '@setup' => $user->toLink('set up', 'edit-form')->toString(),
-          ])
+          ]),
         ];
       }
       else {
@@ -124,6 +120,7 @@ class SendToPhoneForm extends FormBase {
           '#title' => t('Message preview'),
         );
         break;
+
       case 'node':
         if (is_numeric($extra)) {
           $node = Node::load($extra);
@@ -149,8 +146,8 @@ class SendToPhoneForm extends FormBase {
       '#title' => $this->t('Phone number'),
     ];
 
-    if (count($this->phone_numbers)) {
-      $form['number']['#default_value'] = reset($this->phone_numbers);
+    if (count($this->phoneNumbers)) {
+      $form['number']['#default_value'] = reset($this->phoneNumbers);
     }
 
     $form['submit'] = array(

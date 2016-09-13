@@ -1,12 +1,8 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkProviderTest.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\sms\Exception\RecipientRouteException;
 use Drupal\sms\Message\SmsMessage as StandardSmsMessage;
 use Drupal\sms\Message\SmsMessageInterface as StandardSmsMessageInterface;
 use Drupal\sms\Entity\SmsMessage;
@@ -25,11 +21,12 @@ use Drupal\sms\Message\SmsMessageResultInterface;
 class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = ['sms', 'sms_test', 'sms_test_gateway', 'field', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = [
+    'sms', 'sms_test', 'sms_test_gateway', 'field', 'telephone',
+    'dynamic_entity_reference',
+  ];
 
   /**
    * SMS message entity storage.
@@ -39,9 +36,9 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   protected $smsStorage;
 
   /**
-   * @var \Drupal\sms\Provider\SmsProviderInterface
+   * The SMS provider.
    *
-   * The default SMS provider.
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $smsProvider;
 
@@ -111,7 +108,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::OUTGOING)
       ->setMessage($this->randomString());
-    $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class, 'There are no recipients');
+    $this->setExpectedException(RecipientRouteException::class, 'There are no recipients');
     $this->smsProvider->send($sms_message);
     $this->assertEquals(0, count($this->getTestMessages($this->gateway)));
   }
@@ -123,7 +120,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    */
   public function testSendNoFallbackGateway() {
     $this->setFallbackGateway(NULL);
-    $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class);
+    $this->setExpectedException(RecipientRouteException::class);
     $message = $this->createSmsMessage()
       ->addRecipients($this->randomPhoneNumbers());
     $this->smsProvider->send($message);
@@ -148,7 +145,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    */
   public function testQueueNoFallbackGateway() {
     $this->setFallbackGateway(NULL);
-    $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class);
+    $this->setExpectedException(RecipientRouteException::class);
     $message = $this->createSmsMessage()
       ->addRecipients($this->randomPhoneNumbers());
     $this->smsProvider->queue($message);
@@ -235,10 +232,10 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Test an exception is thrown if a message has no recipients
+   * Test an exception is thrown if a message has no recipients.
    */
   public function testNoRecipients() {
-    $this->setExpectedException(\Drupal\sms\Exception\RecipientRouteException::class, 'There are no recipients.');
+    $this->setExpectedException(RecipientRouteException::class, 'There are no recipients.');
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::OUTGOING)
       ->setMessage($this->randomString());
@@ -310,6 +307,8 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Test events for outgoing queue skip queue.
+   *
    * Ensure events are executed when a message added to the outgoing queue and
    * the gateway is set to skip queue.
    */
@@ -369,6 +368,8 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Tests events for incoming queue skip queue.
+   *
    * Ensure events are executed when a message added to the incoming queue and
    * the gateway is set to skip queue.
    */
@@ -462,6 +463,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    *   An mixed array of values to pass when creating the SMS message entity.
    *
    * @return \Drupal\sms\Entity\SmsMessageInterface
+   *   A SMS message entity for testing.
    */
   protected function createSmsMessage(array $values = []) {
     return SmsMessage::create($values)

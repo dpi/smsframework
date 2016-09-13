@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains AdminSettingsForm class
- */
-
 namespace Drupal\sms_user\Form;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -55,10 +50,10 @@ class AdminSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormID() {
+  public function getFormId() {
     return 'sms_user_admin_settings';
   }
-  
+
   /**
    * {@inheritdoc}
    */
@@ -97,7 +92,7 @@ class AdminSettingsForm extends ConfigFormBase {
         'start' => $this->t('Start time'),
         'end' => $this->t('End time'),
       ],
-      '#parents' => ['active_hours', 'days']
+      '#parents' => ['active_hours', 'days'],
     ];
 
     // Convert configuration into days.
@@ -122,14 +117,14 @@ class AdminSettingsForm extends ConfigFormBase {
     for ($i = 0; $i < 24; $i++) {
       $hours[$i] = DrupalDateTime::datePad($i) . ':00';
     }
-    $hours[0] = $this->t(' - Start of day - ');
+    $hours[0] = $this->t('- Start of day -');
     $end_hours = $hours;
     unset($end_hours[0]);
-    $end_hours[24] = $this->t(' - End of day - ');
+    $end_hours[24] = $this->t('- End of day -');
 
     $timestamp = strtotime('next Sunday');
     for ($i = 0; $i < 7; $i++) {
-      $row = ['#tree' => TRUE,];
+      $row = ['#tree' => TRUE];
       $day = strftime('%A', $timestamp);
       $day_lower = strtolower($day);
 
@@ -143,7 +138,7 @@ class AdminSettingsForm extends ConfigFormBase {
         '#title_display' => 'invisible',
         '#default_value' => isset($day_defaults[$day_lower]['start']) ? $day_defaults[$day_lower]['start'] : -1,
         '#options' => $hours,
-        '#empty_option' => $this->t(' - Suspend messages for this day - '),
+        '#empty_option' => $this->t('- Suspend messages for this day -'),
         '#empty_value' => -1,
       ];
       $row['end'] = [
@@ -175,7 +170,7 @@ class AdminSettingsForm extends ConfigFormBase {
     if ($config->get('account_registration.unrecognized_sender.status')) {
       $radio_value = 'all';
     }
-    else if ($config->get('account_registration.incoming_pattern.status')) {
+    elseif ($config->get('account_registration.incoming_pattern.status')) {
       $radio_value = 'incoming_pattern';
     }
     else {
@@ -344,7 +339,7 @@ class AdminSettingsForm extends ConfigFormBase {
           $form_state->unsetValue(['active_hours', 'days', $day]);
           continue 2;
         }
-        else if ($hour == 24) {
+        elseif ($hour == 24) {
           $str = $day . ' +1 day';
         }
         else {
@@ -384,7 +379,7 @@ class AdminSettingsForm extends ConfigFormBase {
       // Empty incoming message.
       $form_state->setError($form['account_registration']['incoming_pattern_options']['incoming_message'], $this->t('Incoming message must be filled if using pre-incoming_pattern option.'));
     }
-    else if (!empty($incoming_message)) {
+    elseif (!empty($incoming_message)) {
       $contains_email = strpos($incoming_message, '[email]') !== FALSE;
       $contains_password = strpos($incoming_message, '[password]') !== FALSE;
       $activation_email = $account_registration['incoming_pattern_options']['send_activation_email'];
@@ -451,9 +446,9 @@ class AdminSettingsForm extends ConfigFormBase {
       ->set('account_registration.incoming_pattern.reply.message_failure', $account_registration['incoming_pattern_options']['reply']['message_failure'])
       ->set('account_registration.incoming_pattern.send_activation_email', $account_registration['incoming_pattern_options']['send_activation_email'])
       // Active Hours.
-      ->set('active_hours.status', (boolean)$form_state->getValue(['active_hours', 'status']))
-      // Days make sense for this form, however storage uses generic 'range' term.
-      // Remove keys so it is a raw sequence.
+      ->set('active_hours.status', (boolean) $form_state->getValue(['active_hours', 'status']))
+      // Days make sense for this form, however storage uses generic 'range'
+      // term. Remove keys so it is a raw sequence.
       ->set('active_hours.ranges', array_values($form_state->getValue(['active_hours', 'days'])))
       ->save();
 

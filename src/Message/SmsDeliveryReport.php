@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Message\SmsDeliveryReport.
- */
-
 namespace Drupal\sms\Message;
 
 /**
@@ -27,10 +22,12 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
   protected $recipient = '';
 
   /**
+   * Status code for the message.
+   *
    * A status code from \Drupal\sms\Message\SmsMessageStatus, or NULL if
    * unknown.
    *
-   * @var string
+   * @var string|NULL
    */
   protected $status = NULL;
 

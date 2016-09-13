@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_user\ActiveHoursDates.
- */
-
 namespace Drupal\sms_user;
 
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -38,7 +33,7 @@ class ActiveHoursDates {
    * @param \Drupal\Core\Datetime\DrupalDateTime $end
    *   The end date.
    */
-  function __construct(DrupalDateTime $start, DrupalDateTime $end) {
+  public function __construct(DrupalDateTime $start, DrupalDateTime $end) {
     $this->start = $start;
     $this->end = $end;
   }
@@ -49,7 +44,7 @@ class ActiveHoursDates {
    * @return \Drupal\Core\Datetime\DrupalDateTime
    *   The start date.
    */
-  function getStartDate() {
+  public function getStartDate() {
     return $this->start;
   }
 
@@ -59,7 +54,7 @@ class ActiveHoursDates {
    * @return \Drupal\Core\Datetime\DrupalDateTime
    *   The end date.
    */
-  function getEndDate() {
+  public function getEndDate() {
     return $this->end;
   }
 

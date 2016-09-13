@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains tests for the sms_blast module.
- */
-
 namespace Drupal\sms_blast\Tests;
 
 use Drupal\sms\Tests\SmsFrameworkWebTestBase;
@@ -23,6 +18,8 @@ class SmsBlastWebTest extends SmsFrameworkWebTestBase {
   public static $modules = ['sms', 'user', 'sms_blast'];
 
   /**
+   * Phone number settings of user entity type.
+   *
    * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
    */
   protected $phoneNumberSettings;
@@ -62,7 +59,7 @@ class SmsBlastWebTest extends SmsFrameworkWebTestBase {
   /**
    * Tests sending SMS blast.
    */
-  function testSendBlast() {
+  public function testSendBlast() {
     // Create users with two phone numbers. Only one message should be sent to
     // each user.
     $phone_numbers = ['+123123123', '+456456456'];

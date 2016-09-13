@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Form\SmsGatewayDeleteForm.
- */
-
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
@@ -15,6 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
  * Form controller to delete SMS Gateway.
  */
 class SmsGatewayDeleteForm extends EntityConfirmFormBase {
+
   /**
    * {@inheritdoc}
    */

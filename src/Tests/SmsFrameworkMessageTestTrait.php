@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Tests\SmsFrameworkMessageTestTrait
- */
-
 namespace Drupal\sms\Tests;
 
 use Drupal\sms\Direction;
@@ -224,7 +219,7 @@ trait SmsFrameworkMessageTestTrait {
   public function testAutomated() {
     $sms_message1 = $this->createSmsMessage();
 
-    // Default
+    // Default.
     $this->assertEquals(TRUE, $sms_message1->isAutomated());
 
     $sms_message2 = $this->createSmsMessage();
@@ -246,7 +241,7 @@ trait SmsFrameworkMessageTestTrait {
   }
 
   /**
-   * Tests chunk by recipients
+   * Tests chunk by recipients.
    *
    * @covers ::chunkByRecipients
    */

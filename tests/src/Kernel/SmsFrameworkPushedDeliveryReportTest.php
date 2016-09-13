@@ -13,9 +13,12 @@ use Drupal\Core\Session\AnonymousUserSession;
 class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase {
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
-  public static $modules = ['system', 'sms', 'entity_test', 'user', 'field', 'telephone', 'dynamic_entity_reference', 'sms_test_gateway'];
+  public static $modules = [
+    'system', 'sms', 'entity_test', 'user', 'field', 'telephone',
+    'dynamic_entity_reference', 'sms_test_gateway',
+  ];
 
   /**
    * The access manager service.
@@ -32,7 +35,7 @@ class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase {
   protected $anonymous;
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();

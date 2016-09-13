@@ -42,6 +42,8 @@ function hook_sms_gateway_info_alter(&$gateways) {
 class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSubscriberInterface {
 
   /**
+   * An example event subscriber.
+   *
    * @see \Drupal\sms\Event\SmsEvents::MESSAGE_PRE_PROCESS
    */
   public function mySmsMessagePreprocess(\Drupal\sms\Event\SmsMessageEvent $event) {
@@ -54,6 +56,8 @@ class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSu
   }
 
   /**
+   * An example event subscriber.
+   *
    * @see \Drupal\sms\Event\SmsEvents::MESSAGE_POST_PROCESS
    */
   public function mySmsMessagePostProcess(\Drupal\sms\Event\SmsMessageEvent $event) {
@@ -66,6 +70,8 @@ class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSu
   }
 
   /**
+   * An example event subscriber.
+   *
    * @see \Drupal\sms\Event\SmsEvents::MESSAGE_GATEWAY
    */
   public function mySmsMessageGateway(\Drupal\sms\Event\RecipientGatewayEvent $event) {
@@ -79,6 +85,8 @@ class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSu
   }
 
   /**
+   * An example event subscriber.
+   *
    * @see \Drupal\sms\Event\SmsEvents::DELIVERY_REPORT_POST_PROCESS
    */
   public function myDeliveryReportPostProcessor(\Drupal\sms\Event\SmsDeliveryReportEvent $event) {

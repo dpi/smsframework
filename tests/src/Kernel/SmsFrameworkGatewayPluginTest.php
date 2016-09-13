@@ -13,11 +13,12 @@ use Drupal\sms\Direction;
 class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = ['sms', 'sms_test', 'sms_test_gateway', 'field', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = [
+    'sms', 'sms_test', 'sms_test_gateway', 'field', 'telephone',
+    'dynamic_entity_reference',
+  ];
 
   /**
    * {@inheritdoc}
@@ -29,8 +30,7 @@ class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Ensure incoming hook is fired on a gateway plugin implementing
-   * SmsGatewayPluginIncomingInterface.
+   * Tests if incoming hook is fired on a gateway plugin.
    */
   public function testIncoming() {
     $gateway = $this->createMemoryGateway([

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\DeliveryReportController
- */
-
 namespace Drupal\sms;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -63,6 +58,7 @@ class DeliveryReportController implements ContainerInjectionInterface {
    *   upcasted.
    *
    * @return \Symfony\Component\HttpFoundation\Response
+   *   A response object to return.
    */
   public function processDeliveryReport(SmsGatewayInterface $sms_gateway) {
     return $this->smsProvider->processDeliveryReport($this->requestStack->getCurrentRequest(), $sms_gateway);

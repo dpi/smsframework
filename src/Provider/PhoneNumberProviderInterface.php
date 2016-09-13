@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Provider\PhoneNumberProviderInterface.
- */
-
 namespace Drupal\sms\Provider;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -51,9 +46,9 @@ interface PhoneNumberProviderInterface {
   /**
    * Gets read only phone number settings config object for a bundle.
    *
-   * @param $entity_type_id
+   * @param string $entity_type_id
    *   The entity type ID of the bundle.
-   * @param $bundle
+   * @param string $bundle
    *   An entity bundle.
    *
    * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|NULL
@@ -97,7 +92,7 @@ interface PhoneNumberProviderInterface {
    *
    * @param string $phone_number
    *   A phone number.
-   * @param boolean|NULL $verified
+   * @param bool|NULL $verified
    *   Whether the returned phone numbers must be verified, or NULL to get all
    *   regardless of status.
    * @param string $entity_type
@@ -117,6 +112,7 @@ interface PhoneNumberProviderInterface {
    *   A phone number.
    *
    * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|NULL
+   *   The phone number verification for an entity and phone number pair.
    */
   public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number);
 
@@ -146,7 +142,7 @@ interface PhoneNumberProviderInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   Update phone number verifications for this entity.
    */
-  function updatePhoneVerificationByEntity(EntityInterface $entity);
+  public function updatePhoneVerificationByEntity(EntityInterface $entity);
 
   /**
    * Deletes phone number verifications for an entity.
@@ -154,10 +150,10 @@ interface PhoneNumberProviderInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   Delete phone number verifications for this entity.
    */
-  function deletePhoneVerificationByEntity(EntityInterface $entity);
+  public function deletePhoneVerificationByEntity(EntityInterface $entity);
 
   /**
-   * Cleans up expired phone number verifications
+   * Cleans up expired phone number verifications.
    *
    * Removes phone numbers from entities if setting is verification expires, and
    * setting is enabled.

@@ -6,7 +6,7 @@ use Drupal\sms\Tests\SmsFrameworkWebTestBase;
 use Drupal\Core\Url;
 
 /**
- * Tests dynamically created SMS User menu links
+ * Tests dynamically created SMS User menu links.
  *
  * @group SMS User
  */

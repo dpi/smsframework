@@ -1,7 +1,5 @@
 <?php
 
-// $Id$
-
 /**
  * @file
  * Token callbacks for the sms module.
@@ -71,6 +69,7 @@ function sms_tokens($type, $tokens, array $data, array $options, BubbleableMetad
             $recipients = $sms_message->getRecipients();
             $replacements[$original] = reset($recipients) ?: '';
             break;
+
           case 'message':
             $replacements[$original] = $sms_message->getMessage();
             break;

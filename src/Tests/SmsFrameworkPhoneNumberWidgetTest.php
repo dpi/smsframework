@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Tests\SmsFrameworkPhoneNumberWidgetTest.
- */
-
 namespace Drupal\sms\Tests;
 
 use Drupal\Core\Url;
@@ -41,7 +36,6 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
     $form_field_phone_number = $field_phone_number . '[0][value]';
 
     $test_entity = $this->createEntityWithPhoneNumber($phone_number_settings);
-
 
     // No verification code created.
     $this->drupalGet($test_entity->toUrl('edit-form'));

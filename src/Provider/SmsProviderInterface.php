@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains definition of \Drupal\sms\Provider\SmsProviderInterface
- */
-
 namespace Drupal\sms\Provider;
 
 use Drupal\sms\Entity\SmsGatewayInterface;
@@ -12,7 +7,7 @@ use Drupal\sms\Message\SmsMessageInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Provides an interface for sending messages
+ * Provides an interface for sending messages.
  */
 interface SmsProviderInterface {
 
@@ -35,7 +30,7 @@ interface SmsProviderInterface {
    *
    * It is preferred to use queue method over directly invoking send().
    *
-   * @param \Drupal\sms\Message\SmsMessageInterface
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms
    *   The message to be sent.
    *
    * @return \Drupal\sms\Message\SmsMessageInterface[]
@@ -51,7 +46,7 @@ interface SmsProviderInterface {
   /**
    * Handles a message received by the server.
    *
-   * @param \Drupal\sms\Message\SmsMessageInterface
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
    *   The message received.
    *
    * @return \Drupal\sms\Message\SmsMessageInterface[]

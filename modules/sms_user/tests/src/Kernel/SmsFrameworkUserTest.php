@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms_user\Kernel\SmsFrameworkUserTest.
- */
-
 namespace Drupal\Tests\sms_user\Kernel;
 
 use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
@@ -24,12 +19,21 @@ class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
    *
    * @var array
    */
-  public static $modules = ['system', 'sms', 'sms_user', 'sms_test_gateway', 'user', 'telephone', 'dynamic_entity_reference', 'field'];
+  public static $modules = [
+    'system',
+    'sms',
+    'sms_user',
+    'sms_test_gateway',
+    'user',
+    'telephone',
+    'dynamic_entity_reference',
+    'field',
+  ];
 
   /**
-   * @var \Drupal\sms\Provider\SmsProviderInterface
+   * The SMS provider.
    *
-   * The default SMS provider.
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $smsProvider;
 
@@ -56,6 +60,8 @@ class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Ensure account registration service does not crash if missing user config.
+   *
    * Ensure sms_user.account_registration service does not crash and burn if
    * there are no phone number settings for user.user.
    */

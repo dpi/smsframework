@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\sms\Message\SmsMessageResultInterface
- */
-
 namespace Drupal\sms\Message;
 
 /**
@@ -27,7 +22,7 @@ interface SmsMessageResultInterface {
    * Usually a setting an error on a result indicates something went wrong with
    * the entire transaction.
    *
-   * @param string $error|NULL
+   * @param string|NULL $error
    *   A error code from \Drupal\sms\Message\SmsMessageResultError, or NULL if
    *   unknown.
    *

@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\sms\Unit\Message;
 
+use Drupal\sms\Exception\SmsException;
 use Drupal\Tests\UnitTestCase;
 use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Message\SmsMessageResult;
@@ -112,7 +113,7 @@ class SmsFrameworkResultUnitTest extends UnitTestCase {
     $balance = 'foobar';
     $result = $this->createResult();
 
-    $this->setExpectedException(\Drupal\sms\Exception\SmsException::class, 'Credit balance set is a string');
+    $this->setExpectedException(SmsException::class, 'Credit balance set is a string');
     $result->setCreditsBalance($balance);
   }
 
@@ -141,7 +142,7 @@ class SmsFrameworkResultUnitTest extends UnitTestCase {
     $used = 'foobar';
     $result = $this->createResult();
 
-    $this->setExpectedException(\Drupal\sms\Exception\SmsException::class, 'Credit used is a string');
+    $this->setExpectedException(SmsException::class, 'Credit used is a string');
     $result->setCreditsUsed($used);
   }
 
@@ -149,6 +150,7 @@ class SmsFrameworkResultUnitTest extends UnitTestCase {
    * Create a result for testing.
    *
    * @return \Drupal\sms\Message\SmsMessageResultInterface
+   *   A result for testing.
    */
   protected function createResult() {
     return new SmsMessageResult();

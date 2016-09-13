@@ -1,12 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_test_gateway\Plugin\SmsGateway\MemoryChunked
- */
-
 namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
-
 
 /**
  * Defines a gateway requiring chunked messages.

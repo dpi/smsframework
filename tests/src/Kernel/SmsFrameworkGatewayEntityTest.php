@@ -1,14 +1,8 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkGatewayEntity.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\SmsGateway;
-use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Direction;
 
 /**
@@ -19,11 +13,11 @@ use Drupal\sms\Direction;
 class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = ['sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = [
+    'sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference',
+  ];
 
   /**
    * Tests skip queue.
@@ -111,7 +105,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
     $this->assertFalse($gateway->supportsReportsPull());
   }
 
-  /*
+  /**
    * Tests 'max outgoing recipients' annotation custom value.
    */
   public function testGetMaxRecipientsOutgoingCustom() {

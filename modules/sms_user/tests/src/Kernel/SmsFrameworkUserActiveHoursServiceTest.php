@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms_user\Kernel\SmsFrameworkUserActiveHoursServiceTest.
- */
-
 namespace Drupal\Tests\sms_user\Kernel;
 
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -28,19 +23,25 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    *
    * @var array
    */
-  public static $modules = ['sms', 'sms_user', 'user', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = [
+    'sms',
+    'sms_user',
+    'user',
+    'telephone',
+    'dynamic_entity_reference',
+  ];
 
   /**
-   * @var \Drupal\sms_user\ActiveHoursInterface
-   *
    * The active hours service.
+   *
+   * @var \Drupal\sms_user\ActiveHoursInterface
    */
   protected $activeHoursService;
 
   /**
-   * @var \Drupal\sms\Provider\SmsProviderInterface
+   * The SMS provider.
    *
-   * The default SMS provider.
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $smsProvider;
 

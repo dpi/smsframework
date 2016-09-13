@@ -1,9 +1,5 @@
 <?php
 
-/**
- * Contains \Drupal\sms\Exception\SmsException
- */
-
 namespace Drupal\sms\Exception;
 
 /**

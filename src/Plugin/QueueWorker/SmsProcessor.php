@@ -1,16 +1,10 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Plugin\QueueWorker\SmsProcessor.
- */
-
 namespace Drupal\sms\Plugin\QueueWorker;
 
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\sms\Direction;
@@ -76,8 +70,8 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
   /**
    * {@inheritdoc}
    *
-   * @param $data
-   *   - id: integer: SMS message entity ID.
+   * @param array $data
+   *   - id: int: SMS message entity ID.
    */
   public function processItem($data) {
     if (isset($data['id'])) {
@@ -89,6 +83,7 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
             $this->smsProvider
               ->incoming($sms_message);
             break;
+
           case Direction::OUTGOING:
             $this->smsProvider
               ->send($sms_message);

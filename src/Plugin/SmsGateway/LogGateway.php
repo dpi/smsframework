@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Plugin\SmsGateway\LogGateway
- */
-
 namespace Drupal\sms\Plugin\SmsGateway;
 
 use Drupal\sms\Message\SmsDeliveryReport;
@@ -14,6 +9,8 @@ use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
 
 /**
+ * Defines a logger gateway for testing and debugging.
+ *
  * @SmsGateway(
  *   id = "log",
  *   label = @Translation("Drupal log"),
@@ -26,8 +23,10 @@ class LogGateway extends SmsGatewayPluginBase {
    * {@inheritdoc}
    */
   public function send(SmsMessageInterface $sms) {
-    $this->logger()->notice('SMS message sent to %number with the text: @message',
-      ['%number' => implode(', ', $sms->getRecipients()), '@message' => $sms->getMessage()]);
+    $this->logger()->notice('SMS message sent to %number with the text: @message', [
+      '%number' => implode(', ', $sms->getRecipients()),
+      '@message' => $sms->getMessage(),
+    ]);
 
     $reports = [];
     foreach ($sms->getRecipients() as $number) {
