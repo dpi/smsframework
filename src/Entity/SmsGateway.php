@@ -126,7 +126,8 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
     parent::postSave($storage, $update);
     /** @var static $original */
     $original = &$this->original;
-    if ($original->getPushReportPath() != $this->getPushReportPath()) {
+    $original_path = isset($original) ? $original->getPushReportPath() : '';
+    if ($original_path != $this->getPushReportPath()) {
       \Drupal::service('router.builder')->setRebuildNeeded();
     }
   }
