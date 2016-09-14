@@ -120,6 +120,18 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   }
 
   /**
+   * @inheritDoc
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+    /** @var static $original */
+    $original = &$this->original;
+    if ($original->getPushReportPath() != $this->getPushReportPath()) {
+      \Drupal::service('router.builder')->setRebuildNeeded();
+    }
+  }
+
+  /**
    * Encapsulates the creation of the action's LazyPluginCollection.
    *
    * @return \Drupal\Component\Plugin\LazyPluginCollection
