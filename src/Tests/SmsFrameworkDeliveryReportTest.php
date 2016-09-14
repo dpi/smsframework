@@ -22,6 +22,7 @@ class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase {
     $this->drupalLogin($user);
 
     $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
+    $this->container->get('router.builder')->rebuild();
     $sms_message = $this->randomSmsMessage($user->id())
       ->setGateway($test_gateway);
 

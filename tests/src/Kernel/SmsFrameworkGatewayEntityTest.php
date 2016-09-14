@@ -74,7 +74,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
     $gateway = $this->createGateway();
 
     $path = $gateway->getPushReportPath();
-    $this->assertTrue(strpos('/sms/delivery-report/receive/', $path) === 0);
+    $this->assertTrue(strpos($path, '/sms/delivery-report/receive/') === 0);
 
     $new_path = '/' . $this->randomMachineName();
     $return = $gateway->setPushReportPath($new_path);
