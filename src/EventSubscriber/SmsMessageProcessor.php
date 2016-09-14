@@ -162,8 +162,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
   public function deliveryReportUrl(SmsMessageEvent $event) {
     foreach ($event->getMessages() as &$sms_message) {
       if (!$sms_message->getOption('delivery_report_url')) {
-        $route_parameters = ['sms_gateway' => $sms_message->getGateway()->id()];
-        $url = Url::fromRoute('sms.process_delivery_report', $route_parameters);
+        $url = $sms_message->getGateway()->getPushReportUrl();
         $sms_message->setOption('delivery_report_url', $url->setAbsolute()->toString());
       }
     }

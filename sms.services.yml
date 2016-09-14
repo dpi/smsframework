@@ -1,4 +1,8 @@
 services:
+  sms.route_enhancer:
+    class: Drupal\sms\Routing\Enhancer\SmsRouteEnhancer
+    tags:
+      - { name: route_enhancer }
   sms.provider:
     alias: sms.provider.default
   sms.provider.default:

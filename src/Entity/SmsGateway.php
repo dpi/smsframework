@@ -2,7 +2,10 @@
 
 namespace Drupal\sms\Entity;
 
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Url;
 use Drupal\sms\Plugin\SmsGatewayPluginCollection;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\sms\Direction;
@@ -85,6 +88,13 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   protected $skip_queue;
 
   /**
+   * The internal path where pushed delivery reports can be received.
+   *
+   * @var string
+   */
+  protected $reports_push_path;
+
+  /**
    * How many seconds to hold messages after they are received.
    *
    * @var int
@@ -97,6 +107,17 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
    * @var int
    */
   protected $retention_duration_outgoing;
+
+  /**
+   * @inheritDoc
+   */
+  public static function preCreate(EntityStorageInterface $storage, array &$values) {
+    parent::preCreate($storage, $values);
+    if (!isset($values['reports_push_path'])) {
+      $key = Crypt::randomBytesBase64(16);
+      $values['reports_push_path'] = '/sms/delivery-report/receive/' . $key;
+    }
+  }
 
   /**
    * Encapsulates the creation of the action's LazyPluginCollection.
@@ -148,6 +169,28 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
    */
   public function setSkipQueue($skip_queue) {
     $this->skip_queue = (boolean) $skip_queue;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPushReportUrl() {
+    return Url::fromRoute('sms.delivery_report.receive.' . $this->id());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPushReportPath() {
+    return $this->reports_push_path;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPushReportPath($path) {
+    $this->reports_push_path = $path;
     return $this;
   }
 

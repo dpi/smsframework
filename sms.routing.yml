@@ -83,10 +83,3 @@ entity.sms_gateway.delete_form:
     _title: 'Delete gateway'
   requirements:
     _permission: 'administer smsframework'
-
-sms.process_delivery_report:
-  path: '/sms/process-delivery-report/{sms_gateway}'
-  defaults:
-    _controller: '\Drupal\sms\DeliveryReportController::processDeliveryReport'
-  requirements:
-    _sms_gateway_supports_pushed_reports: 'TRUE'

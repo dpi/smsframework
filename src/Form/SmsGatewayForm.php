@@ -2,10 +2,13 @@
 
 namespace Drupal\sms\Form;
 
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
+use Drupal\Core\Routing\RouteBuilderInterface;
+use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -17,6 +20,20 @@ use Drupal\sms\Direction;
  * Form controller for SMS Gateways.
  */
 class SmsGatewayForm extends EntityForm {
+
+  /**
+   * The route builder.
+   *
+   * @var \Drupal\Core\Routing\RouteBuilderInterface
+   */
+  protected $routeBuilder;
+
+  /**
+   * The request context.
+   *
+   * @var \Drupal\Core\Routing\RequestContext
+   */
+  protected $requestContext;
 
   /**
    * The access manager service.
@@ -42,6 +59,10 @@ class SmsGatewayForm extends EntityForm {
   /**
    * Constructs a new SmsGatewayForm object.
    *
+   * @param \Drupal\Core\Routing\RouteBuilderInterface $route_builder
+   *   The route builder.
+   * @param \Drupal\Core\Routing\RequestContext $request_context
+   *   The request context.
    * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
    *   The access manager.
    * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
@@ -49,7 +70,9 @@ class SmsGatewayForm extends EntityForm {
    * @param \Drupal\sms\Plugin\SmsGatewayPluginManagerInterface $gateway_manager
    *   The gateway manager service.
    */
-  public function __construct(AccessManagerInterface $access_manager, QueryFactory $query_factory, SmsGatewayPluginManagerInterface $gateway_manager) {
+  public function __construct(RouteBuilderInterface $route_builder, RequestContext $request_context, AccessManagerInterface $access_manager, QueryFactory $query_factory, SmsGatewayPluginManagerInterface $gateway_manager) {
+    $this->routeBuilder = $route_builder;
+    $this->requestContext = $request_context;
     $this->accessManager = $access_manager;
     $this->entityQueryFactory = $query_factory;
     $this->gatewayManager = $gateway_manager;
@@ -60,6 +83,8 @@ class SmsGatewayForm extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
+      $container->get('router.builder'),
+      $container->get('router.request_context'),
       $container->get('access_manager'),
       $container->get('entity.query'),
       $container->get('plugin.manager.sms_gateway')
@@ -160,18 +185,25 @@ class SmsGatewayForm extends EntityForm {
       '#min' => -1,
     ];
 
-    if (!$sms_gateway->isNew()) {
-      $anonymous = new AnonymousUserSession();
-      $url = Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $sms_gateway->id()])->setAbsolute();
-      $access = $this->accessManager->checkNamedRoute($url->getRouteName(), $url->getRouteParameters(), $anonymous);
-      if ($access) {
-        $form['delivery_report_path'] = [
-          '#type' => 'item',
-          '#title' => $this->t('Delivery report URL'),
-          '#markup' => $url->toString(),
-        ];
-      }
+    $form['delivery_reports'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Delivery reports'),
+      '#open' => TRUE,
+      '#optional' => TRUE,
+    ];
+    $form['delivery_reports']['#tree'] = TRUE;
+    $form['delivery_reports']['push_path'] = [
+      '#type' => 'textfield',
+      '#title' => t('Pushed delivery report Url'),
+      '#default_value' => $sms_gateway->getPushReportPath(),
+      '#description' => t('The path where pushed delivery reports are received.'),
+      '#size' => 60,
+      '#field_prefix' => $this->requestContext->getCompleteBaseUrl(),
+      '#access' => !$sms_gateway->isNew() ? $sms_gateway->supportsReportsPush() : TRUE,
+      '#group' => 'delivery_reports',
+    ];
 
+    if (!$sms_gateway->isNew()) {
       $instance = $sms_gateway->getPlugin();
       $form += $instance->buildConfigurationForm($form, $form_state);
     }
@@ -196,6 +228,20 @@ class SmsGatewayForm extends EntityForm {
       $sms_gateway->getPlugin()
         ->validateConfigurationForm($form, $form_state);
     }
+
+    // Delivery report path.
+    $reports_push_path = $form_state->getValue(['delivery_reports', 'push_path']);
+    $reports_push_path_length = Unicode::strlen($reports_push_path);
+
+    // Length must be more than 2 characters, including leading slash character.
+    if ($reports_push_path_length > 0) {
+      if (Unicode::substr($reports_push_path, 0, 1) !== '/') {
+        $form_state->setError($form['delivery_reports']['push_path'], $this->t("Path must begin with a '/' character."));
+      }
+      if ($reports_push_path_length == 1) {
+        $form_state->setError($form['delivery_reports']['push_path'], $this->t("Not enough characters for path."));
+      }
+    }
   }
 
   /**
@@ -219,26 +265,35 @@ class SmsGatewayForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
     $sms_gateway = $this->getEntity();
+    $reports_push_path_original = $sms_gateway->getPushReportPath();
+    $reports_push_path = $form_state->getValue(['delivery_reports', 'push_path']);
 
-    $sms_gateway->setStatus($form_state->getValue('status'));
+    $sms_gateway
+      ->setStatus($form_state->getValue('status'))
+      ->setPushReportPath($reports_push_path);
+
     $saved = $sms_gateway->save();
 
     if ($saved == SAVED_NEW) {
       drupal_set_message($this->t('Gateway created.'));
-    }
-    else {
-      drupal_set_message($this->t('Gateway saved.'));
-    }
+      $rebuild = !empty($reports_push_path);
 
-    if ($saved == SAVED_NEW) {
       // Redirect to edit form.
       $form_state->setRedirectUrl(Url::fromRoute('entity.sms_gateway.edit_form', [
         'sms_gateway' => $sms_gateway->id(),
       ]));
     }
     else {
+      drupal_set_message($this->t('Gateway saved.'));
+      // Only rebuild routes if the path was changed.
+      $rebuild = $reports_push_path_original != $reports_push_path;
+
       // Back to list page.
       $form_state->setRedirect('sms.gateway.list');
+    }
+
+    if ($rebuild) {
+      $this->routeBuilder->setRebuildNeeded();
     }
   }
 
