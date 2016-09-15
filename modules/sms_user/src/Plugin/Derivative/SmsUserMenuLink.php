@@ -4,7 +4,7 @@ namespace Drupal\sms_user\Plugin\Derivative;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
-use Drupal\sms\Provider\PhoneNumberProviderInterface;
+use Drupal\sms\Provider\PhoneNumberVerificationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -15,20 +15,20 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SmsUserMenuLink extends DeriverBase implements ContainerDeriverInterface {
 
   /**
-   * Phone number provider.
+   * The phone number verification service.
    *
-   * @var \Drupal\sms\Provider\PhoneNumberProviderInterface
+   * @var \Drupal\sms\Provider\PhoneNumberVerificationInterface
    */
-  protected $phoneNumberProvider;
+  protected $phoneNumberVerification;
 
   /**
    * Constructs a \Drupal\sms_user\Plugin\Derivative\SmsUserMenuLink instance.
    *
-   * @param \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider
-   *   The phone number provider.
+   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification
+   *   The phone number verification service.
    */
-  public function __construct(PhoneNumberProviderInterface $phone_number_provider) {
-    $this->phoneNumberProvider = $phone_number_provider;
+  public function __construct(PhoneNumberVerificationInterface $phone_number_verification) {
+    $this->phoneNumberVerification = $phone_number_verification;
   }
 
   /**
@@ -36,7 +36,7 @@ class SmsUserMenuLink extends DeriverBase implements ContainerDeriverInterface {
    */
   public static function create(ContainerInterface $container, $base_plugin_id) {
     return new static(
-      $container->get('sms.phone_number')
+      $container->get('sms.phone_number.verification')
     );
   }
 
@@ -46,7 +46,7 @@ class SmsUserMenuLink extends DeriverBase implements ContainerDeriverInterface {
   public function getDerivativeDefinitions($base_plugin_definition) {
     $links = [];
 
-    if ($this->phoneNumberProvider->getPhoneNumberSettings('user', 'user')) {
+    if ($this->phoneNumberVerification->getPhoneNumberSettings('user', 'user')) {
       $links['sms_user_phone_number_settings'] = [
         'title' => t('User phone number'),
         'description' => t('Set up phone number fields and settings for users.'),
