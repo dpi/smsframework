@@ -4,8 +4,8 @@ namespace Drupal\sms\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Url;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Event\RecipientGatewayEvent;
@@ -162,9 +162,13 @@ class SmsMessageProcessor implements EventSubscriberInterface {
   public function deliveryReportUrl(SmsMessageEvent $event) {
     foreach ($event->getMessages() as &$sms_message) {
       if (!$sms_message->getOption('delivery_report_url')) {
-        $route_parameters = ['sms_gateway' => $sms_message->getGateway()->id()];
-        $url = Url::fromRoute('sms.process_delivery_report', $route_parameters);
-        $sms_message->setOption('delivery_report_url', $url->setAbsolute()->toString());
+        $url = $sms_message->getGateway()->getPushReportUrl();
+        try {
+          $url = $url->setAbsolute()->toString();
+          $sms_message->setOption('delivery_report_url', $url);
+        }
+        catch (RouteNotFoundException $e) {
+        }
       }
     }
   }

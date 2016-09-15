@@ -22,6 +22,7 @@ class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase {
     $this->drupalLogin($user);
 
     $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
+    $this->container->get('router.builder')->rebuild();
     $sms_message = $this->randomSmsMessage($user->id())
       ->setGateway($test_gateway);
 
@@ -39,7 +40,7 @@ class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase {
     $this->assertEqual($first_report->getStatus(), SmsMessageReportStatus::QUEUED);
 
     // Get the delivery reports url and simulate push delivery report.
-    $url = Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $test_gateway->id()], ['absolute' => TRUE])->toString();
+    $url = $test_gateway->getPushReportUrl()->setAbsolute()->toString();
     $delivered_time = REQUEST_TIME;
     $delivery_report = <<<EOF
 {

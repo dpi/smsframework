@@ -2,8 +2,10 @@
 
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\Core\Url;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Direction;
+use Drupal\sms\Entity\SmsGatewayInterface;
 
 /**
  * Tests SMS Framework gateway entity.
@@ -63,6 +65,30 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
     $gateway = $this->createGateway();
     $this->setExpectedException(\Exception::class);
     $gateway->getRetentionDuration(0);
+  }
+
+  /**
+   * Tests incoming report path.
+   */
+  public function testPushReportPath() {
+    $gateway = $this->createGateway();
+
+    $path = $gateway->getPushReportPath();
+    $this->assertTrue(strpos($path, '/sms/delivery-report/receive/') === 0);
+
+    $new_path = '/' . $this->randomMachineName();
+    $return = $gateway->setPushReportPath($new_path);
+
+    $this->assertTrue($return instanceof SmsGatewayInterface);
+    $this->assertEquals($new_path, $gateway->getPushReportPath());
+  }
+
+  /**
+   * Tests incoming report url.
+   */
+  public function testPushReportUrl() {
+    $gateway = $this->createGateway();
+    $this->assertTrue($gateway->getPushReportUrl() instanceof Url);
   }
 
   /**

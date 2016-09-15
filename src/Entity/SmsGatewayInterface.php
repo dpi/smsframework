@@ -45,6 +45,33 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   public function setSkipQueue($skip_queue);
 
   /**
+   * Get the url where pushed delivery reports can be received.
+   *
+   * @return \Drupal\Core\Url
+   *   The url where pushed delivery reports can be received.
+   */
+  public function getPushReportUrl();
+
+  /**
+   * Get the internal path where pushed delivery reports can be received.
+   *
+   * @return string
+   *   The internal path where pushed delivery reports can be received.
+   */
+  public function getPushReportPath();
+
+  /**
+   * Set the internal path where pushed delivery reports can be received.
+   *
+   * @param string $path
+   *   The internal path where pushed delivery reports can be received.
+   *
+   * @return $this
+   *   Return this gateway for chaining.
+   */
+  public function setPushReportPath($path);
+
+  /**
    * Get how many seconds to hold messages.
    *
    * @param int $direction

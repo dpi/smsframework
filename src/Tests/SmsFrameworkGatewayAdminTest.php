@@ -133,9 +133,7 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
     $this->assertFieldByName('retention_duration_outgoing', '0');
 
     // Memory gateway supports pushed reports, so the URL should display.
-    $url = Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $test_gateway->id()])->setAbsolute();
-    $this->assertRaw(t('Delivery report URL'));
-    $this->assertRaw($url->toString(), 'Delivery report URL is visible');
+    $this->assertFieldByName('delivery_reports[push_path]', $test_gateway->getPushReportPath());
 
     // Memory gateway has a decoy configuration form.
     $edit = [
@@ -178,7 +176,7 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
     $this->assertResponse(200);
     $this->assertRaw('Edit gateway');
 
-    $this->assertNoRaw(t('Delivery report URL'));
+    $this->assertNoFieldByName('delivery_reports[push_path]');
   }
 
   /**
