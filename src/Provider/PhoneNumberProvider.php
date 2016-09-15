@@ -49,8 +49,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   public function getPhoneNumbers(EntityInterface $entity, $verified = TRUE) {
     $phone_number_settings = $this->phoneNumberVerification
       ->getPhoneNumberSettingsForEntity($entity);
-    $field_name = $phone_number_settings->phoneNumberVerification
-      ->getFieldName('phone_number');
+    $field_name = $phone_number_settings->getFieldName('phone_number');
 
     if (!$field_name) {
       throw new PhoneNumberSettingsException(sprintf('Entity phone number config field mapping not set for bundle %s:%s', $entity->getEntityTypeId(), $entity->bundle()));

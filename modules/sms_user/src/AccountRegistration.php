@@ -5,7 +5,7 @@ namespace Drupal\sms_user;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\sms\Provider\SmsProviderInterface;
-use Drupal\sms\Provider\PhoneNumberProviderInterface;
+use Drupal\sms\Provider\PhoneNumberVerificationInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Direction;
 use Drupal\user\Entity\User;
@@ -42,11 +42,11 @@ class AccountRegistration implements AccountRegistrationInterface {
   protected $smsProvider;
 
   /**
-   * Phone number provider.
+   * Phone number verification provider.
    *
-   * @var \Drupal\sms\Provider\PhoneNumberProviderInterface
+   * @var \Drupal\sms\Provider\PhoneNumberVerificationInterface
    */
-  protected $phoneNumberProvider;
+  protected $phoneNumberVerificationProvider;
 
   /**
    * Phone number settings for user.user bundle.
@@ -64,21 +64,21 @@ class AccountRegistration implements AccountRegistrationInterface {
    *   The token replacement system.
    * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
    *   The SMS provider.
-   * @param \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider
-   *   The phone number provider.
+   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification_provider
+   *   The phone number verification provider.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, Token $token, SmsProviderInterface $sms_provider, PhoneNumberProviderInterface $phone_number_provider) {
+  public function __construct(ConfigFactoryInterface $config_factory, Token $token, SmsProviderInterface $sms_provider, PhoneNumberVerificationInterface $phone_number_verification_provider) {
     $this->configFactory = $config_factory;
     $this->token = $token;
     $this->smsProvider = $sms_provider;
-    $this->phoneNumberProvider = $phone_number_provider;
+    $this->phoneNumberVerificationProvider = $phone_number_verification_provider;
   }
 
   /**
    * {@inheritdoc}
    */
   public function createAccount(SmsMessageInterface $sms_message) {
-    $this->userPhoneNumberSettings = $this->phoneNumberProvider
+    $this->userPhoneNumberSettings = $this->phoneNumberVerificationProvider
       ->getPhoneNumberSettings('user', 'user');
     if (!$this->userPhoneNumberSettings) {
       // Can't do anything if there is no phone number settings for user.
@@ -88,7 +88,7 @@ class AccountRegistration implements AccountRegistrationInterface {
     $sender_number = $sms_message->getSenderNumber();
     if (!empty($sender_number)) {
       // Any users with this phone number?
-      $entities = $this->phoneNumberProvider
+      $entities = $this->phoneNumberVerificationProvider
         ->getPhoneVerificationByPhoneNumber($sender_number, NULL, 'user');
       if (!count($entities)) {
         if (!empty($this->settings('unrecognized_sender.status'))) {
