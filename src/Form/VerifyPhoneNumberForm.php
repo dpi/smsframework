@@ -46,7 +46,7 @@ class VerifyPhoneNumberForm extends FormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('flood'),
-      $container->get('sms.phone_number')
+      $container->get('sms.phone_number.verification')
     );
   }
 
