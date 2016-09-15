@@ -47,12 +47,12 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
     $form = parent::buildConfigurationForm($form, $form_state);
     $config = $this->getConfiguration();
 
-    $form['widget'] = array(
+    $form['widget'] = [
       '#type' => 'textfield',
       '#title' => t('Widget'),
       '#description' => t('Enter a widget.'),
       '#default_value' => $config['widget'],
-    );
+    ];
 
     return $form;
   }

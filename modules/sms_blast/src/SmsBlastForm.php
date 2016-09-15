@@ -63,17 +63,17 @@ class SmsBlastForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['message'] = array(
+    $form['message'] = [
       '#type'  => 'textarea',
       '#title' => $this->t('Message'),
       '#cols'  => 60,
       '#rows'  => 5,
-    );
+    ];
 
-    $form['submit'] = array(
+    $form['submit'] = [
       '#type'  => 'submit',
       '#value' => $this->t('Send'),
-    );
+    ];
 
     return $form;
   }

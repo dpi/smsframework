@@ -84,10 +84,10 @@ class SendToPhoneForm extends FormBase {
         $destination = ['query' => \Drupal::service('redirect.destination')->getAsArray()];
         $form['message'] = [
           '#markup' => $this->t('You do not have permission to send messages. You may need to @signin or @register for an account to send messages to a mobile phone.',
-            array(
+            [
               '@signin' => $this->l('sign in', Url::fromRoute('user.page', [], $destination)),
               '@register' => $this->l('register', Url::fromRoute('user.register', [], $destination)),
-            )),
+            ]),
         ];
       }
     }
@@ -110,33 +110,33 @@ class SendToPhoneForm extends FormBase {
       case 'cck':
       case 'field':
       case 'inline':
-        $form['message'] = array(
+        $form['message'] = [
           '#type' => 'value',
           '#value' => $this->getRequest()->get('text'),
-        );
-        $form['message_preview'] = array(
+        ];
+        $form['message_preview'] = [
           '#type' => 'item',
           '#markup' => '<p class="message-preview">' . $this->getRequest()->get('text') . '</p>',
           '#title' => t('Message preview'),
-        );
+        ];
         break;
 
       case 'node':
         if (is_numeric($extra)) {
           $node = Node::load($extra);
-          $form['message_display'] = array(
+          $form['message_display'] = [
             '#type' => 'textarea',
             '#title' => t('Message preview'),
             '#description' => t('This URL will be sent to the phone.'),
             '#cols' => 35,
             '#rows' => 2,
-            '#attributes' => array('disabled' => TRUE),
+            '#attributes' => ['disabled' => TRUE],
             '#default_value' => $node->toUrl()->setAbsolute()->toString(),
-          );
-          $form['message'] = array(
+          ];
+          $form['message'] = [
             '#type' => 'value',
             '#value' => $node->toUrl()->setAbsolute()->toString(),
-          );
+          ];
         }
         break;
     }
@@ -150,11 +150,11 @@ class SendToPhoneForm extends FormBase {
       $form['number']['#default_value'] = reset($this->phoneNumbers);
     }
 
-    $form['submit'] = array(
+    $form['submit'] = [
       '#type' => 'submit',
       '#value' => t('Send'),
       '#weight' => 20,
-    );
+    ];
 
     // Add library for CSS styling.
     $form['#attached']['library'] = 'sms_sendtophone/default';

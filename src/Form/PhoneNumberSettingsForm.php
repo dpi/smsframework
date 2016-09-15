@@ -111,10 +111,10 @@ class PhoneNumberSettingsForm extends EntityForm {
       '#default_value' => $bundle_default_value,
       '#required' => TRUE,
       '#access' => $config->isNew(),
-      '#ajax' => array(
+      '#ajax' => [
         'callback' => '::updateFieldMapping',
         'wrapper' => 'edit-field-mapping-wrapper',
-      ),
+      ],
     ];
 
     if (!$bundles) {

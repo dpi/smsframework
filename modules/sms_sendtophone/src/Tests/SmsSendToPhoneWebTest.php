@@ -48,15 +48,15 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
 
     // Create Basic page and Article node types.
     if ($this->profile != 'standard') {
-      $this->drupalCreateContentType(array(
+      $this->drupalCreateContentType([
         'type' => 'page',
         'name' => 'Basic page',
         'display_submitted' => FALSE,
-      ));
-      $this->drupalCreateContentType(array(
+      ]);
+      $this->drupalCreateContentType([
         'type' => 'article',
         'name' => 'Article',
-      ));
+      ]);
     }
 
     $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
@@ -88,12 +88,12 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
    * Tests admin settings page and sendtophone node integration.
    */
   public function testAdminSettingsAndSendToPhone() {
-    $user = $this->drupalCreateUser(array('administer smsframework'));
+    $user = $this->drupalCreateUser(['administer smsframework']);
     $this->drupalLogin($user);
 
     $this->drupalGet('admin/config/smsframework/sendtophone');
-    $edit = array();
-    $expected = array();
+    $edit = [];
+    $expected = [];
     foreach (NodeType::loadMultiple() as $type) {
       $this->assertText($type->get('name'));
       if (rand(0, 1) > 0.5) {
@@ -103,13 +103,13 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     // Ensure at least one type is enabled.
     $edit["content_types[page]"] = $expected['page'] = 'page';
     $this->drupalPostForm('admin/config/smsframework/sendtophone', $edit, 'Save configuration');
-    $saved = $this->config('sms_sendtophone.settings')->get('content_types', array());
+    $saved = $this->config('sms_sendtophone.settings')->get('content_types', []);
     $this->assertEqual($expected, $saved);
 
     // Create a new node with sendtophone enabled and verify that the button is
     // added.
     $types = array_keys(array_filter($expected));
-    $node = $this->drupalCreateNode(array('type' => $types[0]));
+    $node = $this->drupalCreateNode(['type' => $types[0]]);
     $this->drupalGet($node->toUrl());
     // Confirm message for user without confirmed number.
     $this->assertText(t('Set up and confirm your mobile number to send to phone.'));
@@ -147,22 +147,23 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     $user = $this->drupalCreateUser(['administer filters']);
     $this->drupalLogin($user);
 
-    $edit = array(
+    $edit = [
       'filters[filter_inline_sms][status]' => TRUE,
       'filters[filter_inline_sms][settings][display]' => 'text',
-    );
+    ];
     $this->drupalPostForm('admin/config/content/formats/manage/plain_text', $edit, t('Save configuration'));
     // Create a new node sms markup and verify that a link is created.
     $type_names = array_keys(NodeType::loadMultiple());
     $node_body = $this->randomMachineName(30);
-    $node = $this->drupalCreateNode(array(
+    $node = $this->drupalCreateNode([
       'type' => array_pop($type_names),
-      'body' => array(array(
+      'body' => [
+        [
         'value' => "[sms]{$node_body}[/sms]",
         'format' => 'plain_text',
-      ),
-      ),
-    ));
+        ],
+      ],
+    ]);
 
     // Unconfirmed users.
     $this->drupalGet('sms/sendtophone/inline');
@@ -183,7 +184,7 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     $this->assertText($node_body);
 
     // Submit phone number and confirm message received.
-    $this->drupalPostForm(NULL, array(), t('Send'), [
+    $this->drupalPostForm(NULL, [], t('Send'), [
       'query' => ['text' => $node_body],
     ]);
 
@@ -198,7 +199,7 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     // Create a custom field of type 'text' using the sms_sendtophone formatter.
     $bundles = array_keys(NodeType::loadMultiple());
     $field_name = Unicode::strtolower($this->randomMachineName());
-    $field_definition = array(
+    $field_definition = [
       'field_name' => $field_name,
       'entity_type' => 'node',
       'bundle' => $bundles[0],
@@ -210,24 +211,24 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
             )
           ),
       */
-    );
-    $field_storage = FieldStorageConfig::create(array(
+    ];
+    $field_storage = FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'node',
       'type' => 'text',
-    ));
+    ]);
     $field_storage->save();
     $field = FieldConfig::create($field_definition);
     $field->save();
 
     $display = EntityViewDisplay::load('node.' . $bundles[0] . '.default');
     if (!$display) {
-      $display = EntityViewDisplay::create(array(
+      $display = EntityViewDisplay::create([
         'targetEntityType' => 'node',
         'bundle' => $bundles[0],
         'mode' => 'default',
         'status' => TRUE,
-      ));
+      ]);
     }
     $display->setComponent($field_name)->save();
     $random_text = $this->randomMachineName(32);
@@ -258,7 +259,7 @@ class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
     $this->clickLink('Send to phone');
 
     // Click the send button there.
-    $this->drupalPostForm(NULL, [], 'Send', array('query' => array('text' => $random_text)));
+    $this->drupalPostForm(NULL, [], 'Send', ['query' => ['text' => $random_text]]);
 
     $sms_message = $this->getLastTestMessage($this->gateway);
     $this->assertTrue(in_array($phone_number, $sms_message->getRecipients()), 'Message sent to correct number');

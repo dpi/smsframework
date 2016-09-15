@@ -41,29 +41,29 @@ function sms_sendtophone_node_links_alter(array &$links, NodeInterface $node, ar
         ['query' => \Drupal::destination()->getAsArray()]
       );
       
-      $build['sms_sendtophone'] = array(
+      $build['sms_sendtophone'] = [
         'title' => t('Send to phone'),
         'url' => $url,
-        'attributes' => array(
+        'attributes' => [
           'class' => 'sms-sendtophone',
           'title' => 'Send a link via SMS.',
-        ),
-      );
+        ],
+      ];
     }
     else if ($user->isAuthenticated()) {
       // Show messages to encourage users to register their mobile number.
       if (!count($phone_numbers)) {
-        $build['sms_sendtophone'] = array(
+        $build['sms_sendtophone'] = [
           'title' => t('Set up and confirm your mobile number to send to phone.'),
           'url' => Url::fromRoute('entity.user.edit_form', ['user' => $user->id()]),
-        );
+        ];
       }
     }
-    $links['sms_sendtophone'] = array(
+    $links['sms_sendtophone'] = [
       '#theme' => 'links__node__sms_sendtophone',
       '#links' => $build,
-      '#attributes' => array('class' => array('links', 'inline')),
-    );
+      '#attributes' => ['class' => ['links', 'inline']],
+    ];
   }
 
 }

@@ -69,12 +69,12 @@ class AdminSettingsForm extends ConfigFormBase {
       '#tree' => TRUE,
     ];
 
-    $form['active_hours']['status'] = array(
+    $form['active_hours']['status'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enable active hours'),
       '#description' => $this->t('Active hours will suspend transmission of automated SMS messages until the users local time is between any of these hours. The site default timezone is used if a user has not selected a timezone. Active hours are not applied to SMS messages created as a result of direct user action. Messages which are already queued are not retroactively updated.'),
       '#default_value' => $config->get('active_hours.status'),
-    );
+    ];
 
     $form['active_hours']['days_container'] = [
       '#type' => 'container',

@@ -19,12 +19,12 @@ class SmsMessageViewsData extends EntityViewsData {
     $data['sms']['direction']['field']['id'] = 'sms_message_direction';
 
     // Recipient phone numbers.
-    $data['sms__recipient_phone_number']['table']['join'] = array(
-      'sms' => array(
+    $data['sms__recipient_phone_number']['table']['join'] = [
+      'sms' => [
         'left_field' => 'id',
         'field' => 'entity_id',
-      ),
-    );
+      ],
+    ];
 
     $data['sms__recipient_phone_number']['table']['group'] = $this->t('SMS Message');
     $data['sms__recipient_phone_number']['table']['provider'] = $this->entityType->getProvider();

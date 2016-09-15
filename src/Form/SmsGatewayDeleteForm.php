@@ -15,9 +15,9 @@ class SmsGatewayDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to delete SMS gateway %label?', array(
+    return $this->t('Are you sure you want to delete SMS gateway %label?', [
       '%label' => $this->entity->label(),
-    ));
+    ]);
   }
 
   /**
@@ -40,9 +40,9 @@ class SmsGatewayDeleteForm extends EntityConfirmFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
 
-    drupal_set_message($this->t('Gateway %label was deleted.', array(
+    drupal_set_message($this->t('Gateway %label was deleted.', [
       '%label' => $this->entity->label(),
-    )));
+    ]));
 
     $form_state->setRedirectUrl($this->getCancelUrl());
   }

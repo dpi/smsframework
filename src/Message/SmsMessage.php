@@ -28,7 +28,7 @@ class SmsMessage implements SmsMessageInterface {
    *
    * @var array
    */
-  protected $recipients = array();
+  protected $recipients = [];
 
   /**
    * The content of the message to be sent.
@@ -59,7 +59,7 @@ class SmsMessage implements SmsMessageInterface {
    * @var string
    *   Other options to be used for the sms.
    */
-  protected $options = array();
+  protected $options = [];
 
   /**
    * The result associated with this SMS message.

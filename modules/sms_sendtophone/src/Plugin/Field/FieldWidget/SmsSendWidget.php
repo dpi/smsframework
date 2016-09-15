@@ -25,14 +25,14 @@ class SmsSendWidget extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $field = $this->fieldDefinition;
 
-    $element['value'] = $element + array(
+    $element['value'] = $element + [
       '#title' => $this->getSetting('label'),
       '#default_value' => $items[$delta]->value,
       '#required' => $field->isRequired(),
       '#description' => $this->getSetting('description'),
       '#maxlength' => $field->getSetting('max_length'),
       '#weight' => $this->getSetting('weight'),
-    );
+      ];
     if ($this->getSetting('rows') == 1) {
       $element['#type'] = 'textfield';
     }
@@ -55,12 +55,12 @@ class SmsSendWidget extends WidgetBase {
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
-    $form['rows'] = array(
+    $form['rows'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Rows'),
       '#default_value' => $this->settings['rows'],
       '#required' => TRUE,
-    );
+    ];
     return $form;
   }
 

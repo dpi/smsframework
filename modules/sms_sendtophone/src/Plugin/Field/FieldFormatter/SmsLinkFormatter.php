@@ -21,29 +21,29 @@ class SmsLinkFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $element = array();
+    $element = [];
     foreach ($items as $delta => $item) {
       $text = strip_tags($item->value);
-      $element[$delta] = array(
+      $element[$delta] = [
         '#type' => 'markup',
-        'text' => array(
+        'text' => [
           '#type' => 'markup',
           '#markup' => $text,
           '#prefix' => '<span class="sms-sendtophone-inline">',
           '#suffix' => '</span>',
-        ),
-        'link' => array(
+        ],
+        'link' => [
           '#type' => 'link',
           '#prefix' => ' (',
           '#suffix' => ')',
           '#title' => $this->t('Send to phone'),
           '#url' => Url::fromRoute('sms_sendtophone.page', ['type' => 'field'], ['query' => ['text' => $text, 'destination' => \Drupal::destination()->get()]]),
-          '#attributes' => array(
+          '#attributes' => [
             'title' => $this->t('Send this text via SMS.'),
             'class' => 'sms-sendtophone',
-          ),
-        ),
-      );
+          ],
+        ],
+      ];
     }
     return $element;
   }

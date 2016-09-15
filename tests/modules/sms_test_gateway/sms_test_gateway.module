@@ -10,7 +10,7 @@ function sms_test_gateway_get_incoming($reset = FALSE) {
   $result = &drupal_static($key);
 
   if (!isset($result)) {
-    $result = \Drupal::state()->get($key, array());
+    $result = \Drupal::state()->get($key, []);
   }
 
   if ($reset) {
