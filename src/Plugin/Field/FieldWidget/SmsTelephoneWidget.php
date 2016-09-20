@@ -29,10 +29,10 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
-    /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
-    $phone_number_provider = \Drupal::service('sms.phone_number');
+    /** @var \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification_provider */
+    $phone_number_verification_provider = \Drupal::service('sms.phone_number.verification');
     try {
-      $config = $phone_number_provider->getPhoneNumberSettingsForEntity($items->getEntity());
+      $config = $phone_number_verification_provider->getPhoneNumberSettingsForEntity($items->getEntity());
     }
     catch (PhoneNumberSettingsException $e) {
       return $element;
@@ -46,7 +46,7 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
     $lifetime = $config->getVerificationCodeLifetime() ?: 0;
 
     if (isset($items[$delta]->value)) {
-      $phone_verification = $phone_number_provider
+      $phone_verification = $phone_number_verification_provider
         ->getPhoneVerificationByEntity($items->getEntity(), $items[$delta]->value);
 
       if ($phone_verification) {

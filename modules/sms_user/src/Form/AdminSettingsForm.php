@@ -10,7 +10,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
-use Drupal\sms\Provider\PhoneNumberProviderInterface;
+use Drupal\sms\Provider\PhoneNumberVerificationInterface;
 
 /**
  * Provides a general settings form for SMS User.
@@ -18,23 +18,23 @@ use Drupal\sms\Provider\PhoneNumberProviderInterface;
 class AdminSettingsForm extends ConfigFormBase {
 
   /**
-   * Phone number provider.
+   * Phone number verification provider.
    *
-   * @var \Drupal\sms\Provider\PhoneNumberProviderInterface
+   * @var \Drupal\sms\Provider\PhoneNumberVerificationInterface
    */
-  protected $phoneNumberProvider;
+  protected $phoneNumberVerificationProvider;
 
   /**
    * Constructs a \Drupal\sms_user\Form\AdminSettingsForm object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider
-   *   The phone number provider.
+   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification_provider
+   *   The phone number verification provider.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, PhoneNumberProviderInterface $phone_number_provider) {
+  public function __construct(ConfigFactoryInterface $config_factory, PhoneNumberVerificationInterface $phone_number_verification_provider) {
     parent::__construct($config_factory);
-    $this->phoneNumberProvider = $phone_number_provider;
+    $this->phoneNumberVerificationProvider = $phone_number_verification_provider;
   }
 
   /**
@@ -43,7 +43,7 @@ class AdminSettingsForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
-      $container->get('sms.phone_number')
+      $container->get('sms.phone_number.verification')
     );
   }
 
@@ -177,7 +177,7 @@ class AdminSettingsForm extends ConfigFormBase {
       $radio_value = 'none';
     }
 
-    $user_phone_settings_exist = $this->phoneNumberProvider
+    $user_phone_settings_exist = $this->phoneNumberVerificationProvider
       ->getPhoneNumberSettings('user', 'user') instanceof PhoneNumberSettingsInterface;
     if (!$user_phone_settings_exist) {
       drupal_set_message($this->t('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings. <a href=":add">Add phone number settings</a>.', [

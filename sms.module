@@ -13,9 +13,9 @@ use Drupal\Core\Entity\ContentEntityInterface;
  * Implements hook_cron().
  */
 function sms_cron() {
-  /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
-  $phone_number_provider = \Drupal::service('sms.phone_number');
-  $phone_number_provider->purgeExpiredVerifications();
+  /** @var \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification */
+  $phone_number_verification_provider = \Drupal::service('sms.phone_number.verification');
+  $phone_number_verification_provider->purgeExpiredVerifications();
 
   /** @var \Drupal\sms\Provider\SmsQueueProcessorInterface $sms_queue_processor */
   $sms_queue_processor = \Drupal::service('sms.queue');
@@ -42,9 +42,9 @@ function sms_entity_update(EntityInterface $entity) {
  */
 function sms_entity_delete(EntityInterface $entity) {
   if ($entity instanceof ContentEntityInterface) {
-    /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
-    $phone_number_provider = \Drupal::service('sms.phone_number');
-    $phone_number_provider->deletePhoneVerificationByEntity($entity);
+    /** @var \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification_provider */
+    $phone_number_verification_provider = \Drupal::service('sms.phone_number.verification');
+    $phone_number_verification_provider->deletePhoneVerificationByEntity($entity);
   }
 }
 
@@ -57,8 +57,8 @@ function sms_entity_delete(EntityInterface $entity) {
  */
 function _sms_entity_postsave(EntityInterface $entity) {
   if ($entity instanceof ContentEntityInterface) {
-    /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
-    $phone_number_provider = \Drupal::service('sms.phone_number');
-    $phone_number_provider->updatePhoneVerificationByEntity($entity);
+    /** @var \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification_provider */
+    $phone_number_verification_provider = \Drupal::service('sms.phone_number.verification');
+    $phone_number_verification_provider->updatePhoneVerificationByEntity($entity);
   }
 }

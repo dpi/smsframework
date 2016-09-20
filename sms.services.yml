@@ -13,6 +13,9 @@ services:
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
   sms.phone_number:
     class: Drupal\sms\Provider\PhoneNumberProvider
+    arguments: ['@sms.provider', '@sms.phone_number.verification']
+  sms.phone_number.verification:
+    class: Drupal\sms\Provider\PhoneNumberVerification
     arguments: ['@entity_type.manager', '@config.factory', '@token', '@sms.provider']
   sms.queue:
     class: Drupal\sms\Provider\SmsQueueProcessor
