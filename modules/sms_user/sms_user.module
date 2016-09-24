@@ -1235,7 +1235,7 @@ function sms_user_entity_property_info_alter(&$info) {
       'type' => 'text',
       'getter callback' => 'entity_property_sms_user_get_properties',
       'computed' => TRUE,
-      'required' => TRUE,
+      'required' => FALSE,
   );
   $properties['sms_user_gateway'] = array(
       'label' => t("SMS Gateway"),
