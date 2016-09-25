@@ -269,7 +269,7 @@ class SmsUserWebTest extends DrupalWebTestCase {
     $this->assertText('23456788901');
     $this->assertResponse(200);
 
-    // Test that $user2 can see his mobile number but not see $user2's number.
+    // Test that $user2 can see his mobile number but not see $user1's number.
     $this->drupalLogin($user2);
     $this->drupalGet('user');
     $this->assertText('23456788901');
