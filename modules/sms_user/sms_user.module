@@ -657,7 +657,7 @@ function sms_user_user_insert(&$edit, $account, $category) {
  */
 function sms_user_user_view($account, $view_mode) {
   global $user;
-  if (user_access('receive sms', $account) && ($user->uid == $account->uid || user_access('administer smsframework'))) {
+  if (user_access('receive sms', $account) && ($user->uid == $account->uid || user_access('access user profiles'))) {
     if (isset($account->sms_user['status']) &&
             $account->sms_user['status'] == SMS_USER_PENDING) {
       drupal_set_message(t('You need to confirm your mobile number, <a href="@mobile_url">enter the confirmation code sent to your mobile</a>.', array('@mobile_url' => url('user/' . $account->uid . '/edit/mobile'))));
