@@ -164,3 +164,12 @@ function sms_test_gateway_validate_number($number) {
   }
   return $errors;
 }
+
+/**
+ * Implements hook_gateway_info_alter().
+ */
+function sms_test_gateway_gateway_info_alter(&$info, $identifier) {
+  if ($identifier == 'test' && variable_get('GATEWAY_INFO_ALTER_TEST')) {
+    $info['x-testing'] = __FUNCTION__;
+  }
+}

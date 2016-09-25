@@ -420,6 +420,8 @@ function _gateways_build() {
   $gateway_array = module_invoke_all('gateway_info');
   foreach ($gateway_array as $identifier => $info) {
     $info['configuration'] = variable_get('sms_' . $identifier . '_settings', array());
+    // Allow other modules to alter this gateway info.
+    drupal_alter('gateway_info', $info, $identifier);
     $_gateways[$identifier] = $info;
     $_names[$identifier] = $info['name'];
   }
