@@ -1,0 +1,31 @@
+{
+  "name": "drupal/sms",
+  "description": "Provides an extensible API that facilitates communication between Drupal and various SMS gateways.",
+  "type": "drupal-module",
+  "license": "GPL-2.0+",
+  "homepage": "http://drupal.org/project/smsframework",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/smsframework",
+    "source": "http://cgit.drupalcode.org/smsframework"
+  },
+  "authors": [
+    {
+      "name": "Aniebiet Udoh",
+      "homepage": "https://www.drupal.org/u/almaudoh",
+      "role": "Maintainer"
+    },
+    {
+      "name": "Daniel Phin",
+      "homepage": "http://danielph.in",
+      "role": "Maintainer"
+    }
+  ],
+  "require": {
+    "drupal/core": "~8.0",
+    "drupal/dynamic_entity_reference": "~8.0",
+    "drupal/telephone": "~8.0"
+  },
+  "provide": {
+    "drupal/smsframework": "~8.0"
+  }
+}
