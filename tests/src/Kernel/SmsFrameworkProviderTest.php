@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Exception\RecipientRouteException;
 use Drupal\sms\Message\SmsMessage as StandardSmsMessage;
 use Drupal\sms\Message\SmsMessageInterface as StandardSmsMessageInterface;
