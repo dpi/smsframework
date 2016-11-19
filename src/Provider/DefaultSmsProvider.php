@@ -49,8 +49,19 @@ class DefaultSmsProvider implements SmsProviderInterface {
       // Tag so SmsEvents::MESSAGE_PRE_PROCESS is not dispatched again.
       $sms_message->setOption('_skip_preprocess_event', TRUE);
 
-      if ($sms_message instanceof SmsMessageEntityInterface && ($count = $sms_message->validate()->count())) {
-        throw new SmsException(sprintf('Can not queue SMS message because there are %s validation error(s).', $count));
+      // Validate SMS message entities.
+      if ($sms_message instanceof SmsMessageEntityInterface) {
+        $errors = [];
+        $violations = $sms_message->validate();
+        foreach ($violations->getFieldNames() as $field_name) {
+          foreach ($violations->getByField($field_name) as $violation) {
+            $errors[] = "[$field_name]: ". strip_tags((string) $violation->getMessage());
+          }
+        }
+
+        if ($errors) {
+          throw new SmsException(sprintf('Can not queue SMS message because there are %s validation error(s): %s', count($errors), implode(' ', $errors)));
+        }
       }
 
       if ($sms_message->getGateway()->getSkipQueue()) {

@@ -114,6 +114,28 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Ensures validation failure if no message.
+   */
+  public function testNoSendNoMessage() {
+    $sms_message = SmsMessage::create()
+      ->setDirection(Direction::OUTGOING)
+      ->addRecipients($this->randomPhoneNumbers());
+    $this->setExpectedException(SmsException::class, 'Can not queue SMS message because there are 1 validation error(s): [message]: This value should not be null.');
+    $this->smsProvider->queue($sms_message);
+  }
+
+  /**
+   * Ensures validation failure if no direction.
+   */
+  public function testNoSendNoDirection() {
+    $sms_message = SmsMessage::create()
+      ->setMessage($this->randomString())
+      ->addRecipients($this->randomPhoneNumbers());
+    $this->setExpectedException(SmsException::class, 'Can not queue SMS message because there are 1 validation error(s): [direction]: This value should not be null.');
+    $this->smsProvider->queue($sms_message);
+  }
+
+  /**
    * Test message is not sent because no gateway is set.
    *
    * @covers ::send
