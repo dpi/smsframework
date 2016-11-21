@@ -75,6 +75,7 @@ class SmsBlastWebTest extends SmsFrameworkWebTestBase {
 
     // Verify three of the users randomly.
     $numbers = range(0, count($entities) - 1);
+    shuffle($numbers);
     foreach (array_slice($numbers, 0, 3) as $i) {
       $this->verifyPhoneNumber($entities[$i], $phone_numbers[0]);
     }
