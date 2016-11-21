@@ -295,6 +295,11 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
       'uid' => 1,
       'name' => $this->randomMachineName(),
     ] + $values);
+
+    // Need to activate so when DER does entity validation it is included by the
+    // UserSelection plugin.
+    $user->activate();
+
     $user->save();
     return $user;
   }
