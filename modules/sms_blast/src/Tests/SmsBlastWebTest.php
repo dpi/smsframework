@@ -60,16 +60,27 @@ class SmsBlastWebTest extends SmsFrameworkWebTestBase {
    * Tests sending SMS blast.
    */
   public function testSendBlast() {
-    // Create users with two phone numbers. Only one message should be sent to
-    // each user.
-    $phone_numbers = ['+123123123', '+456456456'];
-    for ($i = 0; $i < 3; $i++) {
-      // Create an unverified user.
-      $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
-      // Create a verified user.
-      $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
-      $this->verifyPhoneNumber($entity, $phone_numbers[0]);
+    // Create users with multiple phone numbers. Only one message should be sent
+    // to each user.
+    $phone_numbers = $this->randomPhoneNumbers();
+    $entities = [];
+    for ($i = 0; $i < 6; $i++) {
+      /** @var \Drupal\user\UserInterface $user */
+      $user = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
+      // Need to activate so when DER does entity validation it is included by the
+      // UserSelection plugin.
+      $user->activate()->save();
+      $entities[] = $user;
     }
+
+    // Verify three of the users randomly.
+    $numbers = range(0, count($entities) - 1);
+    foreach (array_slice($numbers, 0, 3) as $i) {
+      $this->verifyPhoneNumber($entities[$i], $phone_numbers[0]);
+    }
+
+    // Reset messages created as a result of creating entities above. Such as
+    // verification messages.
     $this->resetTestMessages();
 
     $edit['message'] = $this->randomString();
