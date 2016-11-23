@@ -433,11 +433,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     $fields['sender_entity'] = BaseFieldDefinition::create('dynamic_entity_reference')
       ->setLabel(t('Sender entity'))
       ->setDescription(t('The entity who sent the SMS message.'))
-      ->setRequired(FALSE)
-      ->setSettings([
-        'exclude_entity_types' => TRUE,
-        'entity_type_ids' => [],
-      ]);
+      ->setRequired(FALSE);
 
     $fields['recipient_phone_number'] = BaseFieldDefinition::create('telephone')
       ->setLabel(t('Recipient phone number'))
@@ -448,11 +444,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     $fields['recipient_entity'] = BaseFieldDefinition::create('dynamic_entity_reference')
       ->setLabel(t('Recipient entity'))
       ->setDescription(t('The entity who received the SMS message.'))
-      ->setRequired(FALSE)
-      ->setSettings([
-        'exclude_entity_types' => TRUE,
-        'entity_type_ids' => [],
-      ]);
+      ->setRequired(FALSE);
 
     // Meta information.
     $fields['options'] = BaseFieldDefinition::create('map')
