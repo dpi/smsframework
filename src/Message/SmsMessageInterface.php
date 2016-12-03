@@ -1,74 +1,19 @@
 <?php
 
-/**
- * @file
- * Contains definition of \Drupal\sms\Message\SmsMessageInterface
- */
-
 namespace Drupal\sms\Message;
+
+use Drupal\sms\Entity\SmsGatewayInterface;
 
 /**
  * Contains information about an SMS message.
  */
 interface SmsMessageInterface {
 
-  // Message status codes
-  // 0=Unknown, 2xx=Positive, 3xx=Positive/Neutral (context-dependent), 4xx=Negative
-
-  /**
-   * Status Unknown.
-   *
-   * A message would have this to indicate unknown status.
-   */
-  const STATUS_UNKNOWN = 0;
-
-  /**
-   * Status OK.
-   *
-   * A message with this status indicates it was successfully sent.
-   */
-  const STATUS_OK = 200;
-
-  /**
-   * Status DELIVERED.
-   *
-   * A message with this status indicates it was successfully delivered.
-   */
-  const STATUS_DELIVERED = 202;
-
-  /**
-   * Status QUEUED.
-   *
-   * A message with this status indicates it was successfully queued for sending.
-   */
-  const STATUS_QUEUED = 302;
-
-  /**
-   * Status ERROR.
-   *
-   * A message with this status indicates it could not be sent (routing reasons).
-   */
-  const STATUS_ERROR = 400;
-
-  /**
-   * Status NO_CREDIT.
-   *
-   * A message with this status indicates it could not be sent due to low credit
-   * balance.
-   */
-  const STATUS_NO_CREDIT = 402;
-
-  /**
-   * Status EXPIRED.
-   *
-   * A message with this status indicates it has expired and has not been sent.
-   */
-  const STATUS_EXPIRED = 408;
-
   /**
    * Gets the list of recipients of this SMS message.
    *
    * @return array
+   *   The list of recipients of this SMS message.
    */
   public function getRecipients();
 
@@ -94,7 +39,7 @@ interface SmsMessageInterface {
    */
   public function addRecipients(array $recipients);
 
-    /**
+  /**
    * Removes a single recipient from the SMS message.
    *
    * @param string $recipient
@@ -117,16 +62,55 @@ interface SmsMessageInterface {
   public function removeRecipients(array $recipients);
 
   /**
+   * Get the gateway for this message.
+   *
+   * @return \Drupal\sms\Entity\SmsGatewayInterface|NULL
+   *   A gateway plugin instance, or NULL to let the provider decide.
+   */
+  public function getGateway();
+
+  /**
+   * Set the gateway for this message.
+   *
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $gateway
+   *   A gateway plugin instance.
+   *
+   * @return $this
+   *   Return SMS message for chaining.
+   */
+  public function setGateway(SmsGatewayInterface $gateway);
+
+  /**
+   * Get direction of the message.
+   *
+   * @return int
+   *   See \Drupal\sms\Direction constants for potential values.
+   */
+  public function getDirection();
+
+  /**
+   * Set direction of the message.
+   *
+   * @param int $direction
+   *   Any of \Drupal\sms\Direction constants.
+   *
+   * @return $this
+   *   Return SMS message for chaining.
+   */
+  public function setDirection($direction);
+
+  /**
    * Gets the options for building or sending this SMS message.
    *
    * @return array
+   *   The options for building or sending this SMS message.
    */
   public function getOptions();
 
   /**
    * Gets the option specified by the key $name.
    *
-   * @param string
+   * @param string $name
    *   The name of the option.
    *
    * @return mixed
@@ -138,7 +122,7 @@ interface SmsMessageInterface {
    * Sets an option for this SMS message.
    *
    * @param string $name
-   *   The name of the option
+   *   The name of the option.
    * @param mixed $value
    *   The value of the option.
    *
@@ -159,28 +143,50 @@ interface SmsMessageInterface {
   public function removeOption($name);
 
   /**
-   * Gets the name of the sender of this SMS message.
+   * Get the result associated with this SMS message.
    *
-   * @return string|NULL
-   *   The name of the sender, or NULL if none is defined.
+   * @return \Drupal\sms\Message\SmsMessageResultInterface|NULL
+   *   The result associated with this SMS message, or NULL if there is no
+   *   result.
    */
-  public function getSender();
+  public function getResult();
 
   /**
-   * Set the name of the sender of this SMS message.
+   * Set the result associated with this SMS message.
    *
-   * @param string $sender
-   *   The name of the sender.
+   * @param \Drupal\sms\Message\SmsMessageResultInterface|NULL $result
+   *   The result to associate with this SMS message, or NULL if there is no
+   *   result.
    *
    * @return $this
    *   The called SMS message object.
    */
-  public function setSender($sender);
+  public function setResult(SmsMessageResultInterface $result = NULL);
+
+  /**
+   * Get phone number of the sender.
+   *
+   * @return string
+   *   The phone number of the sender.
+   */
+  public function getSenderNumber();
+
+  /**
+   * Set the phone number of the sender.
+   *
+   * @param string $number
+   *   The phone number of the sender.
+   *
+   * @return $this
+   *   Return SMS message for chaining.
+   */
+  public function setSenderNumber($number);
 
   /**
    * Gets the message to be sent.
    *
    * @return string
+   *   The message to be sent.
    */
   public function getMessage();
 
@@ -199,6 +205,7 @@ interface SmsMessageInterface {
    * Gets the UUID of the SMS object.
    *
    * @return string
+   *   The UUID of the SMS object.
    */
   public function getUuid();
 
@@ -212,7 +219,7 @@ interface SmsMessageInterface {
   public function getUid();
 
   /**
-   * Set the user who created the SMS message
+   * Set the user who created the SMS message.
    *
    * @param int $uid
    *   The ID of a user entity.
@@ -245,7 +252,7 @@ interface SmsMessageInterface {
   /**
    * Split this SMS message into new messages by chunks of recipients.
    *
-   * @param $size
+   * @param int $size
    *   The quantity of recipients to chunk by.
    *
    * @return static[]

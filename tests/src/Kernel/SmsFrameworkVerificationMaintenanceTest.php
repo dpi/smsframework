@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkVerificationMaintenanceTest.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\PhoneNumberSettings;
@@ -22,18 +17,23 @@ use Drupal\entity_test\Entity\EntityTest;
 class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = ['sms', 'sms_test_gateway', 'entity_test', 'user', 'field', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = [
+    'sms', 'sms_test_gateway', 'entity_test', 'user', 'field', 'telephone',
+    'dynamic_entity_reference',
+  ];
 
   /**
+   * Phone number settings for entity_test entity type.
+   *
    * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
    */
   protected $phoneNumberSettings;
 
   /**
+   * A telephone field for testing.
+   *
    * @var \Drupal\field\FieldStorageConfigInterface
    */
   protected $phoneField;
@@ -69,9 +69,8 @@ class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
       ->setVerificationMessage($this->randomString())
       ->save();
 
-    /** @var \Drupal\sms\Provider\DefaultSmsProvider $provider */
-    $provider = \Drupal::service('sms_provider');
-    $provider->setDefaultGateway($this->createMemoryGateway(['skip_queue' => TRUE]));
+    $gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
+    $this->setFallbackGateway($gateway);
 
     $this->testEntity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, ['+123123123']);
   }

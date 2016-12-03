@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Lists\PhoneNumberSettingsListBuilder.
- */
-
 namespace Drupal\sms\Lists;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
@@ -12,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Drupal\sms\Provider\PhoneNumberProviderInterface;
+use Drupal\sms\Provider\PhoneNumberVerificationInterface;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -28,11 +23,11 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
   protected $phoneNumberVerificationStorage;
 
   /**
-   * Phone number provider.
+   * Phone number verification provider.
    *
-   * @var \Drupal\sms\Provider\PhoneNumberProviderInterface
+   * @var \Drupal\sms\Provider\PhoneNumberVerificationInterface
    */
-  protected $phoneNumberProvider;
+  protected $phoneNumberVerificationProvider;
 
   /**
    * Current request time.
@@ -50,7 +45,7 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
       $container->get('entity.manager')->getStorage($entity_type->id()),
       $container->get('entity_type.manager')->getStorage('sms_phone_number_verification'),
       $container->get('request_stack'),
-      $container->get('sms.phone_number')
+      $container->get('sms.phone_number.verification')
     );
   }
 
@@ -61,13 +56,13 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
    *   Storage for Phone Number Verification entities.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
-   * @param \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider
-   *   The phone number provider.
+   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification_provider
+   *   The phone number verification provider.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, EntityStorageInterface $phone_number_verification_storage, RequestStack $request_stack, PhoneNumberProviderInterface $phone_number_provider) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, EntityStorageInterface $phone_number_verification_storage, RequestStack $request_stack, PhoneNumberVerificationInterface $phone_number_verification_provider) {
     parent::__construct($entity_type, $storage);
     $this->phoneNumberVerificationStorage = $phone_number_verification_storage;
-    $this->phoneNumberProvider = $phone_number_provider;
+    $this->phoneNumberVerificationProvider = $phone_number_verification_provider;
     $this->requestTime = $request_stack
       ->getCurrentRequest()
       ->server
@@ -97,7 +92,7 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
     $row['entity_type'] = $entity_type_id;
     $row['bundle'] = $bundle;
 
-    $phone_number_settings = $this->phoneNumberProvider
+    $phone_number_settings = $this->phoneNumberVerificationProvider
       ->getPhoneNumberSettings($entity_type_id, $bundle);
     $lifetime = $phone_number_settings->getVerificationCodeLifetime() ?: 0;
 
@@ -133,6 +128,17 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
     return $render;
   }
 
+  /**
+   * Builds a phone number verification query.
+   *
+   * @param string $entity_type_id
+   *   Entity type to query.
+   * @param string $bundle
+   *   Entity bundle to query.
+   *
+   * @return \Drupal\Core\Entity\Query\QueryInterface
+   *   A phone number entity query.
+   */
   protected function buildPhoneNumberVerificationQuery($entity_type_id, $bundle) {
     return $this->phoneNumberVerificationStorage
       ->getQuery()

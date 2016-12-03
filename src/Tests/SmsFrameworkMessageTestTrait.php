@@ -1,11 +1,9 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Tests\SmsFrameworkMessageTestTrait
- */
-
 namespace Drupal\sms\Tests;
+
+use Drupal\sms\Direction;
+use Drupal\sms\Message\SmsMessageResult;
 
 /**
  * SMS Message object test trait.
@@ -18,19 +16,16 @@ namespace Drupal\sms\Tests;
 trait SmsFrameworkMessageTestTrait {
 
   /**
-   * Tests recipients for SMS messages.
+   * Tests sender phone number.
    *
-   * @covers ::getSender
-   * @covers ::setSender
+   * @covers ::getSenderNumber
+   * @covers ::setSenderNumber
    */
-  public function testSender() {
-    $sms_message1 = $this->createSmsMessage();
-    $this->assertEquals(NULL, $sms_message1->getSender());
-
-    $sender = $this->randomMachineName();
-    $sms_message2 = $this->createSmsMessage();
-    $sms_message2->setSender($sender);
-    $this->assertEquals($sender, $sms_message2->getSender());
+  public function testSenderNumber() {
+    $number = '1234567890';
+    $sms_message = $this->createSmsMessage();
+    $sms_message->setSenderNumber($number);
+    $this->assertEquals($number, $sms_message->getSenderNumber());
   }
 
   /**
@@ -135,6 +130,22 @@ trait SmsFrameworkMessageTestTrait {
   }
 
   /**
+   * Tests direction of SMS messages.
+   *
+   * @covers ::getDirection
+   * @covers ::setDirection
+   */
+  public function testDirection() {
+    $sms_message2 = $this->createSmsMessage()
+      ->setDirection(Direction::OUTGOING);
+    $this->assertEquals(Direction::OUTGOING, $sms_message2->getDirection());
+
+    $sms_message3 = $this->createSmsMessage()
+      ->setDirection(Direction::INCOMING);
+    $this->assertEquals(Direction::INCOMING, $sms_message3->getDirection());
+  }
+
+  /**
    * Tests recipients for SMS messages.
    *
    * @covers ::setOption
@@ -160,6 +171,25 @@ trait SmsFrameworkMessageTestTrait {
     $sms_message1->removeOption('foo');
     unset($options['foo']);
     $this->assertEquals($options, $sms_message1->getOptions());
+  }
+
+  /**
+   * Tests result for SMS messages.
+   *
+   * @covers ::getResult
+   * @covers ::setResult
+   */
+  public function testResults() {
+    $error_message = $this->getRandomGenerator()->string();
+    $result = (new SmsMessageResult())
+      ->setErrorMessage($error_message);
+
+    $sms_message = $this->createSmsMessage();
+    $sms_message->setResult($result);
+
+    $result_actual = $sms_message->getResult();
+    $this->assertSame($result, $result_actual);
+    $this->assertSame($error_message, $result_actual->getErrorMessage());
   }
 
   /**
@@ -189,7 +219,7 @@ trait SmsFrameworkMessageTestTrait {
   public function testAutomated() {
     $sms_message1 = $this->createSmsMessage();
 
-    // Default
+    // Default.
     $this->assertEquals(TRUE, $sms_message1->isAutomated());
 
     $sms_message2 = $this->createSmsMessage();
@@ -211,7 +241,7 @@ trait SmsFrameworkMessageTestTrait {
   }
 
   /**
-   * Tests chunk by recipients
+   * Tests chunk by recipients.
    *
    * @covers ::chunkByRecipients
    */

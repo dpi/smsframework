@@ -1,85 +1,34 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Entity\SmsMessageInterface.
- */
-
 namespace Drupal\sms\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\sms\Message\SmsMessageInterface as PlainSmsMessageInterface;
 use Drupal\Core\Entity\EntityInterface;
 
+/**
+ * Interface for SMS message entity.
+ */
 interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInterface {
 
   /**
-   * Whether the message is queued to be sent from the website.
-   */
-  const DIRECTION_OUTGOING = 1;
-
-  /**
-   * Whether the message was received by the website.
-   */
-  const DIRECTION_INCOMING = -1;
-
-  /**
-   * Get direction of the message.
+   * Gets the name of the sender of this SMS message.
    *
-   * @return int
-   *   See \Drupal\sms\Entity\SmsMessageInterface::DIRECTION_* constants for
-   *   potential values.
+   * @return string|NULL
+   *   The name of the sender, or NULL if none is defined.
    */
-  public function getDirection();
+  public function getSender();
 
   /**
-   * Set direction of the message.
+   * Set the name of the sender of this SMS message.
    *
-   * @param int $direction
-   *   Any of \Drupal\sms\Entity\SmsMessageInterface::DIRECTION_* constants
+   * @param string $sender
+   *   The name of the sender.
    *
    * @return $this
-   *   Return SMS message for chaining.
+   *   The called SMS message object.
    */
-  public function setDirection($direction);
-
-  /**
-   * Get the gateway for this message.
-   *
-   * @return \Drupal\sms\Entity\SmsGatewayInterface
-   *   A gateway plugin instance.
-   */
-  public function getGateway();
-
-  /**
-   * Set the gateway for this message.
-   *
-   * @param \Drupal\sms\Entity\SmsGatewayInterface $gateway
-   *   A gateway plugin instance.
-   *
-   * @return $this
-   *   Return SMS message for chaining.
-   */
-  public function setGateway(SmsGatewayInterface $gateway);
-
-  /**
-   * Get phone number of the sender.
-   *
-   * @return string
-   *   The phone number of the sender.
-   */
-  public function getSenderNumber();
-
-  /**
-   * Set the phone number of the sender.
-   *
-   * @param string $number
-   *   The phone number of the sender.
-   *
-   * @return $this
-   *   Return SMS message for chaining.
-   */
-  public function setSenderNumber($number);
+  public function setSender($sender);
 
   /**
    * Gets the entity who sent the SMS message.
@@ -122,7 +71,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
   /**
    * Get whether the SMS message is in the queue to be processed.
    *
-   * @return boolean
+   * @return bool
    *   Whether the SMS message is in the queue to be processed.
    */
   public function isQueued();

@@ -19,19 +19,89 @@ function hook_sms_gateway_info_alter(&$gateways) {
 }
 
 /**
- * Called before the SMS message is processed by the gateway plugin.
+ * Event subscribers for SMS Framework.
  *
- * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
- *   A SMS message.
+ * Service definition:
+ * <code>
+ * ```yaml
+ *  my_module.my_event_subscriber:
+ *    class: Drupal\my_module\EventSubscriber\MySmsEventSubscriber
+ *    tags:
+ *     - { name: event_subscriber }
+ * ```
+ * </code>
+ *
+ * <code>
+ * <?php
+ * namespace Drupal\my_module\EventSubscriber;
+ * ?>
+ * </code>
+ *
+ * @see \Drupal\sms_test\EventSubscriber\SmsTestEventSubscriber
  */
-function hook_sms_incoming_preprocess(\Drupal\sms\Message\SmsMessageInterface $sms_message) {
-}
+class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSubscriberInterface {
 
-/**
- * Called after the SMS message is processed by the gateway plugin.
- *
- * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
- *   A SMS message.
- */
-function hook_sms_incoming_postprocess(\Drupal\sms\Message\SmsMessageInterface $sms_message) {
+  /**
+   * An example event subscriber.
+   *
+   * @see \Drupal\sms\Event\SmsEvents::MESSAGE_PRE_PROCESS
+   */
+  public function mySmsMessagePreprocess(\Drupal\sms\Event\SmsMessageEvent $event) {
+    $result = [];
+    foreach ($event->getMessages() as $message) {
+      // Modify or chunk messages.
+      $result[] = $message;
+    }
+    $event->setMessages($result);
+  }
+
+  /**
+   * An example event subscriber.
+   *
+   * @see \Drupal\sms\Event\SmsEvents::MESSAGE_POST_PROCESS
+   */
+  public function mySmsMessagePostProcess(\Drupal\sms\Event\SmsMessageEvent $event) {
+    $result = [];
+    foreach ($event->getMessages() as $message) {
+      // Modify or chunk messages.
+      $result[] = $message;
+    }
+    $event->setMessages($result);
+  }
+
+  /**
+   * An example event subscriber.
+   *
+   * @see \Drupal\sms\Event\SmsEvents::MESSAGE_GATEWAY
+   */
+  public function mySmsMessageGateway(\Drupal\sms\Event\RecipientGatewayEvent $event) {
+    // The recipient phone number.
+    $event->getRecipient();
+    // Add a gateway for a phone number.
+    $event->addGateway($a_gateway);
+    // Add a gateway with a priority.
+    $event->addGateway($a_gateway, 333);
+    $event->addGateway($a_gateway, -333);
+  }
+
+  /**
+   * An example event subscriber.
+   *
+   * @see \Drupal\sms\Event\SmsEvents::DELIVERY_REPORT_POST_PROCESS
+   */
+  public function myDeliveryReportPostProcessor(\Drupal\sms\Event\SmsDeliveryReportEvent $event) {
+    $event->getReports();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getSubscribedEvents() {
+    $events[\Drupal\sms\Event\SmsEvents::MESSAGE_PRE_PROCESS][] = ['mySmsMessagePreprocess'];
+    $events[\Drupal\sms\Event\SmsEvents::MESSAGE_POST_PROCESS][] = ['mySmsMessagePostprocess'];
+    $events[\Drupal\sms\Event\SmsEvents::MESSAGE_GATEWAY][] = ['mySmsMessageGateway'];
+    $events[\Drupal\sms\Event\SmsEvents::DELIVERY_REPORT_POST_PROCESS][] = ['myDeliveryReportPostProcessor'];
+    return $events;
+  }
+
 }

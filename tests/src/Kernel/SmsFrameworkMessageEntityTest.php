@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkMessageEntityTest.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -14,7 +9,6 @@ use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Tests\SmsFrameworkMessageTestTrait;
 use Drupal\sms\Tests\SmsFrameworkTestTrait;
 use Drupal\user\Entity\User;
-use Drupal\sms\Entity\SmsMessageInterface;
 
 /**
  * Tests SMS message entity.
@@ -32,11 +26,12 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = ['sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference', 'user', 'entity_test'];
+  public static $modules = [
+    'sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference', 'user',
+    'entity_test',
+  ];
 
   /**
    * {@inheritdoc}
@@ -55,6 +50,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    *   An mixed array of values to pass when creating the SMS message entity.
    *
    * @return \Drupal\sms\Entity\SmsMessageInterface
+   *   A SMS message object for testing.
    */
   protected function createSmsMessage(array $values = []) {
     return SmsMessage::create($values);
@@ -69,7 +65,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function testUid() {
     // User must exist or setUid will throw an exception.
@@ -98,23 +94,15 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Tests direction of SMS messages.
+   * Tests entity validation for direction property of SMS message entity.
    *
    * @covers ::getDirection
    * @covers ::setDirection
    */
-  public function testDirection() {
+  public function testDirectionEntityValidation() {
     // Check for validation violation for missing direction.
     $sms_message1 = $this->createSmsMessage();
     $this->assertTrue(in_array('direction', $sms_message1->validate()->getFieldNames()));
-
-    $sms_message2 = $this->createSmsMessage()
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
-    $this->assertEquals(SmsMessageInterface::DIRECTION_OUTGOING, $sms_message2->getDirection());
-
-    $sms_message3 = $this->createSmsMessage()
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING);
-    $this->assertEquals(SmsMessageInterface::DIRECTION_INCOMING, $sms_message3->getDirection());
   }
 
   /**
@@ -132,19 +120,6 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $sms_message2 = $this->createSmsMessage();
     $sms_message2->setGateway($gateway);
     $this->assertEquals($gateway, $sms_message2->getGateway());
-  }
-
-  /**
-   * Tests sender phone number.
-   *
-   * @covers ::getSenderNumber
-   * @covers ::setSenderNumber
-   */
-  public function testSenderNumber() {
-    $number = '1234567890';
-    $sms_message = $this->createSmsMessage();
-    $sms_message->setSenderNumber($number);
-    $this->assertEquals($number, $sms_message->getSenderNumber());
   }
 
   /**
@@ -259,10 +234,11 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $user = User::create(['uid' => 1, 'name' => 'user']);
     $user->save();
 
+    $sender_number = $this->randomPhoneNumbers(1);
     $original = new StandardSmsMessage('', [], '', [], NULL);
     $original
       ->setAutomated(TRUE)
-      ->setSender($this->randomMachineName())
+      ->setSenderNumber($sender_number[0])
       ->addRecipients(['123123123', '456456456'])
       ->setMessage($this->randomMachineName())
       ->setUid($user->id())
@@ -272,7 +248,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $sms_message = SmsMessage::convertFromSmsMessage($original);
 
     $this->assertEquals($original->isAutomated(), $sms_message->isAutomated());
-    $this->assertEquals($original->getSender(), $sms_message->getSender());
+    $this->assertEquals($original->getSenderNumber(), $sms_message->getSenderNumber());
     $this->assertEquals($original->getRecipients(), $sms_message->getRecipients());
     $this->assertEquals($original->getMessage(), $sms_message->getMessage());
     $this->assertEquals($user->id(), $sms_message->getSenderEntity()->id());

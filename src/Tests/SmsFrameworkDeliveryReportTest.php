@@ -4,6 +4,7 @@ namespace Drupal\sms\Tests;
 
 use Drupal\Core\Url;
 use Drupal\sms\Message\SmsDeliveryReportInterface;
+use Drupal\sms\Message\SmsMessageReportStatus;
 use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
@@ -19,34 +20,37 @@ class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase {
   public function testDeliveryReports() {
     $user = $this->drupalCreateUser();
     $this->drupalLogin($user);
-    $sms_message = $this->randomSmsMessage($user->id());
 
     $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
-    $result = $this->defaultSmsProvider
-      ->send($sms_message, ['gateway' => $test_gateway->id()]);
+    $this->container->get('router.builder')->rebuild();
+    $sms_message = $this->randomSmsMessage($user->id())
+      ->setGateway($test_gateway);
 
+    $sms_messages = $this->defaultSmsProvider->send($sms_message);
+
+    $result = $sms_messages[0]->getResult();
     $this->assertTrue($result instanceof SmsMessageResultInterface);
     $this->assertEqual(count($sms_message->getRecipients()), count($result->getReports()));
     $reports = $result->getReports();
+
+    /** @var \Drupal\sms\Message\SmsDeliveryReportInterface $first_report */
     $first_report = reset($reports);
+    $message_id = $first_report->getMessageId();
     $this->assertTrue($first_report instanceof SmsDeliveryReportInterface);
-    $this->assertEqual($first_report->getStatus(), SmsDeliveryReportInterface::STATUS_SENT);
+    $this->assertEqual($first_report->getStatus(), SmsMessageReportStatus::QUEUED);
 
     // Get the delivery reports url and simulate push delivery report.
-    $url = Url::fromRoute('sms.process_delivery_report', ['sms_gateway' => $test_gateway->id()], ['absolute' => TRUE])->toString();
+    $url = $test_gateway->getPushReportUrl()->setAbsolute()->toString();
     $delivered_time = REQUEST_TIME;
-    $delivery_report =<<<EOF
+    $delivery_report = <<<EOF
 {
    "reports":[
       {
-         "message_id":"{$first_report->getMessageId()}",
+         "message_id":"{$message_id}",
          "recipient":"{$first_report->getRecipient()}",
-         "time_sent":{$first_report->getTimeSent()},
+         "time_sent":{$first_report->getTimeQueued()},
          "time_delivered": $delivered_time,
-         "status": "800",
-         "gateway_status": "THIS_HAS_BEEN_DELIVERED",
-         "gateway_status_code": "202",
-         "gateway_status_description": "Delivered to Handset"
+         "status_message": "status message"
       }
    ]
 }
@@ -56,11 +60,11 @@ EOF;
     \Drupal::state()->resetCache();
 
     // Get the stored report and verify that it was properly parsed.
-    $second_report = $this->getTestMessageReport($first_report->getMessageId(), $test_gateway);
-    $this->assertEqual($first_report->getMessageId(), $second_report->getMessageId());
-    $this->assertEqual("800", $second_report->getStatus());
-    $this->assertEqual("THIS_HAS_BEEN_DELIVERED", $second_report->getGatewayStatus());
+    $second_report = $this->getTestMessageReport($message_id, $test_gateway);
+    $this->assertTrue($second_report instanceof SmsDeliveryReportInterface);
+    $this->assertEqual("status message", $second_report->getStatusMessage());
     $this->assertEqual($delivered_time, $second_report->getTimeDelivered());
+    $this->assertEqual($message_id, $second_report->getMessageId());
   }
 
 }

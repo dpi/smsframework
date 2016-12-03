@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Entity\PhoneNumberSettings.
- */
-
 namespace Drupal\sms\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
@@ -80,8 +75,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
   protected $verification_code_lifetime = 0;
 
   /**
-   * Whether to remove phone number field values when phone number
-   * verifications expire.
+   * Whether to remove phone numbers from entities when verifications expire.
    *
    * @var bool
    */

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Provider\SmsQueueProcessorInterface.
- */
-
 namespace Drupal\sms\Provider;
 
 /**

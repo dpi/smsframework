@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Entity\SmsGatewayInterface.
- */
-
 namespace Drupal\sms\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -33,7 +28,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   /**
    * Get whether messages sent to this gateway should be sent immediately.
    *
-   * @return boolean
+   * @return bool
    *   Whether messages sent to this gateway should be sent immediately.
    */
   public function getSkipQueue();
@@ -41,7 +36,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   /**
    * Set whether messages sent to this gateway should be sent immediately.
    *
-   * @param boolean $skip_queue
+   * @param bool $skip_queue
    *   Whether messages sent to this gateway should be sent immediately.
    *
    * @return $this
@@ -50,11 +45,38 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   public function setSkipQueue($skip_queue);
 
   /**
+   * Get the url where pushed delivery reports can be received.
+   *
+   * @return \Drupal\Core\Url
+   *   The url where pushed delivery reports can be received.
+   */
+  public function getPushReportUrl();
+
+  /**
+   * Get the internal path where pushed delivery reports can be received.
+   *
+   * @return string
+   *   The internal path where pushed delivery reports can be received.
+   */
+  public function getPushReportPath();
+
+  /**
+   * Set the internal path where pushed delivery reports can be received.
+   *
+   * @param string $path
+   *   The internal path where pushed delivery reports can be received.
+   *
+   * @return $this
+   *   Return this gateway for chaining.
+   */
+  public function setPushReportPath($path);
+
+  /**
    * Get how many seconds to hold messages.
    *
    * @param int $direction
    *   The direction of the message. See SmsMessageInterface::DIRECTION_*
-   *   constants
+   *   constants.
    *
    * @return int
    *   How long messages should persist in seconds. -1 to never expire.
@@ -66,7 +88,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    *
    * @param int $direction
    *   The direction of the message. See SmsMessageInterface::DIRECTION_*
-   *   constants
+   *   constants.
    * @param int $retention_duration
    *   How many seconds to hold messages, or use -1 to never expire.
    *
@@ -82,5 +104,43 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    *   Maximum number of recipients, or -1 for no limit.
    */
   public function getMaxRecipientsOutgoing();
+
+  /**
+   * Get whether this gateway is schedule aware.
+   *
+   * @return bool
+   *   Whether this gateway is schedule aware.
+   */
+  public function isScheduleAware();
+
+  /**
+   * Gets whether this gateway can pull reports.
+   *
+   * @return bool
+   *   Whether this gateway can pull reports.
+   *
+   * @see \Drupal\sms\Annotation\SmsGateway::reports_pull
+   */
+  public function supportsReportsPull();
+
+  /**
+   * Gets whether this gateway can handle reports pushed to the site.
+   *
+   * @return bool
+   *   Whether this gateway can handle reports pushed to the site.
+   *
+   * @see \Drupal\sms\Annotation\SmsGateway::reports_push
+   */
+  public function supportsReportsPush();
+
+  /**
+   * Get whether this gateway supports credit balance queries.
+   *
+   * @return bool
+   *   Whether this gateway supports credit balance queries.
+   *
+   * @see \Drupal\sms\Annotation\SmsGateway::credit_balance_available
+   */
+  public function supportsCreditBalanceQuery();
 
 }

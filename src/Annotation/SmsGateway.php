@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Annotation\SmsGateway
- */
-
 namespace Drupal\sms\Annotation;
 
 use Drupal\Component\Annotation\Plugin;
@@ -25,6 +20,7 @@ class SmsGateway extends Plugin {
 
   /**
    * Translated user-readable label.
+   *
    * @var string
    */
   protected $label;
@@ -37,5 +33,44 @@ class SmsGateway extends Plugin {
    * @var int
    */
   protected $outgoing_message_max_recipients;
+
+  /**
+   * Whether the gateway is capable of delaying messages until a date.
+   *
+   * Schedule aware gateways must extract sending time from all message
+   * getSendTime() method. Keep in mind this method is only available if the
+   * message is a SMS message entity. See the schedule aware gateway
+   * implementation in the test modules for an example.
+   *
+   * @var boolean
+   */
+  protected $schedule_aware;
+
+  /**
+   * Whether the gateway can pull reports.
+   *
+   * @see \Drupal\sms\Entity\SmsGatewayInterface::supportsReportsPull()
+   *
+   * @var boolean
+   */
+  protected $reports_pull;
+
+  /**
+   * Whether the gateway can handle reports pushed to the site.
+   *
+   * @see \Drupal\sms\Entity\SmsGatewayInterface::supportsReportsPush()
+   *
+   * @var boolean
+   */
+  protected $reports_push;
+
+  /**
+   * Whether the gateway supports queries of current credit balance.
+   *
+   * @see \Drupal\sms\Entity\SmsGatewayInterface::supportsCreditBalanceQuery()
+   *
+   * @var boolean
+   */
+  protected $credit_balance_available;
 
 }

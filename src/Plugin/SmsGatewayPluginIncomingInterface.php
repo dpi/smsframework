@@ -14,6 +14,9 @@ interface SmsGatewayPluginIncomingInterface {
    *
    * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
    *   A SMS message.
+   *
+   * @return \Drupal\sms\Message\SmsMessageResultInterface
+   *   The result of receiving the message.
    */
   public function incoming(SmsMessageInterface $sms_message);
 

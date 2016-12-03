@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Plugin\SmsGatewayPluginBase
- */
-
 namespace Drupal\sms\Plugin;
 
 use Drupal\Core\Form\FormStateInterface;
@@ -16,13 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
  * Base class for sms gateway plugins.
  */
 abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPluginInterface {
-
-  /**
-   * The watchdog logger for this gateway.
-   *
-   * @var \Psr\Log\LoggerInterface.
-   */
-  protected $logger;
 
   /**
    * Construct a new SmsGateway plugin
@@ -71,21 +59,12 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    return;
   }
 
   /**
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    return;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function sendForm(array &$form, FormStateInterface $form_state) {
-    return [];
   }
 
   /**
@@ -98,15 +77,8 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
   /**
    * {@inheritdoc}
    */
-  public function validateNumbers(array $numbers, array $options = []) {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function balance() {
-    return 0;
+  public function getCreditsBalance() {
+    return NULL;
   }
 
   /**
@@ -121,24 +93,6 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
    */
   public function getDeliveryReports(array $message_ids = NULL) {
     return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getError() {
-    return [];
-  }
-
-  /**
-   * Gets the Psr logger for this gateway.
-   */
-  protected function logger() {
-    if (!isset($this->logger)) {
-      $definition = $this->getPluginDefinition();
-      $this->logger = \Drupal::logger($definition['provider'] . '.' . $definition['id'] );
-    }
-    return $this->logger;
   }
 
 }

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Plugin\SmsGatewayPluginManager
- */
-
 namespace Drupal\sms\Plugin;
 
 use Drupal\Core\Cache\CacheBackendInterface;

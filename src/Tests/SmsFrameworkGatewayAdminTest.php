@@ -1,15 +1,11 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Tests\SmsFrameworkGatewayAdminTest.
- */
-
 namespace Drupal\sms\Tests;
 
 use Drupal\Core\Url;
 use Drupal\Component\Utility\Unicode;
-use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
+use Drupal\sms\Entity\SmsGateway;
 
 /**
  * Tests gateway administration user interface.
@@ -26,6 +22,8 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
   public static $modules = ['block'];
 
   /**
+   * SMS Gateway entity storage.
+   *
    * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
    */
   protected $smsGatewayStorage;
@@ -61,30 +59,30 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
     // Delete all gateways.
     $this->smsGatewayStorage->delete($this->smsGatewayStorage->loadMultiple());
     $this->drupalGet(Url::fromRoute('sms.gateway.list'));
-    $this->assertRaw(t('No SMS Gateways found.'));
+    $this->assertRaw(t('No gateways found.'));
   }
 
   /**
-   * Tests setting up the default gateway.
+   * Tests setting up the fallback gateway.
    */
-  public function testDefaultGateway() {
+  public function testFallbackGateway() {
     $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
 
-    // Test initial default gateway.
-    $sms_gateway_default = $this->defaultSmsProvider->getDefaultGateway();
+    // Test initial fallback gateway.
+    $sms_gateway_fallback = SmsGateway::load($this->config('sms.settings')->get('fallback_gateway'));
 
-    $this->assertEqual($sms_gateway_default->id(), 'log', 'Initial default gateway is "log".');
+    $this->assertEqual($sms_gateway_fallback->id(), 'log', 'Initial fallback gateway is "log".');
 
     $this->drupalLogin($this->drupalCreateUser(['administer smsframework']));
 
-    // Change default gateway.
-    $this->drupalPostForm('admin/config/smsframework/settings', [
-      'default_gateway' => $test_gateway->id(),
+    // Change fallback gateway.
+    $this->drupalPostForm(Url::fromRoute('sms.settings'), [
+      'fallback_gateway' => $test_gateway->id(),
     ], 'Save configuration');
     $this->assertResponse(200);
 
-    $sms_gateway_default = $this->defaultSmsProvider->getDefaultGateway();
-    $this->assertEqual($sms_gateway_default->id(), $test_gateway->id(), 'Default gateway changed.');
+    $sms_gateway_fallback = SmsGateway::load($this->config('sms.settings')->get('fallback_gateway'));
+    $this->assertEqual($sms_gateway_fallback->id(), $test_gateway->id(), 'Fallback gateway changed.');
   }
 
   /**
@@ -134,6 +132,9 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
     $this->assertFieldByName('retention_duration_incoming', '0');
     $this->assertFieldByName('retention_duration_outgoing', '0');
 
+    // Memory gateway supports pushed reports, so the URL should display.
+    $this->assertFieldByName('delivery_reports[push_path]', $test_gateway->getPushReportPath());
+
     // Memory gateway has a decoy configuration form.
     $edit = [
       'widget' => $this->randomString(),
@@ -153,13 +154,29 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkWebTestBase {
 
     // Gateway settings.
     $this->assertEqual(TRUE, $test_gateway->getSkipQueue());
-    $this->assertEqual($edit['retention_duration_incoming'], $test_gateway->getRetentionDuration(SmsMessageInterface::DIRECTION_INCOMING));
-    $this->assertEqual($edit['retention_duration_outgoing'], $test_gateway->getRetentionDuration(SmsMessageInterface::DIRECTION_OUTGOING));
+    $this->assertEqual($edit['retention_duration_incoming'], $test_gateway->getRetentionDuration(Direction::INCOMING));
+    $this->assertEqual($edit['retention_duration_outgoing'], $test_gateway->getRetentionDuration(Direction::OUTGOING));
 
     // Plugin form.
     $config = $test_gateway->getPlugin()
       ->getConfiguration();
     $this->assertEqual($edit['widget'], $config['widget'], 'Plugin configuration changed.');
+  }
+
+  /**
+   * Tests a gateway edit form does not display delivery report URL.
+   */
+  public function testGatewayEditNoDeliveryUrl() {
+    $this->drupalLogin($this->drupalCreateUser(['administer smsframework']));
+    $test_gateway = $this->createMemoryGateway(['plugin' => 'capabilities_default']);
+
+    $this->drupalGet(Url::fromRoute('entity.sms_gateway.edit_form', [
+      'sms_gateway' => $test_gateway->id(),
+    ]));
+    $this->assertResponse(200);
+    $this->assertRaw('Edit gateway');
+
+    $this->assertNoFieldByName('delivery_reports[push_path]');
   }
 
   /**

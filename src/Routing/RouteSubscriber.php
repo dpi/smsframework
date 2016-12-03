@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Routing\RouteSubscriber.
- */
-
 namespace Drupal\sms\Routing;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -13,6 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Drupal\Component\Utility\Unicode;
+use Drupal\sms\Entity\SmsGateway;
 
 /**
  * Subscriber for SMS Framework routes.
@@ -27,9 +23,9 @@ class RouteSubscriber implements ContainerInjectionInterface {
   protected $configFactory;
 
   /**
-   * Constructs a new SMS Framework RouteSubscriber
+   * Constructs a new SMS Framework RouteSubscriber.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The gateway manager.
    */
   public function __construct(ConfigFactoryInterface $config_factory) {
@@ -58,7 +54,7 @@ class RouteSubscriber implements ContainerInjectionInterface {
     // Phone number verification.
     $path_verify = $sms_settings->get('page.verify');
     // String length must include at least a slash + another character.
-    if (Unicode::strlen($path_verify) > 2) {
+    if (Unicode::strlen($path_verify) >= 2) {
       $collection->add('sms.phone.verify', new Route(
         $path_verify,
         [
@@ -69,6 +65,23 @@ class RouteSubscriber implements ContainerInjectionInterface {
           '_permission' => 'sms verify phone number',
         ]
       ));
+    }
+
+    /** @var \Drupal\sms\Entity\SmsGatewayInterface $gateway */
+    foreach (SmsGateway::loadMultiple() as $gateway) {
+      if (!$gateway->supportsReportsPush()) {
+        continue;
+      }
+
+      $id = $gateway->id();
+      $path = $gateway->getPushReportPath();
+      if (Unicode::strlen($path) >= 2 && Unicode::substr($path, 0, 1) == '/') {
+        $route = (new Route($path))
+          ->setDefault('_controller', '\Drupal\sms\DeliveryReportController::processDeliveryReport')
+          ->setDefault('_sms_gateway_push_endpoint', $id)
+          ->setRequirement('_sms_gateway_supports_pushed_reports', 'TRUE');
+        $collection->add('sms.delivery_report.receive.' . $id, $route);
+      }
     }
 
     return $collection;

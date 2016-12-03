@@ -1,15 +1,7 @@
 sms_user.options:
-  path: '/admin/config/smsframework/sms_user_options'
+  path: '/admin/config/smsframework/user'
   defaults:
     _form: '\Drupal\sms_user\Form\AdminSettingsForm'
-    _title: 'SMS User Options'
+    _title: 'User SMS settings'
   requirements:
     _permission: 'administer smsframework'
-
-sms_user.user_edit:
-  path: '/user/{user}/mobile'
-  defaults:
-    _controller: 'sms_user_settings'
-  requirements:
-    _permission: 'receive sms'
-    _entity_access: 'user.update'

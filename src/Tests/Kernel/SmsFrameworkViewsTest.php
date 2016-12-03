@@ -2,7 +2,6 @@
 
 namespace Drupal\sms\Tests\Kernel;
 
-use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Tests\SmsFrameworkTestTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
@@ -11,6 +10,7 @@ use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\Core\Render\RenderContext;
+use Drupal\sms\Direction;
 
 /**
  * Tests SMS Framework integration with Views.
@@ -21,7 +21,13 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
 
   use SmsFrameworkTestTrait;
 
-  public static $modules = ['views', 'user', 'sms', 'sms_test_gateway', 'sms_test_views', 'telephone', 'dynamic_entity_reference', 'field'];
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = [
+    'user', 'sms', 'sms_test_gateway', 'sms_test_views', 'telephone',
+    'dynamic_entity_reference', 'field',
+  ];
 
   /**
    * Views used by this test.
@@ -44,16 +50,19 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
    */
   protected $gateway;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp($import_test_views = TRUE) {
     parent::setUp($import_test_views);
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('sms');
 
-    $this->smsProvider = $this->container->get('sms_provider');
+    $this->smsProvider = $this->container->get('sms.provider');
 
     $this->gateway = $this->createMemoryGateway();
-    $this->smsProvider->setDefaultGateway($this->gateway);
+    $this->setFallbackGateway($this->gateway);
 
     ViewTestData::createTestViews(get_class($this), ['sms_test_views']);
   }
@@ -86,7 +95,7 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     $message1
       ->setSenderEntity($user1)
       ->addRecipients($this->randomPhoneNumbers(2))
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
+      ->setDirection(Direction::OUTGOING)
       ->setMessage($this->randomMachineName())
       ->setSenderNumber('+123123123')
       ->setQueued(TRUE);
@@ -97,7 +106,7 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
       ->setRecipientEntity($user1)
       ->setSenderEntity($user2)
       ->addRecipients($this->randomPhoneNumbers(1))
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING)
+      ->setDirection(Direction::INCOMING)
       ->setMessage($this->randomMachineName())
       ->setAutomated(FALSE)
       ->setProcessedTime(499488280);
@@ -111,7 +120,11 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
 
     $this->assertEquals(2, $view->total_rows);
 
-    $cols = ['direction_1', 'sender_phone_number', 'recipient_phone_number', 'message', 'created', 'gateway', 'sender_entity__target_id', 'recipient_entity__target_id', 'automated', 'processed', 'queued'];
+    $cols = [
+      'direction_1', 'sender_phone_number', 'recipient_phone_number',
+      'message', 'created', 'gateway', 'sender_entity__target_id',
+      'recipient_entity__target_id', 'automated', 'processed', 'queued',
+    ];
     $this->assertEquals($cols, array_keys($view->field));
 
     /** @var \Drupal\Core\Render\RendererInterface $renderer */

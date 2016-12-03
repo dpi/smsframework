@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Form\PhoneNumberSettingsForm.
- */
-
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Entity\EntityForm;
@@ -24,7 +19,7 @@ class PhoneNumberSettingsForm extends EntityForm {
   /**
    * Form field value used to indicate to create a new attached field.
    */
-  const createNewField = '!create';
+  const CREATE_NEW_FIELD = '!create';
 
   /**
    * The entity type manager.
@@ -116,10 +111,10 @@ class PhoneNumberSettingsForm extends EntityForm {
       '#default_value' => $bundle_default_value,
       '#required' => TRUE,
       '#access' => $config->isNew(),
-      '#ajax' => array(
+      '#ajax' => [
         'callback' => '::updateFieldMapping',
         'wrapper' => 'edit-field-mapping-wrapper',
-      ),
+      ],
     ];
 
     if (!$bundles) {
@@ -127,8 +122,8 @@ class PhoneNumberSettingsForm extends EntityForm {
     }
 
     $field_options = [];
-    $field_options['telephone'][self::createNewField] = $this->t('- Create a new telephone field -');
-    $field_options['boolean'][self::createNewField] = $this->t('- Create a new boolean field -');
+    $field_options['telephone'][self::CREATE_NEW_FIELD] = $this->t('- Create a new telephone field -');
+    $field_options['boolean'][self::CREATE_NEW_FIELD] = $this->t('- Create a new boolean field -');
 
     if ($entity_bundle = $form_state->getValue('entity_bundle', $bundle_default_value ?: NULL)) {
       list($entity_type_id, $bundle) = explode('|', $entity_bundle);
@@ -153,7 +148,8 @@ class PhoneNumberSettingsForm extends EntityForm {
     ];
 
     // Form ID must be the same as found in $config->getFieldName().
-    // $config->getFieldName($config_key) == $form['field_mapping'][$config_key]
+    // ($config->getFieldName($config_key) ==
+    // $form['field_mapping'][$config_key]).
     $form['field_mapping']['phone_number'] = [
       '#type' => 'select',
       '#title' => $this->t('Phone number'),
@@ -171,7 +167,6 @@ class PhoneNumberSettingsForm extends EntityForm {
       '#empty_option' => $this->t('- None -'),
       '#default_value' => $config->getFieldName('automated_opt_out'),
     ];
-
 
     $form['message'] = [
       '#type' => 'fieldset',
@@ -248,13 +243,12 @@ class PhoneNumberSettingsForm extends EntityForm {
       ->setPurgeVerificationPhoneNumber((bool) $form_state->getValue('phone_number_purge'));
 
     foreach ($form_state->getValue('field_mapping') as $config_key => $field_name) {
-      if ($field_name == self::createNewField) {
+      if ($field_name == self::CREATE_NEW_FIELD) {
         $field_config = $this->createNewField($entity_type_id, $bundle, $config_key);
         $field_name = $field_config->getName();
       }
       else {
         // Use existing field.
-
         /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
         $entity_form_display = $field_storage_config = $this->entityTypeManager
           ->getStorage('entity_form_display')
@@ -292,11 +286,11 @@ class PhoneNumberSettingsForm extends EntityForm {
   /**
    * Create a new field storage and field, and modify form display.
    *
-   * @param $entity_type_id
+   * @param string $entity_type_id
    *   An entity type ID.
-   * @param $bundle
+   * @param string $bundle
    *   A bundle ID.
-   * @param $config_key
+   * @param string $config_key
    *   A config ID as found in sms.phone.*.*.fields.$config_key
    *
    * @return \Drupal\field\FieldConfigInterface

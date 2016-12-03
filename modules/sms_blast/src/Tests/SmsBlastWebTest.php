@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains tests for the sms_blast module.
- */
-
 namespace Drupal\sms_blast\Tests;
 
 use Drupal\sms\Tests\SmsFrameworkWebTestBase;
@@ -20,9 +15,11 @@ use Drupal\sms\Entity\PhoneNumberSettings;
  */
 class SmsBlastWebTest extends SmsFrameworkWebTestBase {
 
-  public static $modules = ['sms_user', 'sms_blast'];
+  public static $modules = ['sms', 'user', 'sms_blast'];
 
   /**
+   * Phone number settings of user entity type.
+   *
    * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
    */
   protected $phoneNumberSettings;
@@ -35,8 +32,7 @@ class SmsBlastWebTest extends SmsFrameworkWebTestBase {
     $this->drupalLogin($this->drupalCreateUser(['Send SMS Blast']));
 
     $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
-    $this->defaultSmsProvider
-      ->setDefaultGateway($this->gateway);
+    $this->setFallbackGateway($this->gateway);
 
     $phone_field = FieldStorageConfig::create([
       'entity_type' => 'user',
@@ -63,17 +59,29 @@ class SmsBlastWebTest extends SmsFrameworkWebTestBase {
   /**
    * Tests sending SMS blast.
    */
-  function testSendBlast() {
-    // Create users with two phone numbers. Only one message should be sent to
-    // each user.
-    $phone_numbers = ['+123123123', '+456456456'];
-    for ($i = 0; $i < 3; $i++) {
-      // Create an unverified user.
-      $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
-      // Create a verified user.
-      $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
-      $this->verifyPhoneNumber($entity, $phone_numbers[0]);
+  public function testSendBlast() {
+    // Create users with multiple phone numbers. Only one message should be sent
+    // to each user.
+    $phone_numbers = $this->randomPhoneNumbers();
+    $entities = [];
+    for ($i = 0; $i < 6; $i++) {
+      /** @var \Drupal\user\UserInterface $user */
+      $user = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
+      // Need to activate so when DER does entity validation it is included by the
+      // UserSelection plugin.
+      $user->activate()->save();
+      $entities[] = $user;
     }
+
+    // Verify three of the users randomly.
+    $numbers = range(0, count($entities) - 1);
+    shuffle($numbers);
+    foreach (array_slice($numbers, 0, 3) as $i) {
+      $this->verifyPhoneNumber($entities[$i], $phone_numbers[0]);
+    }
+
+    // Reset messages created as a result of creating entities above. Such as
+    // verification messages.
     $this->resetTestMessages();
 
     $edit['message'] = $this->randomString();

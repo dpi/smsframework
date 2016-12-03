@@ -1,18 +1,16 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Form\VerifyPhoneNumberForm.
- */
-
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Flood\FloodInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\sms\Provider\PhoneNumberProviderInterface;
+use Drupal\sms\Provider\PhoneNumberVerificationInterface;
 use Drupal\Core\Form\FormStateInterface;
 
+/**
+ * Form to accept a verification code.
+ */
 class VerifyPhoneNumberForm extends FormBase {
 
   /**
@@ -23,23 +21,23 @@ class VerifyPhoneNumberForm extends FormBase {
   protected $flood;
 
   /**
-   * Phone number provider.
+   * The phone number verification service.
    *
-   * @var \Drupal\sms\Provider\PhoneNumberProviderInterface
+   * @var \Drupal\sms\Provider\PhoneNumberVerificationInterface
    */
-  protected $phoneNumberProvider;
+  protected $phoneNumberVerification;
 
   /**
    * Constructs a VerifyPhoneNumberForm object.
    *
    * @param \Drupal\Core\Flood\FloodInterface $flood
    *   The flood control mechanism.
-   * @param \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider
-   *   The phone number provider.
+   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification
+   *   The phone number verification service.
    */
-  public function __construct(FloodInterface $flood, PhoneNumberProviderInterface $phone_number_provider) {
+  public function __construct(FloodInterface $flood, PhoneNumberVerificationInterface $phone_number_verification) {
     $this->flood = $flood;
-    $this->phoneNumberProvider = $phone_number_provider;
+    $this->phoneNumberVerification = $phone_number_verification;
   }
 
   /**
@@ -48,14 +46,20 @@ class VerifyPhoneNumberForm extends FormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('flood'),
-      $container->get('sms.phone_number')
+      $container->get('sms.phone_number.verification')
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId() {
     return 'sms_verify_phone_number';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildForm(array $form, FormStateInterface $form_state) {
 
     $form['code'] = [
@@ -75,7 +79,7 @@ class VerifyPhoneNumberForm extends FormBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $flood_window = $this->config('sms.settings')->get('flood.verify_window');
@@ -88,12 +92,12 @@ class VerifyPhoneNumberForm extends FormBase {
 
     $current_time = $this->getRequest()->server->get('REQUEST_TIME');
     $code = $form_state->getValue('code');
-    $phone_verification = $this->phoneNumberProvider
+    $phone_verification = $this->phoneNumberVerification
       ->getPhoneVerificationByCode($code);
 
     if ($phone_verification && !$phone_verification->getStatus()) {
       $entity = $phone_verification->getEntity();
-      $phone_number_settings = $this->phoneNumberProvider
+      $phone_number_settings = $this->phoneNumberVerification
         ->getPhoneNumberSettingsForEntity($entity);
       $lifetime = $phone_number_settings->getVerificationCodeLifetime() ?: 0;
 
@@ -109,9 +113,12 @@ class VerifyPhoneNumberForm extends FormBase {
       ->register('sms.verify_phone_number', $flood_window);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $code = $form_state->getValue('code');
-    $phone_verification = $this->phoneNumberProvider
+    $phone_verification = $this->phoneNumberVerification
       ->getPhoneVerificationByCode($code);
     $phone_verification
       ->setStatus(TRUE)

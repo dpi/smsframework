@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Plugin\SmsGatewayPluginCollection
- */
-
 namespace Drupal\sms\Plugin;
 
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;

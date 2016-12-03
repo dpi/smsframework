@@ -1,14 +1,9 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkQueueTest.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\SmsMessage;
-use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 
 /**
  * Tests behaviour of SMS Framework message queue.
@@ -18,23 +13,23 @@ use Drupal\sms\Entity\SmsMessageInterface;
 class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = ['sms', 'sms_test_gateway', 'field', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = [
+    'sms', 'sms_test_gateway', 'field', 'telephone', 'dynamic_entity_reference',
+  ];
 
   /**
-   * @var \Drupal\sms\Provider\SmsProviderInterface
+   * The SMS provider.
    *
-   * The default SMS provider.
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $smsProvider;
 
   /**
-   * @var \Drupal\sms\Provider\SmsQueueProcessorInterface
-   *
    * The SMS queue processor.
+   *
+   * @var \Drupal\sms\Provider\SmsQueueProcessorInterface
    */
   protected $smsQueueProcessor;
 
@@ -46,7 +41,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
   protected $gateway;
 
   /**
-   * The cron service
+   * The cron service.
    *
    * @var \Drupal\Core\Cron;
    */
@@ -61,8 +56,8 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
     $this->installEntitySchema('sms');
 
     $this->gateway = $this->createMemoryGateway();
-    $this->smsProvider = $this->container->get('sms_provider');
-    $this->smsProvider->setDefaultGateway($this->gateway);
+    $this->smsProvider = $this->container->get('sms.provider');
+    $this->setFallbackGateway($this->gateway);
     $this->smsQueueProcessor = $this->container->get('sms.queue');
     $this->cronService = $this->container->get('cron');
   }
@@ -73,8 +68,8 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
   public function testProcessUnqueued() {
     $sms_message = $this->createSmsMessage();
 
-    $this->smsProvider->queue($sms_message);
-    $id = $sms_message->id();
+    $result = $this->smsProvider->queue($sms_message);
+    $id = $result[0]->id();
 
     // Call processUnqueued manually so cron does not send the message with
     // queue workers.
@@ -90,7 +85,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
    */
   public function testQueueIncoming() {
     $sms_message = $this->createSmsMessage()
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING);
+      ->setDirection(Direction::INCOMING);
 
     // @todo sms_test_gateway_sms_incoming() requires an incoming recipient.
     $sms_message->addRecipients($this->randomPhoneNumbers());
@@ -107,7 +102,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
    */
   public function testQueueOutgoing() {
     $sms_message = $this->createSmsMessage()
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING);
+      ->setDirection(Direction::OUTGOING);
     $this->smsProvider->queue($sms_message);
     $this->assertEquals(0, count($this->getTestMessages($this->gateway)), 'Message not sent yet.');
 
@@ -129,13 +124,29 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Test message is not delayed for schedule aware gateways..
+   */
+  public function testQueueNotDelayedScheduleAware() {
+    $gateway = $this->createMemoryGateway(['plugin' => 'memory_schedule_aware']);
+
+    $sms_message = $this->createSmsMessage()
+      ->setSendTime(REQUEST_TIME + 9999)
+      ->setGateway($gateway);
+
+    $this->smsProvider->queue($sms_message);
+
+    $this->cronService->run();
+    $this->assertEquals(1, count($this->getTestMessages($gateway)), 'Message sent.');
+  }
+
+  /**
    * Test retention is set to delete messages immediately after transmission.
    *
    * Tests \Drupal\sms\Plugin\QueueWorker\SmsProcessor.
    */
   public function testRetentionImmediateDelete() {
     $this->gateway
-      ->setRetentionDuration(SmsMessageInterface::DIRECTION_OUTGOING, 0)
+      ->setRetentionDuration(Direction::OUTGOING, 0)
       ->save();
 
     $sms_message = $this->createSmsMessage();
@@ -153,7 +164,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
    */
   public function testRetentionPersist() {
     $this->gateway
-      ->setRetentionDuration(SmsMessageInterface::DIRECTION_OUTGOING, 9999)
+      ->setRetentionDuration(Direction::OUTGOING, 9999)
       ->save();
 
     $sms_message = $this->createSmsMessage();
@@ -174,7 +185,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
    */
   public function testRetentionUnlimited() {
     $this->gateway
-      ->setRetentionDuration(SmsMessageInterface::DIRECTION_OUTGOING, -1)
+      ->setRetentionDuration(Direction::OUTGOING, -1)
       ->save();
 
     $this->createSmsMessage()
@@ -183,7 +194,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
       ->setProcessedTime(1)
       ->save();
 
-    // Garbage collect
+    // Garbage collect.
     $this->cronService->run();
 
     $this->assertEquals(1, count(SmsMessage::loadMultiple()), 'There are SMS entities in storage.');
@@ -196,11 +207,13 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
    *   An mixed array of values to pass when creating the SMS message entity.
    *
    * @return \Drupal\sms\Entity\SmsMessageInterface
+   *   A SMS message entity for testing.
    */
   protected function createSmsMessage(array $values = []) {
     return SmsMessage::create($values)
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
-      ->setMessage($this->randomString());
+      ->setDirection(Direction::OUTGOING)
+      ->setMessage($this->randomString())
+      ->addRecipients($this->randomPhoneNumbers(1));
   }
 
 }

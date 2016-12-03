@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Tests\SmsFrameworkTestTrait.
- */
-
 namespace Drupal\sms\Tests;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -20,16 +15,30 @@ use Drupal\sms\Message\SmsMessage;
 trait SmsFrameworkTestTrait {
 
   /**
+   * Sets the fallback gateway.
+   *
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
+   *   The new site fallback SMS Gateway, or NULL to unset.
+   */
+  protected function setFallbackGateway(SmsGatewayInterface $sms_gateway = NULL) {
+    $sms_gateway = $sms_gateway ? $sms_gateway->id() : NULL;
+    $this->config('sms.settings')
+      ->set('fallback_gateway', $sms_gateway)
+      ->save();
+  }
+
+  /**
    * Creates a memory gateway.
    *
    * @param array $values
    *   Additional values to use when creating the gateway.
    *
    * @return \Drupal\sms\Entity\SmsGatewayInterface
+   *   A saved memory gateway.
    */
   protected function createMemoryGateway($values = []) {
-    $id = Unicode::strtolower($this->randomMachineName(16));
-    $gateway = SmsGateway::create([
+    $id = isset($values['id']) ? $values['id'] : Unicode::strtolower($this->randomMachineName(16));
+    $gateway = SmsGateway::create($values + [
       'plugin' => 'memory',
       'id' => $id,
       'label' => $this->randomString(),
@@ -47,6 +56,7 @@ trait SmsFrameworkTestTrait {
    *   A gateway plugin instance.
    *
    * @return \Drupal\sms\Message\SmsMessageInterface[]
+   *   An array of SMS messages sent to a 'Memory' gateway.
    */
   function getTestMessages(SmsGatewayInterface $sms_gateway) {
     $gateway_id = $sms_gateway->id();
@@ -72,14 +82,15 @@ trait SmsFrameworkTestTrait {
   /**
    * Resets SMS messages stored in memory by 'Memory' gateway.
    *
-   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
+   * @param \Drupal\sms\Entity\SmsGatewayInterface|NULL $sms_gateway
    *   A gateway plugin, or NULL to reset all messages.
    */
   public function resetTestMessages(SmsGatewayInterface $sms_gateway = NULL) {
     $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
     if ($sms_gateway) {
       $sms_messages[$sms_gateway->id()] = [];
-    } else {
+    }
+    else {
       $sms_messages = [];
     }
     \Drupal::state()->set('sms_test_gateway.memory.send', $sms_messages);
@@ -92,6 +103,7 @@ trait SmsFrameworkTestTrait {
    *   A gateway plugin.
    *
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
+   *   An array of SMS reports for messages sent to 'Memory' gateway.
    */
   protected function getTestMessageReports(SmsGatewayInterface $sms_gateway) {
     $gateway_id = $sms_gateway->id();
@@ -171,7 +183,7 @@ trait SmsFrameworkTestTrait {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   An entity to verify phone number.
-   * @param $phone_number
+   * @param string $phone_number
    *   A phone number.
    */
   protected function verifyPhoneNumber(EntityInterface $entity, $phone_number) {
@@ -213,9 +225,11 @@ trait SmsFrameworkTestTrait {
    *   (optional) The user ID to generate the message as. Defaults to 1.
    *
    * @return \Drupal\sms\Message\SmsMessageInterface
+   *   A random SMS message by the specified user.
    */
   protected function randomSmsMessage($uid = 1) {
-    return new SmsMessage($this->randomString(), $this->randomPhoneNumbers(), $this->randomString(), [], $uid);
+    $phone_numbers = $this->randomPhoneNumbers(1);
+    return new SmsMessage($phone_numbers[0], $this->randomPhoneNumbers(), $this->randomString(), [], $uid);
   }
 
   /**

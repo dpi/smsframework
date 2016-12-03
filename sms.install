@@ -5,7 +5,7 @@
  * Install, update and uninstall functions for SMS Framework.
  */
 
-use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 
 /**
  * Implements hook_requirements().
@@ -21,7 +21,7 @@ function sms_requirements($phase) {
     $query = clone $base_query;
     $count = $query
       ->condition('queued', 0)
-      ->condition('direction', SmsMessageInterface::DIRECTION_INCOMING)
+      ->condition('direction', Direction::INCOMING)
       ->condition('processed', NULL, 'IS NULL')
       ->count()
       ->execute();
@@ -39,7 +39,7 @@ function sms_requirements($phase) {
     $query = clone $base_query;
     $count = $query
       ->condition('queued', 0)
-      ->condition('direction', SmsMessageInterface::DIRECTION_OUTGOING)
+      ->condition('direction', Direction::OUTGOING)
       ->condition('processed', NULL, 'IS NULL')
       ->count()
       ->execute();

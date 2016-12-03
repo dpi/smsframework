@@ -18,7 +18,7 @@ class NoIncoming extends SmsGatewayPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms, array $options) {
+  public function send(SmsMessageInterface $sms) {
   }
 
 }

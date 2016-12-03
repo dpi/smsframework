@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_blast\SmsBlastForm
- */
-
 namespace Drupal\sms_blast;
 
 use Drupal\Core\Form\FormBase;
@@ -14,6 +9,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\sms\Message\SmsMessage;
 
+/**
+ * Defines a form for sending mass messages.
+ */
 class SmsBlastForm extends FormBase {
 
   /**
@@ -65,17 +63,17 @@ class SmsBlastForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['message'] = array(
+    $form['message'] = [
       '#type'  => 'textarea',
       '#title' => $this->t('Message'),
       '#cols'  => 60,
       '#rows'  => 5,
-    );
+    ];
 
-    $form['submit'] = array(
+    $form['submit'] = [
       '#type'  => 'submit',
       '#value' => $this->t('Send'),
-    );
+    ];
 
     return $form;
   }
@@ -92,17 +90,32 @@ class SmsBlastForm extends FormBase {
       ->condition('entity__target_type', 'user')
       ->execute();
 
+    $success = 0;
+    $failure = 0;
     $entity_ids = [];
     /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $verification */
     foreach ($this->phoneNumberVerificationStorage->loadMultiple($ids) as $verification) {
       // Ensure entity exists and one message is sent to each entity.
       if (($entity = $verification->getEntity()) && !in_array($entity->id(), $entity_ids)) {
         $entity_ids[] = $entity->id();
-        $this->phoneNumberProvider
-          ->sendMessage($entity, $sms_message);
+
+        try {
+          $this->phoneNumberProvider
+            ->sendMessage($entity, $sms_message);
+          $success++;
+        }
+        catch (\Exception $e) {
+          $failure++;
+        }
       }
     }
 
-    drupal_set_message($this->formatPlural(count($entity_ids), 'Message sent to @count user.', 'Message sent to @count users.'));
+    if ($success > 0) {
+      drupal_set_message($this->formatPlural($success, 'Message sent to @count user.', 'Message sent to @count users.'));
+    }
+    if ($failure > 0) {
+      drupal_set_message($this->formatPlural($failure, 'Message could not be sent to @count user.', 'Message could not be sent to @count users.'), 'error');
+    }
   }
+
 }

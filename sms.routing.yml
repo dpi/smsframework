@@ -83,18 +83,3 @@ entity.sms_gateway.delete_form:
     _title: 'Delete gateway'
   requirements:
     _permission: 'administer smsframework'
-
-sms.bootstrap_admin:
-  path: '/admin/config/smsframework/bootstrap'
-  defaults:
-    _form: '\Drupal\sms\Form\BootstrapAdminForm'
-    _title: 'Incoming SMS bootstrap'
-  requirements:
-    _permission: 'administer smsframework'
-
-sms.process_delivery_report:
-  path: '/sms/process-delivery-report/{sms_gateway}'
-  defaults:
-    _controller: '\Drupal\sms\DeliveryReportController::processDeliveryReport'
-  requirements:
-    _access: 'TRUE'

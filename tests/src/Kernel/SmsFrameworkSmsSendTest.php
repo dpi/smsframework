@@ -1,13 +1,11 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkSmsSendTest.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\SmsGateway;
+use Drupal\sms\Message\SmsMessage;
+use Drupal\sms\Message\SmsMessageResultInterface;
+use Drupal\sms\Direction;
 
 /**
  * Tests sending SMS messages.
@@ -17,16 +15,16 @@ use Drupal\sms\Entity\SmsGateway;
 class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = ['sms', 'sms_test_gateway'];
+  public static $modules = [
+    'sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference',
+  ];
 
   /**
    * The default SMS provider service.
    *
-   * @var \Drupal\sms\Provider\DefaultSmsProvider
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $defaultSmsProvider;
 
@@ -35,7 +33,7 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->defaultSmsProvider = $this->container->get('sms_provider.default');
+    $this->defaultSmsProvider = $this->container->get('sms.provider');
   }
 
   /**
@@ -64,8 +62,14 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
     $message_counts = [0, 0, 0];
     for ($a = 0; $a < 3; $a++) {
       foreach ($gateways as $i => &$gateway) {
-        $this->defaultSmsProvider->setDefaultGateway($gateway);
-        sms_send('+123123123', $this->randomString());
+        $this->setFallbackGateway($gateway);
+
+        $sms_message = (new SmsMessage())
+          ->addRecipients($this->randomPhoneNumbers(1))
+          ->setMessage($this->randomString())
+          ->setDirection(Direction::OUTGOING);
+        $this->defaultSmsProvider->queue($sms_message);
+
         $message_counts[$i]++;
         foreach ($gateways as $k => $gateway2) {
           $this->assertEquals($message_counts[$k], count($this->getTestMessages($gateway2)));
@@ -75,32 +79,22 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Tests the sending of messages.
-   *
-   * Tests SMS message 'gateway' option.
+   * Tests overriding default gateway with message option.
    */
   public function testSmsSendSpecified() {
     $test_gateway1 = $this->createMemoryGateway(['skip_queue' => TRUE]);
     $test_gateway2 = $this->createMemoryGateway(['skip_queue' => TRUE]);
-    $this->defaultSmsProvider->setDefaultGateway($test_gateway1);
+    $this->setFallbackGateway($test_gateway1);
 
-    // Test message goes to default gateway.
-    $message = $this->randomString();
-    $number = '+123123123';
-    $options['sender'] = 'Sender';
+    $sms_message = (new SmsMessage())
+      ->addRecipients($this->randomPhoneNumbers(1))
+      ->setMessage($this->randomString())
+      ->setGateway($test_gateway2);
 
-    $result = sms_send($number, $message, $options);
-    $this->assertTrue($result, 'Message successfully sent.');
-
-    $this->assertEquals(1, count($this->getTestMessages($test_gateway1)), 'Message sent to default gateway.');
-    $this->assertEquals(0, count($this->getTestMessages($test_gateway2)), 'Message not sent to extra gateway.');
-
-    // Test message goes to specified gateway.
-    $options['gateway'] = $test_gateway2->id();
-    $result = sms_send($number, $message, $options);
-    $this->assertTrue($result, 'Message successfully sent.');
+    $sms_messages = $this->defaultSmsProvider->send($sms_message);
+    $this->assertTrue($sms_messages[0]->getResult() instanceof SmsMessageResultInterface, 'Message successfully sent.');
+    $this->assertEquals(0, count($this->getTestMessages($test_gateway1)), 'Message not sent to the default gateway.');
     $this->assertEquals(1, count($this->getTestMessages($test_gateway2)), 'Message sent to the specified gateway.');
-    $this->assertEquals(1, count($this->getTestMessages($test_gateway1)), 'Message not sent to the default gateway.');
   }
 
 }

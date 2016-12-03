@@ -1,17 +1,12 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms_user\Kernel\SmsFrameworkUserActiveHoursServiceTest.
- */
-
 namespace Drupal\Tests\sms_user\Kernel;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
 use Drupal\user\Entity\User;
-use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 
 /**
  * Tests active hours service.
@@ -28,19 +23,25 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    *
    * @var array
    */
-  public static $modules = ['sms', 'sms_user', 'user', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = [
+    'sms',
+    'sms_user',
+    'user',
+    'telephone',
+    'dynamic_entity_reference',
+  ];
 
   /**
-   * @var \Drupal\sms_user\ActiveHoursInterface
-   *
    * The active hours service.
+   *
+   * @var \Drupal\sms_user\ActiveHoursInterface
    */
   protected $activeHoursService;
 
   /**
-   * @var \Drupal\sms\Provider\SmsProviderInterface
+   * The SMS provider.
    *
-   * The default SMS provider.
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $smsProvider;
 
@@ -50,13 +51,9 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   protected function setUp() {
     parent::setUp();
     $this->activeHoursService = $this->container->get('sms_user.active_hours');
-    $this->smsProvider = $this->container->get('sms_provider');
+    $this->smsProvider = $this->container->get('sms.provider');
     $this->installEntitySchema('user');
     $this->installEntitySchema('sms');
-
-    // @todo Remove when sms_user_user_load() no longer queries a 'sms_user'
-    // table.
-    $this->installSchema('sms_user', ['sms_user']);
   }
 
   /**
@@ -233,12 +230,13 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
     $user = $this->createUser();
     $sms_message = SmsMessage::create()
       ->setMessage($this->randomString())
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
+      ->addRecipients($this->randomPhoneNumbers())
+      ->setDirection(Direction::OUTGOING)
       ->setRecipientEntity($user)
       ->setAutomated(TRUE);
-    $this->smsProvider->queue($sms_message);
+    $return = $this->smsProvider->queue($sms_message);
 
-    $this->assertEquals($timestamp, $sms_message->getSendTime());
+    $this->assertEquals($timestamp, $return[0]->getSendTime());
   }
 
   /**
@@ -253,8 +251,9 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
 
     $user = $this->createUser();
     $sms_message = SmsMessage::create()
+      ->addRecipients($this->randomPhoneNumbers(1))
       ->setMessage($this->randomString())
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
+      ->setDirection(Direction::OUTGOING)
       ->setRecipientEntity($user)
       ->setAutomated(FALSE);
     $this->smsProvider->queue($sms_message);
@@ -296,6 +295,11 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
       'uid' => 1,
       'name' => $this->randomMachineName(),
     ] + $values);
+
+    // Need to activate so when DER does entity validation it is included by the
+    // UserSelection plugin.
+    $user->activate();
+
     $user->save();
     return $user;
   }

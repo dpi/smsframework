@@ -1,15 +1,10 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Provider\SmsQueueProcessor
- */
-
 namespace Drupal\sms\Provider;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Queue\QueueFactory;
-use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Direction;
 
 /**
  * The SMS Queue Processor.
@@ -62,15 +57,24 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function processUnqueued() {
-    $ids = $this->smsMessageStorage
-      ->getQuery()
-      ->condition('queued', 0, '=')
-      ->condition('processed', NULL, 'IS NULL')
-      ->condition('send_on', REQUEST_TIME, '<=')
-      ->execute();
+    /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
+    $ids = [];
+    foreach ($this->smsGatewayStorage->loadMultiple() as $sms_gateway) {
+      $query = $this->smsMessageStorage
+        ->getQuery()
+        ->condition('gateway', $sms_gateway->id(), '=')
+        ->condition('queued', 0, '=')
+        ->condition('processed', NULL, 'IS NULL');
+
+      if (!$sms_gateway->isScheduleAware()) {
+        $query->condition('send_on', REQUEST_TIME, '<=');
+      }
+
+      $ids += $query->execute();
+    }
 
     /** @var \Drupal\sms\Entity\SmsMessageInterface $sms_message */
     foreach ($this->smsMessageStorage->loadMultiple($ids) as $sms_message) {
@@ -84,12 +88,12 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function garbageCollection() {
     $directions = [
-      SmsMessageInterface::DIRECTION_INCOMING,
-      SmsMessageInterface::DIRECTION_OUTGOING,
+      Direction::INCOMING,
+      Direction::OUTGOING,
     ];
 
     $ids = [];

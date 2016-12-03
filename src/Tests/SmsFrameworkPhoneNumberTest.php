@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Tests\SmsFrameworkPhoneNumberTest.
- */
-
 namespace Drupal\sms\Tests;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -25,14 +20,13 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
   protected function setUp() {
     parent::setUp();
     $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
-    $this->defaultSmsProvider
-      ->setDefaultGateway($test_gateway);
+    $this->setFallbackGateway($test_gateway);
   }
 
   /**
    * Test verification code creation on entity postsave.
    *
-   * @see _sms_entity_postsave().
+   * @see _sms_entity_postsave()
    */
   public function testPhoneNumberVerificationCreated() {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
@@ -43,7 +37,8 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
 
       $this->assertEqual($quantity, $this->countVerificationCodes($test_entity), 'There is ' . $quantity . ' verification code.');
 
-      // Ensure postsave did not create verification codes if one already exists.
+      // Ensure post-save did not create verification codes if one already
+      // exists.
       $test_entity->save();
       $this->assertEqual($quantity, $this->countVerificationCodes($test_entity), 'Additional verification codes were not created.');
     }
@@ -52,12 +47,11 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
   /**
    * Ensure phone number verification SMS sent.
    *
-   * @see _sms_entity_postsave().
+   * @see _sms_entity_postsave()
    */
   public function testPhoneNumberVerificationMessage() {
     $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
-    $this->defaultSmsProvider
-      ->setDefaultGateway($test_gateway);
+    $this->setFallbackGateway($test_gateway);
 
     $phone_numbers = ['+123123123'];
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
@@ -79,7 +73,7 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
   /**
    * Ensure phone number verification are deleted.
    *
-   * @see sms_entity_delete().
+   * @see sms_entity_delete()
    */
   public function testPhoneNumberVerificationDeleted() {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');

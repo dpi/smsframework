@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Form\PhoneNumberSettingsDeleteForm.
- */
-
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
@@ -20,9 +15,9 @@ class PhoneNumberSettingsDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to delete SMS phone number settings %label?', array(
+    return $this->t('Are you sure you want to delete SMS phone number settings %label?', [
       '%label' => $this->entity->label(),
-    ));
+    ]);
   }
 
   /**
@@ -45,9 +40,9 @@ class PhoneNumberSettingsDeleteForm extends EntityConfirmFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
 
-    drupal_set_message($this->t('Phone number settings %label was deleted.', array(
+    drupal_set_message($this->t('Phone number settings %label was deleted.', [
       '%label' => $this->entity->label(),
-    )));
+    ]));
 
     $form_state->setRedirectUrl($this->getCancelUrl());
   }

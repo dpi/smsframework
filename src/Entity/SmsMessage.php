@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Entity\SmsMessage.
- */
-
 namespace Drupal\sms\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
@@ -14,6 +9,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\sms\Message\SmsMessageInterface as StdSmsMessageInterface;
+use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
  * Defines the SMS message entity.
@@ -36,6 +32,13 @@ use Drupal\sms\Message\SmsMessageInterface as StdSmsMessageInterface;
  * )
  */
 class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
+
+  /**
+   * The result associated with this SMS message.
+   *
+   * @var \Drupal\sms\Message\SmsMessageResultInterface|NULL
+   */
+  protected $result;
 
   /**
    * Following are implementors of plain SmsMessage interface.
@@ -136,11 +139,27 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
+  public function getResult() {
+    return $this->result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setResult(SmsMessageResultInterface $result = NULL) {
+    $this->result = $result;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getSender() {
     $sender_name = $this->get('sender_name');
     if (isset($sender_name->value)) {
       return $sender_name->value;
-    } else {
+    }
+    else {
       return ($sender_entity = $this->getSenderEntity()) ? $sender_entity->label() : NULL;
     }
   }
@@ -148,7 +167,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    *
-   * @param string $sender|NULL
+   * @param string|NULL $sender
    *   The name of the sender. Or NULL to defer to the label of the sender
    *   entity.
    *
@@ -229,7 +248,8 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function setDirection($direction) {
-    return $this->set('direction', $direction);
+    $this->set('direction', $direction);
+    return $this;
   }
 
   /**
@@ -296,7 +316,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function isQueued() {
-    return (boolean)$this->get('queued')->value;
+    return (boolean) $this->get('queued')->value;
   }
 
   /**
@@ -349,6 +369,12 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    */
   public function chunkByRecipients($size) {
     $recipients_all = $this->getRecipients();
+
+    // Save processing by returning early.
+    if ($size < 1 || count($recipients_all) <= $size) {
+      return [$this];
+    }
+
     // Create a baseline SMS message with recipients cleaned out.
     $base = $this->createDuplicate();
     $base->removeRecipients($recipients_all);
@@ -484,8 +510,9 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
 
     $new = static::create();
     $new
+      ->setDirection($sms_message->getDirection())
       ->setAutomated($sms_message->isAutomated())
-      ->setSender($sms_message->getSender())
+      ->setSenderNumber($sms_message->getSenderNumber())
       ->addRecipients($sms_message->getRecipients())
       ->setMessage($sms_message->getMessage());
 

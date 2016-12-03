@@ -1,7 +1,5 @@
 <?php
 
-// $Id$
-
 /**
  * @file
  * Token callbacks for the sms module.
@@ -14,27 +12,27 @@ use Drupal\sms\Message\SmsMessageInterface;
  * Implements hook_token_info().
  */
 function sms_token_info() {
-  $info['types']['sms'] = array(
+  $info['types']['sms'] = [
     'name' => t('SMS'),
     'description' => t("SMS Framework tokens."),
-  );
+  ];
   $info['tokens']['sms']['verification-url'] = [
     'name' => t("Verification URL"),
     'description' => t("The URL of the site verification page."),
   ];
-  $info['types']['sms-message'] = array(
+  $info['types']['sms-message'] = [
     'name' => t('SMS Message'),
     'needs-data' => 'sms-message',
     'description' => t("Tokens for an SMS Message."),
-  );
-  $info['tokens']['sms-message']['phone-number'] = array(
+  ];
+  $info['tokens']['sms-message']['phone-number'] = [
     'name' => t('Phone number'),
     'description' => t("Recipient phone number"),
-  );
-  $info['tokens']['sms-message']['message'] = array(
+  ];
+  $info['tokens']['sms-message']['message'] = [
     'name' => t('Message'),
     'description' => t("Contents of the SMS message."),
-  );
+  ];
   $info['tokens']['sms-message']['verification-code'] = [
     'name' => t("Verification Code"),
     'description' => t("A verification code for a phone number."),
@@ -71,6 +69,7 @@ function sms_tokens($type, $tokens, array $data, array $options, BubbleableMetad
             $recipients = $sms_message->getRecipients();
             $replacements[$original] = reset($recipients) ?: '';
             break;
+
           case 'message':
             $replacements[$original] = $sms_message->getMessage();
             break;

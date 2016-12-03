@@ -1,12 +1,8 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Plugin\Field\FieldWidget\SmsTelephoneWidget.
- */
-
 namespace Drupal\sms\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\telephone\Plugin\Field\FieldWidget\TelephoneDefaultWidget;
 use Drupal\Core\Routing\UrlGeneratorTrait;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -30,13 +26,13 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
-    /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
-    $phone_number_provider = \Drupal::service('sms.phone_number');
+    /** @var \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification_provider */
+    $phone_number_verification_provider = \Drupal::service('sms.phone_number.verification');
     try {
-      $config = $phone_number_provider->getPhoneNumberSettingsForEntity($items->getEntity());
+      $config = $phone_number_verification_provider->getPhoneNumberSettingsForEntity($items->getEntity());
     }
     catch (PhoneNumberSettingsException $e) {
       return $element;
@@ -50,7 +46,7 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
     $lifetime = $config->getVerificationCodeLifetime() ?: 0;
 
     if (isset($items[$delta]->value)) {
-      $phone_verification = $phone_number_provider
+      $phone_verification = $phone_number_verification_provider
         ->getPhoneVerificationByEntity($items->getEntity(), $items[$delta]->value);
 
       if ($phone_verification) {

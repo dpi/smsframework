@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Unit\Message\SmsMessageTest
- */
-
 namespace Drupal\Tests\sms\Unit\Message;
 
 use Drupal\Component\Uuid\Php;
@@ -15,7 +10,7 @@ use Drupal\sms\Tests\SmsFrameworkMessageTestTrait;
 /**
  * Unit Tests for SmsMessage.
  *
- * @group SmsFramework
+ * @group SMS Framework
  * @coversDefaultClass \Drupal\sms\Message\SmsMessage
  */
 class SmsMessageTest extends UnitTestCase {
@@ -25,7 +20,8 @@ class SmsMessageTest extends UnitTestCase {
   /**
    * Create a SMS message object for testing.
    *
-   * @return \Drupal\Tests\sms\Unit\Message\TestSmsMessage
+   * @return \Drupal\sms\Message\SmsMessageInterface
+   *   A SMS message object for testing.
    */
   protected function createSmsMessage() {
     return new TestSmsMessage();

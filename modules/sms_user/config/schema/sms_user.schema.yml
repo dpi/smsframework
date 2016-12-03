@@ -4,12 +4,6 @@ sms_user.settings:
   type: config_object
   label: 'SMS User settings'
   mapping:
-    registration_form:
-      type: integer
-      label: 'Show mobile fields during user registration'
-    confirmation_message:
-      type: string
-      label: 'Confirmation message format'
     active_hours:
       type: mapping
       mapping:
@@ -31,7 +25,7 @@ sms_user.settings:
       type: mapping
       label: 'Options to create user accounts when a message is received.'
       mapping:
-        all_unknown_numbers:
+        unrecognized_sender:
           label: 'Create user accounts for all phone numbers not associated with existing users.'
           type: mapping
           mapping:
@@ -47,7 +41,7 @@ sms_user.settings:
                 message:
                   type: string
                   label: 'The reply message when an account was successfully created.'
-        formatted:
+        incoming_pattern:
           type: mapping
           mapping:
             status:
@@ -59,7 +53,7 @@ sms_user.settings:
               sequence:
                - type: string
                  label: 'An incoming message pattern matcher.'
-            activation_email:
+            send_activation_email:
               type: boolean
               label: 'Option to send an account email if email address is present and password is omitted.'
             reply:

@@ -6,4 +6,3 @@ type: module
 dependencies:
   - sms
   - user
-  - views

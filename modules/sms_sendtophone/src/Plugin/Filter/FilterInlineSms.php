@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms_sendtophone\Plugin\Filter\FilterInlineSms.
- */
-
 namespace Drupal\sms_sendtophone\Plugin\Filter;
 
 use Drupal\Core\Form\FormStateInterface;
@@ -38,7 +33,7 @@ class FilterInlineSms extends FilterBase {
    * {@inheritdoc}
    */
   public function process($text, $langcode) {
-    $matches = array();
+    $matches = [];
     preg_match_all('/\[sms\](.*?)\[\/sms\]/i', $text, $matches, PREG_SET_ORDER);
 
     $type = ($this->settings['display'] == 'icon') ? 'icon' : 'text';
@@ -55,43 +50,46 @@ class FilterInlineSms extends FilterBase {
     return $this->t('Text between [sms][/sms] tags will be highlighted and appended with a "send to phone" button.');
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function settingsForm(array $form, FormStateInterface $form_state) {
-    $elements['display'] = array(
+    $elements['display'] = [
       '#type' => 'radios',
       '#title' => t('Show link as'),
       '#description' => t('How to display the the "send to phone" link.'),
-      '#options' => array(
+      '#options' => [
         'text' => t('Text'),
         'icon' => t('Icon'),
-      ),
+      ],
       '#default_value' => $this->settings['display'],
-    );
+    ];
 
-    $elements['display_text'] = array(
+    $elements['display_text'] = [
       '#type' => 'textfield',
       '#title' => t('Text for link'),
       '#description' => t('If "Text" is selected above, the following text will be appended as a link.'),
       '#size' => 32,
       '#maxlength' => 32,
       '#default_value' => $this->settings['display_text'],
-    );
+    ];
 
-    $elements['default_icon'] = array(
+    $elements['default_icon'] = [
       '#type' => 'checkbox',
       '#title' => t('Use default icon'),
       '#description' => t('If "Icon" is selected above and this option is enabled, the default icon that came with the module will be used.'),
       '#default_value' => $this->settings['default_icon'],
-    );
+    ];
 
-    $elements['custom_icon_path'] = array(
+    $elements['custom_icon_path'] = [
       '#type' => 'textfield',
       '#title' => t('Path to custom icon'),
       '#description' => t('Provide a path to a custom icon. This icon will be used if "Icon" is selected above and the "Use default icon" option is disabled.'),
       '#size' => 40,
       '#maxlength' => 255,
       '#default_value' => $this->settings['custom_icon_path'],
-      '#field_prefix' => Url::fromRoute('<none>', array(), array('absolute' => TRUE)),
-    );
+      '#field_prefix' => Url::fromRoute('<none>', [], ['absolute' => TRUE]),
+    ];
 
     return $elements;
   }
@@ -121,30 +119,30 @@ class FilterInlineSms extends FilterBase {
         break;
 
     }
-    $options = array(
-      'attributes' => array(
+    $options = [
+      'attributes' => [
         'title' => t('Send the highlighted text via SMS.'),
-        'class' => 'sms-sendtophone'
-      ),
-      'query' => array(
+        'class' => 'sms-sendtophone',
+      ],
+      'query' => [
         'text' => urlencode($text),
-        drupal_get_destination()
-      ),
+      ],
       'html' => TRUE,
-    );
+    ];
     $link = [
       '#type' => 'link',
       '#prefix' => '<span class="sms-sendtophone-inline">' . $text . '</span> ',
       '#title' => $markup,
       '#url' => Url::fromRoute('sms_sendtophone.page', ['type' => 'inline'], $options),
     ];
-    return  $this->renderer()->renderPlain($link);
+    return $this->renderer()->renderPlain($link);
   }
 
   /**
    * Encapsulates the renderer service for unit testing purposes.
    *
    * @return \Drupal\Core\Render\RendererInterface
+   *   Returns the renderer service.
    */
   protected function renderer() {
     return \Drupal::service('renderer');

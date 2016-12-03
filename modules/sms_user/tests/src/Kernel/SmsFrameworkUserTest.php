@@ -1,16 +1,11 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms_user\Kernel\SmsFrameworkUserTest.
- */
-
 namespace Drupal\Tests\sms_user\Kernel;
 
 use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
 use Drupal\sms\Entity\SmsMessage;
-use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Entity\PhoneNumberSettings;
+use Drupal\sms\Direction;
 
 /**
  * General tests for SMS User.
@@ -24,12 +19,21 @@ class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
    *
    * @var array
    */
-  public static $modules = ['system', 'sms', 'sms_user', 'sms_test_gateway', 'user', 'telephone', 'dynamic_entity_reference', 'field'];
+  public static $modules = [
+    'system',
+    'sms',
+    'sms_user',
+    'sms_test_gateway',
+    'user',
+    'telephone',
+    'dynamic_entity_reference',
+    'field',
+  ];
 
   /**
-   * @var \Drupal\sms\Provider\SmsProviderInterface
+   * The SMS provider.
    *
-   * The default SMS provider.
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $smsProvider;
 
@@ -50,25 +54,27 @@ class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('sms');
     $this->installEntitySchema('sms_phone_number_verification');
-    $this->smsProvider = $this->container->get('sms_provider');
+    $this->smsProvider = $this->container->get('sms.provider');
     $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
-    $this->smsProvider->setDefaultGateway($this->gateway);
+    $this->setFallbackGateway($this->gateway);
   }
 
   /**
+   * Ensure account registration service does not crash if missing user config.
+   *
    * Ensure sms_user.account_registration service does not crash and burn if
    * there are no phone number settings for user.user.
    */
   public function testAccountRegistrationNoPhoneSettings() {
     $this->config('sms_user.settings')
-      ->set('account_registration.all_unknown_numbers.status', 1)
-      ->set('account_registration.all_unknown_numbers.reply.status', 1)
+      ->set('account_registration.unrecognized_sender.status', 1)
+      ->set('account_registration.unrecognized_sender.reply.status', 1)
       ->save();
 
     $message = $this->randomString();
     $incoming = SmsMessage::create()
       ->setSenderNumber('+123')
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING)
+      ->setDirection(Direction::INCOMING)
       ->setMessage($message)
       ->addRecipients($this->randomPhoneNumbers(1));
     $this->smsProvider->queue($incoming);

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Form\SmsSettingsForm
- */
-
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
@@ -64,7 +59,7 @@ class SmsSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormID() {
+  public function getFormId() {
     return 'sms_settings_form';
   }
 
@@ -81,12 +76,13 @@ class SmsSettingsForm extends ConfigFormBase {
       $gateways[$gateway->id()] = $gateway->label();
     }
 
-    $form['default_gateway'] = [
+    $form['fallback_gateway'] = [
       '#type' => 'select',
-      '#title' => $this->t('Default gateway'),
+      '#title' => $this->t('Fallback gateway'),
+      '#description' => $this->t('Gateway to use if no other module sets a gateway for a message.'),
       '#options' => $gateways,
-      '#default_value' => $sms_settings->get('default_gateway'),
-      '#required' => TRUE,
+      '#default_value' => $sms_settings->get('fallback_gateway'),
+      '#empty_option' => $this->t('- No Fallback Gateway -'),
     ];
 
     $form['pages']['#tree'] = TRUE;
@@ -108,7 +104,7 @@ class SmsSettingsForm extends ConfigFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $verify = $form_state->getValue(['pages', 'verify']);
-    if (substr($verify, 0 , 1) !== '/') {
+    if (substr($verify, 0, 1) !== '/') {
       $form_state->setError($form['pages']['verify'], $this->t("Path must begin with a '/' character."));
     }
   }
@@ -126,7 +122,7 @@ class SmsSettingsForm extends ConfigFormBase {
     }
 
     $this->config('sms.settings')
-      ->set('default_gateway', $form_state->getValue('default_gateway'))
+      ->set('fallback_gateway', $form_state->getValue('fallback_gateway'))
       ->set('page.verify', $path_verify)
       ->save();
 

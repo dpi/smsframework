@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkTokenTest.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Message\SmsMessage;
@@ -18,11 +13,12 @@ use Drupal\Component\Utility\Html;
 class SmsFrameworkTokenTest extends SmsFrameworkKernelBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = ['system', 'sms', 'entity_test', 'user', 'field', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = [
+    'system', 'sms', 'entity_test', 'user', 'field', 'telephone',
+    'dynamic_entity_reference',
+  ];
 
   /**
    * The token service.
@@ -74,7 +70,7 @@ class SmsFrameworkTokenTest extends SmsFrameworkKernelBase {
     $message = $this->randomString();
     $sms_message = new SmsMessage();
     $sms_message
-      ->setSender('+999888777')
+      ->setSenderNumber('+999888777')
       ->setMessage($message)
       ->addRecipients($phone_numbers);
     $data['sms-message'] = $sms_message;

@@ -1,16 +1,17 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms\Kernel\SmsFrameworkProviderTest.
- */
-
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\sms\Exception\SmsException;
+use Drupal\sms\Exception\RecipientRouteException;
 use Drupal\sms\Message\SmsMessage as StandardSmsMessage;
+use Drupal\sms\Message\SmsMessageInterface as StandardSmsMessageInterface;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Entity\SmsGateway;
+use Drupal\sms\Direction;
+use Drupal\sms\Event\SmsEvents;
+use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
  * Tests SMS Framework provider service.
@@ -21,16 +22,24 @@ use Drupal\sms\Entity\SmsGateway;
 class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = ['sms', 'sms_test', 'sms_test_gateway', 'field', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = [
+    'sms', 'sms_test', 'sms_test_gateway', 'field', 'telephone',
+    'dynamic_entity_reference',
+  ];
 
   /**
-   * @var \Drupal\sms\Provider\SmsProviderInterface
+   * SMS message entity storage.
    *
-   * The default SMS provider.
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $smsStorage;
+
+  /**
+   * The SMS provider.
+   *
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $smsProvider;
 
@@ -50,8 +59,10 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->installEntitySchema('sms');
 
     $this->gateway = $this->createMemoryGateway();
-    $this->smsProvider = $this->container->get('sms_provider');
-    $this->smsProvider->setDefaultGateway($this->gateway);
+    $this->smsStorage = $this->container->get('entity_type.manager')
+      ->getStorage('sms');
+    $this->smsProvider = $this->container->get('sms.provider');
+    $this->setFallbackGateway($this->gateway);
   }
 
   /**
@@ -60,17 +71,107 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    * @covers ::send
    */
   public function testSend() {
-    $this->smsProvider->send($this->createSmsMessage(), []);
+    $message = $this->createSmsMessage()
+      ->addRecipients($this->randomPhoneNumbers());
+
+    $sms_messages = $this->smsProvider->send($message);
+
+    $this->assertEquals(1, count($sms_messages), 'Return value contains 1 item.');
+    $this->assertTrue($sms_messages[0] instanceof StandardSmsMessageInterface, 'Return value is a SMS message.');
     $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
+    $this->assertTrue($sms_messages[0]->getResult() instanceof SmsMessageResultInterface);
+  }
+
+  /**
+   * Test message is received.
+   *
+   * @covers ::incoming
+   */
+  public function testIncoming() {
+    $message = $this->randomString();
+    $sms_message = SmsMessage::create()
+      ->setDirection(Direction::INCOMING)
+      ->setMessage($message)
+      ->addRecipients($this->randomPhoneNumbers());
+
+    $sms_messages = $this->smsProvider->incoming($sms_message);
+
+    $this->assertEquals($message, sms_test_gateway_get_incoming()['message'], 'Message was received.');
+    $this->assertEquals(1, count($sms_messages), 'Return value contains 1 item.');
+    $this->assertTrue($sms_messages[0] instanceof StandardSmsMessageInterface, 'Return value is a SMS message.');
+    $this->assertTrue($sms_messages[0]->getResult() instanceof SmsMessageResultInterface);
+  }
+
+  /**
+   * Ensure no messages sent if no recipients.
+   */
+  public function testNoSendNoRecipients() {
+    $sms_message = SmsMessage::create()
+      ->setDirection(Direction::OUTGOING)
+      ->setMessage($this->randomString());
+    $this->setExpectedException(RecipientRouteException::class, 'There are no recipients');
+    $this->smsProvider->send($sms_message);
+    $this->assertEquals(0, count($this->getTestMessages($this->gateway)));
+  }
+
+  /**
+   * Ensures validation failure if no message.
+   */
+  public function testNoSendNoMessage() {
+    $sms_message = SmsMessage::create()
+      ->setDirection(Direction::OUTGOING)
+      ->addRecipients($this->randomPhoneNumbers());
+    $this->setExpectedException(SmsException::class, 'Can not queue SMS message because there are 1 validation error(s): [message]: This value should not be null.');
+    $this->smsProvider->queue($sms_message);
+  }
+
+  /**
+   * Ensures validation failure if no direction.
+   */
+  public function testNoSendNoDirection() {
+    $sms_message = SmsMessage::create()
+      ->setMessage($this->randomString())
+      ->addRecipients($this->randomPhoneNumbers());
+    $this->setExpectedException(SmsException::class, 'Can not queue SMS message because there are 1 validation error(s): [direction]: This value should not be null.');
+    $this->smsProvider->queue($sms_message);
+  }
+
+  /**
+   * Test message is not sent because no gateway is set.
+   *
+   * @covers ::send
+   */
+  public function testSendNoFallbackGateway() {
+    $this->setFallbackGateway(NULL);
+    $this->setExpectedException(RecipientRouteException::class);
+    $message = $this->createSmsMessage()
+      ->addRecipients($this->randomPhoneNumbers());
+    $this->smsProvider->send($message);
   }
 
   /**
    * Test message is saved.
    */
   public function testQueueBasic() {
-    $sms_message = $this->createSmsMessage();
-    $this->smsProvider->queue($sms_message);
+    $sms_message = $this->createSmsMessage()
+      ->addRecipients($this->randomPhoneNumbers());
+    $return = $this->smsProvider->queue($sms_message);
     $this->assertEquals(1, count(SmsMessage::loadMultiple()), 'SMS message saved.');
+    $this->assertEquals(1, count($return));
+    $this->assertTrue($return[0] instanceof SmsMessageInterface);
+  }
+
+  /**
+   * Test message is not queued because no gateway is set.
+   *
+   * @covers ::send
+   */
+  public function testQueueNoFallbackGateway() {
+    $this->setFallbackGateway(NULL);
+    $this->setExpectedException(RecipientRouteException::class);
+    $message = $this->createSmsMessage()
+      ->addRecipients($this->randomPhoneNumbers());
+    $this->smsProvider->queue($message);
   }
 
   /**
@@ -80,7 +181,8 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->gateway
       ->setSkipQueue(TRUE)
       ->save();
-    $sms_message = $this->createSmsMessage();
+    $sms_message = $this->createSmsMessage()
+      ->addRecipients($this->randomPhoneNumbers());
     $this->smsProvider->queue($sms_message);
     $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
   }
@@ -89,36 +191,49 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    * Test sending standard SMS object queue in.
    */
   public function testQueueIn() {
-    $sms_message = new StandardSmsMessage('', [], '', [], NULL);
+    $sms_message = new StandardSmsMessage();
     $sms_message
       ->addRecipients($this->randomPhoneNumbers())
-      ->setMessage($this->randomString());
+      ->setMessage($this->randomString())
+      ->setDirection(Direction::INCOMING);
 
-    $this->smsProvider->queueIn($sms_message);
+    $sms_messages = $this->smsStorage
+      ->loadByProperties(['direction' => Direction::INCOMING]);
+    $this->assertEquals(0, count($sms_messages), 'There is zero SMS message in the incoming queue.');
 
-    $sms_messages = SmsMessage::loadMultiple();
-    $this->assertEquals(1, count($sms_messages), 'There is one SMS message in the queue.');
+    $this->smsProvider
+      ->queue($sms_message);
+
+    $sms_messages = $this->smsStorage
+      ->loadByProperties(['direction' => Direction::INCOMING]);
+    $this->assertEquals(1, count($sms_messages), 'There is one SMS message in the incoming queue.');
 
     $sms_message_loaded = reset($sms_messages);
-    $this->assertEquals(SmsMessageInterface::DIRECTION_INCOMING, $sms_message_loaded->getDirection());
+    $this->assertEquals(Direction::INCOMING, $sms_message_loaded->getDirection());
   }
 
   /**
    * Test sending standard SMS object queue out.
    */
   public function testQueueOut() {
-    $sms_message = new StandardSmsMessage('', [], '', [], NULL);
+    $sms_message = new StandardSmsMessage();
     $sms_message
       ->addRecipients($this->randomPhoneNumbers())
-      ->setMessage($this->randomString());
+      ->setMessage($this->randomString())
+      ->setDirection(Direction::OUTGOING);
 
-    $this->smsProvider->queueOut($sms_message);
+    $sms_messages = $this->smsStorage
+      ->loadByProperties(['direction' => Direction::OUTGOING]);
+    $this->assertEquals(0, count($sms_messages), 'There is zero SMS message in the outgoing queue.');
 
-    $sms_messages = SmsMessage::loadMultiple();
-    $this->assertEquals(1, count($sms_messages), 'There is one SMS message in the queue.');
+    $this->smsProvider->queue($sms_message);
+
+    $sms_messages = $this->smsStorage
+      ->loadByProperties(['direction' => Direction::OUTGOING]);
+    $this->assertEquals(1, count($sms_messages), 'There is one SMS message in the outgoing queue.');
 
     $sms_message_loaded = reset($sms_messages);
-    $this->assertEquals(SmsMessageInterface::DIRECTION_OUTGOING, $sms_message_loaded->getDirection());
+    $this->assertEquals(Direction::OUTGOING, $sms_message_loaded->getDirection());
   }
 
   /**
@@ -132,10 +247,22 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message = new StandardSmsMessage('', [], '', [], NULL);
     $sms_message
       ->addRecipients($this->randomPhoneNumbers())
-      ->setMessage($this->randomString());
+      ->setMessage($this->randomString())
+      ->setDirection(Direction::OUTGOING);
 
-    $this->smsProvider->queueOut($sms_message);
+    $this->smsProvider->queue($sms_message);
     $this->assertEquals(1, count($this->getTestMessages($this->gateway)), 'One standard SMS send skipped queue.');
+  }
+
+  /**
+   * Test an exception is thrown if a message has no recipients.
+   */
+  public function testNoRecipients() {
+    $this->setExpectedException(RecipientRouteException::class, 'There are no recipients.');
+    $sms_message = SmsMessage::create()
+      ->setDirection(Direction::OUTGOING)
+      ->setMessage($this->randomString());
+    $this->smsProvider->send($sms_message);
   }
 
   /**
@@ -152,9 +279,10 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message = $this->createSmsMessage()
       ->setGateway($gateway_chunked)
       ->addRecipients(['123123123', '456456456', '789789789']);
-    $this->smsProvider->queue($sms_message);
+    $return = $this->smsProvider->queue($sms_message);
 
     $this->assertEquals(2, count(SmsMessage::loadMultiple()), 'One SMS message has been split into two.');
+    $this->assertEquals(2, count($return), 'Provider queue method returned two messages.');
   }
 
   /**
@@ -171,54 +299,184 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Ensure hook_sms_incoming_preprocess is fired.
+   * Ensure events are executed when a message added to the outgoing queue.
    */
-  public function testIncomingHookPreprocess() {
-    $this->gateway
-      ->setSkipQueue(TRUE)
-      ->save();
-
+  public function testEventsQueueOutgoing() {
     $sms_message = $this->createSmsMessage()
       ->setGateway($this->gateway)
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING)
+      ->setDirection(Direction::OUTGOING)
       ->addRecipients($this->randomPhoneNumbers());
 
     $this->smsProvider->queue($sms_message);
-    $this->assertTrue(\Drupal::state()->get('sms_test_sms_incoming_preprocess'));
+
+    $expected = [
+      SmsEvents::MESSAGE_PRE_PROCESS,
+      SmsEvents::MESSAGE_QUEUE_PRE_PROCESS,
+      SmsEvents::MESSAGE_QUEUE_POST_PROCESS,
+    ];
+    $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
+    $this->assertEquals($expected, $execution_order);
+
+    // Ensure SmsEvents::MESSAGE_PRE_PROCESS is not executed. See
+    // '_skip_preprocess_event' option.
+    $this->container->get('cron')->run();
+
+    $expected[] = SmsEvents::MESSAGE_OUTGOING_PRE_PROCESS;
+    $expected[] = SmsEvents::MESSAGE_OUTGOING_POST_PROCESS;
+    $expected[] = SmsEvents::MESSAGE_POST_PROCESS;
+
+    $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
+    $this->assertEquals($expected, $execution_order);
   }
 
   /**
-   * Ensure hook_sms_incoming_postprocess is fired.
+   * Test events for outgoing queue skip queue.
+   *
+   * Ensure events are executed when a message added to the outgoing queue and
+   * the gateway is set to skip queue.
    */
-  public function testIncomingHookPostprocess() {
+  public function testEventsQueueOutgoingSkipQueue() {
     $this->gateway
       ->setSkipQueue(TRUE)
       ->save();
 
     $sms_message = $this->createSmsMessage()
       ->setGateway($this->gateway)
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING)
+      ->setDirection(Direction::OUTGOING)
       ->addRecipients($this->randomPhoneNumbers());
 
     $this->smsProvider->queue($sms_message);
-    $this->assertTrue(\Drupal::state()->get('sms_test_sms_incoming_postprocess'));
+
+    $expected = [
+      SmsEvents::MESSAGE_PRE_PROCESS,
+      SmsEvents::MESSAGE_QUEUE_PRE_PROCESS,
+      SmsEvents::MESSAGE_OUTGOING_PRE_PROCESS,
+      SmsEvents::MESSAGE_OUTGOING_POST_PROCESS,
+      SmsEvents::MESSAGE_POST_PROCESS,
+      SmsEvents::MESSAGE_QUEUE_POST_PROCESS,
+    ];
+    $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
+    $this->assertEquals($expected, $execution_order);
+  }
+
+  /**
+   * Ensure events are executed when a message added to the incoming queue.
+   */
+  public function testEventsQueueIncoming() {
+    $sms_message = $this->createSmsMessage()
+      ->setGateway($this->gateway)
+      ->setDirection(Direction::INCOMING)
+      ->addRecipients($this->randomPhoneNumbers());
+
+    $this->smsProvider->queue($sms_message);
+
+    $expected = [
+      SmsEvents::MESSAGE_PRE_PROCESS,
+      SmsEvents::MESSAGE_QUEUE_PRE_PROCESS,
+      SmsEvents::MESSAGE_QUEUE_POST_PROCESS,
+    ];
+    $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
+    $this->assertEquals($expected, $execution_order);
+
+    // Ensure SmsEvents::MESSAGE_PRE_PROCESS is not executed. See
+    // '_skip_preprocess_event' option.
+    $this->container->get('cron')->run();
+
+    $expected[] = SmsEvents::MESSAGE_INCOMING_PRE_PROCESS;
+    $expected[] = SmsEvents::MESSAGE_INCOMING_POST_PROCESS;
+    $expected[] = SmsEvents::MESSAGE_POST_PROCESS;
+
+    $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
+    $this->assertEquals($expected, $execution_order);
+  }
+
+  /**
+   * Tests events for incoming queue skip queue.
+   *
+   * Ensure events are executed when a message added to the incoming queue and
+   * the gateway is set to skip queue.
+   */
+  public function testEventsQueueIncomingSkipQueue() {
+    $this->gateway
+      ->setSkipQueue(TRUE)
+      ->save();
+
+    $sms_message = $this->createSmsMessage()
+      ->setGateway($this->gateway)
+      ->setDirection(Direction::INCOMING)
+      ->addRecipients($this->randomPhoneNumbers());
+
+    $this->smsProvider->queue($sms_message);
+
+    $expected = [
+      SmsEvents::MESSAGE_PRE_PROCESS,
+      SmsEvents::MESSAGE_QUEUE_PRE_PROCESS,
+      SmsEvents::MESSAGE_INCOMING_PRE_PROCESS,
+      SmsEvents::MESSAGE_INCOMING_POST_PROCESS,
+      SmsEvents::MESSAGE_POST_PROCESS,
+      SmsEvents::MESSAGE_QUEUE_POST_PROCESS,
+    ];
+    $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
+    $this->assertEquals($expected, $execution_order);
+  }
+
+  /**
+   * Ensure events are executed when a message is sent.
+   */
+  public function testEventsOutgoing() {
+    $sms_message = $this->createSmsMessage()
+      ->setGateway($this->gateway)
+      ->setDirection(Direction::OUTGOING)
+      ->addRecipients($this->randomPhoneNumbers());
+
+    $this->smsProvider->send($sms_message);
+
+    $expected = [
+      SmsEvents::MESSAGE_PRE_PROCESS,
+      SmsEvents::MESSAGE_OUTGOING_PRE_PROCESS,
+      SmsEvents::MESSAGE_OUTGOING_POST_PROCESS,
+      SmsEvents::MESSAGE_POST_PROCESS,
+    ];
+    $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
+    $this->assertEquals($expected, $execution_order);
+  }
+
+  /**
+   * Ensure events are executed when a message is received.
+   */
+  public function testEventsIncoming() {
+    $sms_message = $this->createSmsMessage()
+      ->setGateway($this->gateway)
+      ->setDirection(Direction::INCOMING)
+      ->addRecipients($this->randomPhoneNumbers());
+
+    $this->smsProvider->incoming($sms_message);
+
+    $expected = [
+      SmsEvents::MESSAGE_PRE_PROCESS,
+      SmsEvents::MESSAGE_INCOMING_PRE_PROCESS,
+      SmsEvents::MESSAGE_INCOMING_POST_PROCESS,
+      SmsEvents::MESSAGE_POST_PROCESS,
+    ];
+    $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
+    $this->assertEquals($expected, $execution_order);
   }
 
   /**
    * Ensure SMS message is processed by the gateway.
    */
-  public function testIncomingHookProcess() {
+  public function testIncomingGatewayProcessed() {
     $this->gateway
       ->setSkipQueue(TRUE)
       ->save();
 
     $sms_message = $this->createSmsMessage()
       ->setGateway($this->gateway)
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING)
+      ->setDirection(Direction::INCOMING)
       ->addRecipients($this->randomPhoneNumbers());
 
     $this->smsProvider->queue($sms_message);
-    $this->assertTrue(\Drupal::state()->get('sms_test_gateway.memory.incoming_hook_temporary'));
+    $this->assertTrue(\Drupal::state()->get('sms_test_gateway.memory.incoming'));
   }
 
   /**
@@ -228,10 +486,11 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    *   An mixed array of values to pass when creating the SMS message entity.
    *
    * @return \Drupal\sms\Entity\SmsMessageInterface
+   *   A SMS message entity for testing.
    */
   protected function createSmsMessage(array $values = []) {
     return SmsMessage::create($values)
-      ->setDirection(SmsMessageInterface::DIRECTION_OUTGOING)
+      ->setDirection(Direction::OUTGOING)
       ->setMessage($this->randomString());
   }
 

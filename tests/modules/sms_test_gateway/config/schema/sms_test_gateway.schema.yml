@@ -15,3 +15,24 @@ sms_gateway.settings.memory_chunked:
     gateway_id:
       type: string
       label: 'ID of the gateway config entity.'
+
+sms_gateway.settings.memory_noincoming:
+  type: sms_gateway_settings
+  label: 'No incoming'
+  mapping:
+    gateway_id:
+      type: string
+
+sms_gateway.settings.memory_schedule_aware:
+  type: sms_gateway_settings
+  label: 'Schedule aware'
+  mapping:
+    gateway_id:
+      type: string
+
+sms_gateway.settings.capabilities_default:
+  type: sms_gateway_settings
+  label: 'Default annotation capabilities'
+  mapping:
+    gateway_id:
+      type: string

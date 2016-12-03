@@ -1,39 +1,14 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Lists\SmsGatewayListBuilder.
- */
-
 namespace Drupal\sms\Lists;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Builds a list of SMS Gateway plugins.
  */
 class SmsGatewayListBuilder extends ConfigEntityListBuilder {
-
-  /*
-   * Default gateway plugin ID.
-   *
-   * @var string
-   */
-  protected $defaultGatewayId;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage) {
-    parent::__construct($entity_type, $storage);
-
-    /** @var \Drupal\sms\Provider\DefaultSmsProvider $provider */
-    $provider = \Drupal::service('sms_provider.default');
-    $this->defaultGatewayId = $provider->getDefaultGateway() ? $provider->getDefaultGateway()->id() : FALSE;
-  }
 
   /**
    * {@inheritdoc}
@@ -42,7 +17,6 @@ class SmsGatewayListBuilder extends ConfigEntityListBuilder {
     $header['label'] = $this->t('Label');
     $header['gateway'] = $this->t('Gateway');
     $header['status'] = $this->t('Status');
-    $header['is_default'] = $this->t('Is site default?');
     return $header + parent::buildHeader();
   }
 
@@ -54,8 +28,6 @@ class SmsGatewayListBuilder extends ConfigEntityListBuilder {
     $row['label'] = $entity->label();
     $row['gateway'] = $entity->getPlugin()->getPluginDefinition()['label'];
     $row['status'] = $entity->status() ? $this->t('Enabled') : $this->t('Disabled');
-    $row['is_default'] = $entity->id() == $this->defaultGatewayId ? $this->t('Default') : '';
-
     return $row + parent::buildRow($entity);
   }
 
@@ -64,7 +36,7 @@ class SmsGatewayListBuilder extends ConfigEntityListBuilder {
    */
   public function render() {
     $render = parent::render();
-    $render['table']['#empty'] = t('No SMS Gateways found.');
+    $render['table']['#empty'] = t('No gateways found.');
     return $render;
   }
 

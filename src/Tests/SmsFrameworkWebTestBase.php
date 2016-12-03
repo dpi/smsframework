@@ -1,14 +1,10 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Tests\SmsFrameworkWebTestBase.
- */
-
 namespace Drupal\sms\Tests;
 
 use Drupal\simpletest\WebTestBase;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 
 /**
  * Provides commonly used functionality for tests.
@@ -17,7 +13,12 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
 
   use SmsFrameworkTestTrait;
 
-  public static $modules = ['sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference'];
+  public static $modules = [
+    'sms',
+    'sms_test_gateway',
+    'telephone',
+    'dynamic_entity_reference',
+  ];
 
   /**
    * The gateway manager.
@@ -29,7 +30,7 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
   /**
    * The default SMS provider service.
    *
-   * @var \Drupal\sms\Provider\DefaultSmsProvider
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $defaultSmsProvider;
 
@@ -39,11 +40,11 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
   protected function setUp() {
     parent::setUp();
     $this->gatewayManager = $this->container->get('plugin.manager.sms_gateway');
-    $this->defaultSmsProvider = $this->container->get('sms_provider');
+    $this->defaultSmsProvider = $this->container->get('sms.provider');
   }
 
   /**
-   * Utility to create phone number settings
+   * Utility to create phone number settings.
    *
    * Creates new field storage and field configs.
    *
@@ -61,7 +62,6 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
         'type' => 'telephone',
       ]);
     $field_storage
-//      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
       ->setCardinality(1)
       ->save();
 
@@ -73,9 +73,17 @@ abstract class SmsFrameworkWebTestBase extends WebTestBase {
       ])->save();
 
     /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
-    $entity_form_display = $entity_type_manager
-      ->getStorage('entity_form_display')
-      ->load($entity_type_id . '.' . $bundle . '.default');
+    $entity_form_display = EntityFormDisplay::load($entity_type_id . '.' . $bundle . '.default');
+    if (!$entity_form_display) {
+      $entity_form_display = EntityFormDisplay::create([
+        'targetEntityType' => $entity_type_id,
+        'bundle' => $bundle,
+        'mode' => 'default',
+        'status' => TRUE,
+      ]);
+    }
+    $entity_form_display->save();
+
     $entity_form_display
       ->setComponent($field_storage->getName(), ['type' => 'sms_telephone'])
       ->save();

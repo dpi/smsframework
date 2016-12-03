@@ -1,11 +1,8 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\sms\Message\SmsMessage.
- */
-
 namespace Drupal\sms\Message;
+
+use Drupal\sms\Entity\SmsGatewayInterface;
 
 /**
  * Basic implementation of an SMS message.
@@ -20,29 +17,56 @@ class SmsMessage implements SmsMessageInterface {
   protected $uuid;
 
   /**
-   * The sender of the message.
+   * The senders' phone number.
    *
    * @var string
    */
-  protected $sender;
+  protected $senderPhoneNumber;
 
   /**
+   * The recipients of the message.
+   *
    * @var array
-   *   The recipients of the message.
    */
-  protected $recipients = array();
+  protected $recipients = [];
 
   /**
+   * The content of the message to be sent.
+   *
    * @var string
-   *   The content of the message to be sent.
    */
   protected $message;
+
+  /**
+   * The gateway for this message.
+   *
+   * @var \Drupal\sms\Entity\SmsGatewayInterface
+   */
+  protected $gateway;
+
+  /**
+   * The direction of the message.
+   *
+   * See \Drupal\sms\Direction constants for potential values.
+   *
+   * @see \Drupal\sms\Direction
+   *
+   * @var int
+   */
+  protected $direction;
 
   /**
    * @var string
    *   Other options to be used for the sms.
    */
-  protected $options = array();
+  protected $options = [];
+
+  /**
+   * The result associated with this SMS message.
+   *
+   * @var \Drupal\sms\Message\SmsMessageResultInterface|NULL
+   */
+  protected $result;
 
   /**
    * The UID of the creator of the SMS message.
@@ -61,38 +85,39 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * Creates a new instance of an SMS message.
    *
-   * @param string $sender
-   *   (optional) The sender of the message.
+   * @param string $sender_phone_number
+   *   (optional) The senders' phone number.
    * @param array $recipients
    *   (optional) The list of recipient phone numbers for the message.
    * @param string $message
    *   (optional) The actual SMS message to be sent.
    * @param array $options
-   *   (optional) Additional options to be considered in building the SMS message
+   *   (optional) Additional options.
    * @param int $uid
    *   (optional) The user who created the SMS message.
    */
-  public function __construct($sender = '', array $recipients = [], $message = '', array $options = [], $uid = NULL) {
-    $this->sender = $sender;
+  public function __construct($sender_phone_number = NULL, array $recipients = [], $message = '', array $options = [], $uid = NULL) {
+    $this->setSenderNumber($sender_phone_number);
     $this->addRecipients($recipients);
+    $this->setMessage($message);
     $this->message = $message;
     $this->options = $options;
-    $this->uid = $uid;
+    $this->setUid($uid);
     $this->uuid = $this->uuidGenerator()->generate();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getSender() {
-    return $this->sender;
+  public function getSenderNumber() {
+    return $this->senderPhoneNumber;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setSender($sender) {
-    $this->sender = $sender;
+  public function setSenderNumber($number) {
+    $this->senderPhoneNumber = $number;
     return $this;
   }
 
@@ -157,6 +182,36 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
+  public function getGateway() {
+    return $this->gateway;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setGateway(SmsGatewayInterface $gateway) {
+    $this->gateway = $gateway;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDirection() {
+    return $this->direction;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDirection($direction) {
+    $this->direction = $direction;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getOptions() {
     return $this->options;
   }
@@ -184,6 +239,21 @@ class SmsMessage implements SmsMessageInterface {
    */
   public function removeOption($name) {
     unset($this->options[$name]);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getResult() {
+    return $this->result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setResult(SmsMessageResultInterface $result = NULL) {
+    $this->result = $result;
     return $this;
   }
 
@@ -228,6 +298,7 @@ class SmsMessage implements SmsMessageInterface {
    * Gets the UUID generator.
    *
    * @return \Drupal\Component\Uuid\UuidInterface
+   *   The UUID generator.
    */
   protected function uuidGenerator() {
     return \Drupal::service('uuid');
@@ -238,6 +309,11 @@ class SmsMessage implements SmsMessageInterface {
    */
   public function chunkByRecipients($size) {
     $recipients_all = $this->getRecipients();
+
+    // Save processing by returning early.
+    if ($size < 1 || count($recipients_all) <= $size) {
+      return [$this];
+    }
 
     $base = clone $this;
     $base->removeRecipients($recipients_all);

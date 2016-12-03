@@ -1,16 +1,10 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\sms_user\Kernel\SmsFrameworkUserAccountRegistrationServiceTest.
- */
-
 namespace Drupal\Tests\sms_user\Kernel;
 
 use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\sms\Entity\SmsMessage;
-use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -18,6 +12,7 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\sms\Entity\PhoneNumberSettings;
 use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Direction;
 
 /**
  * Tests account registration.
@@ -34,19 +29,28 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    *
    * @var array
    */
-  public static $modules = ['system', 'sms', 'sms_user', 'sms_test_gateway', 'user', 'telephone', 'dynamic_entity_reference', 'field'];
+  public static $modules = [
+    'system',
+    'sms',
+    'sms_user',
+    'sms_test_gateway',
+    'user',
+    'telephone',
+    'dynamic_entity_reference',
+    'field',
+  ];
 
   /**
-   * @var \Drupal\sms_user\AccountRegistrationInterface
-   *
    * The account registration service.
+   *
+   * @var \Drupal\sms_user\AccountRegistrationInterface
    */
   protected $accountRegistration;
 
   /**
-   * @var \Drupal\sms\Provider\SmsProviderInterface
-   *
    * The default SMS provider.
+   *
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $smsProvider;
 
@@ -58,11 +62,15 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   protected $gateway;
 
   /**
+   * A phone field ofr testing.
+   *
    * @var \Drupal\field\FieldStorageConfigInterface
    */
   protected $phoneField;
 
   /**
+   * Phone number settings for user entity type.
+   *
    * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
    */
   protected $phoneNumberSettings;
@@ -75,14 +83,11 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     $this->installSchema('system', ['sequences']);
     $this->installConfig('sms_user');
 
-    // @todo Remove table install after https://www.drupal.org/node/2677690
-    $this->installSchema('sms_user', ['sms_user']);
-
     $this->accountRegistration = $this->container->get('sms_user.account_registration');
-    $this->smsProvider = $this->container->get('sms_provider');
+    $this->smsProvider = $this->container->get('sms.provider');
 
     $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
-    $this->smsProvider->setDefaultGateway($this->gateway);
+    $this->setFallbackGateway($this->gateway);
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('sms');
@@ -123,8 +128,8 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    */
   public function testUnrecognisedOffNoCreateUser() {
     $this->config('sms_user.settings')
-      ->set('account_registration.all_unknown_numbers.status', 0)
-      ->set('account_registration.all_unknown_numbers.reply.status', 1)
+      ->set('account_registration.unrecognized_sender.status', 0)
+      ->set('account_registration.unrecognized_sender.reply.status', 1)
       ->save();
 
     $this->sendIncomingMessage('+123', $this->randomString());
@@ -137,8 +142,8 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    */
   public function testUnrecognisedCreateUser() {
     $this->config('sms_user.settings')
-      ->set('account_registration.all_unknown_numbers.status', 1)
-      ->set('account_registration.all_unknown_numbers.reply.status', 1)
+      ->set('account_registration.unrecognized_sender.status', 1)
+      ->set('account_registration.unrecognized_sender.reply.status', 1)
       ->save();
 
     $sender_number = '+123123123';
@@ -154,8 +159,8 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    */
   public function testUnrecognisedCreateUserPhoneNumberRecognised() {
     $this->config('sms_user.settings')
-      ->set('account_registration.all_unknown_numbers.status', 1)
-      ->set('account_registration.all_unknown_numbers.reply.status', 1)
+      ->set('account_registration.unrecognized_sender.status', 1)
+      ->set('account_registration.unrecognized_sender.reply.status', 1)
       ->save();
 
     $sender_number = '+123123123';
@@ -174,9 +179,9 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   public function testUnrecognisedNoReply() {
     $reply_message = $this->randomString();
     $this->config('sms_user.settings')
-      ->set('account_registration.all_unknown_numbers.status', TRUE)
-      ->set('account_registration.all_unknown_numbers.reply.status', FALSE)
-      ->set('account_registration.all_unknown_numbers.reply.message', $reply_message)
+      ->set('account_registration.unrecognized_sender.status', TRUE)
+      ->set('account_registration.unrecognized_sender.reply.status', FALSE)
+      ->set('account_registration.unrecognized_sender.reply.message', $reply_message)
       ->save();
 
     $this->sendIncomingMessage('+123123123', $this->randomString());
@@ -190,9 +195,9 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   public function testUnrecognisedGotReply() {
     $reply_message = $this->randomString();
     $this->config('sms_user.settings')
-      ->set('account_registration.all_unknown_numbers.status', TRUE)
-      ->set('account_registration.all_unknown_numbers.reply.status', TRUE)
-      ->set('account_registration.all_unknown_numbers.reply.message', $reply_message)
+      ->set('account_registration.unrecognized_sender.status', TRUE)
+      ->set('account_registration.unrecognized_sender.reply.status', TRUE)
+      ->set('account_registration.unrecognized_sender.reply.message', $reply_message)
       ->save();
 
     $this->sendIncomingMessage('+123123123', $this->randomString());
@@ -205,7 +210,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    */
   public function testUnrecognisedNoEmail() {
     $this->config('sms_user.settings')
-      ->set('account_registration.all_unknown_numbers.status', 1)
+      ->set('account_registration.unrecognized_sender.status', 1)
       ->save();
 
     $this->assertEquals(0, $this->countUsers());
@@ -215,12 +220,12 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
-   * Test user is created from a preformatted message.
+   * Test user is created from a incoming pattern message.
    */
-  public function testPreformattedUserCreated() {
+  public function testIncomingPatternUserCreated() {
     $this->config('sms_user.settings')
-      ->set('account_registration.formatted.status', 1)
-      ->set('account_registration.formatted.reply.status', 1)
+      ->set('account_registration.incoming_pattern.status', 1)
+      ->set('account_registration.incoming_pattern.reply.status', 1)
       ->save();
 
     $username = $this->randomMachineName();
@@ -239,11 +244,11 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Test all placeholders make their way into the user object.
    */
-  public function testPreformattedPlaceholders() {
+  public function testIncomingPatternPlaceholders() {
     $this->config('sms_user.settings')
-      ->set('account_registration.formatted.status', 1)
-      ->set('account_registration.formatted.reply.status', 1)
-      ->set('account_registration.formatted.incoming_messages.0', "[email] [username] [password]")
+      ->set('account_registration.incoming_pattern.status', 1)
+      ->set('account_registration.incoming_pattern.reply.status', 1)
+      ->set('account_registration.incoming_pattern.incoming_messages.0', "[email] [username] [password]")
       ->save();
 
     $email = 'email@domain.tld';
@@ -266,11 +271,11 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Test if a duplicated placeholder is confirmed.
    */
-  public function testPreformattedMultiplePlaceholderSuccess() {
+  public function testIncomingPatternMultiplePlaceholderSuccess() {
     $this->config('sms_user.settings')
-      ->set('account_registration.formatted.status', 1)
-      ->set('account_registration.formatted.reply.status', 1)
-      ->set('account_registration.formatted.incoming_messages.0', "[password] [username] [password]")
+      ->set('account_registration.incoming_pattern.status', 1)
+      ->set('account_registration.incoming_pattern.reply.status', 1)
+      ->set('account_registration.incoming_pattern.incoming_messages.0', "[password] [username] [password]")
       ->save();
 
     $username = $this->randomMachineName();
@@ -281,13 +286,13 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
-   * Test if a duplicated placeholder is not confirmed
+   * Test if a duplicated placeholder is not confirmed.
    */
-  public function testPreformattedMultiplePlaceholderFailure() {
+  public function testIncomingPatternMultiplePlaceholderFailure() {
     $this->config('sms_user.settings')
-      ->set('account_registration.formatted.status', 1)
-      ->set('account_registration.formatted.reply.status', 1)
-      ->set('account_registration.formatted.incoming_messages.0', "[password] [username] [password]")
+      ->set('account_registration.incoming_pattern.status', 1)
+      ->set('account_registration.incoming_pattern.reply.status', 1)
+      ->set('account_registration.incoming_pattern.incoming_messages.0', "[password] [username] [password]")
       ->save();
 
     $username = $this->randomMachineName();
@@ -303,10 +308,10 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Test if a user is created despite no email address.
    */
-  public function testPreformattedNoEmail() {
+  public function testIncomingPatternNoEmail() {
     $this->config('sms_user.settings')
-      ->set('account_registration.formatted.status', 1)
-      ->set('account_registration.formatted.incoming_messages.0', "[username] [password]")
+      ->set('account_registration.incoming_pattern.status', 1)
+      ->set('account_registration.incoming_pattern.incoming_messages.0', "[username] [password]")
       ->save();
 
     $this->assertEquals(0, $this->countUsers());
@@ -319,15 +324,15 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
-   * Test if a user is created despite no placeholders
+   * Test if a user is created despite no placeholders.
    */
-  public function testPreformattedNoPlaceholders() {
+  public function testIncomingPatternNoPlaceholders() {
     $incoming_message = $this->randomString();
     $this->config('sms_user.settings')
-      ->set('account_registration.formatted.status', 1)
-      ->set('account_registration.formatted.incoming_messages.0', $incoming_message)
-      ->set('account_registration.formatted.reply.status', TRUE)
-      ->set('account_registration.formatted.reply.message', '[user:account-name] Foo [user:mail]')
+      ->set('account_registration.incoming_pattern.status', 1)
+      ->set('account_registration.incoming_pattern.incoming_messages.0', $incoming_message)
+      ->set('account_registration.incoming_pattern.reply.status', TRUE)
+      ->set('account_registration.incoming_pattern.reply.message', '[user:account-name] Foo [user:mail]')
       ->save();
 
     $this->assertEquals(0, $this->countUsers());
@@ -344,14 +349,14 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Ensure escaped delimiters.
    */
-  public function testPreformattedPlaceholderEscapedDelimiters() {
+  public function testIncomingPatternPlaceholderEscapedDelimiters() {
     // AccountRegistration::createAccount uses '/' delimiters. Ensure that they
     // are escaped otherwise a "preg_match_all(): Unknown modifier error" will
     // be thrown.
     $incoming_message = $this->randomString() . '/';
     $this->config('sms_user.settings')
-      ->set('account_registration.formatted.status', 1)
-      ->set('account_registration.formatted.incoming_messages.0', $incoming_message)
+      ->set('account_registration.incoming_pattern.status', 1)
+      ->set('account_registration.incoming_pattern.incoming_messages.0', $incoming_message)
       ->save();
 
     $this->sendIncomingMessage('+123123123', $this->randomString());
@@ -360,13 +365,13 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Ensure no reply sent if turned off.
    */
-  public function testPreformattedNoReply() {
+  public function testIncomingPatternNoReply() {
     $reply_message = $this->randomString();
     $this->config('sms_user.settings')
-      ->set('account_registration.formatted.status', TRUE)
-      ->set('account_registration.formatted.incoming_messages.0', "[username] [password]")
-      ->set('account_registration.formatted.reply.status', FALSE)
-      ->set('account_registration.formatted.reply.message', $reply_message)
+      ->set('account_registration.incoming_pattern.status', TRUE)
+      ->set('account_registration.incoming_pattern.incoming_messages.0', "[username] [password]")
+      ->set('account_registration.incoming_pattern.reply.status', FALSE)
+      ->set('account_registration.incoming_pattern.reply.message', $reply_message)
       ->save();
 
     $incoming_message = $this->randomMachineName() . ' ' . $this->randomMachineName();
@@ -378,13 +383,13 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Ensure reply sent if turned on.
    */
-  public function testPreformattedHasReply() {
+  public function testIncomingPatternHasReply() {
     $reply_message = $this->randomString();
     $this->config('sms_user.settings')
-      ->set('account_registration.formatted.status', TRUE)
-      ->set('account_registration.formatted.incoming_messages.0', "[username] [password]")
-      ->set('account_registration.formatted.reply.status', TRUE)
-      ->set('account_registration.formatted.reply.message', $reply_message)
+      ->set('account_registration.incoming_pattern.status', TRUE)
+      ->set('account_registration.incoming_pattern.incoming_messages.0', "[username] [password]")
+      ->set('account_registration.incoming_pattern.reply.status', TRUE)
+      ->set('account_registration.incoming_pattern.reply.message', $reply_message)
       ->save();
 
     $incoming_message = $this->randomMachineName() . ' ' . $this->randomMachineName();
@@ -396,11 +401,11 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Ensure account activation email sent.
    */
-  public function testPreformattedActivateEmail() {
+  public function testIncomingPatternActivateEmail() {
     $this->config('sms_user.settings')
-      ->set('account_registration.formatted.status', TRUE)
-      ->set('account_registration.formatted.incoming_messages.0', "E [email] U [username]")
-      ->set('account_registration.formatted.activation_email', TRUE)
+      ->set('account_registration.incoming_pattern.status', TRUE)
+      ->set('account_registration.incoming_pattern.incoming_messages.0', "E [email] U [username]")
+      ->set('account_registration.incoming_pattern.send_activation_email', TRUE)
       ->save();
 
     $subject = $this->randomMachineName();
@@ -423,11 +428,11 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Ensure no activation email sent.
    */
-  public function testPreformattedNoActivateEmail() {
+  public function testIncomingPatternNoActivateEmail() {
     $this->config('sms_user.settings')
-      ->set('account_registration.formatted.status', TRUE)
-      ->set('account_registration.formatted.incoming_messages.0', "E [email] P [password]")
-      ->set('account_registration.formatted.activation_email', TRUE)
+      ->set('account_registration.incoming_pattern.status', TRUE)
+      ->set('account_registration.incoming_pattern.incoming_messages.0', "E [email] P [password]")
+      ->set('account_registration.incoming_pattern.send_activation_email', TRUE)
       ->save();
 
     $this->config('user.mail')
@@ -451,10 +456,10 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   public function testErrorBuilder() {
     $failure_prefix = 'foo: ';
     $this->config('sms_user.settings')
-      ->set('account_registration.formatted.status', 1)
-      ->set('account_registration.formatted.incoming_messages.0', "[username] [email]")
-      ->set('account_registration.formatted.reply.status', 1)
-      ->set('account_registration.formatted.reply.message_failure', $failure_prefix . '[error]')
+      ->set('account_registration.incoming_pattern.status', 1)
+      ->set('account_registration.incoming_pattern.incoming_messages.0', "[username] [email]")
+      ->set('account_registration.incoming_pattern.reply.status', 1)
+      ->set('account_registration.incoming_pattern.reply.message_failure', $failure_prefix . '[error]')
       ->save();
 
     $username = $this->randomMachineName();
@@ -476,7 +481,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    */
   public function testUniqueUsername() {
     $this->config('sms_user.settings')
-      ->set('account_registration.all_unknown_numbers.status', 1)
+      ->set('account_registration.unrecognized_sender.status', 1)
       ->save();
 
     $this->sendIncomingMessage('+123123123', $this->randomString());
@@ -492,10 +497,10 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    */
   public function testReplyTokens() {
     $this->config('sms_user.settings')
-      ->set('account_registration.formatted.status', TRUE)
-      ->set('account_registration.formatted.incoming_messages.0', "[username] [password]")
-      ->set('account_registration.formatted.reply.status', TRUE)
-      ->set('account_registration.formatted.reply.message', 'Username is [user:account-name] Password is [user:password]')
+      ->set('account_registration.incoming_pattern.status', TRUE)
+      ->set('account_registration.incoming_pattern.incoming_messages.0', "[username] [password]")
+      ->set('account_registration.incoming_pattern.reply.status', TRUE)
+      ->set('account_registration.incoming_pattern.reply.message', 'Username is [user:account-name] Password is [user:password]')
       ->save();
 
     $username = $this->randomMachineName();
@@ -519,7 +524,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     /** @var \Drupal\sms\Entity\SmsMessage $incoming */
     $incoming = SmsMessage::create()
       ->setSenderNumber($sender_number)
-      ->setDirection(SmsMessageInterface::DIRECTION_INCOMING)
+      ->setDirection(Direction::INCOMING)
       ->setMessage($message)
       ->addRecipients($this->randomPhoneNumbers(1));
     $this->smsProvider->queue($incoming);
@@ -528,7 +533,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Count number of registered users.
    *
-   * @return integer
+   * @return int
    *   Number of users in database.
    */
   protected function countUsers() {
@@ -554,7 +559,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    * @param string $message
    *   The message to check.
    *
-   * @return boolean
+   * @return bool
    *   Whether message was found in any memory messages.
    */
   public function inTestMessages(SmsGatewayInterface $sms_gateway, $message) {
