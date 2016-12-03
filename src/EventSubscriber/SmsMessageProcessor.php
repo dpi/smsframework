@@ -8,11 +8,16 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\sms\Direction;
 use Drupal\sms\Event\RecipientGatewayEvent;
 use Drupal\sms\Event\SmsMessageEvent;
 use Drupal\sms\Exception\RecipientRouteException;
+use Drupal\sms\Exception\SmsPluginReportException;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Event\SmsEvents;
+use Drupal\sms\Message\SmsDeliveryReportInterface;
+use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
  * Handles messages before they are processed by queue(), send(), or incoming().
@@ -47,6 +52,61 @@ class SmsMessageProcessor implements EventSubscriberInterface {
   public function __construct(EventDispatcherInterface $event_dispatcher, ConfigFactoryInterface $config_factory) {
     $this->eventDispatcher = $event_dispatcher;
     $this->configFactory = $config_factory;
+  }
+
+  /**
+   * Ensures there is a result, and reports for each recipient.
+   *
+   * @param \Drupal\sms\Event\SmsMessageEvent $event
+   *   An SMS message process event.
+   */
+  public function ensureReportsPreprocess(SmsMessageEvent $event) {
+    $sms_messages = $event->getMessages();
+    foreach ($sms_messages as $sms_message) {
+      // Event can be for any direction. Capture incoming only for preprocess.
+      if ($sms_message->getDirection() == Direction::INCOMING) {
+        $this->ensureReports($sms_message);
+      }
+    }
+  }
+
+  /**
+   * Ensures there is a result, and reports for each recipient.
+   *
+   * @param \Drupal\sms\Event\SmsMessageEvent $event
+   *   An SMS message process event.
+   */
+  public function ensureReportsPostprocess(SmsMessageEvent $event) {
+    $sms_messages = $event->getMessages();
+    foreach ($sms_messages as $sms_message) {
+      $this->ensureReports($sms_message);
+    }
+  }
+
+  /**
+   * Ensures there is a result, and reports for each recipient.
+   *
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
+   *   A message to validate.
+   *
+   * @throws \Drupal\sms\Exception\SmsPluginReportException
+   *   Thrown if result or reports are invalid.
+   */
+  protected function ensureReports(SmsMessageInterface $sms_message) {
+    $result = $sms_message->getResult();
+    if (!$result instanceof SmsMessageResultInterface) {
+      throw new SmsPluginReportException('Missing report for message.');
+    }
+
+    $message_recipients = $sms_message->getRecipients();
+    $result_recipients = array_map(function(SmsDeliveryReportInterface $report) {
+      return $report->getRecipient();
+    }, $result->getReports());
+
+    $difference_count = count(array_diff($message_recipients, $result_recipients));
+    if ($difference_count) {
+      throw new SmsPluginReportException(sprintf('Missing reports for %s recipient(s).', $difference_count));
+    }
   }
 
   /**
@@ -194,10 +254,17 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
+    // Ensure reports for incoming messages.
+    $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['ensureReportsPreprocess', 1024];
+
     $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['ensureRecipients', 1024];
     $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['ensureGateways', 1024];
     $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['deliveryReportUrl'];
     $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['chunkMaxRecipients', -1024];
+
+    // Ensure reports for outgoing messages.
+    $events[SmsEvents::MESSAGE_OUTGOING_POST_PROCESS][] = ['ensureReportsPostprocess', 1024];
+
     return $events;
   }
 
