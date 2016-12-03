@@ -95,13 +95,16 @@ class SmsMessageProcessor implements EventSubscriberInterface {
   protected function ensureReports(SmsMessageInterface $sms_message) {
     $result = $sms_message->getResult();
     if (!$result instanceof SmsMessageResultInterface) {
-      throw new SmsPluginReportException('Missing report for message.');
+      throw new SmsPluginReportException('Missing result for message.');
     }
 
     $message_recipients = $sms_message->getRecipients();
-    $result_recipients = array_map(function(SmsDeliveryReportInterface $report) {
-      return $report->getRecipient();
-    }, $result->getReports());
+    $result_recipients = array_map(
+      function(SmsDeliveryReportInterface $report) {
+        return $report->getRecipient();
+      },
+      $result->getReports()
+    );
 
     $difference_count = count(array_diff($message_recipients, $result_recipients));
     if ($difference_count) {
@@ -256,15 +259,12 @@ class SmsMessageProcessor implements EventSubscriberInterface {
   public static function getSubscribedEvents() {
     // Ensure reports for incoming messages.
     $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['ensureReportsPreprocess', 1024];
-
     $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['ensureRecipients', 1024];
     $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['ensureGateways', 1024];
     $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['deliveryReportUrl'];
     $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['chunkMaxRecipients', -1024];
-
     // Ensure reports for outgoing messages.
     $events[SmsEvents::MESSAGE_OUTGOING_POST_PROCESS][] = ['ensureReportsPostprocess', 1024];
-
     return $events;
   }
 

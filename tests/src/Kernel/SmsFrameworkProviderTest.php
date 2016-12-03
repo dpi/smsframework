@@ -198,6 +198,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
       ->addRecipients($this->randomPhoneNumbers())
       ->setMessage($this->randomString())
       ->setDirection(Direction::INCOMING);
+    $sms_message->setResult($this->createMessageResult($sms_message));
 
     $sms_messages = $this->smsStorage
       ->loadByProperties(['direction' => Direction::INCOMING]);
@@ -369,6 +370,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
       ->setGateway($this->gateway)
       ->setDirection(Direction::INCOMING)
       ->addRecipients($this->randomPhoneNumbers());
+    $sms_message->setResult($this->createMessageResult($sms_message));
 
     $this->smsProvider->queue($sms_message);
 
@@ -407,6 +409,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
       ->setGateway($this->gateway)
       ->setDirection(Direction::INCOMING)
       ->addRecipients($this->randomPhoneNumbers());
+    $sms_message->setResult($this->createMessageResult($sms_message));
 
     $this->smsProvider->queue($sms_message);
 
@@ -451,6 +454,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
       ->setGateway($this->gateway)
       ->setDirection(Direction::INCOMING)
       ->addRecipients($this->randomPhoneNumbers());
+    $sms_message->setResult($this->createMessageResult($sms_message));
 
     $this->smsProvider->incoming($sms_message);
 

@@ -29,6 +29,7 @@ class SmsFrameworkWebTest extends SmsFrameworkWebTestBase {
     for ($i = 0; $i < 2; $i++) {
       $clone = $sms_message->createDuplicate()
         ->setDirection(Direction::INCOMING);
+      $clone->setResult($this->createMessageResult($clone));
       $provider->queue($clone);
     }
     for ($i = 0; $i < 4; $i++) {

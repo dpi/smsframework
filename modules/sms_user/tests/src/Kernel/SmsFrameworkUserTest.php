@@ -77,6 +77,7 @@ class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
       ->setDirection(Direction::INCOMING)
       ->setMessage($message)
       ->addRecipients($this->randomPhoneNumbers(1));
+    $incoming->setResult($this->createMessageResult($incoming));
     $this->smsProvider->queue($incoming);
 
     $this->assertEquals($message, sms_test_gateway_get_incoming()['message']);
