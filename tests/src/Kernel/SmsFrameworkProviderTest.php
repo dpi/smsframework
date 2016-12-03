@@ -92,7 +92,9 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::INCOMING)
       ->setMessage($message)
-      ->addRecipients($this->randomPhoneNumbers());
+      ->addRecipients($this->randomPhoneNumbers())
+      ->setGateway($this->gateway);
+    $sms_message->setResult($this->createMessageResult($sms_message));
 
     $sms_messages = $this->smsProvider->incoming($sms_message);
 
@@ -460,23 +462,6 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     ];
     $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
     $this->assertEquals($expected, $execution_order);
-  }
-
-  /**
-   * Ensure SMS message is processed by the gateway.
-   */
-  public function testIncomingGatewayProcessed() {
-    $this->gateway
-      ->setSkipQueue(TRUE)
-      ->save();
-
-    $sms_message = $this->createSmsMessage()
-      ->setGateway($this->gateway)
-      ->setDirection(Direction::INCOMING)
-      ->addRecipients($this->randomPhoneNumbers());
-
-    $this->smsProvider->queue($sms_message);
-    $this->assertTrue(\Drupal::state()->get('sms_test_gateway.memory.incoming'));
   }
 
   /**

@@ -30,7 +30,7 @@ class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Tests if incoming hook is fired on a gateway plugin.
+   * Tests if incoming event is fired on a gateway plugin.
    */
   public function testIncoming() {
     $gateway = $this->createMemoryGateway([
@@ -43,6 +43,7 @@ class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
       ->setDirection(Direction::INCOMING)
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers());
+    $sms_message->setResult($this->createMessageResult($sms_message));
 
     $this->smsProvider->queue($sms_message);
     $this->assertTrue(\Drupal::state()->get('sms_test_gateway.memory.incoming'));

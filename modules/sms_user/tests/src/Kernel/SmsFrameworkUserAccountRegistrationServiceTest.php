@@ -527,6 +527,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
       ->setDirection(Direction::INCOMING)
       ->setMessage($message)
       ->addRecipients($this->randomPhoneNumbers(1));
+    $incoming->setResult($this->createMessageResult($incoming));
     $this->smsProvider->queue($incoming);
   }
 
