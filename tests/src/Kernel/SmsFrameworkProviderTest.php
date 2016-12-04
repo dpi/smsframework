@@ -197,7 +197,8 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message
       ->addRecipients($this->randomPhoneNumbers())
       ->setMessage($this->randomString())
-      ->setDirection(Direction::INCOMING);
+      ->setDirection(Direction::INCOMING)
+      ->setGateway($this->gateway);
     $sms_message->setResult($this->createMessageResult($sms_message));
 
     $sms_messages = $this->smsStorage

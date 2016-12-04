@@ -4,6 +4,7 @@ namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsMessage;
+use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Exception\SmsPluginReportException;
 use Drupal\sms\Message\SmsMessageResult;
 
@@ -148,6 +149,41 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
       ->addRecipients($this->randomPhoneNumbers($delete_count + 1));
 
     $this->setExpectedException(SmsPluginReportException::class, "Missing reports for $delete_count recipient(s).");
+    $this->smsProvider->queue($sms_message);
+  }
+
+  /**
+   * Tests exception is thrown if gateway is not set on incoming messages.
+   *
+   * @covers ::ensureIncomingSupport
+   */
+  public function testIncomingMissingGateway() {
+    $sms_message = SmsMessage::create()
+      ->setDirection(Direction::INCOMING)
+      ->setMessage($this->randomString())
+      ->addRecipients($this->randomPhoneNumbers());
+
+    $this->setExpectedException(SmsException::class, 'Gateway not set on incoming message');
+    $this->smsProvider->queue($sms_message);
+  }
+
+  /**
+   * Tests exception is thrown if gateway does not support incoming messages.
+   *
+   * @covers ::ensureIncomingSupport
+   */
+  public function testIncomingUnSupported() {
+    $gateway = $this->createMemoryGateway([
+      'plugin' => 'capabilities_default',
+    ]);
+
+    $sms_message = SmsMessage::create()
+      ->setDirection(Direction::INCOMING)
+      ->setMessage($this->randomString())
+      ->addRecipients($this->randomPhoneNumbers())
+      ->setGateway($gateway);
+
+    $this->setExpectedException(SmsException::class, "Gateway `" . $gateway->id() . "` does not support incoming messages.");
     $this->smsProvider->queue($sms_message);
   }
 

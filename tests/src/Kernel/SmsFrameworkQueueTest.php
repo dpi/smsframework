@@ -86,7 +86,8 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
   public function testQueueIncoming() {
     $sms_message = $this->createSmsMessage()
       ->setDirection(Direction::INCOMING)
-      ->addRecipients($this->randomPhoneNumbers());
+      ->addRecipients($this->randomPhoneNumbers())
+      ->setGateway($this->gateway);
     $sms_message->setResult($this->createMessageResult($sms_message));
 
     $this->smsProvider->queue($sms_message);

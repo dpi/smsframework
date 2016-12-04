@@ -12,6 +12,7 @@ use Drupal\sms\Direction;
 use Drupal\sms\Event\RecipientGatewayEvent;
 use Drupal\sms\Event\SmsMessageEvent;
 use Drupal\sms\Exception\RecipientRouteException;
+use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Exception\SmsPluginReportException;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Event\SmsEvents;
@@ -52,6 +53,27 @@ class SmsMessageProcessor implements EventSubscriberInterface {
   public function __construct(EventDispatcherInterface $event_dispatcher, ConfigFactoryInterface $config_factory) {
     $this->eventDispatcher = $event_dispatcher;
     $this->configFactory = $config_factory;
+  }
+
+  /**
+   * Ensures gateway supports incoming messages.
+   *
+   * @param \Drupal\sms\Event\SmsMessageEvent $event
+   *   An SMS message process event.
+   */
+  public function ensureIncomingSupport(SmsMessageEvent $event) {
+    $sms_messages = $event->getMessages();
+    foreach ($sms_messages as $sms_message) {
+      if ($sms_message->getDirection() == Direction::INCOMING) {
+        $gateway = $sms_message->getGateway();
+        if (!$gateway instanceof SmsGatewayInterface) {
+          throw new SmsException('Gateway not set on incoming message');
+        }
+        if (!$gateway->supportsIncoming()) {
+          throw new SmsException(sprintf('Gateway `%s` does not support incoming messages.', $gateway->id()));
+        }
+      }
+    }
   }
 
   /**
@@ -257,6 +279,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
+    $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['ensureIncomingSupport', 1024];
     // Ensure reports for incoming messages.
     $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['ensureReportsPreprocess', 1024];
     $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['ensureRecipients', 1024];

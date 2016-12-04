@@ -22,6 +22,7 @@ use Drupal\sms\Message\SmsMessageReportStatus;
  *   id = "memory",
  *   label = @Translation("Memory"),
  *   outgoing_message_max_recipients = -1,
+ *   incoming = TRUE,
  *   schedule_aware = FALSE,
  *   reports_pull = TRUE,
  *   reports_push = TRUE,
