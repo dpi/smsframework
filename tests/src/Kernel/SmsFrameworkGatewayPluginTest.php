@@ -32,7 +32,7 @@ class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
   /**
    * Tests if incoming event is fired on a gateway plugin.
    */
-  public function testIncoming() {
+  public function testIncomingEvent() {
     $gateway = $this->createMemoryGateway([
       'plugin' => 'memory',
     ])->setSkipQueue(TRUE);
