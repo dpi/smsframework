@@ -32,7 +32,7 @@ class SmsEntityPhoneNumber extends Event {
    *
    * @var string[]
    */
-  protected $phoneNumbers;
+  protected $phoneNumbers = [];
 
   /**
    * Constructs the object.
@@ -45,6 +45,7 @@ class SmsEntityPhoneNumber extends Event {
    */
   public function __construct(EntityInterface $entity, $verified = TRUE) {
     $this->entity = $entity;
+    $this->verified = $verified;
   }
 
   /**

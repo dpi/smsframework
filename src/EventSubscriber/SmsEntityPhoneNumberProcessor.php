@@ -53,8 +53,8 @@ class SmsEntityPhoneNumberProcessor implements EventSubscriberInterface {
 
     $phone_numbers = [];
     if (isset($entity->{$field_name})) {
-      foreach ($entity->{$field_name} as $index => &$item) {
-        $phone_numbers[$index] = $item->value;
+      foreach ($entity->{$field_name} as $item) {
+        $phone_numbers[] = $item->value;
       }
     }
 
@@ -77,7 +77,6 @@ class SmsEntityPhoneNumberProcessor implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events = [];
     $events[SmsEvents::ENTITY_PHONE_NUMBERS][] = ['entityPhoneNumbers', 1024];
     return $events;
   }
