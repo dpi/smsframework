@@ -114,6 +114,14 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   public function supportsIncoming();
 
   /**
+   * Whether to automatically create a route for receiving incoming messages.
+   *
+   * @return boolean
+   *   Whether to automatically create a route for receiving incoming messages.
+   */
+  public function autoCreateIncomingRoute();
+
+  /**
    * Get whether this gateway is schedule aware.
    *
    * @return bool

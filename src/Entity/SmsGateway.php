@@ -260,6 +260,15 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   /**
    * {@inheritdoc}
    */
+  public function autoCreateIncomingRoute() {
+    $definition = $this->getPlugin()
+      ->getPluginDefinition();
+    return isset($definition['incoming_route']) ? (boolean) $definition['incoming_route'] : FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isScheduleAware() {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
