@@ -109,7 +109,9 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
       ->setDirection(Direction::INCOMING)
       ->setMessage($this->randomMachineName())
       ->setAutomated(FALSE)
-      ->setProcessedTime(499488280);
+      ->setProcessedTime(499488280)
+      ->setGateway($this->gateway);
+    $message2->setResult($this->createMessageResult($message2));
     $this->smsProvider->queue($message2);
 
     Views::viewsData()->clear();

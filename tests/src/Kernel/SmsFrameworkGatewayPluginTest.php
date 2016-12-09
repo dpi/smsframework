@@ -30,19 +30,19 @@ class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Tests if incoming hook is fired on a gateway plugin.
+   * Tests if incoming event is fired on a gateway plugin.
    */
-  public function testIncoming() {
-    $gateway = $this->createMemoryGateway([
-      'plugin' => 'memory',
-    ])->setSkipQueue(TRUE);
+  public function testIncomingEvent() {
+    $gateway = $this->createMemoryGateway()
+      ->setSkipQueue(TRUE);
     $gateway->save();
-    $this->setFallbackGateway($gateway);
 
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::INCOMING)
       ->setMessage($this->randomString())
-      ->addRecipients($this->randomPhoneNumbers());
+      ->addRecipients($this->randomPhoneNumbers())
+      ->setGateway($gateway);
+    $sms_message->setResult($this->createMessageResult($sms_message));
 
     $this->smsProvider->queue($sms_message);
     $this->assertTrue(\Drupal::state()->get('sms_test_gateway.memory.incoming'));

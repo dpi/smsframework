@@ -8,6 +8,9 @@ use Drupal\sms\Entity\SmsGateway;
 use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Message\SmsMessage;
+use Drupal\sms\Message\SmsDeliveryReport;
+use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Message\SmsMessageResult;
 
 /**
  * Shared SMS Framework helpers for kernel and web tests.
@@ -216,6 +219,28 @@ trait SmsFrameworkTestTrait {
     $verifications = $verification_storage->loadMultiple($verification_ids);
 
     return reset($verifications);
+  }
+
+  /**
+   * Create a result and reports for a message.
+   *
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
+   *   A message object.
+   *
+   * @return \Drupal\sms\Message\SmsMessageResult
+   *   A message result with reports for each message recipient.
+   */
+  protected function createMessageResult(SmsMessageInterface $sms_message) {
+    $reports = array_map(
+      function($recipient) {
+        return (new SmsDeliveryReport())
+          ->setRecipient($recipient);
+      },
+      $sms_message->getRecipients()
+    );
+
+    return (new SmsMessageResult())
+      ->setReports($reports);
   }
 
   /**

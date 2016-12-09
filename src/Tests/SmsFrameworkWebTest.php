@@ -17,6 +17,8 @@ class SmsFrameworkWebTest extends SmsFrameworkWebTestBase {
    * Tests queue statistics located on Drupal report page.
    */
   public function testQueueReport() {
+    $gateway = $this->createMemoryGateway();
+
     /** @var \Drupal\sms\Provider\SmsProviderInterface $provider */
     $provider = \Drupal::service('sms.provider');
 
@@ -28,7 +30,9 @@ class SmsFrameworkWebTest extends SmsFrameworkWebTestBase {
 
     for ($i = 0; $i < 2; $i++) {
       $clone = $sms_message->createDuplicate()
-        ->setDirection(Direction::INCOMING);
+        ->setDirection(Direction::INCOMING)
+        ->setGateway($gateway);
+      $clone->setResult($this->createMessageResult($clone));
       $provider->queue($clone);
     }
     for ($i = 0; $i < 4; $i++) {

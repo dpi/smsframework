@@ -68,19 +68,29 @@ class RouteSubscriber implements ContainerInjectionInterface {
     }
 
     /** @var \Drupal\sms\Entity\SmsGatewayInterface $gateway */
-    foreach (SmsGateway::loadMultiple() as $gateway) {
-      if (!$gateway->supportsReportsPush()) {
-        continue;
+    foreach (SmsGateway::loadMultiple() as $id => $gateway) {
+      if ($gateway->supportsReportsPush()) {
+        $path = $gateway->getPushReportPath();
+        if (Unicode::strlen($path) >= 2 && Unicode::substr($path, 0, 1) == '/') {
+          $route = (new Route($path))
+            ->setDefault('_controller', '\Drupal\sms\DeliveryReportController::processDeliveryReport')
+            ->setDefault('_sms_gateway_push_endpoint', $id)
+            ->setRequirement('_sms_gateway_supports_pushed_reports', 'TRUE');
+          $collection->add('sms.delivery_report.receive.' . $id, $route);
+        }
       }
 
-      $id = $gateway->id();
-      $path = $gateway->getPushReportPath();
-      if (Unicode::strlen($path) >= 2 && Unicode::substr($path, 0, 1) == '/') {
-        $route = (new Route($path))
-          ->setDefault('_controller', '\Drupal\sms\DeliveryReportController::processDeliveryReport')
-          ->setDefault('_sms_gateway_push_endpoint', $id)
-          ->setRequirement('_sms_gateway_supports_pushed_reports', 'TRUE');
-        $collection->add('sms.delivery_report.receive.' . $id, $route);
+      if ($gateway->autoCreateIncomingRoute()) {
+        $path = $gateway->getPushIncomingPath();
+        if (Unicode::strlen($path) >= 2 && Unicode::substr($path, 0, 1) == '/') {
+          $parameters['sms_gateway']['type'] = 'entity:sms_gateway';
+          $route = (new Route($path))
+            ->setDefault('sms_gateway', $id)
+            ->setDefault('_controller', '\Drupal\sms\SmsIncomingController::processIncoming')
+            ->setRequirement('_access', 'TRUE')
+            ->setOption('parameters', $parameters);
+          $collection->add('sms.incoming.receive.' . $id, $route);
+        }
       }
     }
 

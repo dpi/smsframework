@@ -35,6 +35,20 @@ class SmsGateway extends Plugin {
   protected $outgoing_message_max_recipients;
 
   /**
+   * Whether the gateway supports receiving messages.
+   *
+   * @var boolean
+   */
+  protected $incoming;
+
+  /**
+   * Whether to automatically create a route for receiving incoming messages.
+   *
+   * @var boolean
+   */
+  protected $incoming_route;
+
+  /**
    * Whether the gateway is capable of delaying messages until a date.
    *
    * Schedule aware gateways must extract sending time from all message

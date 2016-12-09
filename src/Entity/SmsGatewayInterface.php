@@ -45,6 +45,25 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   public function setSkipQueue($skip_queue);
 
   /**
+   * Get the internal path where incoming messages are received.
+   *
+   * @return string
+   *   The internal path where incoming messages are received.
+   */
+  public function getPushIncomingPath();
+
+  /**
+   * Set the internal path where incoming messages are received.
+   *
+   * @param string $path
+   *   The internal path where incoming messages are received.
+   *
+   * @return $this
+   *   Return this gateway for chaining.
+   */
+  public function setPushIncomingPath($path);
+
+  /**
    * Get the url where pushed delivery reports can be received.
    *
    * @return \Drupal\Core\Url
@@ -104,6 +123,22 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    *   Maximum number of recipients, or -1 for no limit.
    */
   public function getMaxRecipientsOutgoing();
+
+  /**
+   * Whether the gateway supports receiving messages.
+   *
+   * @return boolean
+   *   Whether the gateway supports receiving messages.
+   */
+  public function supportsIncoming();
+
+  /**
+   * Whether to automatically create a route for receiving incoming messages.
+   *
+   * @return boolean
+   *   Whether to automatically create a route for receiving incoming messages.
+   */
+  public function autoCreateIncomingRoute();
 
   /**
    * Get whether this gateway is schedule aware.
