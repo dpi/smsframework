@@ -44,6 +44,9 @@ sms.gateway.*:
     skip_queue:
       type: boolean
       label: 'Whether messages sent to this gateway should be sent immediately.'
+    incoming_push_path:
+      type: path
+      label: 'The internal path where incoming messages are received.'
     reports_push_path:
       type: path
       label: 'The internal path where pushed delivery reports can be received.'

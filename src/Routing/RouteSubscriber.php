@@ -81,14 +81,16 @@ class RouteSubscriber implements ContainerInjectionInterface {
       }
 
       if ($gateway->autoCreateIncomingRoute()) {
-        $parameters['sms_gateway']['type'] = 'entity:sms_gateway';
-        $path = '/testroute';
-        $route = (new Route($path))
-          ->setDefault('sms_gateway', $id)
-          ->setDefault('_controller', '\Drupal\sms\SmsIncomingController::processIncoming')
-          ->setRequirement('_access', 'TRUE')
-          ->setOption('parameters', $parameters);
-        $collection->add('sms.incoming.receive.' . $id, $route);
+        $path = $gateway->getPushIncomingPath();
+        if (Unicode::strlen($path) >= 2 && Unicode::substr($path, 0, 1) == '/') {
+          $parameters['sms_gateway']['type'] = 'entity:sms_gateway';
+          $route = (new Route($path))
+            ->setDefault('sms_gateway', $id)
+            ->setDefault('_controller', '\Drupal\sms\SmsIncomingController::processIncoming')
+            ->setRequirement('_access', 'TRUE')
+            ->setOption('parameters', $parameters);
+          $collection->add('sms.incoming.receive.' . $id, $route);
+        }
       }
     }
 
