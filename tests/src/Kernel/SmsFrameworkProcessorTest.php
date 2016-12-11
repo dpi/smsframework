@@ -103,7 +103,7 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Ensure exception thrown if incoming message is missing a result.
+   * Ensure exception thrown if gateway send method did not return a result.
    *
    * @covers ::ensureReportsPreprocess
    */
