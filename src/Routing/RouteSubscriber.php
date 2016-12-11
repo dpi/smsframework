@@ -88,7 +88,8 @@ class RouteSubscriber implements ContainerInjectionInterface {
             ->setDefault('sms_gateway', $id)
             ->setDefault('_controller', '\Drupal\sms\SmsIncomingController::processIncoming')
             ->setRequirement('_access', 'TRUE')
-            ->setOption('parameters', $parameters);
+            ->setOption('parameters', $parameters)
+            ->setMethods(['POST']);
           $collection->add('sms.incoming.receive.' . $id, $route);
         }
       }

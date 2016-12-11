@@ -3,7 +3,7 @@
 namespace Drupal\sms;
 
 /**
- * Defines an container for SMS objects for processing and a request response.
+ * Defines a container for SMS objects for processing and a request response.
  */
 class SmsProcessingResponse {
 

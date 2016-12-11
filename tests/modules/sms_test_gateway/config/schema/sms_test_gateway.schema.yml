@@ -5,6 +5,9 @@ sms_test_gateway_base:
       type: string
       label: 'ID of the gateway config entity.'
 
+sms_gateway.settings.incoming:
+  type: sms_test_gateway_base
+
 sms_gateway.settings.memory:
   type: sms_test_gateway_base
   label: 'Memory'
