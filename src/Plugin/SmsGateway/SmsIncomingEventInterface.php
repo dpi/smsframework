@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\sms\Plugin;
+namespace Drupal\sms\Plugin\SmsGateway;
 
 use Drupal\sms\Event\SmsMessageEvent;
 
 /**
  * Interface for gateways implementing an incoming event subscriber.
  */
-interface SmsGatewayPluginIncomingEventInterface {
+interface SmsIncomingEventInterface {
 
   /**
    * Process a SMS message from this gateway.

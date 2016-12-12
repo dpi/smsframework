@@ -33,7 +33,7 @@ class MemoryOutgoingResult extends Memory {
         throw new \Exception('There are no reports to delete.');
       }
 
-      // Slice of the first {$delete_reports}x reports.
+      // Slice off the first {$delete_reports}x reports.
       $reports = array_slice($reports, $delete_reports);
 
       $result->setReports($reports);
