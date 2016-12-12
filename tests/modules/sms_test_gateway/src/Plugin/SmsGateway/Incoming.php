@@ -32,7 +32,6 @@ class Incoming extends SmsGatewayPluginBase {
    *   A SMS processing response task.
    */
   function processIncoming() {
-
     $task = new SmsProcessingResponse();
     $response = new Response('All good', 200);
     $task->setResponse($response);
