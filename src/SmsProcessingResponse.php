@@ -36,9 +36,13 @@ class SmsProcessingResponse {
    *
    * @param \Drupal\sms\Message\SmsMessageInterface[]
    *   An array of messages to process.
+   *
+   * @return $this
+   *   Return this object for chaining.
    */
   public function setMessages(array $messages) {
     $this->messages = $messages;
+    return $this;
   }
 
   /**
@@ -56,9 +60,13 @@ class SmsProcessingResponse {
    *
    * @param mixed $response
    *   Set the response to pass to the request controller.
+   *
+   * @return $this
+   *   Return this object for chaining.
    */
   public function setResponse($response) {
     $this->response = $response;
+    return $this;
   }
 
 }

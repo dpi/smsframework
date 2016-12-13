@@ -31,6 +31,13 @@ class SmsTestGatewayEventSubscriber implements EventSubscriberInterface {
       $result['message'] = $sms_message->getMessage();
       \Drupal::state()->set($key, $result);
     }
+
+    $key = 'sms_test_gateway_incoming_messages';
+    $incoming_messages = &drupal_static($key, []);
+    foreach ($event->getMessages() as $message) {
+      $incoming_messages[] = $message;
+    }
+    \Drupal::state()->set($key, $incoming_messages);
   }
 
   /**

@@ -3,6 +3,7 @@
 namespace Drupal\Tests\sms\Kernel;
 
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Drupal\Core\Url;
 
 /**
  * Tests incoming routes for gateway plugins.
@@ -16,7 +17,7 @@ class SmsFrameworkIncomingRouteTest extends SmsFrameworkKernelBase {
    */
   public static $modules = [
     'system', 'sms', 'entity_test', 'user', 'field', 'telephone',
-    'dynamic_entity_reference', 'sms_test_gateway',
+    'dynamic_entity_reference', 'sms_test_gateway', 'basic_auth',
   ];
 
   /**
@@ -27,11 +28,27 @@ class SmsFrameworkIncomingRouteTest extends SmsFrameworkKernelBase {
   protected $routeProvider;
 
   /**
+   * The HTTP client.
+   *
+   * @var \GuzzleHttp\Client
+   */
+  protected $httpClient;
+
+  /**
+   * An incoming gateway instance.
+   *
+   * @var \Drupal\sms\Entity\SmsGatewayInterface
+   */
+  protected $incomingGateway;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
     $this->routeProvider = $this->container->get('router.route_provider');
+    $this->httpClient = $this->container->get('http_client');
+    $this->incomingGateway = $this->createMemoryGateway(['plugin' => 'incoming']);
   }
 
   /**
@@ -48,8 +65,7 @@ class SmsFrameworkIncomingRouteTest extends SmsFrameworkKernelBase {
    * Tests route exists for gateway with incoming route annotation.
    */
   public function testIncomingRoute() {
-    $gateway = $this->createMemoryGateway(['plugin' => 'incoming']);
-    $route = 'sms.incoming.receive.' . $gateway->id();
+    $route = 'sms.incoming.receive.' . $this->incomingGateway->id();
     $this->routeProvider->getRouteByName($route);
   }
 

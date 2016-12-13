@@ -268,8 +268,13 @@ class SmsMessageProcessor implements EventSubscriberInterface {
     $result = [];
 
     foreach ($event->getMessages() as $sms_message) {
-      $max = $sms_message->getGateway()->getMaxRecipientsOutgoing();
-      $result = array_merge($result, $sms_message->chunkByRecipients($max));
+      if ($sms_message->getDirection() == Direction::OUTGOING) {
+        $max = $sms_message->getGateway()->getMaxRecipientsOutgoing();
+        $result = array_merge($result, $sms_message->chunkByRecipients($max));
+      }
+      else {
+        $result[] = $sms_message;
+      }
     }
 
     $event->setMessages($result);
