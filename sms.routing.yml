@@ -38,7 +38,7 @@ entity.phone_number_settings.delete_form:
   path: '/admin/config/smsframework/phone_number/{phone_number_settings}/delete'
   defaults:
     _entity_form: 'phone_number_settings.delete'
-    _title: 'Delete phone numebr settings'
+    _title: 'Delete phone number settings'
   requirements:
     _permission: 'administer smsframework'
 
