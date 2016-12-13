@@ -320,8 +320,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
     $this->smsProvider->queue($message);
 
-    $key = 'sms_test_gateway_incoming_messages';
-    $incoming_messages = \Drupal::state()->get($key, []);
+    $incoming_messages = $this->getIncomingMessages($gateway_chunked);
     $this->assertEquals(1, count($incoming_messages), 'There is one incoming message.');
   }
 
