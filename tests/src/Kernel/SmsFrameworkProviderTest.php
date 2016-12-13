@@ -299,6 +299,34 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Test incoming messages do not get chunked.
+   */
+  public function testIncomingNotChunked() {
+    $gateway_chunked = SmsGateway::create([
+      'plugin' => 'memory_chunked',
+      'id' => 'memory_chunked',
+      'settings' => ['gateway_id' => 'memory_chunked'],
+    ]);
+    $gateway_chunked
+      ->enable()
+      ->setSkipQueue(TRUE)
+      ->save();
+
+    $message = (new StandardSmsMessage())
+      ->setMessage($this->randomString())
+      ->addRecipients($this->randomPhoneNumbers())
+      ->setDirection(Direction::INCOMING)
+      ->setGateway($gateway_chunked);
+
+    $this->smsProvider->queue($message);
+
+
+    $key = 'sms_test_gateway_incoming_messages';
+    $incoming_messages = \Drupal::state()->get($key, []);
+    $this->assertEquals(1, count($incoming_messages), 'There is one incoming message.');
+  }
+
+  /**
    * Ensure events are executed when a message added to the outgoing queue.
    */
   public function testEventsQueueOutgoing() {
