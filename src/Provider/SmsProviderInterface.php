@@ -20,6 +20,8 @@ interface SmsProviderInterface {
    * @return \Drupal\sms\Entity\SmsMessageInterface[]
    *   The queued messages. A single message may be transformed into many.
    *
+   * @throws \Drupal\sms\Exception\SmsDirectionException
+   *   Thrown if no direction is set for the message.
    * @throws \Drupal\sms\Exception\RecipientRouteException
    *   Thrown if no gateway could be determined for the message.
    */

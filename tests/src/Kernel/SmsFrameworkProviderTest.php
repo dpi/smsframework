@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\sms\Exception\SmsDirectionException;
 use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Exception\RecipientRouteException;
 use Drupal\sms\Message\SmsMessage as StandardSmsMessage;
@@ -12,6 +13,7 @@ use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Direction;
 use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Message\SmsMessageResultInterface;
+use Drupal\sms\Tests\SmsFrameworkTestTrait;
 
 /**
  * Tests SMS Framework provider service.
@@ -51,6 +53,13 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   protected $gateway;
 
   /**
+   * An incoming gateway.
+   *
+   * @var \Drupal\sms\Entity\SmsGatewayInterface
+   */
+  protected $incomingGateway;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -59,6 +68,9 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->installEntitySchema('sms');
 
     $this->gateway = $this->createMemoryGateway();
+    // Incoming gateway should be set to 'incoming' when
+    // https://www.drupal.org/node/2832601 lands.
+    $this->incomingGateway = $this->createMemoryGateway(['plugin' => 'memory']);
     $this->smsStorage = $this->container->get('entity_type.manager')
       ->getStorage('sms');
     $this->smsProvider = $this->container->get('sms.provider');
@@ -83,6 +95,25 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Ensures direction is set by the provider.
+   *
+   * @covers ::send
+   */
+  public function testSendNoDirection() {
+    $sms_message = SmsMessage::create()
+      ->setMessage($this->randomString())
+      ->addRecipients($this->randomPhoneNumbers())
+      ->setGateway($this->gateway);
+
+    // This method will set direction.
+    $this->smsProvider->send($sms_message);
+
+    $messages = $this->getTestMessages($this->gateway);
+    $this->assertEquals(1, count($messages), 'Message was added to outgoing queue without direction being explicitly set');
+    $this->assertEquals(Direction::OUTGOING, $messages[0]->getDirection(), 'Message direction set to outgoing.');
+  }
+
+  /**
    * Test message is received.
    *
    * @covers ::incoming
@@ -100,6 +131,25 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->assertEquals(1, count($sms_messages), 'Return value contains 1 item.');
     $this->assertTrue($sms_messages[0] instanceof StandardSmsMessageInterface, 'Return value is a SMS message.');
     $this->assertTrue($sms_messages[0]->getResult() instanceof SmsMessageResultInterface);
+  }
+
+  /**
+   * Ensures direction is set by the provider.
+   *
+   * @covers ::incoming
+   */
+  public function testIncomingNoDirection() {
+    $sms_message = SmsMessage::create()
+      ->setMessage($this->randomString())
+      ->addRecipients($this->randomPhoneNumbers())
+      ->setGateway($this->incomingGateway);
+
+    // This method will set direction.
+    $this->smsProvider->incoming($sms_message);
+
+    $messages = $this->getIncomingMessages($this->incomingGateway);
+    $this->assertEquals(1, count($messages), 'Message was added to incoming queue without direction being explicitly set');
+    $this->assertEquals(Direction::INCOMING, $messages[0]->getDirection(), 'Message direction set to incoming.');
   }
 
   /**
@@ -126,13 +176,15 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Ensures validation failure if no direction.
+   * Ensures exception if missing direction for queue method.
+   *
+   * @covers ::queue
    */
-  public function testNoSendNoDirection() {
+  public function testQueueNoDirection() {
     $sms_message = SmsMessage::create()
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers());
-    $this->setExpectedException(SmsException::class, 'Can not queue SMS message because there are 1 validation error(s): [direction]: This value should not be null.');
+    $this->setExpectedException(SmsDirectionException::class, 'Missing direction for message.');
     $this->smsProvider->queue($sms_message);
   }
 
