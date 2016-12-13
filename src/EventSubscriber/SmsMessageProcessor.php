@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\sms\Direction;
 use Drupal\sms\Event\RecipientGatewayEvent;
 use Drupal\sms\Event\SmsMessageEvent;
 use Drupal\sms\Exception\RecipientRouteException;
@@ -183,8 +184,13 @@ class SmsMessageProcessor implements EventSubscriberInterface {
     $result = [];
 
     foreach ($event->getMessages() as $sms_message) {
-      $max = $sms_message->getGateway()->getMaxRecipientsOutgoing();
-      $result = array_merge($result, $sms_message->chunkByRecipients($max));
+      if ($sms_message->getDirection() == Direction::OUTGOING) {
+        $max = $sms_message->getGateway()->getMaxRecipientsOutgoing();
+        $result = array_merge($result, $sms_message->chunkByRecipients($max));
+      }
+      else {
+        $result[] = $sms_message;
+      }
     }
 
     $event->setMessages($result);
