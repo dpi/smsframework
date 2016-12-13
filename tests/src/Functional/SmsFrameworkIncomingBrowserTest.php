@@ -48,8 +48,11 @@ class SmsFrameworkIncomingBrowserTest extends SmsFrameworkBrowserTestBase {
   }
 
   public function testIncomingRouteEndpoint() {
-    $messages = [];
     $messages[0] = [
+      'message' => $this->randomString(),
+      'recipients' => $this->randomPhoneNumbers(),
+    ];
+    $messages[1] = [
       'message' => $this->randomString(),
       'recipients' => $this->randomPhoneNumbers(),
     ];
@@ -71,9 +74,8 @@ class SmsFrameworkIncomingBrowserTest extends SmsFrameworkBrowserTestBase {
     $this->assertEquals(204, $response->getStatusCode(), 'HTTP code is 204');
     $this->assertEmpty((string) $response->getBody(), 'Response body is empty.');
 
-    $key = 'sms_test_gateway_incoming_messages';
-    $incoming_messages = \Drupal::state()->get($key, []);
-    $this->assertEquals(count($messages), count($incoming_messages), 'There are 1 messages');
+    $incoming_messages = $this->getIncomingMessages($this->incomingGateway);
+    $this->assertEquals(count($messages), count($incoming_messages), 'There are 2 messages');
   }
 
 }
