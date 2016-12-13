@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\sms\Kernel;
+namespace Drupal\sms\Tests\Kernel;
 
 use Drupal\sms\Tests\SmsFrameworkTestTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
