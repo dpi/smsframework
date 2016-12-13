@@ -68,9 +68,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->installEntitySchema('sms');
 
     $this->gateway = $this->createMemoryGateway();
-    // Incoming gateway should be set to 'incoming' when
-    // https://www.drupal.org/node/2832601 lands.
-    $this->incomingGateway = $this->createMemoryGateway(['plugin' => 'memory']);
+    $this->incomingGateway = $this->createMemoryGateway(['plugin' => 'incoming']);
     $this->smsStorage = $this->container->get('entity_type.manager')
       ->getStorage('sms');
     $this->smsProvider = $this->container->get('sms.provider');
@@ -145,6 +143,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers())
       ->setGateway($this->incomingGateway);
+    $sms_message->setResult($this->createMessageResult($sms_message));
 
     // This method will set direction.
     $this->smsProvider->incoming($sms_message);
@@ -358,13 +357,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    * Test incoming messages do not get chunked.
    */
   public function testIncomingNotChunked() {
-    $gateway_chunked = SmsGateway::create([
-      'plugin' => 'memory_chunked',
-      'id' => 'memory_chunked',
-      'settings' => ['gateway_id' => 'memory_chunked'],
-    ]);
-    $gateway_chunked
-      ->enable()
+    $this->incomingGateway
       ->setSkipQueue(TRUE)
       ->save();
 
@@ -372,11 +365,12 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers())
       ->setDirection(Direction::INCOMING)
-      ->setGateway($gateway_chunked);
+      ->setGateway($this->incomingGateway);
+    $message->setResult($this->createMessageResult($message));
 
     $this->smsProvider->queue($message);
 
-    $incoming_messages = $this->getIncomingMessages($gateway_chunked);
+    $incoming_messages = $this->getIncomingMessages($this->incomingGateway);
     $this->assertEquals(1, count($incoming_messages), 'There is one incoming message.');
   }
 
