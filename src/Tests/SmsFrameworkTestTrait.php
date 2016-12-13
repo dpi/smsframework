@@ -97,13 +97,13 @@ trait SmsFrameworkTestTrait {
   }
 
   /**
-   * Get all SMS messages received by a gateway.
+   * Get all messages received by a gateway.
    *
    * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
    *   A gateway plugin instance.
    *
    * @return \Drupal\sms\Message\SmsMessageInterface[]
-   *   An array of SMS messages sent to a gateway.
+   *   An array of messages received by a gateway.
    */
   protected function getIncomingMessages(SmsGatewayInterface $sms_gateway) {
     $gateway_id = $sms_gateway->id();
