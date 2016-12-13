@@ -13,6 +13,7 @@ use Drupal\sms\Plugin\SmsGatewayPluginIncomingInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\sms\Exception\SmsException;
+use Drupal\sms\Exception\SmsDirectionException;
 use Drupal\sms\Direction;
 use Drupal\sms\Event\SmsEvents;
 
@@ -42,6 +43,10 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * {@inheritdoc}
    */
   public function queue(SmsMessageInterface $sms_message) {
+    if (!$sms_message->getDirection()) {
+      throw new SmsDirectionException('Missing direction for message.');
+    }
+
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_PRE_PROCESS, [$sms_message])->getMessages();
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_QUEUE_PRE_PROCESS, $sms_messages)->getMessages();
 
@@ -89,6 +94,8 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * {@inheritdoc}
    */
   public function send(SmsMessageInterface $sms) {
+    $sms->setDirection(Direction::OUTGOING);
+
     $dispatch = !$sms->getOption('_skip_preprocess_event');
     $sms_messages = $dispatch ? $this->dispatchEvent(SmsEvents::MESSAGE_PRE_PROCESS, [$sms])->getMessages() : [$sms];
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_OUTGOING_PRE_PROCESS, $sms_messages)->getMessages();
@@ -110,6 +117,8 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * {@inheritdoc}
    */
   public function incoming(SmsMessageInterface $sms_message) {
+    $sms_message->setDirection(Direction::INCOMING);
+
     $dispatch = !$sms_message->getOption('_skip_preprocess_event');
     $sms_messages = $dispatch ? $this->dispatchEvent(SmsEvents::MESSAGE_PRE_PROCESS, [$sms_message])->getMessages() : [$sms_message];
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_INCOMING_PRE_PROCESS, $sms_messages)->getMessages();
