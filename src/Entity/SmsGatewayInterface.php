@@ -106,6 +106,14 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   public function getMaxRecipientsOutgoing();
 
   /**
+   * Whether the gateway supports receiving messages.
+   *
+   * @return boolean
+   *   Whether the gateway supports receiving messages.
+   */
+  public function supportsIncoming();
+
+  /**
    * Get whether this gateway is schedule aware.
    *
    * @return bool

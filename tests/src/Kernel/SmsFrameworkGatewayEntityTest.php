@@ -152,6 +152,26 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Tests 'incoming' annotation custom value.
+   */
+  public function testSupportsIncomingCustom() {
+    $gateway = $this->createGateway([
+      'plugin' => 'memory',
+    ]);
+    $this->assertEquals(TRUE, $gateway->supportsIncoming());
+  }
+
+  /**
+   * Tests 'incoming' annotation default value.
+   */
+  public function testSupportsIncomingDefault() {
+    $gateway = $this->createGateway([
+      'plugin' => 'capabilities_default',
+    ]);
+    $this->assertEquals(FALSE, $gateway->supportsIncoming());
+  }
+
+  /**
    * Tests 'schedule aware annotation' custom value.
    */
   public function testIsScheduleAwareCustom() {

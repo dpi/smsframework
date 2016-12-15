@@ -251,6 +251,15 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   /**
    * {@inheritdoc}
    */
+  public function supportsIncoming() {
+    $definition = $this->getPlugin()
+      ->getPluginDefinition();
+    return isset($definition['incoming']) ? (boolean) $definition['incoming'] : FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isScheduleAware() {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
