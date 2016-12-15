@@ -6,7 +6,7 @@ use Drupal\Core\Url;
 use Drupal\sms\Entity\SmsGateway;
 
 /**
- * Tests manage event access page.
+ * Tests gateway administration user interface.
  *
  * \Drupal\sms\Tests\SmsFrameworkGatewayAdminTest to be migrated to this class.
  *
