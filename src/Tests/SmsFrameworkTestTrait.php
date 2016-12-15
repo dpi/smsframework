@@ -8,6 +8,9 @@ use Drupal\sms\Entity\SmsGateway;
 use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Message\SmsMessage;
+use Drupal\sms\Message\SmsDeliveryReport;
+use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Message\SmsMessageResult;
 
 /**
  * Shared SMS Framework helpers for kernel and web tests.
@@ -94,6 +97,53 @@ trait SmsFrameworkTestTrait {
       $sms_messages = [];
     }
     \Drupal::state()->set('sms_test_gateway.memory.send', $sms_messages);
+  }
+
+  /**
+   * Get all messages received by a gateway.
+   *
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
+   *   A gateway plugin instance.
+   *
+   * @return \Drupal\sms\Message\SmsMessageInterface[]
+   *   An array of messages received by a gateway.
+   */
+  protected function getIncomingMessages(SmsGatewayInterface $sms_gateway) {
+    $gateway_id = $sms_gateway->id();
+    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.incoming', []);
+    return isset($sms_messages[$gateway_id]) ? $sms_messages[$gateway_id] : [];
+  }
+
+  /**
+   * Get the last message sent to gateway.
+   *
+   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
+   *   A gateway plugin.
+   *
+   * @return \Drupal\sms\Message\SmsMessageInterface|FALSE
+   *   The last message, or FALSE if no messages were received.
+   */
+  protected function getLastIncomingMessage(SmsGatewayInterface $sms_gateway) {
+    $gateway_id = $sms_gateway->id();
+    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.incoming', []);
+    return isset($sms_messages[$gateway_id]) ? end($sms_messages[$gateway_id]) : FALSE;
+  }
+
+  /**
+   * Resets incoming messages stored in memory by gateway.
+   *
+   * @param \Drupal\sms\Entity\SmsGatewayInterface|NULL $sms_gateway
+   *   A gateway plugin, or NULL to reset all messages.
+   */
+  protected function resetIncomingMessages(SmsGatewayInterface $sms_gateway = NULL) {
+    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.incoming', []);
+    if ($sms_gateway) {
+      $sms_messages[$sms_gateway->id()] = [];
+    }
+    else {
+      $sms_messages = [];
+    }
+    \Drupal::state()->set('sms_test_gateway.memory.incoming', $sms_messages);
   }
 
   /**
@@ -216,6 +266,28 @@ trait SmsFrameworkTestTrait {
     $verifications = $verification_storage->loadMultiple($verification_ids);
 
     return reset($verifications);
+  }
+
+  /**
+   * Create a result and reports for a message.
+   *
+   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
+   *   A message object.
+   *
+   * @return \Drupal\sms\Message\SmsMessageResult
+   *   A message result with reports for each message recipient.
+   */
+  protected function createMessageResult(SmsMessageInterface $sms_message) {
+    $reports = array_map(
+      function($recipient) {
+        return (new SmsDeliveryReport())
+          ->setRecipient($recipient);
+      },
+      $sms_message->getRecipients()
+    );
+
+    return (new SmsMessageResult())
+      ->setReports($reports);
   }
 
   /**

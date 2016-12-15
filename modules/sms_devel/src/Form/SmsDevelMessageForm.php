@@ -12,6 +12,8 @@ use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Direction;
 use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Message\SmsMessageResultInterface;
+use Drupal\sms\Message\SmsDeliveryReport;
+use Drupal\sms\Message\SmsMessageResult;
 
 /**
  * Simulate a message being sent or received.
@@ -165,6 +167,18 @@ class SmsDevelMessageForm extends FormBase {
    */
   public function submitReceive(array &$form, FormStateInterface $form_state) {
     $this->message->setDirection(Direction::INCOMING);
+
+    // Create some fake reports.
+    $reports = array_map(
+      function($recipient) {
+        return (new SmsDeliveryReport())
+          ->setRecipient($recipient);
+      },
+      $this->message->getRecipients()
+    );
+    $result = (new SmsMessageResult())
+      ->setReports($reports);
+    $this->message->setResult($result);
 
     if ($form_state->getValue('skip_queue')) {
       $messages = $this->smsProvider->incoming($this->message);

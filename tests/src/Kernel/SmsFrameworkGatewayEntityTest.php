@@ -63,7 +63,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
    */
   public function testGetRetentionDurationInvalidDirection() {
     $gateway = $this->createGateway();
-    $this->setExpectedException(\Exception::class);
+    $this->setExpectedException(\InvalidArgumentException::class, '0 is not a valid direction.');
     $gateway->getRetentionDuration(0);
   }
 
@@ -149,6 +149,26 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
       'plugin' => 'capabilities_default',
     ]);
     $this->assertEquals(1, $gateway->getMaxRecipientsOutgoing());
+  }
+
+  /**
+   * Tests 'incoming' annotation custom value.
+   */
+  public function testSupportsIncomingCustom() {
+    $gateway = $this->createGateway([
+      'plugin' => 'memory',
+    ]);
+    $this->assertEquals(TRUE, $gateway->supportsIncoming());
+  }
+
+  /**
+   * Tests 'incoming' annotation default value.
+   */
+  public function testSupportsIncomingDefault() {
+    $gateway = $this->createGateway([
+      'plugin' => 'capabilities_default',
+    ]);
+    $this->assertEquals(FALSE, $gateway->supportsIncoming());
   }
 
   /**

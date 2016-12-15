@@ -6,7 +6,8 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Random;
 use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Plugin\SmsGatewayPluginBase;
-use Drupal\sms\Plugin\SmsGatewayPluginIncomingInterface;
+use Drupal\sms\Plugin\SmsGateway\SmsIncomingEventProcessorInterface;
+use Drupal\sms\Event\SmsMessageEvent;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
 use Drupal\Core\Form\FormStateInterface;
@@ -21,13 +22,14 @@ use Drupal\sms\Message\SmsMessageReportStatus;
  *   id = "memory",
  *   label = @Translation("Memory"),
  *   outgoing_message_max_recipients = -1,
+ *   incoming = TRUE,
  *   schedule_aware = FALSE,
  *   reports_pull = TRUE,
  *   reports_push = TRUE,
  *   credit_balance_available = TRUE,
  * )
  */
-class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInterface {
+class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorInterface {
 
   /**
    * {@inheritdoc}
@@ -89,16 +91,16 @@ class Memory extends SmsGatewayPluginBase implements SmsGatewayPluginIncomingInt
   /**
    * {@inheritdoc}
    */
-  public function incoming(SmsMessageInterface $sms_message) {
+  public function incomingEvent(SmsMessageEvent $event) {
     // @todo Contents of this method are subject to proposals made in
     // https://www.drupal.org/node/2712579
     // Set state so we test this method is executed, remove this after above is
     // addressed.
     \Drupal::state()->set('sms_test_gateway.memory.incoming', TRUE);
 
-    $new_reports = $this->randomDeliveryReports($sms_message);
-    return (new SmsMessageResult())
-      ->setReports($new_reports);
+    $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
+    $execution_order[] = __METHOD__;
+    \Drupal::state()->set('sms_test_event_subscriber__execution_order', $execution_order);
   }
 
   /**

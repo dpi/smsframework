@@ -219,7 +219,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
         return (int) $this->retention_duration_outgoing;
 
       default:
-        throw new \Exception('%s is not a valid direction.', $direction);
+        throw new \InvalidArgumentException(sprintf('%s is not a valid direction.', $direction));
     }
   }
 
@@ -246,6 +246,15 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return isset($definition['outgoing_message_max_recipients']) ? (int) $definition['outgoing_message_max_recipients'] : 1;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function supportsIncoming() {
+    $definition = $this->getPlugin()
+      ->getPluginDefinition();
+    return isset($definition['incoming']) ? (boolean) $definition['incoming'] : FALSE;
   }
 
   /**
