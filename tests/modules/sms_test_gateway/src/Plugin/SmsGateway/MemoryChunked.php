@@ -8,6 +8,7 @@ namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
  * @SmsGateway(
  *   id = "memory_chunked",
  *   label = @Translation("Memory Chunked"),
+ *   incoming = TRUE,
  *   outgoing_message_max_recipients = 2,
  * )
  */

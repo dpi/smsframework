@@ -145,6 +145,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers())
       ->setGateway($this->incomingGateway);
+    $sms_message->setResult($this->createMessageResult($sms_message));
 
     // This method will set direction.
     $this->smsProvider->incoming($sms_message);
@@ -373,6 +374,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
       ->addRecipients($this->randomPhoneNumbers())
       ->setDirection(Direction::INCOMING)
       ->setGateway($gateway_chunked);
+    $message->setResult($this->createMessageResult($message));
 
     $this->smsProvider->queue($message);
 
