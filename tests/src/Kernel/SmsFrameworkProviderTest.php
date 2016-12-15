@@ -460,7 +460,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->container->get('cron')->run();
 
     $expected[] = SmsEvents::MESSAGE_INCOMING_PRE_PROCESS;
-    $expected[] = 'incomingEvent'; // Plugin incoming event.
+    $expected[] = 'Drupal\sms_test_gateway\Plugin\SmsGateway\Memory::incomingEvent';
     $expected[] = SmsEvents::MESSAGE_INCOMING_POST_PROCESS;
     $expected[] = SmsEvents::MESSAGE_POST_PROCESS;
 
@@ -491,8 +491,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
       SmsEvents::MESSAGE_PRE_PROCESS,
       SmsEvents::MESSAGE_QUEUE_PRE_PROCESS,
       SmsEvents::MESSAGE_INCOMING_PRE_PROCESS,
-      // Plugin incoming event.
-      'incomingEvent',
+      'Drupal\sms_test_gateway\Plugin\SmsGateway\Memory::incomingEvent',
       SmsEvents::MESSAGE_INCOMING_POST_PROCESS,
       SmsEvents::MESSAGE_POST_PROCESS,
       SmsEvents::MESSAGE_QUEUE_POST_PROCESS,
@@ -537,7 +536,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $expected = [
       SmsEvents::MESSAGE_PRE_PROCESS,
       SmsEvents::MESSAGE_INCOMING_PRE_PROCESS,
-      'incomingEvent',
+      'Drupal\sms_test_gateway\Plugin\SmsGateway\Memory::incomingEvent',
       SmsEvents::MESSAGE_INCOMING_POST_PROCESS,
       SmsEvents::MESSAGE_POST_PROCESS,
     ];
