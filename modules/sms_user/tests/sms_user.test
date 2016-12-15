@@ -278,4 +278,43 @@ class SmsUserWebTest extends DrupalWebTestCase {
     $this->assertResponse(403);
   }
 
+  public function testIncomingUserSwitch() {
+    $user1 = $this->drupalCreateUser(array('administer smsframework', 'receive sms'));
+
+    $user2 = $this->drupalCreateUser(array('receive sms'));
+    $edit['sms_user']['status'] = SMS_USER_CONFIRMED;
+    $edit['sms_user']['number'] = '1234567890';
+    $account2 = user_load($user2->uid);
+    user_save($account2, $edit, 'mobile');
+
+    // Login as user one and receive SMS message. Verify that $user1 is the user.
+    $this->drupalLogin($user1);
+    $test_message1 = array(
+      'number' => '1234567890',
+      'message' => 'Test opting out of incoming user switch',
+    );
+    $this->drupalPost('admin/smsframework/devel', $test_message1, t('Receive Message'));
+    $this->assertResponse(200);
+    $this->assertText('Message received from number ' . $test_message1['number'] . ' and message: ' . $test_message1['message'], 'Successfully received message to recipient with registered number');
+    $result = sms_test_gateway_get_incoming('process');
+    $this->assertEqual($result['uid'], $user1->uid);
+
+    // Activate user switching and receive SMS message. Verify that user was
+    // switched to $user2.
+    $edit = array(
+      'sms_user_switch_account_incoming' => TRUE,
+    );
+    $this->drupalPost('admin/smsframework/sms_user_options', $edit, t('Save configuration'));
+    $test_message2 = array(
+      'number' => '1234567890',
+      'message' => 'Test opting in to incoming user switch',
+    );
+    sms_test_gateway_get_incoming('process', TRUE);
+    $this->drupalPost('admin/smsframework/devel', $test_message2, t('Receive Message'));
+    $this->assertResponse(200);
+    $this->assertText('Message received from number ' . $test_message2['number'] . ' and message: ' . $test_message2['message'], 'Successfully received message to recipient with registered number');
+    $result = sms_test_gateway_get_incoming('process');
+    $this->assertEqual($result['uid'], $user2->uid);
+  }
+
 }

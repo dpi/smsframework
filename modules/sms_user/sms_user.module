@@ -915,15 +915,17 @@ function sms_user_token_info() {
 function sms_user_sms_incoming($op, $number, $message, $options) {
   switch ($op) {
     case 'pre process':
-      if ($account = sms_user_authenticate($number)) {
-        $metadata = array(
-          'login' => TRUE,
-          'number' => $number,
-          'message' => $message,
-          'options' => $options,
-        );
-        sms_user_login_metadata($account->uid, $metadata);
-        _sms_user_switch($account);
+      if (variable_get('sms_user_switch_account_incoming', 0)) {
+        if ($account = sms_user_authenticate($number)) {
+          $metadata = array(
+            'login' => TRUE,
+            'number' => $number,
+            'message' => $message,
+            'options' => $options,
+          );
+          sms_user_login_metadata($account->uid, $metadata);
+          _sms_user_switch($account);
+        }
       }
       elseif (variable_get('sms_user_registration_enabled', 0) && $number) {
         if ($account = sms_user_register_new_user($number, $message, $options)) {
@@ -935,7 +937,9 @@ function sms_user_sms_incoming($op, $number, $message, $options) {
       }
       break;
     case 'post process':
-      _sms_user_switch();
+      if (variable_get('sms_user_switch_account_incoming', 0)) {
+        _sms_user_switch();
+      }
       break;
   }
 }
