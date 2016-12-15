@@ -6,7 +6,7 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Random;
 use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Plugin\SmsGatewayPluginBase;
-use Drupal\sms\Plugin\SmsGateway\SmsIncomingEventInterface;
+use Drupal\sms\Plugin\SmsGateway\SmsIncomingEventProcessorInterface;
 use Drupal\sms\Event\SmsMessageEvent;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
@@ -29,7 +29,7 @@ use Drupal\sms\Message\SmsMessageReportStatus;
  *   credit_balance_available = TRUE,
  * )
  */
-class Memory extends SmsGatewayPluginBase implements SmsIncomingEventInterface {
+class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorInterface {
 
   /**
    * {@inheritdoc}

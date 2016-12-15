@@ -9,7 +9,7 @@ use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
 use Drupal\sms\Event\SmsMessageEvent;
 use Drupal\sms\Message\SmsMessageInterface;
-use Drupal\sms\Plugin\SmsGateway\SmsIncomingEventInterface;
+use Drupal\sms\Plugin\SmsGateway\SmsIncomingEventProcessorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\sms\Exception\SmsException;
@@ -129,7 +129,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
     $sms_messages = $dispatch ? $this->dispatchEvent(SmsEvents::MESSAGE_PRE_PROCESS, [$sms_message])->getMessages() : [$sms_message];
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_INCOMING_PRE_PROCESS, $sms_messages)->getMessages();
 
-    if ($plugin instanceof SmsIncomingEventInterface) {
+    if ($plugin instanceof SmsIncomingEventProcessorInterface) {
       $event = new SmsMessageEvent($sms_messages);
       $plugin->incomingEvent($event);
     }

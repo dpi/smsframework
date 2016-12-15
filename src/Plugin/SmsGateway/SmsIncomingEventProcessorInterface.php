@@ -7,7 +7,7 @@ use Drupal\sms\Event\SmsMessageEvent;
 /**
  * Interface for gateways implementing an incoming event subscriber.
  */
-interface SmsIncomingEventInterface {
+interface SmsIncomingEventProcessorInterface {
 
   /**
    * Process a SMS message from this gateway.
