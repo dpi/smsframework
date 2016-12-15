@@ -99,7 +99,7 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventInterface {
     \Drupal::state()->set('sms_test_gateway.memory.incoming', TRUE);
 
     $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
-    $execution_order[] = __FUNCTION__;
+    $execution_order[] = __METHOD__;
     \Drupal::state()->set('sms_test_event_subscriber__execution_order', $execution_order);
   }
 
