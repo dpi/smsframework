@@ -28,13 +28,6 @@ class SmsFrameworkIncomingRouteTest extends SmsFrameworkKernelBase {
   protected $routeProvider;
 
   /**
-   * The HTTP client.
-   *
-   * @var \GuzzleHttp\Client
-   */
-  protected $httpClient;
-
-  /**
    * An incoming gateway instance.
    *
    * @var \Drupal\sms\Entity\SmsGatewayInterface
@@ -47,8 +40,6 @@ class SmsFrameworkIncomingRouteTest extends SmsFrameworkKernelBase {
   protected function setUp() {
     parent::setUp();
     $this->routeProvider = $this->container->get('router.route_provider');
-    $this->httpClient = $this->container->get('http_client');
-    $this->incomingGateway = $this->createMemoryGateway(['plugin' => 'incoming']);
   }
 
   /**
@@ -65,7 +56,8 @@ class SmsFrameworkIncomingRouteTest extends SmsFrameworkKernelBase {
    * Tests route exists for gateway with incoming route annotation.
    */
   public function testIncomingRoute() {
-    $route = 'sms.incoming.receive.' . $this->incomingGateway->id();
+    $incoming_gateway = $this->createMemoryGateway(['plugin' => 'incoming']);
+    $route = 'sms.incoming.receive.' . $incoming_gateway->id();
     $this->routeProvider->getRouteByName($route);
   }
 

@@ -10,7 +10,7 @@ use Drupal\sms\Provider\SmsProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Provides delivery reports acknowledgement and passes to the correct gateway.
+ * Provides a controller for receiving incoming messages.
  */
 class SmsIncomingController extends ControllerBase {
 
@@ -29,7 +29,7 @@ class SmsIncomingController extends ControllerBase {
   protected $smsProvider;
 
   /**
-   * Creates an incoming route controller
+   * Creates an incoming route controller.
    *
    * @param \Drupal\Core\Controller\ControllerResolverInterface $controller_resolver
    *   The controller resolver.
