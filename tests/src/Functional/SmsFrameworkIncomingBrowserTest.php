@@ -5,7 +5,7 @@ namespace Drupal\Tests\sms\Functional;
 use Drupal\Core\Url;
 
 /**
- * Tests manage event access page.
+ * Tests incoming route endpoint.
  *
  * @group SMS Framework
  */
