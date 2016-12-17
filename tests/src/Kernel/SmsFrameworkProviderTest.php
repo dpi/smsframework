@@ -121,7 +121,6 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::INCOMING)
       ->setMessage($message)
-      ->addRecipients($this->randomPhoneNumbers())
       ->setGateway($this->gateway);
     $sms_message->setResult($this->createMessageResult($sms_message));
 
@@ -151,6 +150,26 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $messages = $this->getIncomingMessages($this->incomingGateway);
     $this->assertEquals(1, count($messages), 'Message was added to incoming queue without direction being explicitly set');
     $this->assertEquals(Direction::INCOMING, $messages[0]->getDirection(), 'Message direction set to incoming.');
+  }
+
+  /**
+   * Ensures incoming message without recipients do not trigger exception.
+   */
+  public function testIncomingNoRecipients() {
+    $this->incomingGateway
+      ->setSkipQueue(TRUE)
+      ->save();
+
+    $sms_message = SmsMessage::create()
+      ->setMessage($this->randomString())
+      ->setGateway($this->incomingGateway)
+      ->setDirection(Direction::INCOMING);
+    $sms_message->setResult($this->createMessageResult($sms_message));
+
+    $this->smsProvider->queue($sms_message);
+
+    $messages = $this->getIncomingMessages($this->incomingGateway);
+    $this->assertEquals(1, count($messages), 'Message was added to incoming queue without recipients.');
   }
 
   /**
