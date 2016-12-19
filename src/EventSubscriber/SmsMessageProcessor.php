@@ -144,9 +144,11 @@ class SmsMessageProcessor implements EventSubscriberInterface {
     $sms_messages = $event->getMessages();
 
     foreach ($sms_messages as $sms_message) {
-      $recipients = $sms_message->getRecipients();
-      if (!count($recipients)) {
-        throw new RecipientRouteException(sprintf('There are no recipients.'));
+      if ($sms_message->getDirection() == Direction::OUTGOING) {
+        $recipients = $sms_message->getRecipients();
+        if (!count($recipients)) {
+          throw new RecipientRouteException(sprintf('There are no recipients.'));
+        }
       }
     }
   }

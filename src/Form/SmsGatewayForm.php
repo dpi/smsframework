@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginManagerInterface;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Direction;
+use Drupal\Component\Utility\NestedArray;
 
 /**
  * Form controller for SMS Gateways.
@@ -185,6 +186,33 @@ class SmsGatewayForm extends EntityForm {
       '#min' => -1,
     ];
 
+    $form['incoming_messages'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Incoming messages'),
+      '#open' => TRUE,
+      '#optional' => TRUE,
+      '#tree' => TRUE,
+    ];
+    $form['incoming_messages']['push_path'] = [
+      '#type' => 'textfield',
+      '#title' => t('Pushed messages url'),
+      '#default_value' => $sms_gateway->getPushIncomingPath(),
+      '#description' => t('The path where incoming messages are received.'),
+      '#size' => 60,
+      '#field_prefix' => $this->requestContext->getCompleteBaseUrl(),
+      '#access' => !$sms_gateway->isNew() ? $sms_gateway->autoCreateIncomingRoute() : TRUE,
+      '#group' => 'incoming_messages',
+    ];
+
+    // Don't check for incoming support yet, plugin type unknown.
+    if (!$sms_gateway->isNew()) {
+      // Remove optional tag so the plain text element is shown.
+      $form['incoming_messages']['#optional'] = FALSE;
+      if (!$sms_gateway->supportsIncoming()) {
+        $form['incoming_messages']['unsupported']['#plain_text'] = $this->t('This gateway does not support receiving messages.');
+      }
+    }
+
     $form['delivery_reports'] = [
       '#type' => 'details',
       '#title' => $this->t('Delivery reports'),
@@ -229,17 +257,24 @@ class SmsGatewayForm extends EntityForm {
         ->validateConfigurationForm($form, $form_state);
     }
 
-    // Delivery report path.
-    $reports_push_path = $form_state->getValue(['delivery_reports', 'push_path']);
-    $reports_push_path_length = Unicode::strlen($reports_push_path);
+    $path_elements_parents = [
+      ['incoming_messages', 'push_path'],
+      ['delivery_reports', 'push_path'],
+    ];
 
-    // Length must be more than 2 characters, including leading slash character.
-    if ($reports_push_path_length > 0) {
-      if (Unicode::substr($reports_push_path, 0, 1) !== '/') {
-        $form_state->setError($form['delivery_reports']['push_path'], $this->t("Path must begin with a '/' character."));
-      }
-      if ($reports_push_path_length == 1) {
-        $form_state->setError($form['delivery_reports']['push_path'], $this->t("Not enough characters for path."));
+    foreach ($path_elements_parents as $parents) {
+      $element = NestedArray::getValue($form, $parents);
+      $path = $form_state->getValue($parents);
+      $path_length = Unicode::strlen($path);
+
+      // Length must be more than 2 characters, including leading slash character.
+      if ($path_length > 0) {
+        if (Unicode::substr($path, 0, 1) !== '/') {
+          $form_state->setError($element, $this->t("Path must begin with a '/' character."));
+        }
+        if ($path_length == 1) {
+          $form_state->setError($element, $this->t("Not enough characters for path."));
+        }
       }
     }
   }
@@ -265,18 +300,22 @@ class SmsGatewayForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
     $sms_gateway = $this->getEntity();
+
+    $incoming_push_path_original = $sms_gateway->getPushIncomingPath();
+    $incoming_push_path = $form_state->getValue(['incoming_messages', 'push_path']);
     $reports_push_path_original = $sms_gateway->getPushReportPath();
     $reports_push_path = $form_state->getValue(['delivery_reports', 'push_path']);
 
     $sms_gateway
       ->setStatus($form_state->getValue('status'))
-      ->setPushReportPath($reports_push_path);
+      ->setPushReportPath($reports_push_path)
+      ->setPushIncomingPath($incoming_push_path);
 
     $saved = $sms_gateway->save();
 
     if ($saved == SAVED_NEW) {
       drupal_set_message($this->t('Gateway created.'));
-      $rebuild = !empty($reports_push_path);
+      $rebuild = !empty($incoming_push_path) || !empty($reports_push_path);
 
       // Redirect to edit form.
       $form_state->setRedirectUrl(Url::fromRoute('entity.sms_gateway.edit_form', [
@@ -285,8 +324,11 @@ class SmsGatewayForm extends EntityForm {
     }
     else {
       drupal_set_message($this->t('Gateway saved.'));
-      // Only rebuild routes if the path was changed.
-      $rebuild = $reports_push_path_original != $reports_push_path;
+
+      // Only rebuild routes if the paths changed.
+      $rebuild_incoming = $incoming_push_path_original != $incoming_push_path;
+      $rebuild_reports = $reports_push_path_original != $reports_push_path;
+      $rebuild = $rebuild_incoming || $rebuild_reports;
 
       // Back to list page.
       $form_state->setRedirect('sms.gateway.list');
