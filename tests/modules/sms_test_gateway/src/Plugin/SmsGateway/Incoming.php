@@ -59,16 +59,13 @@ class Incoming extends SmsGatewayPluginBase {
 
     $messages = [];
     foreach ($raw_messages as $raw_message) {
-      $reports = array_map(
-        function($recipient) {
-          return (new SmsDeliveryReport())
-            ->setRecipient($recipient);
-        },
-        $raw_message['recipients']
-      );
+      $result = new SmsMessageResult();
 
-      $result = (new SmsMessageResult())
-        ->setReports($reports);
+      foreach ($raw_message['recipients'] as $recipient) {
+        $report = (new SmsDeliveryReport())
+          ->setRecipient($recipient);
+        $result->addReport($report);
+      }
 
       $message = (new SmsMessage())
         ->setDirection(Direction::INCOMING)

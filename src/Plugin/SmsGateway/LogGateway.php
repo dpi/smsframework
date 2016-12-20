@@ -68,17 +68,17 @@ class LogGateway extends SmsGatewayPluginBase implements ContainerFactoryPluginI
       '@message' => $sms->getMessage(),
     ]);
 
-    $reports = [];
+    $result = new SmsMessageResult();
     foreach ($sms->getRecipients() as $number) {
-      $reports[] = (new SmsDeliveryReport())
+      $report = (new SmsDeliveryReport())
         ->setRecipient($number)
         ->setStatus(SmsMessageReportStatus::DELIVERED)
         ->setStatusMessage('DELIVERED')
         ->setTimeDelivered(REQUEST_TIME);
+      $result->addReport($report);
     }
 
-    return (new SmsMessageResult())
-      ->setReports($reports);
+    return $result;
   }
 
 }
