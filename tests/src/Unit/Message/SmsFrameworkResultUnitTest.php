@@ -52,11 +52,11 @@ class SmsFrameworkResultUnitTest extends UnitTestCase {
   }
 
   /**
-   * Tests get result.
+   * Tests get report for a recipient.
    *
    * @covers ::getReport
    */
-  public function testGetResult() {
+  public function testGetReport() {
     $result = $this->createResult();
     $recipient = '123123123';
     $this->assertNull($result->getReport($recipient), 'No report found');
@@ -86,6 +86,25 @@ class SmsFrameworkResultUnitTest extends UnitTestCase {
     $reports = $result->getReports();
     $this->assertEquals(1, count($reports));
     $this->assertTrue($reports[0] instanceof SmsDeliveryReportInterface);
+  }
+
+  /**
+   * Tests adding report to result.
+   *
+   * @covers ::addReport
+   */
+  public function testAddReport() {
+    $result = $this->createResult();
+
+    $this->assertEquals(0, count($result->getReports()), 'There are zero reports.');
+
+    $report = (new SmsDeliveryReport())
+      ->setRecipient('123123123');
+
+    $return = $result->addReport($report);
+    $this->assertTrue($return instanceof SmsMessageResultInterface, 'Return type is a result object');
+
+    $this->assertEquals(1, count($result->getReports()), 'There is one report.');
   }
 
   /**
