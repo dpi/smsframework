@@ -84,6 +84,17 @@ interface SmsMessageResultInterface {
   public function setReports(array $reports);
 
   /**
+   * Adds a delivery report to the result.
+   *
+   * @param \Drupal\sms\Message\SmsDeliveryReportInterface $report
+   *   A delivery report.
+   *
+   * @return $this
+   *   Returns this result object for chaining.
+   */
+  public function addReport(SmsDeliveryReportInterface $report);
+
+  /**
    * Gets the credit balance after this transaction.
    *
    * @return float|NULL

@@ -108,6 +108,14 @@ class SmsMessageResult implements SmsMessageResultInterface {
   /**
    * {@inheritdoc}
    */
+  public function addReport(SmsDeliveryReportInterface $report) {
+    $this->reports[] = $report;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCreditsBalance() {
     return $this->creditsBalance;
   }
