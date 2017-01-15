@@ -516,6 +516,10 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
       ->addRecipients($sms_message->getRecipients())
       ->setMessage($sms_message->getMessage());
 
+    if ($gateway = $sms_message->getGateway()) {
+      $new->setGateway($gateway);
+    }
+
     if ($uid = $sms_message->getUid()) {
       $new->setUid($uid);
     }
