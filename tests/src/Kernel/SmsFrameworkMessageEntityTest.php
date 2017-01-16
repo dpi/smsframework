@@ -239,6 +239,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $original = new StandardSmsMessage('', [], '', [], NULL);
     $original
       ->setAutomated(TRUE)
+      ->setSender($this->randomMachineName())
       ->setSenderNumber($sender_number[0])
       ->addRecipients(['123123123', '456456456'])
       ->setMessage($this->randomMachineName())
@@ -250,6 +251,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $sms_message = SmsMessage::convertFromSmsMessage($original);
 
     $this->assertEquals($original->isAutomated(), $sms_message->isAutomated());
+    $this->assertEquals($original->getSender(), $sms_message->getSender());
     $this->assertEquals($original->getSenderNumber(), $sms_message->getSenderNumber());
     $this->assertEquals($original->getRecipients(), $sms_message->getRecipients());
     $this->assertEquals($original->getMessage(), $sms_message->getMessage());

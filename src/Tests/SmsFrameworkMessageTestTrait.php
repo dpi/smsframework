@@ -16,6 +16,16 @@ use Drupal\sms\Message\SmsMessageResult;
 trait SmsFrameworkMessageTestTrait {
 
   /**
+   * Tests sender name.
+   */
+  public function testSender() {
+    $sender = $this->randomMachineName();
+    $sms_message = $this->createSmsMessage();
+    $sms_message->setSender($sender);
+    $this->assertEquals($sender, $sms_message->getSender());
+  }
+
+  /**
    * Tests sender phone number.
    *
    * @covers ::getSenderNumber

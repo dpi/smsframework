@@ -164,6 +164,25 @@ interface SmsMessageInterface {
   public function setResult(SmsMessageResultInterface $result = NULL);
 
   /**
+   * Gets the name of the sender of this SMS message.
+   *
+   * @return string|NULL
+   *   The name of the sender, or NULL if none is defined.
+   */
+  public function getSender();
+
+  /**
+   * Set the name of the sender of this SMS message.
+   *
+   * @param string|NULL $sender
+   *   The name of the sender.
+   *
+   * @return $this
+   *   The called SMS message object.
+   */
+  public function setSender($sender);
+
+  /**
    * Get phone number of the sender.
    *
    * @return string

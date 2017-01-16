@@ -12,25 +12,6 @@ use Drupal\Core\Entity\EntityInterface;
 interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInterface {
 
   /**
-   * Gets the name of the sender of this SMS message.
-   *
-   * @return string|NULL
-   *   The name of the sender, or NULL if none is defined.
-   */
-  public function getSender();
-
-  /**
-   * Set the name of the sender of this SMS message.
-   *
-   * @param string $sender
-   *   The name of the sender.
-   *
-   * @return $this
-   *   The called SMS message object.
-   */
-  public function setSender($sender);
-
-  /**
    * Gets the entity who sent the SMS message.
    *
    * @return \Drupal\Core\Entity\EntityInterface|NULL

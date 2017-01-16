@@ -17,6 +17,13 @@ class SmsMessage implements SmsMessageInterface {
   protected $uuid;
 
   /**
+   * The sender's name.
+   *
+   * @var string|NULL
+   */
+  protected $senderName;
+
+  /**
    * The senders' phone number.
    *
    * @var string
@@ -104,6 +111,21 @@ class SmsMessage implements SmsMessageInterface {
     $this->options = $options;
     $this->setUid($uid);
     $this->uuid = $this->uuidGenerator()->generate();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSender() {
+    return $this->senderName;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSender($sender) {
+    $this->senderName = $sender;
+    return $this;
   }
 
   /**
