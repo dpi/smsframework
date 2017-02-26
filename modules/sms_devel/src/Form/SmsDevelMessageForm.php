@@ -64,6 +64,110 @@ class SmsDevelMessageForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $results = $form_state->getTemporaryValue('results');
+    if ($results) {
+      $form['results'] = [
+        '#type' => 'table',
+        '#caption' => $this->t('<h2>Results</h2>'),
+        '#header' => [
+          $this->t('Result'),
+          $this->t('Error'),
+          $this->t('Error Message'),
+          $this->t('Credits Used'),
+          $this->t('Credits Balance'),
+        ],
+      ];
+
+      /** @var \Drupal\sms\Message\SmsMessageResultInterface[] $results */
+      foreach ($results as $i => $result) {
+        $row = [];
+        $row[]['#plain_text'] = t("#@number", ['@number' => $i]);
+
+        $error = $result->getError();
+        if ($error) {
+          $row[]['#plain_text'] = $error;
+        }
+        else {
+          $row[]['#markup'] = t('<em>Success</em>');
+        }
+
+        $other_values = [
+          $result->getErrorMessage(),
+          $result->getCreditsUsed(),
+          $result->getCreditsBalance(),
+        ];
+
+        foreach ($other_values as $other_value) {
+          if (!empty($other_value)) {
+            $row[]['#plain_text'] = $other_value;
+          }
+          else {
+            $row[]['#markup'] = t('<em>Undefined</em>');
+          }
+        }
+
+        $form['results'][] = $row;
+
+        $reports_cell = [
+          '#type' => 'table',
+          '#header' => [
+            $this->t('Recipient'),
+            $this->t('Message ID'),
+            $this->t('Status'),
+            $this->t('Status Message'),
+            $this->t('Time Delivered'),
+            $this->t('Time Queued'),
+          ],
+        ];
+        foreach ($result->getReports() as $report) {
+          $row = [];
+
+          $row[]['#plain_text'] = $report->getRecipient();
+
+          $values = [
+            $report->getMessageId(),
+            $report->getStatus(),
+            $report->getStatusMessage()
+          ];
+          foreach ($values as $value) {
+            if (!empty($value)) {
+              $row[]['#plain_text'] = $value;
+            }
+            else {
+              $row[]['#markup'] = t('<em>Undefined</em>');
+            }
+          }
+
+          $time_delivered = $report->getTimeDelivered();
+          if ($time_delivered) {
+            $date = DrupalDateTime::createFromTimestamp($time_delivered);
+            $row[]['#plain_text'] = $date->format('c');
+          }
+          else {
+            $row[]['#markup'] = t('<em>Undefined</em>');
+          }
+
+          $time_queued = $report->getTimeQueued();
+          if ($time_queued) {
+            $date = DrupalDateTime::createFromTimestamp($time_queued);
+            $row[]['#plain_text'] = $date->format('c');
+          }
+          else {
+            $row[]['#markup'] = t('<em>Undefined</em>');
+          }
+
+          $reports_cell[] = $row;
+        }
+
+        $form['results'][][] = [
+          '#wrapper_attributes' => [
+            'colspan' => count($form['results']['#header']),
+          ],
+          'data' => $reports_cell,
+        ];
+      }
+    }
+
     $form['number'] = [
       '#type' => 'tel',
       '#title' => $this->t('Phone number'),
@@ -206,10 +310,14 @@ class SmsDevelMessageForm extends FormBase {
     try {
       if ($form_state->getValue('skip_queue')) {
         $messages = $this->smsProvider->send($this->message);
+        $results = [];
         foreach ($messages as $message) {
           $result = $message->getResult();
           $this->resultMessage($result);
+          $results[] = $result;
         }
+        $form_state->setTemporaryValue('results', $results);
+        $form_state->setRebuild();
       }
       else {
         $this->smsProvider->queue($this->message);
