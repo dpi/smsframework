@@ -19,7 +19,7 @@ interface PhoneNumberProviderInterface {
    *   Whether the returned phone numbers must be verified, or NULL to get all
    *   phone numbers regardless of status.
    *
-   * @return string[int]
+   * @return string[]
    *   An array of phone numbers, keyed by original field item index.
    *
    * @throws \Drupal\sms\Exception\PhoneNumberSettingsException
