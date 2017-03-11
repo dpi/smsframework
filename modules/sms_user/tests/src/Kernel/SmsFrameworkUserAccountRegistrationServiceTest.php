@@ -547,7 +547,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Count number of registered users.
    *
-   * @return \Drupal\user\UserInterface|NULL
+   * @return \Drupal\user\UserInterface|null
    *   Get last created user, or NULL if no users in database.
    */
   protected function getLastUser() {

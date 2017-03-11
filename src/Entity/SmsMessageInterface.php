@@ -14,7 +14,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
   /**
    * Gets the entity who sent the SMS message.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|NULL
+   * @return \Drupal\Core\Entity\EntityInterface|null
    *   The entity who sent the SMS message, or NULL if it is missing.
    */
   public function getSenderEntity();
@@ -33,7 +33,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
   /**
    * Gets the entity who will receive the SMS message.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|NULL
+   * @return \Drupal\Core\Entity\EntityInterface|null
    *   The entity who will receive the SMS message, or NULL if it is missing.
    */
   public function getRecipientEntity();
@@ -101,7 +101,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * This value does not indicate whether the message was sent, only that the
    * gateway accepted the request.
    *
-   * @return int|NULL
+   * @return int|null
    *   The timestamp when SMS message was processed, or NULL if not processed.
    */
   public function getProcessedTime();

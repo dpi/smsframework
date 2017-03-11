@@ -32,7 +32,7 @@ interface ActiveHoursInterface {
    *   A time or strtotime() relative string localised to the users timezone.
    *   Defaults to current time for the user.
    *
-   * @return \Drupal\sms_user\ActiveHoursDates|FALSE
+   * @return \Drupal\sms_user\ActiveHoursDates|false
    *   A date pair, or FALSE if no next date could be determined.
    */
   public function findNextTime(UserInterface $user, $now = 'now');

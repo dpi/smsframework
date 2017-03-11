@@ -18,7 +18,7 @@ interface PhoneNumberVerificationInterface {
    * @param string $bundle
    *   An entity bundle.
    *
-   * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|NULL
+   * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|null
    *   A phone number settings entity, or NULL if it does not exist.
    */
   public function getPhoneNumberSettings($entity_type_id, $bundle);
@@ -29,7 +29,7 @@ interface PhoneNumberVerificationInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to get settings.
    *
-   * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|NULL
+   * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|null
    *   A phone number settings entity, or NULL if it does not exist.
    *
    * @throws \Drupal\sms\Exception\PhoneNumberSettingsException
@@ -43,7 +43,7 @@ interface PhoneNumberVerificationInterface {
    * @param string $code
    *   A string to check is a verification code.
    *
-   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|FALSE
+   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|false
    *   A phone number verification entity, or FALSE if $code is not a valid
    *   verification code.
    */
@@ -59,7 +59,7 @@ interface PhoneNumberVerificationInterface {
    *
    * @param string $phone_number
    *   A phone number.
-   * @param bool|NULL $verified
+   * @param bool|null $verified
    *   Whether the returned phone numbers must be verified, or NULL to get all
    *   regardless of status.
    * @param string $entity_type
@@ -78,7 +78,7 @@ interface PhoneNumberVerificationInterface {
    * @param string $phone_number
    *   A phone number.
    *
-   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|NULL
+   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|null
    *   The phone number verification for an entity and phone number pair.
    */
   public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number);
@@ -94,7 +94,7 @@ interface PhoneNumberVerificationInterface {
    * @param string $phone_number
    *   A phone number.
    *
-   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|NULL
+   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|null
    *   A phone number verification.
    */
   public function newPhoneVerification(EntityInterface $entity, $phone_number);

@@ -92,7 +92,7 @@ class SmsFrameworkPhoneNumberTest extends SmsFrameworkWebTestBase {
   /**
    * Count verification codes in database.
    *
-   * @param \Drupal\Core\Entity\EntityInterface|NULL $entity
+   * @param \Drupal\Core\Entity\EntityInterface|null $entity
    *   The entity to count verification codes for, or NULL to count all codes.
    *
    * @return int
