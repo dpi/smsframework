@@ -10,7 +10,7 @@ interface SmsMessageResultInterface {
   /**
    * Gets the error of the message.
    *
-   * @return string|NULL
+   * @return string|null
    *   A error code from \Drupal\sms\Message\SmsMessageResultError, or NULL if
    *   there was no error.
    */
@@ -22,7 +22,7 @@ interface SmsMessageResultInterface {
    * Usually a setting an error on a result indicates something went wrong with
    * the entire transaction.
    *
-   * @param string|NULL $error
+   * @param string|null $error
    *   A error code from \Drupal\sms\Message\SmsMessageResultError, or NULL if
    *   unknown.
    *
@@ -56,7 +56,7 @@ interface SmsMessageResultInterface {
    * @param string $recipient
    *   The number of the recipient for which the report is to be retrieved.
    *
-   * @return \Drupal\sms\Message\SmsDeliveryReportInterface|NULL
+   * @return \Drupal\sms\Message\SmsDeliveryReportInterface|null
    *   A delivery report object, or NULL if there is no report for the
    *   recipient.
    *
@@ -97,7 +97,7 @@ interface SmsMessageResultInterface {
   /**
    * Gets the credit balance after this transaction.
    *
-   * @return float|NULL
+   * @return float|null
    *   The credit balance after the message is processed, or NULL if unknown.
    */
   public function getCreditsBalance();
@@ -105,7 +105,7 @@ interface SmsMessageResultInterface {
   /**
    * Sets the credit balance after this transaction.
    *
-   * @param float|NULL $balance
+   * @param float|null $balance
    *   The credit balance after the message is processed, or NULL if unknown.
    *
    * @return $this
@@ -119,7 +119,7 @@ interface SmsMessageResultInterface {
   /**
    * Gets the credits consumed for this transaction.
    *
-   * @return float|NULL
+   * @return float|null
    *   The credits consumed for this transaction, or NULL if unknown.
    */
   public function getCreditsUsed();
@@ -127,7 +127,7 @@ interface SmsMessageResultInterface {
   /**
    * Sets the credits consumed for this transaction.
    *
-   * @param float|NULL $credits_used
+   * @param float|null $credits_used
    *   The credits consumed for this transaction, or NULL if unknown.
    *
    * @return $this

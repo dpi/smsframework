@@ -355,7 +355,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    *
    * @param \Drupal\Core\Entity\EntityConstraintViolationListInterface $violations
    *   A violation list.
-   * @param string|NULL $incoming_form
+   * @param string|null $incoming_form
    *   Incoming form, if applicable.
    *
    * @return \Drupal\Core\Entity\EntityConstraintViolationListInterface
@@ -382,7 +382,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @param string $name
    *   The configuration name.
    *
-   * @return array|NULL
+   * @return array|null
    *   The values for the requested configuration.
    */
   protected function settings($name) {

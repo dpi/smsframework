@@ -116,7 +116,7 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
    * @param string $map
    *   ID to map field name, as found in sms.phone.*.*.fields.$map.
    *
-   * @return string|NULL
+   * @return string|null
    *   A field name, or NULL if not set.
    */
   public function getFieldName($map);
@@ -126,7 +126,7 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
    *
    * @param string $map
    *   ID to map field name, as found in sms.phone.*.*.fields.$map.
-   * @param string|NULL $field_name
+   * @param string|null $field_name
    *   A field name, or NULL to unset.
    *
    * @return $this

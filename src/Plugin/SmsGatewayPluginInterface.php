@@ -31,7 +31,7 @@ interface SmsGatewayPluginInterface extends ConfigurablePluginInterface, PluginF
    * The 'credit_balance_available' plugin annotation should be set to inform
    * the framework whether this gateway supports balance queries.
    *
-   * @return float|NULL
+   * @return float|null
    *   The credit balance of the gateway, or NULL if unknown.
    */
   public function getCreditsBalance();
@@ -56,7 +56,7 @@ interface SmsGatewayPluginInterface extends ConfigurablePluginInterface, PluginF
   /**
    * Gets delivery reports from the gateway.
    *
-   * @param string[]|NULL $message_ids
+   * @param string[]|null $message_ids
    *   A list of specific message ID's to pull, or NULL to get any reports which
    *   have not been requested previously.
    *

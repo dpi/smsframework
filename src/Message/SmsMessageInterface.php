@@ -64,7 +64,7 @@ interface SmsMessageInterface {
   /**
    * Get the gateway for this message.
    *
-   * @return \Drupal\sms\Entity\SmsGatewayInterface|NULL
+   * @return \Drupal\sms\Entity\SmsGatewayInterface|null
    *   A gateway plugin instance, or NULL to let the provider decide.
    */
   public function getGateway();
@@ -145,7 +145,7 @@ interface SmsMessageInterface {
   /**
    * Get the result associated with this SMS message.
    *
-   * @return \Drupal\sms\Message\SmsMessageResultInterface|NULL
+   * @return \Drupal\sms\Message\SmsMessageResultInterface|null
    *   The result associated with this SMS message, or NULL if there is no
    *   result.
    */
@@ -154,7 +154,7 @@ interface SmsMessageInterface {
   /**
    * Set the result associated with this SMS message.
    *
-   * @param \Drupal\sms\Message\SmsMessageResultInterface|NULL $result
+   * @param \Drupal\sms\Message\SmsMessageResultInterface|null $result
    *   The result to associate with this SMS message, or NULL if there is no
    *   result.
    *
@@ -166,7 +166,7 @@ interface SmsMessageInterface {
   /**
    * Gets the name of the sender of this SMS message.
    *
-   * @return string|NULL
+   * @return string|null
    *   The name of the sender, or NULL if none is defined.
    */
   public function getSender();
@@ -174,7 +174,7 @@ interface SmsMessageInterface {
   /**
    * Set the name of the sender of this SMS message.
    *
-   * @param string|NULL $sender
+   * @param string|null $sender
    *   The name of the sender.
    *
    * @return $this
@@ -231,7 +231,7 @@ interface SmsMessageInterface {
   /**
    * Gets the user who created the SMS message.
    *
-   * @return int|NULL
+   * @return int|null
    *   The ID of the user who created the message. Or NULL if no user entity is
    *   associated as the sender.
    */

@@ -167,7 +167,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    *
-   * @param string|NULL $sender
+   * @param string|null $sender
    *   The name of the sender. Or NULL to defer to the label of the sender
    *   entity.
    *

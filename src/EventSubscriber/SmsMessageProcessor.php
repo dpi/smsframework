@@ -215,7 +215,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    * @param string $recipient
    *   A recipient phone number.
    *
-   * @return \Drupal\sms\Entity\SmsGatewayInterface|NULL
+   * @return \Drupal\sms\Entity\SmsGatewayInterface|null
    *   A gateway for the phone number, or NULL if there is no gateway.
    */
   protected function getGatewayForPhoneNumber($recipient) {

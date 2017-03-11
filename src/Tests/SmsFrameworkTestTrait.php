@@ -73,7 +73,7 @@ trait SmsFrameworkTestTrait {
    * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
    *   A gateway plugin.
    *
-   * @return \Drupal\sms\Message\SmsMessageInterface|FALSE
+   * @return \Drupal\sms\Message\SmsMessageInterface|false
    *   The last SMS message, or FALSE if no messages have been sent.
    */
   public function getLastTestMessage(SmsGatewayInterface $sms_gateway) {
@@ -85,7 +85,7 @@ trait SmsFrameworkTestTrait {
   /**
    * Resets SMS messages stored in memory by 'Memory' gateway.
    *
-   * @param \Drupal\sms\Entity\SmsGatewayInterface|NULL $sms_gateway
+   * @param \Drupal\sms\Entity\SmsGatewayInterface|null $sms_gateway
    *   A gateway plugin, or NULL to reset all messages.
    */
   public function resetTestMessages(SmsGatewayInterface $sms_gateway = NULL) {
@@ -120,7 +120,7 @@ trait SmsFrameworkTestTrait {
    * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
    *   A gateway plugin.
    *
-   * @return \Drupal\sms\Message\SmsMessageInterface|FALSE
+   * @return \Drupal\sms\Message\SmsMessageInterface|false
    *   The last message, or FALSE if no messages were received.
    */
   protected function getLastIncomingMessage(SmsGatewayInterface $sms_gateway) {
@@ -132,7 +132,7 @@ trait SmsFrameworkTestTrait {
   /**
    * Resets incoming messages stored in memory by gateway.
    *
-   * @param \Drupal\sms\Entity\SmsGatewayInterface|NULL $sms_gateway
+   * @param \Drupal\sms\Entity\SmsGatewayInterface|null $sms_gateway
    *   A gateway plugin, or NULL to reset all messages.
    */
   protected function resetIncomingMessages(SmsGatewayInterface $sms_gateway = NULL) {
@@ -252,7 +252,7 @@ trait SmsFrameworkTestTrait {
   /**
    * Gets the last phone number verification that was created.
    *
-   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|FALSE
+   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|false
    *   The last verification created, or FALSE if no verifications exist.
    */
   protected function getLastVerification() {
@@ -307,7 +307,7 @@ trait SmsFrameworkTestTrait {
   /**
    * Generates random phone numbers for tests.
    *
-   * @param int|NULL $quantity
+   * @param int|null $quantity
    *   Quantity of phone numbers, or NULL to generate at least 2.
    *
    * @return array
