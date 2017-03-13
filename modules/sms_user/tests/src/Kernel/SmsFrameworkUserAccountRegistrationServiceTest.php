@@ -91,6 +91,8 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('sms');
+    $this->installEntitySchema('sms_result');
+    $this->installEntitySchema('sms_report');
     $this->installEntitySchema('sms_phone_number_verification');
 
     $this->phoneField = FieldStorageConfig::create([

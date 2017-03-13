@@ -287,6 +287,7 @@ trait SmsFrameworkTestTrait {
     );
 
     return (new SmsMessageResult())
+      ->setErrorMessage($this->randomString())
       ->setReports($reports);
   }
 

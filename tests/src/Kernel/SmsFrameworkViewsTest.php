@@ -58,6 +58,8 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('sms');
+    $this->installEntitySchema('sms_result');
+    $this->installEntitySchema('sms_report');
 
     $this->smsProvider = $this->container->get('sms.provider');
 

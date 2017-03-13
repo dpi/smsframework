@@ -66,6 +66,8 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     parent::setUp();
 
     $this->installEntitySchema('sms');
+    $this->installEntitySchema('sms_result');
+    $this->installEntitySchema('sms_report');
 
     $this->gateway = $this->createMemoryGateway();
     $this->incomingGateway = $this->createMemoryGateway(['plugin' => 'incoming']);

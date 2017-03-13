@@ -39,6 +39,13 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
   protected $statusMessage = '';
 
   /**
+   * The timestamp when the delivery report status was updated.
+   *
+   * @var int
+   */
+  protected $statusTime = NULL;
+
+  /**
    * The timestamp when the message was queued, or NULL if unknown.
    *
    * @var string|NULL
@@ -139,6 +146,21 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
    */
   public function setTimeDelivered($time) {
     $this->timeDelivered = $time;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getStatusTime() {
+    return $this->statusTime;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setStatusTime($time) {
+    $this->statusTime = $time;
     return $this;
   }
 

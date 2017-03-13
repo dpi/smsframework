@@ -348,4 +348,18 @@ class SmsMessage implements SmsMessageInterface {
     return $messages;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getReport($recipient) {
+    return $this->result ? $this->result->getReport($recipient) : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getReports() {
+    return $this->result ? $this->result->getReports() : [];
+  }
+
 }
