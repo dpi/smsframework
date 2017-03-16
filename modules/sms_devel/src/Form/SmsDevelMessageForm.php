@@ -167,17 +167,15 @@ class SmsDevelMessageForm extends FormBase {
    */
   public function submitReceive(array &$form, FormStateInterface $form_state) {
     $this->message->setDirection(Direction::INCOMING);
+    $result = new SmsMessageResult();
 
     // Create some fake reports.
-    $reports = array_map(
-      function($recipient) {
-        return (new SmsDeliveryReport())
-          ->setRecipient($recipient);
-      },
-      $this->message->getRecipients()
-    );
-    $result = (new SmsMessageResult())
-      ->setReports($reports);
+    foreach ($this->message->getRecipients() as $recipient) {
+      $report = (new SmsDeliveryReport())
+        ->setRecipient($recipient);
+      $result->addReport($report);
+    }
+
     $this->message->setResult($result);
 
     if ($form_state->getValue('skip_queue')) {

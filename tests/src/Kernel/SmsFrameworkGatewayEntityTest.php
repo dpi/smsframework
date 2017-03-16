@@ -68,6 +68,54 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   }
 
   /**
+   * Tests incoming message path.
+   */
+  public function testPushIncomingPath() {
+    $gateway = $this->createGateway(['plugin' => 'incoming']);
+
+    $path = $gateway->getPushIncomingPath();
+    $this->assertTrue(strpos($path, '/sms/incoming/receive/') === 0);
+
+    $new_path = '/' . $this->randomMachineName();
+    $return = $gateway->setPushIncomingPath($new_path);
+
+    $this->assertTrue($return instanceof SmsGatewayInterface);
+    $this->assertEquals($new_path, $gateway->getPushIncomingPath());
+  }
+
+  /**
+   * Tests 'incoming' annotation custom value.
+   */
+  public function testSupportsIncoming() {
+    $gateway = $this->createGateway(['plugin' => 'incoming']);
+    $this->assertTrue($gateway->supportsIncoming());
+  }
+
+  /**
+   * Tests 'incoming' annotation default value.
+   */
+  public function testNotSupportsIncoming() {
+    $gateway = $this->createGateway(['plugin' => 'capabilities_default']);
+    $this->assertFalse($gateway->supportsIncoming());
+  }
+
+  /**
+   * Tests 'incoming_route' annotation custom value.
+   */
+  public function testAutoCreateIncomingRoute() {
+    $gateway = $this->createGateway(['plugin' => 'incoming']);
+    $this->assertTrue($gateway->autoCreateIncomingRoute());
+  }
+
+  /**
+   * Tests 'incoming_route' annotation default value.
+   */
+  public function testNoAutoCreateIncomingRoute() {
+    $gateway = $this->createGateway(['plugin' => 'capabilities_default']);
+    $this->assertFalse($gateway->autoCreateIncomingRoute());
+  }
+
+  /**
    * Tests incoming report path.
    */
   public function testPushReportPath() {

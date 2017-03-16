@@ -88,6 +88,13 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   protected $skip_queue;
 
   /**
+   * The internal path where incoming messages are received.
+   *
+   * @var string
+   */
+  protected $incoming_push_path;
+
+  /**
    * The internal path where pushed delivery reports can be received.
    *
    * @var string
@@ -113,6 +120,10 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
    */
   public static function preCreate(EntityStorageInterface $storage, array &$values) {
     parent::preCreate($storage, $values);
+    if (!isset($values['incoming_push_path'])) {
+      $key = Crypt::randomBytesBase64(16);
+      $values['incoming_push_path'] = '/sms/incoming/receive/' . $key;
+    }
     if (!isset($values['reports_push_path'])) {
       $key = Crypt::randomBytesBase64(16);
       $values['reports_push_path'] = '/sms/delivery-report/receive/' . $key;
@@ -188,6 +199,21 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   /**
    * {@inheritdoc}
    */
+  public function getPushIncomingPath() {
+    return $this->incoming_push_path;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPushIncomingPath($path) {
+    $this->incoming_push_path = $path;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPushReportUrl() {
     return Url::fromRoute('sms.delivery_report.receive.' . $this->id());
   }
@@ -255,6 +281,15 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return isset($definition['incoming']) ? (boolean) $definition['incoming'] : FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function autoCreateIncomingRoute() {
+    $definition = $this->getPlugin()
+      ->getPluginDefinition();
+    return isset($definition['incoming_route']) ? (boolean) $definition['incoming_route'] : FALSE;
   }
 
   /**

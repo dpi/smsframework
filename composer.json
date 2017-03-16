@@ -1,5 +1,5 @@
 {
-  "name": "drupal/sms",
+  "name": "drupal/smsframework",
   "description": "Provides an extensible API that facilitates communication between Drupal and various SMS gateways.",
   "type": "drupal-module",
   "license": "GPL-2.0+",
@@ -21,11 +21,14 @@
     }
   ],
   "require": {
-    "drupal/core": "~8.0",
-    "drupal/dynamic_entity_reference": "~8.0",
-    "drupal/telephone": "~8.0"
+    "drupal/core": "^8.0",
+    "drupal/dynamic_entity_reference": "^1.0",
+    "drupal/telephone": "^8.0"
   },
-  "provide": {
-    "drupal/smsframework": "~8.0"
+  "replace": {
+    "drupal/sms_blast": "self.version",
+    "drupal/sms_devel": "self.version",
+    "drupal/sms_sendtophone": "self.version",
+    "drupal/sms_user": "self.version"
   }
 }

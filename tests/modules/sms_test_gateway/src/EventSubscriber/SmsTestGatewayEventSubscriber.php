@@ -27,7 +27,8 @@ class SmsTestGatewayEventSubscriber implements EventSubscriberInterface {
     $result = &drupal_static($key);
 
     if (!is_null($sms_message->getRecipients()) && !is_null($sms_message->getMessage())) {
-      $result['number'] = $sms_message->getRecipients()[0];
+      $recipients = $sms_message->getRecipients();
+      $result['number'] = count($recipients) ? reset($recipients) : NULL;
       $result['message'] = $sms_message->getMessage();
       \Drupal::state()->set($key, $result);
     }

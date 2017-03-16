@@ -3,6 +3,9 @@
 namespace Drupal\sms\Tests;
 
 use Drupal\sms\Direction;
+use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Message\SmsDeliveryReport;
+use Drupal\sms\Message\SmsMessageReportStatus;
 use Drupal\sms\Message\SmsMessageResult;
 
 /**
@@ -14,6 +17,16 @@ use Drupal\sms\Message\SmsMessageResult;
  * imported class.
  */
 trait SmsFrameworkMessageTestTrait {
+
+  /**
+   * Tests sender name.
+   */
+  public function testSender() {
+    $sender = $this->randomMachineName();
+    $sms_message = $this->createSmsMessage();
+    $sms_message->setSender($sender);
+    $this->assertEquals($sender, $sms_message->getSender());
+  }
 
   /**
    * Tests sender phone number.
@@ -174,22 +187,33 @@ trait SmsFrameworkMessageTestTrait {
   }
 
   /**
-   * Tests result for SMS messages.
+   * Tests result and reports for SMS messages.
    *
    * @covers ::getResult
    * @covers ::setResult
+   * @covers ::getReport
+   * @covers ::getReports
    */
   public function testResults() {
     $error_message = $this->getRandomGenerator()->string();
+    $recipients = ['2345678901', '1234567890'];
+    $reports = array_combine($recipients, array_map(function ($recipient) {
+      return (new SmsDeliveryReport())
+        ->setRecipient($recipient)
+        ->setStatus(SmsMessageReportStatus::DELIVERED);
+    }, $recipients));
     $result = (new SmsMessageResult())
-      ->setErrorMessage($error_message);
-
-    $sms_message = $this->createSmsMessage();
-    $sms_message->setResult($result);
+      ->setErrorMessage($error_message)
+      ->setReports($reports);
+    $sms_message = $this->createSmsMessage()
+      ->addRecipients($recipients)
+      ->setResult($result);
 
     $result_actual = $sms_message->getResult();
-    $this->assertSame($result, $result_actual);
-    $this->assertSame($error_message, $result_actual->getErrorMessage());
+    $this->assertEquals($error_message, $result_actual->getErrorMessage());
+    $this->assertEquals($result->getErrorMessage(), $result_actual->getErrorMessage());
+    $this->assertEquals($reports['1234567890']->getStatus(), $sms_message->getReport('1234567890')->getStatus());
+    $this->assertEquals($reports['2345678901']->getStatus(), $sms_message->getReport('2345678901')->getStatus());
   }
 
   /**

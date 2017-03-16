@@ -4,8 +4,13 @@ namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\sms\Direction;
+use Drupal\sms\Entity\SmsDeliveryReport;
+use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Entity\SmsMessageResult;
 use Drupal\sms\Message\SmsMessage as StandardSmsMessage;
 use Drupal\sms\Entity\SmsMessage;
+use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Tests\SmsFrameworkMessageTestTrait;
 use Drupal\sms\Tests\SmsFrameworkTestTrait;
 use Drupal\user\Entity\User;
@@ -39,6 +44,8 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   protected function setUp() {
     parent::setUp();
     $this->installEntitySchema('sms');
+    $this->installEntitySchema('sms_result');
+    $this->installEntitySchema('sms_report');
     $this->installEntitySchema('user');
     $this->installEntitySchema('entity_test');
   }
@@ -234,26 +241,38 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $user = User::create(['uid' => 1, 'name' => 'user']);
     $user->save();
 
+    $gateway = $this->createMemoryGateway();
     $sender_number = $this->randomPhoneNumbers(1);
     $original = new StandardSmsMessage('', [], '', [], NULL);
     $original
       ->setAutomated(TRUE)
+      ->setSender($this->randomMachineName())
       ->setSenderNumber($sender_number[0])
       ->addRecipients(['123123123', '456456456'])
       ->setMessage($this->randomMachineName())
       ->setUid($user->id())
+      ->setGateway($gateway)
       ->setOption('foo', $this->randomMachineName())
-      ->setOption('bar', $this->randomMachineName());
+      ->setOption('bar', $this->randomMachineName())
+      ->setResult($this->createMessageResult($original));
 
     $sms_message = SmsMessage::convertFromSmsMessage($original);
 
     $this->assertEquals($original->isAutomated(), $sms_message->isAutomated());
+    $this->assertEquals($original->getSender(), $sms_message->getSender());
     $this->assertEquals($original->getSenderNumber(), $sms_message->getSenderNumber());
     $this->assertEquals($original->getRecipients(), $sms_message->getRecipients());
     $this->assertEquals($original->getMessage(), $sms_message->getMessage());
     $this->assertEquals($user->id(), $sms_message->getSenderEntity()->id());
     $this->assertEquals($original->getOption('foo'), $sms_message->getOption('foo'));
     $this->assertEquals($original->getOption('bar'), $sms_message->getOption('bar'));
+    $this->assertEquals($original->getGateway(), $sms_message->getGateway());
+    $this->assertEquals($original->getResult()->getErrorMessage(), $sms_message->getResult()->getErrorMessage());
+    $this->assertEquals(count($original->getReports()), count($sms_message->getReports()));
+    $this->assertEquals($original->getReport('123123123')->getRecipient(),
+      $sms_message->getReport('123123123')->getRecipient());
+    $this->assertEquals($original->getReport('456456456')->getRecipient(),
+      $sms_message->getReport('456456456')->getRecipient());
   }
 
   /**
@@ -272,6 +291,69 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $sms_message = SmsMessage::convertFromSmsMessage($original);
     $this->assertEquals($original->getMessage(), $sms_message->getMessage());
     $this->assertEquals($original->getRecipientEntity(), $sms_message->getRecipientEntity());
+  }
+
+  /**
+   * Tests saving and retrieval of complete entity.
+   */
+  public function testSaveAndRetrieveSmsMessage() {
+    /** @var \Drupal\sms\Entity\SmsMessageInterface $sms_message */
+    $sms_message = SmsMessage::create()
+      ->setMessage($this->randomMachineName(100))
+      ->setSender($this->randomMachineName())
+      ->setDirection(Direction::OUTGOING)
+      ->addRecipients(['1234567890', '2345678901']);
+    $sms_message
+      ->setResult($this->createMessageResult($sms_message))
+      ->save();
+    $saved = SmsMessage::load($sms_message->id());
+    $this->assertEquals($sms_message->getMessage(), $saved->getMessage());
+    $this->assertEquals($sms_message->getSender(), $saved->getSender());
+    $this->assertEquals($sms_message->getDirection(), $saved->getDirection());
+    $this->assertEquals($sms_message->getRecipients(), $saved->getRecipients());
+    $this->assertEquals($sms_message->getResult()->getErrorMessage(), $saved->getResult()->getErrorMessage());
+    $this->assertEquals(count($sms_message->getReports()), count($saved->getReports()));
+    $this->assertEquals(2, count($sms_message->getReports()));
+  }
+
+  /**
+   * Tests that getResult returns null if no result is set.
+   *
+   * @covers ::getResult
+   */
+  public function testGetResultNoResult() {
+    $sms_message = SmsMessage::create();
+    $this->assertNull($sms_message->getResult());
+  }
+
+  /**
+   * Tests cascade delete on the SMS message, result and reports.
+   */
+  public function testCascadeDelete() {
+    /** @var \Drupal\sms\Entity\SmsMessageInterface $sms_message */
+    $sms_message = SmsMessage::create()
+      ->setMessage($this->getRandomGenerator()->paragraphs())
+      ->setGateway($this->createMemoryGateway())
+      ->addRecipients($this->randomPhoneNumbers())
+      ->setSender($this->randomMachineName());
+
+    $this->assertNull($sms_message->getResult());
+    $sms_result = $this->createMessageResult($sms_message);
+    $sms_message
+      ->setResult($sms_result)
+      ->save();
+    $sms_reports = $sms_result->getReports();
+
+    $this->assertInstanceOf(SmsMessageResultInterface::class, $sms_message->getResult());
+    $this->assertInstanceOf(SmsMessageInterface::class, SmsMessage::load($sms_message->id()));
+    $this->assertEquals(count($sms_reports), count(SmsDeliveryReport::loadMultiple()));
+
+    // Delete the message and confirm that all has been removed.
+    $sms_message->delete();
+
+    $this->assertNull(SmsMessage::load($sms_message->id()));
+    $this->assertEquals([], SmsMessageResult::loadMultiple());
+    $this->assertEquals([], SmsDeliveryReport::loadMultiple());
   }
 
 }

@@ -117,10 +117,16 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
       $new_report = (new SmsDeliveryReport())
         ->setRecipient($report['recipient'])
         ->setMessageId($message_id)
-        ->setStatus(SmsMessageReportStatus::DELIVERED)
+        ->setStatus($report['status'])
         ->setStatusMessage($report['status_message'])
-        ->setTimeQueued($report['time_sent'])
-        ->setTimeDelivered($report['time_delivered']);
+        ->setStatusTime($report['status_time']);
+      // Backfill the specific values.
+      if ($report['status'] === SmsMessageReportStatus::QUEUED) {
+        $new_report->setTimeQueued($report['status_time']);
+      }
+      if ($report['status'] === SmsMessageReportStatus::DELIVERED) {
+        $new_report->setTimeDelivered($report['status_time']);
+      }
 
       // Set separately since this method should not have meaningful keys.
       $return[] = $new_report;
@@ -154,15 +160,17 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
    */
   protected function randomDeliveryReports(SmsMessageInterface $sms_message) {
     $random = new Random();
+    $request_time = \Drupal::time()->getRequestTime();
     $reports = [];
     foreach ($sms_message->getRecipients() as $number) {
       $reports[] = (new SmsDeliveryReport())
         ->setRecipient($number)
         ->setMessageId($random->name(16))
         ->setStatus(SmsMessageReportStatus::QUEUED)
+        ->setStatusTime($request_time)
         ->setStatusMessage('Sent to memory gateway')
-        ->setTimeQueued(time())
-        ->setTimeDelivered(time() + rand(0, 10));
+        ->setTimeQueued($request_time)
+        ->setTimeDelivered($request_time + rand(0, 10));
     }
     return $reports;
   }

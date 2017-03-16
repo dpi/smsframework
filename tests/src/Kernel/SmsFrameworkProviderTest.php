@@ -66,11 +66,11 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     parent::setUp();
 
     $this->installEntitySchema('sms');
+    $this->installEntitySchema('sms_result');
+    $this->installEntitySchema('sms_report');
 
     $this->gateway = $this->createMemoryGateway();
-    // Incoming gateway should be set to 'incoming' when
-    // https://www.drupal.org/node/2832601 lands.
-    $this->incomingGateway = $this->createMemoryGateway(['plugin' => 'memory']);
+    $this->incomingGateway = $this->createMemoryGateway(['plugin' => 'incoming']);
     $this->smsStorage = $this->container->get('entity_type.manager')
       ->getStorage('sms');
     $this->smsProvider = $this->container->get('sms.provider');
@@ -123,7 +123,6 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::INCOMING)
       ->setMessage($message)
-      ->addRecipients($this->randomPhoneNumbers())
       ->setGateway($this->gateway);
     $sms_message->setResult($this->createMessageResult($sms_message));
 
@@ -153,6 +152,26 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $messages = $this->getIncomingMessages($this->incomingGateway);
     $this->assertEquals(1, count($messages), 'Message was added to incoming queue without direction being explicitly set');
     $this->assertEquals(Direction::INCOMING, $messages[0]->getDirection(), 'Message direction set to incoming.');
+  }
+
+  /**
+   * Ensures incoming message without recipients do not trigger exception.
+   */
+  public function testIncomingNoRecipients() {
+    $this->incomingGateway
+      ->setSkipQueue(TRUE)
+      ->save();
+
+    $sms_message = SmsMessage::create()
+      ->setMessage($this->randomString())
+      ->setGateway($this->incomingGateway)
+      ->setDirection(Direction::INCOMING);
+    $sms_message->setResult($this->createMessageResult($sms_message));
+
+    $this->smsProvider->queue($sms_message);
+
+    $messages = $this->getIncomingMessages($this->incomingGateway);
+    $this->assertEquals(1, count($messages), 'Message was added to incoming queue without recipients.');
   }
 
   /**
@@ -359,13 +378,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    * Test incoming messages do not get chunked.
    */
   public function testIncomingNotChunked() {
-    $gateway_chunked = SmsGateway::create([
-      'plugin' => 'memory_chunked',
-      'id' => 'memory_chunked',
-      'settings' => ['gateway_id' => 'memory_chunked'],
-    ]);
-    $gateway_chunked
-      ->enable()
+    $this->incomingGateway
       ->setSkipQueue(TRUE)
       ->save();
 
@@ -373,12 +386,12 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers())
       ->setDirection(Direction::INCOMING)
-      ->setGateway($gateway_chunked);
+      ->setGateway($this->incomingGateway);
     $message->setResult($this->createMessageResult($message));
 
     $this->smsProvider->queue($message);
 
-    $incoming_messages = $this->getIncomingMessages($gateway_chunked);
+    $incoming_messages = $this->getIncomingMessages($this->incomingGateway);
     $this->assertEquals(1, count($incoming_messages), 'There is one incoming message.');
   }
 

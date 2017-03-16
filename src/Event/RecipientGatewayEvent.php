@@ -119,7 +119,7 @@ class RecipientGatewayEvent extends Event {
    *
    * @param string $gateway_id
    *   A gateway plugin ID.
-   * @param int|NULL $priority
+   * @param int|null $priority
    *   The priority of the gateway to remove, or NULL to remove all gateways
    *   with the identifier.
    *

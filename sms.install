@@ -57,3 +57,21 @@ function sms_requirements($phase) {
 
   return $requirements;
 }
+
+/**
+ * Install the "sms_result" and "sms_report" entity types.
+ */
+function sms_update_8101() {
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type_manager = \Drupal::entityTypeManager();
+
+  if ($update_manager->getEntityType('sms')) {
+    // Add storage definitions for the sms_result and sms_report entities.
+    if (!$update_manager->getEntityType('sms_result')) {
+      $update_manager->installEntityType($entity_type_manager->getDefinition('sms_result'));
+    }
+    if (!$update_manager->getEntityType('sms_report')) {
+      $update_manager->installEntityType($entity_type_manager->getDefinition('sms_report'));
+    }
+  }
+}

@@ -3,13 +3,15 @@
 namespace Drupal\sms\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\sms\Exception\SmsStorageException;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\sms\Message\SmsMessageInterface as StdSmsMessageInterface;
-use Drupal\sms\Message\SmsMessageResultInterface;
+use Drupal\sms\Message\SmsMessageResultInterface as StdMessageResultInterface;
 
 /**
  * Defines the SMS message entity.
@@ -34,11 +36,11 @@ use Drupal\sms\Message\SmsMessageResultInterface;
 class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
 
   /**
-   * The result associated with this SMS message.
+   * Temporarily stores the message result until save().
    *
-   * @var \Drupal\sms\Message\SmsMessageResultInterface|NULL
+   * @var \Drupal\sms\Message\SmsMessageResultInterface|null
    */
-  protected $result;
+  protected $result = NULL;
 
   /**
    * Following are implementors of plain SmsMessage interface.
@@ -140,15 +142,81 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function getResult() {
-    return $this->result;
+    // Check the temporary store first as that contains the most recent value.
+    // Also, if the entity is new then return that value (can be null).
+    if ($this->result || $this->isNew()) {
+      return $this->result;
+    }
+    $results = $this->entityTypeManager()
+      ->getStorage('sms_result')
+      ->loadByProperties(['sms_message' => $this->id()]);
+    return $results ? reset($results) : NULL;
+  }
+
+  /**
+   * Sets the result associated with this SMS message.
+   *
+   * Results on a saved SMS message are immutable and cannot be changed. An
+   * exception will be thrown if this method is called on an SmsMessage that
+   * already has saved results.
+   *
+   * @param \Drupal\sms\Message\SmsMessageResultInterface|NULL $result
+   *   The result to associate with this SMS message, or NULL if there is no
+   *   result.
+   *
+   * @return $this
+   *   The called SMS message object.
+   *
+   * @throws \Drupal\sms\Exception\SmsStorageException
+   *   If the SMS message entity already has saved results.
+   */
+  public function setResult(StdMessageResultInterface $result = NULL) {
+    // Throw an exception if there is already a result for this SMS message.
+    $previous_result = $this->getResult();
+    if ($previous_result) {
+      throw new SmsStorageException('Saved SMS message results cannot be changed or updated.');
+    }
+    elseif ($result) {
+      // Temporarily store the result so it can be retrieved without having to
+      // save the message entity.
+      $this->result = $result;
+    }
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setResult(SmsMessageResultInterface $result = NULL) {
-    $this->result = $result;
-    return $this;
+  public function getReport($recipient) {
+    // If a result has been set, check that first.
+    if ($this->result) {
+      return $this->result->getReport($recipient);
+    }
+    elseif (!$this->isNew()) {
+      $reports = $this->entityTypeManager()
+        ->getStorage('sms_report')
+        ->loadByProperties([
+          'sms_message' => $this->id(),
+          'recipient' => $recipient,
+        ]);
+      return $reports ? reset($reports) : NULL;
+    }
+    return NULL;  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getReports() {
+    // If a result has been set, check that first.
+    if ($this->result) {
+      return $this->result->getReports();
+    }
+    elseif (!$this->isNew()) {
+      return array_values($this->entityTypeManager()
+        ->getStorage('sms_report')
+        ->loadByProperties(['sms_message' => $this->id()]));
+    }
+    return [];
   }
 
   /**
@@ -167,7 +235,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    *
-   * @param string|NULL $sender
+   * @param string|null $sender
    *   The name of the sender. Or NULL to defer to the label of the sender
    *   entity.
    *
@@ -512,9 +580,15 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     $new
       ->setDirection($sms_message->getDirection())
       ->setAutomated($sms_message->isAutomated())
+      ->setSender($sms_message->getSender())
       ->setSenderNumber($sms_message->getSenderNumber())
       ->addRecipients($sms_message->getRecipients())
-      ->setMessage($sms_message->getMessage());
+      ->setMessage($sms_message->getMessage())
+      ->setResult($sms_message->getResult());
+
+    if ($gateway = $sms_message->getGateway()) {
+      $new->setGateway($gateway);
+    }
 
     if ($uid = $sms_message->getUid()) {
       $new->setUid($uid);
@@ -525,6 +599,53 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     }
 
     return $new;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
+    $results = [];
+    $reports = [];
+    /** @var \Drupal\sms\Entity\SmsMessageInterface $sms_message */
+    foreach ($entities as $sms_message) {
+      // Since the $sms_message can have both in-memory and stored objects, only
+      // need to delete actual stored entities.
+      if (($result = $sms_message->getResult()) && $result instanceof EntityInterface) {
+        $results[] = $result;
+      }
+      foreach ($sms_message->getReports() as $report) {
+        if ($report instanceof EntityInterface) {
+          $reports[] = $report;
+        }
+      }
+    }
+    \Drupal::entityTypeManager()->getStorage('sms_result')->delete($results);
+    \Drupal::entityTypeManager()->getStorage('sms_report')->delete($reports);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+    // Save the result and reports in the static cache.
+    if ($this->result) {
+      $result_entity = SmsMessageResult::convertFromMessageResult($this->result);
+      $result_entity
+        ->setSmsMessage($this)
+        ->save();
+
+      foreach ($this->result->getReports() as $report) {
+        $report_entity = SmsDeliveryReport::convertFromDeliveryReport($report);
+        $report_entity
+          ->setSmsMessage($this)
+          ->save();
+      }
+      // Unset $this->result as we don't need it anymore after save.
+      unset($this->result);
+    }
   }
 
 }

@@ -48,8 +48,8 @@ class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase {
       {
          "message_id":"{$message_id}",
          "recipient":"{$first_report->getRecipient()}",
-         "time_sent":{$first_report->getTimeQueued()},
-         "time_delivered": $delivered_time,
+         "status":"delivered",
+         "status_time": $delivered_time,
          "status_message": "status message"
       }
    ]

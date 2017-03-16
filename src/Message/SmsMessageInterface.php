@@ -64,7 +64,7 @@ interface SmsMessageInterface {
   /**
    * Get the gateway for this message.
    *
-   * @return \Drupal\sms\Entity\SmsGatewayInterface|NULL
+   * @return \Drupal\sms\Entity\SmsGatewayInterface|null
    *   A gateway plugin instance, or NULL to let the provider decide.
    */
   public function getGateway();
@@ -145,7 +145,7 @@ interface SmsMessageInterface {
   /**
    * Get the result associated with this SMS message.
    *
-   * @return \Drupal\sms\Message\SmsMessageResultInterface|NULL
+   * @return \Drupal\sms\Message\SmsMessageResultInterface|null
    *   The result associated with this SMS message, or NULL if there is no
    *   result.
    */
@@ -154,7 +154,7 @@ interface SmsMessageInterface {
   /**
    * Set the result associated with this SMS message.
    *
-   * @param \Drupal\sms\Message\SmsMessageResultInterface|NULL $result
+   * @param \Drupal\sms\Message\SmsMessageResultInterface|null $result
    *   The result to associate with this SMS message, or NULL if there is no
    *   result.
    *
@@ -162,6 +162,25 @@ interface SmsMessageInterface {
    *   The called SMS message object.
    */
   public function setResult(SmsMessageResultInterface $result = NULL);
+
+  /**
+   * Gets the name of the sender of this SMS message.
+   *
+   * @return string|null
+   *   The name of the sender, or NULL if none is defined.
+   */
+  public function getSender();
+
+  /**
+   * Set the name of the sender of this SMS message.
+   *
+   * @param string|null $sender
+   *   The name of the sender.
+   *
+   * @return $this
+   *   The called SMS message object.
+   */
+  public function setSender($sender);
 
   /**
    * Get phone number of the sender.
@@ -212,7 +231,7 @@ interface SmsMessageInterface {
   /**
    * Gets the user who created the SMS message.
    *
-   * @return int|NULL
+   * @return int|null
    *   The ID of the user who created the message. Or NULL if no user entity is
    *   associated as the sender.
    */
@@ -259,5 +278,27 @@ interface SmsMessageInterface {
    *   An array of SMS messages split by recipient chunks.
    */
   public function chunkByRecipients($size);
+
+  /**
+   * Gets the delivery report for a particular recipient.
+   *
+   * @param string $recipient
+   *   The number of the recipient for which the report is to be retrieved.
+   *
+   * @return \Drupal\sms\Message\SmsDeliveryReportInterface|NULL
+   *   A delivery report object, or NULL if there is no report for the
+   *   recipient.
+   *
+   * @see SmsMessageInterface::getReports()
+   */
+  public function getReport($recipient);
+
+  /**
+   * Gets the delivery reports for all recipients.
+   *
+   * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
+   *   An array of delivery reports.
+   */
+  public function getReports();
 
 }

@@ -12,28 +12,9 @@ use Drupal\Core\Entity\EntityInterface;
 interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInterface {
 
   /**
-   * Gets the name of the sender of this SMS message.
-   *
-   * @return string|NULL
-   *   The name of the sender, or NULL if none is defined.
-   */
-  public function getSender();
-
-  /**
-   * Set the name of the sender of this SMS message.
-   *
-   * @param string $sender
-   *   The name of the sender.
-   *
-   * @return $this
-   *   The called SMS message object.
-   */
-  public function setSender($sender);
-
-  /**
    * Gets the entity who sent the SMS message.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|NULL
+   * @return \Drupal\Core\Entity\EntityInterface|null
    *   The entity who sent the SMS message, or NULL if it is missing.
    */
   public function getSenderEntity();
@@ -52,7 +33,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
   /**
    * Gets the entity who will receive the SMS message.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|NULL
+   * @return \Drupal\Core\Entity\EntityInterface|null
    *   The entity who will receive the SMS message, or NULL if it is missing.
    */
   public function getRecipientEntity();
@@ -120,7 +101,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * This value does not indicate whether the message was sent, only that the
    * gateway accepted the request.
    *
-   * @return int|NULL
+   * @return int|null
    *   The timestamp when SMS message was processed, or NULL if not processed.
    */
   public function getProcessedTime();
