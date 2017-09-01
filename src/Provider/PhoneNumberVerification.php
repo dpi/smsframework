@@ -155,6 +155,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
       $sms_message = new SmsMessage();
       $sms_message
         ->addRecipient($phone_number)
+        ->setOption('_is_verification_message', TRUE)
         ->setMessage($message)
         ->setDirection(Direction::OUTGOING);
 
