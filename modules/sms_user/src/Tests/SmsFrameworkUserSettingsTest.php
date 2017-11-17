@@ -9,6 +9,7 @@ use Drupal\Core\Url;
  * Tests SMS User settings user interface.
  *
  * @group SMS User
+ * @group legacy
  */
 class SmsFrameworkUserSettingsTest extends SmsFrameworkWebTestBase {
 

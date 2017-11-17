@@ -11,6 +11,7 @@ use Drupal\sms\Entity\SmsGateway;
  * \Drupal\sms\Tests\SmsFrameworkGatewayAdminTest to be migrated to this class.
  *
  * @group SMS Framework
+ * @group legacy
  */
 class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
 

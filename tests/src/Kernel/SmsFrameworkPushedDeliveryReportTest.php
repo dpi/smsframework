@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
  * Tests pushing delivery reports to the site.
  *
  * @group SMS Framework
+ * @group legacy
  */
 class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase {
 

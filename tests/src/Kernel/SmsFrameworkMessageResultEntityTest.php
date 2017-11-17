@@ -14,6 +14,7 @@ use Drupal\sms\Tests\SmsFrameworkMessageResultTestTrait;
  * Tests the SMS message result entity.
  *
  * @group SMS Framework
+ * @group legacy
  * @coversDefaultClass \Drupal\sms\Entity\SmsMessageResult
  */
 class SmsFrameworkMessageResultEntityTest extends KernelTestBase {

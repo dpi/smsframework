@@ -15,6 +15,7 @@ use Drupal\sms\Tests\SmsFrameworkTestTrait;
  * Tests the SMS Delivery report entity.
  *
  * @group SMS Framework
+ * @group legacy
  * @coversDefaultClass \Drupal\sms\Entity\SmsDeliveryReport
  */
 class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase  {

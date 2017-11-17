@@ -9,6 +9,7 @@ use Drupal\Component\Utility\Html;
  * Tests SMS Framework tokens.
  *
  * @group SMS Framework
+ * @group legacy
  */
 class SmsFrameworkTokenTest extends SmsFrameworkKernelBase {
 

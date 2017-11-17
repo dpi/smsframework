@@ -11,6 +11,7 @@ use Drupal\sms\Direction;
  * General tests for SMS User.
  *
  * @group SMS Framework
+ * @group legacy
  */
 class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
 

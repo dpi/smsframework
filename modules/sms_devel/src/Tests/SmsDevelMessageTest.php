@@ -12,6 +12,7 @@ use Drupal\sms\Direction;
  * Tests the message form.
  *
  * @group SMS Framework
+ * @group legacy
  */
 class SmsDevelMessageTest extends SmsFrameworkWebTestBase {
 

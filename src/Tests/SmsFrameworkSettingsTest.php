@@ -8,6 +8,7 @@ use Drupal\Core\Url;
  * Tests SMS Framework settings form.
  *
  * @group SMS Framework
+ * @group legacy
  */
 class SmsFrameworkSettingsTest extends SmsFrameworkWebTestBase {
 

@@ -12,6 +12,7 @@ use Drupal\sms\Message\SmsMessageResult;
  * Tests functionality provided by the SMS message event subscriber.
  *
  * @group SMS Framework
+ * @group legacy
  * @coversDefaultClass \Drupal\sms\EventSubscriber\SmsMessageProcessor
  */
 class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {

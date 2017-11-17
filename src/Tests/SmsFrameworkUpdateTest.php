@@ -14,6 +14,7 @@ use Drupal\system\Tests\Update\UpdatePathTestBase;
  * Update path test coverage for sms module.
  *
  * @group SMS Framework
+ * @group legacy
  */
 class SmsFrameworkUpdateTest extends UpdatePathTestBase {
 

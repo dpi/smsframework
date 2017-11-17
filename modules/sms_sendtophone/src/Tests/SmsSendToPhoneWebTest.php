@@ -14,6 +14,7 @@ use Drupal\sms\Entity\PhoneNumberSettings;
  * Integration tests for the SMS SendToPhone Module.
  *
  * @group SMS Framework
+ * @group legacy
  */
 class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
 

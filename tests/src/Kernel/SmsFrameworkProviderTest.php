@@ -19,6 +19,7 @@ use Drupal\sms\Tests\SmsFrameworkTestTrait;
  * Tests SMS Framework provider service.
  *
  * @group SMS Framework
+ * @group legacy
  * @coversDefaultClass \Drupal\sms\Provider\SmsProviderInterface
  */
 class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {

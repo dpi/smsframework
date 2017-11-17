@@ -8,6 +8,7 @@ use Drupal\Core\Url;
  * Tests phone numbers verification code form.
  *
  * @group SMS Framework
+ * @group legacy
  */
 class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkWebTestBase {
 

@@ -8,6 +8,7 @@ use Drupal\Core\Url;
  * Tests phone numbers.
  *
  * @group SMS Framework
+ * @group legacy
  */
 class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkWebTestBase {
 

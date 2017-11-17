@@ -14,6 +14,7 @@ use Drupal\sms\Direction;
  * Using absolute dates to prevent random test failures.
  *
  * @group SMS Framework
+ * @group legacy
  * @coversDefaultClass \Drupal\sms_user\ActiveHours
  */
 class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {

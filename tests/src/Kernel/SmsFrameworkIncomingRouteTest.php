@@ -9,6 +9,7 @@ use Drupal\Core\Url;
  * Tests incoming routes for gateway plugins.
  *
  * @group SMS Framework
+ * @group legacy
  */
 class SmsFrameworkIncomingRouteTest extends SmsFrameworkKernelBase {
 

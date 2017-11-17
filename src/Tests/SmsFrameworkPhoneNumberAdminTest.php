@@ -11,6 +11,7 @@ use Drupal\sms\Entity\PhoneNumberVerification;
  * Tests phone number administration user interface.
  *
  * @group SMS Framework
+ * @group legacy
  */
 class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkWebTestBase {
 

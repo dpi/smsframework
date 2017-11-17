@@ -9,6 +9,7 @@ use Drupal\sms\Direction;
  * Tests SMS Framework gateway plugins.
  *
  * @group SMS Framework
+ * @group legacy
  */
 class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
 
