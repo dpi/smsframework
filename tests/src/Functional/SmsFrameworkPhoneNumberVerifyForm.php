@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\sms\Tests;
+namespace Drupal\Tests\sms\Functional;
 
 use Drupal\Core\Url;
 
@@ -10,7 +10,7 @@ use Drupal\Core\Url;
  * @group SMS Framework
  * @group legacy
  */
-class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkWebTestBase {
+class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkBrowserTestBase {
 
   public static $modules = ['entity_test'];
 

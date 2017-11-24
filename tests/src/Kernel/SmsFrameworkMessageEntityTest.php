@@ -11,8 +11,8 @@ use Drupal\sms\Entity\SmsMessageResult;
 use Drupal\sms\Message\SmsMessage as StandardSmsMessage;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Message\SmsMessageResultInterface;
-use Drupal\sms\Tests\SmsFrameworkMessageTestTrait;
-use Drupal\sms\Tests\SmsFrameworkTestTrait;
+use Drupal\Tests\sms\Functional\SmsFrameworkMessageTestTrait;
+use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
 use Drupal\user\Entity\User;
 
 /**

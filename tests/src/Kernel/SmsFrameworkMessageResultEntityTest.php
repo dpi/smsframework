@@ -8,7 +8,7 @@ use Drupal\sms\Entity\SmsDeliveryReport;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsMessageResult;
 use Drupal\sms\Message\SmsMessageResultStatus;
-use Drupal\sms\Tests\SmsFrameworkMessageResultTestTrait;
+use Drupal\Tests\sms\Functional\SmsFrameworkMessageResultTestTrait;
 
 /**
  * Tests the SMS message result entity.

@@ -1,8 +1,7 @@
 <?php
 
-namespace Drupal\sms\Tests;
+namespace Drupal\Tests\sms\Functional;
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\sms\Entity\PhoneNumberVerification;
@@ -13,7 +12,7 @@ use Drupal\sms\Entity\PhoneNumberVerification;
  * @group SMS Framework
  * @group legacy
  */
-class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkWebTestBase {
+class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase {
 
   public static $modules = ['block', 'entity_test'];
 
@@ -170,39 +169,6 @@ class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkWebTestBase {
     $this->drupalGet('admin/config/smsframework/phone_number/entity_test.entity_test');
     $this->assertResponse(200);
     $this->assertOptionSelected('edit-field-mapping-phone-number', $field_name_telephone);
-  }
-
-  /**
-   * Test using existing fields for new phone number settings.
-   */
-  public function testPhoneNumberFieldExisting() {
-    $field_storage = $this->entityTypeManager->getStorage('field_storage_config');
-    $field_instance = $this->entityTypeManager->getStorage('field_config');
-
-    // Create a field so it appears as a pre-existing field.
-    /** @var \Drupal\field\FieldStorageConfigInterface $field_telephone */
-    $field_telephone = $field_storage->create([
-      'entity_type' => 'entity_test',
-      'field_name' => Unicode::strtolower($this->randomMachineName()),
-      'type' => 'telephone',
-    ]);
-    $field_telephone->save();
-
-    $field_instance->create([
-      'entity_type' => 'entity_test',
-      'bundle' => 'entity_test',
-      'field_name' => $field_telephone->getName(),
-    ])->save();
-
-    $edit = ['entity_bundle' => 'entity_test|entity_test'];
-    $this->drupalPostAjaxForm('admin/config/smsframework/phone_number/add', $edit, 'entity_bundle');
-
-    $edit['field_mapping[phone_number]'] = $field_telephone->getName();
-    $this->drupalPostForm(NULL, $edit, t('Save'));
-
-    $this->drupalGet('admin/config/smsframework/phone_number/entity_test.entity_test');
-    $this->assertResponse(200);
-    $this->assertOptionSelected('edit-field-mapping-phone-number', $field_telephone->getName());
   }
 
 }

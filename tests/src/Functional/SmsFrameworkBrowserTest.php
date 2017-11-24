@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\sms\Tests;
+namespace Drupal\Tests\sms\Functional;
 
 use Drupal\Core\Url;
 use Drupal\sms\Entity\SmsMessage;
@@ -12,7 +12,7 @@ use Drupal\sms\Direction;
  * @group SMS Framework
  * @group legacy
  */
-class SmsFrameworkWebTest extends SmsFrameworkWebTestBase {
+class SmsFrameworkBrowserTest extends SmsFrameworkBrowserTestBase {
 
   /**
    * Tests queue statistics located on Drupal report page.

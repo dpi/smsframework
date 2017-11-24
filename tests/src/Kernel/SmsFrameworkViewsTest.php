@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\sms\Kernel;
 
-use Drupal\sms\Tests\SmsFrameworkTestTrait;
+use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 use Drupal\views\Tests\ViewTestData;

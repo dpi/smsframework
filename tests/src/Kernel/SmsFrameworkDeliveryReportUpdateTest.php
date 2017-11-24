@@ -8,7 +8,7 @@ use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsDeliveryReport;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageReportStatus;
-use Drupal\sms\Tests\SmsFrameworkTestTrait;
+use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
 use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 

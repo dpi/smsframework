@@ -1,10 +1,10 @@
 <?php
 
-namespace Drupal\sms_devel\Tests;
+namespace Drupal\Tests\sms_devel\Functional;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Url;
-use Drupal\sms\Tests\SmsFrameworkWebTestBase;
+use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Direction;
 
@@ -14,7 +14,7 @@ use Drupal\sms\Direction;
  * @group SMS Framework
  * @group legacy
  */
-class SmsDevelMessageTest extends SmsFrameworkWebTestBase {
+class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
 
   public static $modules = ['sms_devel'];
 

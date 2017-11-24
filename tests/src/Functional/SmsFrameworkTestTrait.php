@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\sms\Tests;
+namespace Drupal\Tests\sms\Functional;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;

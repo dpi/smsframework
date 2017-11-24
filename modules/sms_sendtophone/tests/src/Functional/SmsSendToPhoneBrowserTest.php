@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\sms_sendtophone\Tests;
+namespace Drupal\Tests\sms_sendtophone\Functional;
 
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
-use Drupal\sms\Tests\SmsFrameworkWebTestBase;
+use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
 use Drupal\sms\Entity\PhoneNumberSettings;
 
 /**
@@ -16,7 +16,7 @@ use Drupal\sms\Entity\PhoneNumberSettings;
  * @group SMS Framework
  * @group legacy
  */
-class SmsSendToPhoneWebTest extends SmsFrameworkWebTestBase {
+class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
 
   public static $modules = [
     'sms',

@@ -1,8 +1,7 @@
 <?php
 
-namespace Drupal\sms\Tests;
+namespace Drupal\Tests\sms\Functional;
 
-use Drupal\Core\Url;
 use Drupal\sms\Message\SmsDeliveryReportInterface;
 use Drupal\sms\Message\SmsMessageReportStatus;
 use Drupal\sms\Message\SmsMessageResultInterface;
@@ -13,7 +12,7 @@ use Drupal\sms\Message\SmsMessageResultInterface;
  * @group SMS Framework
  * @group legacy
  */
-class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase {
+class SmsFrameworkDeliveryReportTest extends SmsFrameworkBrowserTestBase {
 
   /**
    * Tests delivery reports integration.
@@ -56,7 +55,9 @@ class SmsFrameworkDeliveryReportTest extends SmsFrameworkWebTestBase {
    ]
 }
 EOF;
-    $this->drupalPost($url, 'application/json', ['delivery_report' => $delivery_report]);
+    /** @var \Symfony\Component\BrowserKit\Client $client */
+    $client = $this->getSession()->getDriver()->getClient();
+    $client->request('post', $url, ['delivery_report' => $delivery_report]);
     $this->assertText('custom response content');
     \Drupal::state()->resetCache();
 

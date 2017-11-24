@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\sms_user\Tests;
+namespace Drupal\Tests\sms_user\Functional;
 
-use Drupal\sms\Tests\SmsFrameworkWebTestBase;
+use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
 use Drupal\Core\Url;
 
 /**
@@ -11,7 +11,7 @@ use Drupal\Core\Url;
  * @group SMS User
  * @group legacy
  */
-class SmsFrameworkUserMenuLinksTest extends SmsFrameworkWebTestBase {
+class SmsFrameworkUserMenuLinksTest extends SmsFrameworkBrowserTestBase {
 
   /**
    * Modules to enable.

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\sms\Tests;
+namespace Drupal\Tests\sms\Functional;
 
 use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Message\SmsDeliveryReport;
