@@ -177,4 +177,73 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $this->assertEquals(0, count($messages), 'No messages sent.');
   }
 
+  /**
+   * Tests verbose message output.
+   */
+  function testVerboseReports() {
+    $edit['gateway'] = $this->gateway->id();
+    $edit['number'] = $this->randomPhoneNumbers(1)[0];
+    $edit['message'] = $this->randomString();
+    $edit['skip_queue'] = TRUE;
+    $edit['verbose'] = TRUE;
+
+    $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseContains('Message was processed, 1 delivery reports were generated.');
+
+    $first_row = '#edit-results > tbody > tr:nth-child(1)';
+    
+    // Result.
+    $selector = $first_row . ' > td:nth-child(1)';
+    $this->assertSession()->elementTextContains('css', $selector, '#0');
+
+    // Error.
+    $selector = $first_row . ' > td:nth-child(2)';
+    $this->assertSession()->elementTextContains('css', $selector, 'Success');
+
+    // Error Message.
+    $selector = $first_row . ' > td:nth-child(3)';
+    $this->assertSession()->elementTextContains('css', $selector, 'Undefined');
+
+    // Credits Used.
+    $selector = $first_row . ' > td:nth-child(4)';
+    $this->assertSession()->elementTextContains('css', $selector, 'Undefined');
+
+    // Credits Balance.
+    $selector = $first_row . ' > td:nth-child(5)';
+    $this->assertSession()->elementTextContains('css', $selector, 'Undefined');
+
+    $message = $this->getLastTestMessage($this->gateway);
+    $report = $message->getReports()[0];
+    $this->assertEquals($edit['number'], $report->getRecipient());
+
+    $first_row_first_report = '#edit-results > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(1)';
+
+    // Recipient.
+    $selector = $first_row_first_report . ' > td:nth-child(1)';
+    $this->assertSession()->elementTextContains('css', $selector, $report->getRecipient());
+
+    // Message ID.
+    $selector = $first_row_first_report . ' > td:nth-child(2)';
+    $this->assertSession()->elementTextContains('css', $selector, $report->getMessageId());
+
+    // Status.
+    $selector = $first_row_first_report . ' > td:nth-child(3)';
+    $this->assertSession()->elementTextContains('css', $selector, $report->getStatus());
+
+    // Status Message.
+    $selector = $first_row_first_report . ' > td:nth-child(4)';
+    $this->assertSession()->elementTextContains('css', $selector, $report->getStatusMessage());
+
+    // Time Delivered.
+    $date = DrupalDateTime::createFromTimestamp($report->getTimeDelivered());
+    $selector = $first_row_first_report . ' > td:nth-child(5)';
+    $this->assertSession()->elementTextContains('css', $selector, $date->format('c'));
+
+    // Time Queued.
+    $date = DrupalDateTime::createFromTimestamp($report->getTimeQueued());
+    $selector = $first_row_first_report . ' > td:nth-child(6)';
+    $this->assertSession()->elementTextContains('css', $selector, $date->format('c'));
+  }
+
 }
