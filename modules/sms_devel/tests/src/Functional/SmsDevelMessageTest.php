@@ -12,7 +12,6 @@ use Drupal\sms\Direction;
  * Tests the message form.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
 
@@ -47,12 +46,12 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = TRUE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertResponse(200);
-    $this->assertRaw('Message was processed, 1 delivery reports were generated.');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseContains('Message was processed, 1 delivery reports were generated.');
 
     $messages = $this->getTestMessages($this->gateway);
-    $this->assertEqual(1, count($messages));
-    $this->assertEqual($edit['message'], $messages[0]->getMessage());
+    $this->assertEquals(1, count($messages));
+    $this->assertEquals($edit['message'], $messages[0]->getMessage());
   }
 
   /**
@@ -64,13 +63,13 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = FALSE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertResponse(200);
-    $this->assertRaw('Message added to the outgoing queue.');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseContains('Message added to the outgoing queue.');
 
     $messages = SmsMessage::loadMultiple();
     $message = reset($messages);
-    $this->assertEqual($edit['message'], $message->getMessage(), 'Message is same');
-    $this->assertEqual(Direction::OUTGOING, $message->getDirection(), 'Message is outgoing');
+    $this->assertEquals($edit['message'], $message->getMessage(), 'Message is same');
+    $this->assertEquals(Direction::OUTGOING, $message->getDirection(), 'Message is outgoing');
   }
 
   /**
@@ -83,10 +82,10 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = TRUE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Receive'));
-    $this->assertResponse(200);
-    $this->assertRaw('Message was processed, 1 delivery reports were generated.');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseContains('Message was processed, 1 delivery reports were generated.');
 
-    $this->assertEqual($edit['message'], sms_test_gateway_get_incoming()['message']);
+    $this->assertEquals($edit['message'], sms_test_gateway_get_incoming()['message']);
   }
 
   /**
@@ -99,13 +98,13 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = FALSE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Receive'));
-    $this->assertResponse(200);
-    $this->assertRaw('Message added to the incoming queue.');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseContains('Message added to the incoming queue.');
 
     $messages = SmsMessage::loadMultiple();
     $message = reset($messages);
-    $this->assertEqual($edit['message'], $message->getMessage(), 'Message is same');
-    $this->assertEqual(Direction::INCOMING, $message->getDirection(), 'Message is incoming');
+    $this->assertEquals($edit['message'], $message->getMessage(), 'Message is same');
+    $this->assertEquals(Direction::INCOMING, $message->getDirection(), 'Message is incoming');
   }
 
   /**
@@ -115,8 +114,8 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['gateway'] = '';
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Receive'));
-    $this->assertResponse(200);
-    $this->assertRaw('Gateway must be selected if receiving a message.');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseContains('Gateway must be selected if receiving a message.');
   }
 
   /**
@@ -129,7 +128,7 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['automated'] = FALSE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     $messages = SmsMessage::loadMultiple();
     $message = reset($messages);
@@ -153,11 +152,11 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['send_on[date]'] = $date_user->format('Y-m-d');
     $edit['send_on[time]'] = $date_user->format('H:i:s');
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     $messages = SmsMessage::loadMultiple();
     $message = reset($messages);
-    $this->assertEqual($date->format('U'), $message->getSendTime(), 'Message has send time.');
+    $this->assertEquals($date->format('U'), $message->getSendTime(), 'Message has send time.');
   }
 
   /**
@@ -171,11 +170,11 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = TRUE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertResponse(200);
-    $this->assertRaw('Message could not be sent');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseContains('Message could not be sent');
 
     $messages = $this->getTestMessages($this->gateway);
-    $this->assertEqual(0, count($messages), 'No messages sent.');
+    $this->assertEquals(0, count($messages), 'No messages sent.');
   }
 
 }
