@@ -105,6 +105,7 @@ class SmsDevelMessageForm extends FormBase {
       '#title' => $this->t('Force skip queue'),
       '#description' => $this->t('Send or receive the message immediately. If the gateway-specific skip queue setting is turned on, then this option is already applied.'),
       '#default_value' => TRUE,
+      '#name' => 'skip_queue',
     ];
     $form['options']['automated'] = [
       '#type' => 'checkbox',
@@ -115,8 +116,13 @@ class SmsDevelMessageForm extends FormBase {
     $form['options']['verbose'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Verbose output'),
-      '#description' => $this->t('Show full details of messages sent.'),
+      '#description' => $this->t('Show full details of messages.'),
       '#default_value' => TRUE,
+      '#states' => [
+        'visible' => [
+          ':input[name="' . $form['options']['skip_queue']['#name'] . '"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
     $form['options']['send_on'] = [
       '#type' => 'datetime',
@@ -281,9 +287,30 @@ class SmsDevelMessageForm extends FormBase {
   protected function verboseResults(array $results) {
     $render = [];
 
+    // Renders plain text, or 'Undefined' message if falsey.
+    $renderString = function($value) {
+      return !empty($value) ? ['#plain_text' => $value] : ['#markup' => $this->t('<em>Undefined</em>')];
+    };
+
+    // Renders a date text, or 'Undefined' message if falsey.
+    $renderDate = function($timestamp) {
+      if ($timestamp) {
+        $date = DrupalDateTime::createFromTimestamp($timestamp);
+        return ['#plain_text' => $date->format('c')];
+      }
+      else {
+        return ['#markup' => $this->t('<em>Undefined</em>')];
+      }
+    };
+
     $render['results'] = [
       '#type' => 'table',
-      '#caption' => $this->t('<h2>Results</h2>'),
+      '#caption' => [
+        'heading' => [
+          '#type' => 'inline_template',
+          '#template' => '<h2>Results</h2>',
+        ]
+      ],
       '#header' => [
         $this->t('Result'),
         $this->t('Error'),
@@ -298,27 +325,10 @@ class SmsDevelMessageForm extends FormBase {
       $row[]['#plain_text'] = $this->t("#@number", ['@number' => $i]);
 
       $error = $result->getError();
-      if ($error) {
-        $row[]['#plain_text'] = $error;
-      }
-      else {
-        $row[]['#markup'] = $this->t('<em>Success</em>');
-      }
-
-      $other_values = [
-        $result->getErrorMessage(),
-        $result->getCreditsUsed(),
-        $result->getCreditsBalance(),
-      ];
-
-      foreach ($other_values as $other_value) {
-        if (!empty($other_value)) {
-          $row[]['#plain_text'] = $other_value;
-        }
-        else {
-          $row[]['#markup'] = $this->t('<em>Undefined</em>');
-        }
-      }
+      $row[] = $error ? ['#plain_text' => $error] : ['#markup' => $this->t('<em>Success</em>')];
+      $row[] = $renderString($result->getErrorMessage());
+      $row[] = $renderString($result->getCreditsUsed());
+      $row[] = $renderString($result->getCreditsBalance());
 
       $render['results'][] = $row;
 
@@ -336,39 +346,12 @@ class SmsDevelMessageForm extends FormBase {
       foreach ($result->getReports() as $report) {
         $row = [];
 
-        $row[]['#plain_text'] = $report->getRecipient();
-
-        $values = [
-          $report->getMessageId(),
-          $report->getStatus(),
-          $report->getStatusMessage()
-        ];
-        foreach ($values as $value) {
-          if (!empty($value)) {
-            $row[]['#plain_text'] = $value;
-          }
-          else {
-            $row[]['#markup'] = $this->t('<em>Undefined</em>');
-          }
-        }
-
-        $time_delivered = $report->getTimeDelivered();
-        if ($time_delivered) {
-          $date = DrupalDateTime::createFromTimestamp($time_delivered);
-          $row[]['#plain_text'] = $date->format('c');
-        }
-        else {
-          $row[]['#markup'] = $this->t('<em>Undefined</em>');
-        }
-
-        $time_queued = $report->getTimeQueued();
-        if ($time_queued) {
-          $date = DrupalDateTime::createFromTimestamp($time_queued);
-          $row[]['#plain_text'] = $date->format('c');
-        }
-        else {
-          $row[]['#markup'] = $this->t('<em>Undefined</em>');
-        }
+        $row[] = $renderString($report->getRecipient());
+        $row[] = $renderString($report->getMessageId());
+        $row[] = $renderString($report->getStatus());
+        $row[] = $renderString($report->getStatusMessage());
+        $row[] = $renderDate($report->getTimeDelivered());
+        $row[] = $renderDate($report->getTimeQueued());
 
         $reports_cell[] = $row;
       }
