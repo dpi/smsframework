@@ -13,12 +13,12 @@ use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Direction;
 use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Message\SmsMessageResultInterface;
-use Drupal\sms\Tests\SmsFrameworkTestTrait;
 
 /**
  * Tests SMS Framework provider service.
  *
  * @group SMS Framework
+ * @group legacy
  * @coversDefaultClass \Drupal\sms\Provider\SmsProviderInterface
  */
 class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {

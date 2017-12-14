@@ -2,6 +2,7 @@
 
 namespace Drupal\sms\Plugin;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPluginInterface {
 
   /**
-   * Construct a new SmsGateway plugin
+   * Constructs a new SmsGateway plugin.
    *
    * @param array $configuration
    *   The configuration to use and build the sms gateway.
@@ -24,7 +25,7 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->configuration = array_merge($this->defaultConfiguration(), $this->configuration);
+    $this->setConfiguration($configuration);
   }
 
   /**
@@ -38,7 +39,7 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
    * {@inheritdoc}
    */
   public function setConfiguration(array $configuration) {
-    $this->configuration = $configuration;
+    $this->configuration = NestedArray::mergeDeep($this->defaultConfiguration(), $configuration);
   }
 
   /**

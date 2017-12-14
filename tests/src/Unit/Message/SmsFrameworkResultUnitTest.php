@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\sms\Unit\Message;
 
-use Drupal\sms\Tests\SmsFrameworkMessageResultTestTrait;
+use Drupal\Tests\sms\Functional\SmsFrameworkMessageResultTestTrait;
 use Drupal\Tests\UnitTestCase;
 use Drupal\sms\Message\SmsMessageResult;
 

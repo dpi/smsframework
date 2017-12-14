@@ -3,7 +3,7 @@
 namespace Drupal\Tests\sms\Unit\Event;
 
 use Drupal\Tests\UnitTestCase;
-use Drupal\sms\Tests\SmsFrameworkTestTrait;
+use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
 use Drupal\sms\Event\RecipientGatewayEvent;
 use Drupal\sms\Entity\SmsGatewayInterface;
 

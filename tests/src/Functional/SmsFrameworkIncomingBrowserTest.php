@@ -8,6 +8,7 @@ use Drupal\Core\Url;
  * Tests incoming route endpoint.
  *
  * @group SMS Framework
+ * @group legacy
  */
 class SmsFrameworkIncomingBrowserTest extends SmsFrameworkBrowserTestBase {
 

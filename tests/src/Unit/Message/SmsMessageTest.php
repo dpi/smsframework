@@ -5,7 +5,7 @@ namespace Drupal\Tests\sms\Unit\Message;
 use Drupal\Component\Uuid\Php;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\Tests\UnitTestCase;
-use Drupal\sms\Tests\SmsFrameworkMessageTestTrait;
+use Drupal\Tests\sms\Functional\SmsFrameworkMessageTestTrait;
 
 /**
  * Unit Tests for SmsMessage.

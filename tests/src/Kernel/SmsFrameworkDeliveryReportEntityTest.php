@@ -8,13 +8,14 @@ use Drupal\sms\Entity\SmsDeliveryReport;
 use Drupal\sms\Entity\SmsDeliveryReportInterface;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Message\SmsMessageReportStatus;
-use Drupal\sms\Tests\SmsFrameworkDeliveryReportTestTrait;
-use Drupal\sms\Tests\SmsFrameworkTestTrait;
+use Drupal\Tests\sms\Functional\SmsFrameworkDeliveryReportTestTrait;
+use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
 
 /**
  * Tests the SMS Delivery report entity.
  *
  * @group SMS Framework
+ * @group legacy
  * @coversDefaultClass \Drupal\sms\Entity\SmsDeliveryReport
  */
 class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase  {

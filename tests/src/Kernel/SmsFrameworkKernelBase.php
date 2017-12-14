@@ -3,7 +3,7 @@
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\sms\Tests\SmsFrameworkTestTrait;
+use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
 
 /**
  * Base class for SMS Framework unit tests.

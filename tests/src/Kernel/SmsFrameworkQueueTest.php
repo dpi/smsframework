@@ -9,6 +9,7 @@ use Drupal\sms\Direction;
  * Tests behaviour of SMS Framework message queue.
  *
  * @group SMS Framework
+ * @group legacy
  */
 class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
 
