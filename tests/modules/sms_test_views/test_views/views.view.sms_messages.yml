@@ -188,7 +188,7 @@ display:
         recipient_phone_number:
           id: recipient_phone_number
           table: sms__recipient_phone_number
-          field: recipient_phone_number
+          field: recipient_phone_number_value
           relationship: none
           group_type: group
           admin_label: ''
