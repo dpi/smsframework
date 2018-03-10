@@ -8,7 +8,8 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  * Source plugin for D6 sms_user phone number.
  *
  * @MigrateSource(
- *   id = "d6_sms_number"
+ *   id = "d6_sms_number",
+ *   source_module = "sms"
  * )
  */
 class D6SmsNumber extends DrupalSqlBase {
