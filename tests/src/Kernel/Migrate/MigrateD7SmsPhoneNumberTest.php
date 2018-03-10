@@ -21,6 +21,14 @@ class MigrateD7SmsPhoneNumberTest extends MigrateDrupal7TestBase {
   /**
    * {@inheritdoc}
    */
+  protected function setUp() {
+    parent::setUp();
+    $this->loadFixture(__DIR__ . '/../../../fixtures/migrate/drupal7.php');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static $modules = [
     'sms',
     'telephone',
