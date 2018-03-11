@@ -18,7 +18,6 @@ use Drupal\sms\Message\SmsMessageResultInterface;
  * Tests SMS Framework provider service.
  *
  * @group SMS Framework
- * @group legacy
  * @coversDefaultClass \Drupal\sms\Provider\SmsProviderInterface
  */
 class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {

@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
  * Tests the update of SMS Delivery report entities.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
 

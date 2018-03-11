@@ -9,7 +9,6 @@ use Drupal\sms\Message\SmsMessageInterface;
  * General phone number verification tests.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsFrameworkPhoneNumberTest extends SmsFrameworkBrowserTestBase {
 

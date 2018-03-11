@@ -11,7 +11,6 @@ use Drupal\sms\Entity\SmsGatewayInterface;
  * Tests SMS Framework gateway entity.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
 

@@ -12,7 +12,6 @@ use Drupal\sms\Entity\PhoneNumberSettings;
  * Integration tests for the sms_blast module.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
 

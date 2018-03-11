@@ -15,7 +15,6 @@ use Drupal\sms\Exception\PhoneNumberSettingsException;
  * Tests Phone Number Provider.
  *
  * @group SMS Framework
- * @group legacy
  * @coversDefaultClass \Drupal\sms\Provider\PhoneNumberVerification
  */
 class SmsFrameworkPhoneNumberVerificationTest extends SmsFrameworkKernelBase {

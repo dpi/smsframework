@@ -10,7 +10,6 @@ use Drupal\sms\Direction;
  * Integration tests for the SMS Framework.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsFrameworkBrowserTest extends SmsFrameworkBrowserTestBase {
 

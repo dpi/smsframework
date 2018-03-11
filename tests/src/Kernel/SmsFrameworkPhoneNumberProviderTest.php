@@ -13,7 +13,6 @@ use Drupal\sms\Message\SmsMessage;
  * Tests Phone Number Provider.
  *
  * @group SMS Framework
- * @group legacy
  * @coversDefaultClass \Drupal\sms\Provider\PhoneNumberProvider
  */
 class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {

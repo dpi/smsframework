@@ -12,7 +12,6 @@ use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
  * Tests gateway administration user interface.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
 

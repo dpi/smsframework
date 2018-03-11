@@ -16,7 +16,6 @@ use Drupal\sms\Direction;
  * Tests SMS Framework integration with Views.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsFrameworkViewsTest extends ViewsKernelTestBase {
 

@@ -10,7 +10,6 @@ use Drupal\sms\Message\SmsMessageResultInterface;
  * Integration tests for delivery reports.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsFrameworkDeliveryReportTest extends SmsFrameworkBrowserTestBase {
 

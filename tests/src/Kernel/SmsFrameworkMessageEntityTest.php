@@ -19,7 +19,6 @@ use Drupal\user\Entity\User;
  * Tests SMS message entity.
  *
  * @group SMS Framework
- * @group legacy
  * @coversDefaultClass \Drupal\sms\Entity\SmsMessage
  */
 class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
