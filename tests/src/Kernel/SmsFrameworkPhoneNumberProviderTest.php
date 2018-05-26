@@ -133,12 +133,13 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
       $phone_numbers = array_slice($phone_numbers_all, 0, $i);
       $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
 
-      // Verify first phone number.
-      // Ensures test verifications don't leak between entities.
-      // array_slice()' $preserve_keys ensures original field index is retained.
-      $phone_number_verified = array_slice($phone_numbers, 0, 1, TRUE);
-      $phone_number_unverified = array_slice($phone_numbers, 1, $i, TRUE);
+      // Ensures test verifications don't leak between entities. array_values()
+      // resets array keys since they are not important, assertEquals() normally
+      // asserts keys.
+      $phone_number_verified = array_values(array_slice($phone_numbers, 0, 1, TRUE));
+      $phone_number_unverified = array_values(array_slice($phone_numbers, 1, $i, TRUE));
 
+      // Verify first phone number.
       if (!empty($phone_number_verified)) {
         $this->verifyPhoneNumber($entity, reset($phone_number_verified));
       }

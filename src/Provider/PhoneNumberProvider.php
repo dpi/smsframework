@@ -2,17 +2,26 @@
 
 namespace Drupal\sms\Provider;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsMessage as SmsMessageEntity;
+use Drupal\sms\Event\SmsEvents;
+use Drupal\sms\Event\SmsEntityPhoneNumber;
 use Drupal\sms\Exception\NoPhoneNumberException;
-use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Drupal\sms\Message\SmsMessageInterface;
 
 /**
  * Phone number provider.
  */
 class PhoneNumberProvider implements PhoneNumberProviderInterface {
+
+  /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
 
   /**
    * The SMS provider.
@@ -22,55 +31,27 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   protected $smsProvider;
 
   /**
-   * The phone number verification service.
-   *
-   * @var \Drupal\sms\Provider\PhoneNumberVerificationInterface
-   */
-  protected $phoneNumberVerification;
-
-  /**
    * Constructs a new PhoneNumberProvider object.
    *
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   *   The event dispatcher.
    * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
    *   The SMS provider.
-   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification
-   *   The phone number verification service.
    */
-  public function __construct(SmsProviderInterface $sms_provider, PhoneNumberVerificationInterface $phone_number_verification) {
+  public function __construct(EventDispatcherInterface $event_dispatcher, SmsProviderInterface $sms_provider) {
+    $this->eventDispatcher = $event_dispatcher;
     $this->smsProvider = $sms_provider;
-    // Temporarily inject service until an event is created.
-    // See: https://www.drupal.org/node/2797121
-    $this->phoneNumberVerification = $phone_number_verification;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getPhoneNumbers(EntityInterface $entity, $verified = TRUE) {
-    $phone_number_settings = $this->phoneNumberVerification
-      ->getPhoneNumberSettingsForEntity($entity);
-    $field_name = $phone_number_settings->getFieldName('phone_number');
-
-    if (!$field_name) {
-      throw new PhoneNumberSettingsException(sprintf('Entity phone number config field mapping not set for bundle %s:%s', $entity->getEntityTypeId(), $entity->bundle()));
-    }
-
-    $phone_numbers = [];
-    if (isset($entity->{$field_name})) {
-      foreach ($entity->{$field_name} as $index => &$item) {
-        $phone_numbers[$index] = $item->value;
-      }
-    }
-
-    if (isset($verified)) {
-      return array_filter($phone_numbers, function ($phone_number) use (&$entity, $verified) {
-        $verification = $this->phoneNumberVerification
-          ->getPhoneVerificationByEntity($entity, $phone_number);
-        return $verification && ($verification->getStatus() == $verified);
-      });
-    }
-
-    return $phone_numbers;
+    $event = new SmsEntityPhoneNumber($entity, $verified);
+    /** @var \Drupal\sms\Event\SmsEntityPhoneNumber $event */
+    $event = $this->eventDispatcher
+      ->dispatch(SmsEvents::ENTITY_PHONE_NUMBERS, $event);
+    return $event->getPhoneNumbers();
   }
 
   /**
