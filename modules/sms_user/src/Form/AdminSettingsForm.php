@@ -185,145 +185,145 @@ class AdminSettingsForm extends ConfigFormBase {
       ]), 'warning');
     }
 
+    // The parent 'radios' form element for our account registration behaviour.
     $form['account_registration']['behaviour'] = [
       '#type' => 'radios',
-      '#options' => NULL,
       '#title' => $this->t('Account registration via SMS'),
+      '#options' => [
+        'none' => $this->t('Disabled'),
+        'all' => $this->t('All unrecognised phone numbers'),
+        'incoming_pattern' => $this->t('Incoming message based on pattern'),
+      ],
       '#required' => TRUE,
       '#default_value' => $radio_value,
     ];
 
-    $form['account_registration']['none']['#tree'] = TRUE;
-    $form['account_registration']['none']['radio'] = [
-      '#type' => 'radio',
-      '#title' => $this->t('Disabled'),
+    // Modify the radio button for the 'Disabled' option.
+    $form['account_registration']['behaviour']['none'] = [
       '#description' => $this->t('Disable account creation via SMS.'),
       '#return_value' => 'none',
-      '#parents' => ['account_registration', 'behaviour'],
-      '#default_value' => $radio_value,
     ];
 
-    $form['account_registration']['all']['#tree'] = TRUE;
-    $form['account_registration']['all']['radio'] = [
-      '#type' => 'radio',
-      '#title' => $this->t('All unrecognised phone numbers'),
+    // Modify the radio button for the 'All unrecognised phone numbers' option.
+    $form['account_registration']['behaviour']['all'] = [
       '#description' => $this->t('Automatically create a Drupal account for all phone numbers not associated with an existing account.'),
       '#return_value' => 'all',
-      '#parents' => ['account_registration', 'behaviour'],
-      '#default_value' => $radio_value,
       '#disabled' => !$user_phone_settings_exist,
     ];
 
-    $form['account_registration']['all_options'] = [
+    // Dynamically show form elements if the 'all' radio button is selected.
+    // This container holds a checkbox which, if checked, will be accompanied
+    // by a textarea.
+    $form['account_registration']['behaviour']['all_options'] = [
       '#type' => 'container',
       '#attributes' => [
         'class' => ['sms_user-radio-indent'],
       ],
+      '#parents' => ['account_registration', 'all_options'],
+      '#tree' => TRUE,
       '#states' => [
+        // Show only when the 'all' radio button is selected.
         'visible' => [
           ':input[name="account_registration[behaviour]"]' => ['value' => 'all'],
         ],
       ],
     ];
-
-    $form['account_registration']['all_options']['reply_status'] = [
+    $form['account_registration']['behaviour']['all_options']['reply_status'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enable reply message'),
       '#default_value' => $config->get('account_registration.unrecognized_sender.reply.status'),
     ];
-
-    $form['account_registration']['all_options']['reply'] = [
+    // Show the accompanying textarea only if the 'reply_status' checkbox
+    // is selected.
+    $form['account_registration']['behaviour']['all_options']['reply'] = [
       '#type' => 'container',
       '#states' => [
         'visible' => [
-          ':input[name="account_registration[all_options][reply_status]"]' => ['checked' => TRUE],
+          ':input[name="account_registration[behaviour][all_options][reply_status]"]' => ['checked' => TRUE],
         ],
       ],
     ];
-
-    $form['account_registration']['all_options']['reply']['message'] = [
+    $form['account_registration']['behaviour']['all_options']['reply']['message'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Reply message'),
       '#description' => $this->t('Send a message after a new account is created. In addition to the tokens listed below, [user:password] is also available.'),
       '#default_value' => $config->get('account_registration.unrecognized_sender.reply.message'),
       '#states' => [
         'visible' => [
-          ':input[name="account_registration[all_options][reply_status]"]' => ['checked' => TRUE],
+          ':input[name="account_registration[behaviour][all_options][reply_status]"]' => ['checked' => TRUE],
         ],
       ],
     ];
+    $form['account_registration']['behaviour']['all_options']['reply']['tokens'] = $this->buildTokenElement();
 
-    $form['account_registration']['all_options']['reply']['tokens'] = $this->buildTokenElement();
-
-    $form['account_registration']['incoming_pattern']['radio'] = [
-      '#type' => 'radio',
-      '#title' => $this->t('Incoming message based on pattern'),
+    // Modify radio button for the 'Incoming message based on pattern' option.
+    $form['account_registration']['behaviour']['incoming_pattern'] = [
       '#description' => $this->t('Automatically create a Drupal account if message is received in a specified format.'),
       '#return_value' => 'incoming_pattern',
-      '#parents' => ['account_registration', 'behaviour'],
-      '#default_value' => $radio_value,
       '#disabled' => !$user_phone_settings_exist,
     ];
 
-    $form['account_registration']['incoming_pattern_options'] = [
+    // Dynamically show form elements if the 'incoming_pattern' radio button is
+    // selected. This container holds a textarea and two checkboxs. The second
+    // checkbox, if checked, will be accompanied by two message textareas.
+    $form['account_registration']['behaviour']['incoming_pattern_options'] = [
       '#type' => 'container',
       '#attributes' => [
         'class' => ['sms_user-radio-indent'],
       ],
+      '#parents' => ['account_registration', 'incoming_pattern_options'],
+      '#tree' => TRUE,
       '#states' => [
+        // Show only when the 'incoming_pattern' radio button is selected.
         'visible' => [
           ':input[name="account_registration[behaviour]"]' => ['value' => 'incoming_pattern'],
         ],
       ],
     ];
-
-    $form['account_registration']['incoming_pattern_options']['incoming_message'] = [
+    $form['account_registration']['behaviour']['incoming_pattern_options']['incoming_message'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Incoming message'),
       '#description' => $this->t('You should use at least one placeholder: [email], [password], or [username]. If password is omitted: a random password will be generated. If username is omitted: a random username will be generated. If email address is omitted: no email address will be associated with the account.'),
       '#default_value' => $config->get('account_registration.incoming_pattern.incoming_messages.0'),
     ];
-
-    $form['account_registration']['incoming_pattern_options']['send_activation_email'] = [
+    $form['account_registration']['behaviour']['incoming_pattern_options']['send_activation_email'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Send activation email'),
       '#description' => $this->t('Send activation email if an [email] placeholder is present, and [password] placeholder is omitted.'),
       '#default_value' => $config->get('account_registration.incoming_pattern.send_activation_email'),
     ];
 
-    $form['account_registration']['incoming_pattern_options']['reply_status'] = [
+    $form['account_registration']['behaviour']['incoming_pattern_options']['reply_status'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enable reply message'),
       '#default_value' => $config->get('account_registration.incoming_pattern.reply.status'),
     ];
-
-    $form['account_registration']['incoming_pattern_options']['reply'] = [
+    // Show the two accompanying textareas only if the 'reply_status' checkbox
+    // is selected.
+    $form['account_registration']['behaviour']['incoming_pattern_options']['reply'] = [
       '#type' => 'container',
       '#attributes' => [
         'class' => ['sms_user-radio-indent'],
       ],
       '#states' => [
         'visible' => [
-          ':input[name="account_registration[incoming_pattern_options][reply_status]"]' => ['checked' => TRUE],
+          ':input[name="account_registration[behaviour][incoming_pattern_options][reply_status]"]' => ['checked' => TRUE],
         ],
       ],
     ];
-
-    $form['account_registration']['incoming_pattern_options']['reply']['message_success'] = [
+    $form['account_registration']['behaviour']['incoming_pattern_options']['reply']['message_success'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Reply message (success)'),
       '#description' => $this->t('Send a message after a new account is successfully created. In addition to the tokens listed below, [user:password] is also available.'),
       '#default_value' => $config->get('account_registration.incoming_pattern.reply.message'),
     ];
-
-    $form['account_registration']['incoming_pattern_options']['reply']['message_failure'] = [
+    $form['account_registration']['behaviour']['incoming_pattern_options']['reply']['message_failure'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Reply message (failure)'),
       '#description' => $this->t('Send a message if a new account could not be created. Such reasons include: username already taken, email already used. In addition to the tokens listed below, [error] is also available.'),
       '#default_value' => $config->get('account_registration.incoming_pattern.reply.message_failure'),
     ];
-
-    $form['account_registration']['incoming_pattern_options']['reply']['tokens'] = $this->buildTokenElement();
+    $form['account_registration']['behaviour']['incoming_pattern_options']['reply']['tokens'] = $this->buildTokenElement();
 
     return parent::buildForm($form, $form_state);
   }
@@ -370,14 +370,14 @@ class AdminSettingsForm extends ConfigFormBase {
     $account_registration = $form_state->getValue(['account_registration']);
     if (!empty($account_registration['all_options']['reply_status']) && empty($account_registration['all_options']['reply']['message'])) {
       // Reply is enabled, but empty reply.
-      $form_state->setError($form['account_registration']['all_options']['reply']['message'], $this->t('Reply message must have a value if reply is enabled.'));
+      $form_state->setError($form['account_registration']['behaviour']['all_options']['reply']['message'], $this->t('Reply message must have a value if reply is enabled.'));
     }
 
     // Incoming message.
     $incoming_message = $account_registration['incoming_pattern_options']['incoming_message'];
     if ($account_registration['behaviour'] == 'incoming_pattern' && empty($incoming_message)) {
       // Empty incoming message.
-      $form_state->setError($form['account_registration']['incoming_pattern_options']['incoming_message'], $this->t('Incoming message must be filled if using pre-incoming_pattern option.'));
+      $form_state->setError($form['account_registration']['behaviour']['incoming_pattern_options']['incoming_message'], $this->t('Incoming message must be filled if using pre-incoming_pattern option.'));
     }
     elseif (!empty($incoming_message)) {
       $contains_email = strpos($incoming_message, '[email]') !== FALSE;
@@ -385,11 +385,11 @@ class AdminSettingsForm extends ConfigFormBase {
       $activation_email = $account_registration['incoming_pattern_options']['send_activation_email'];
       if ($activation_email && !$contains_email) {
         // Email placeholder must be present if activation email is on.
-        $form_state->setError($form['account_registration']['incoming_pattern_options']['send_activation_email'], $this->t('Activation email cannot be sent if [email] placeholder is missing.'));
+        $form_state->setError($form['account_registration']['behaviour']['incoming_pattern_options']['send_activation_email'], $this->t('Activation email cannot be sent if [email] placeholder is missing.'));
       }
       if ($activation_email && $contains_email && $contains_password) {
         // Check if password and email occur at the same time.
-        $form_state->setError($form['account_registration']['incoming_pattern_options']['send_activation_email'], $this->t('Activation email cannot be sent if [password] placeholder is present.'));
+        $form_state->setError($form['account_registration']['behaviour']['incoming_pattern_options']['send_activation_email'], $this->t('Activation email cannot be sent if [password] placeholder is present.'));
       }
 
       // Make sure there is a separator between placeholders so regex capture
@@ -408,7 +408,7 @@ class AdminSettingsForm extends ConfigFormBase {
         }
         $this_word_is_placeholder = in_array($word, $placeholders);
         if ($last_word_is_placeholder && $this_word_is_placeholder) {
-          $form_state->setError($form['account_registration']['incoming_pattern_options']['incoming_message'], $this->t('There must be a separator between placeholders.'));
+          $form_state->setError($form['account_registration']['behaviour']['incoming_pattern_options']['incoming_message'], $this->t('There must be a separator between placeholders.'));
         }
         $last_word_is_placeholder = $this_word_is_placeholder;
       }
@@ -417,11 +417,11 @@ class AdminSettingsForm extends ConfigFormBase {
     // Replies.
     if (!empty($account_registration['incoming_pattern_options']['reply_status']) && empty($account_registration['incoming_pattern_options']['reply']['message_success'])) {
       // Reply is enabled, but empty reply.
-      $form_state->setError($form['account_registration']['incoming_pattern_options']['reply']['message_success'], $this->t('Reply message must have a value if reply is enabled.'));
+      $form_state->setError($form['account_registration']['behaviour']['incoming_pattern_options']['reply']['message_success'], $this->t('Reply message must have a value if reply is enabled.'));
     }
     if (!empty($account_registration['incoming_pattern_options']['reply_status']) && empty($account_registration['incoming_pattern_options']['reply']['message_failure'])) {
       // Reply is enabled, but empty reply.
-      $form_state->setError($form['account_registration']['incoming_pattern_options']['reply']['message_failure'], $this->t('Reply message must have a value if reply is enabled.'));
+      $form_state->setError($form['account_registration']['behaviour']['incoming_pattern_options']['reply']['message_failure'], $this->t('Reply message must have a value if reply is enabled.'));
     }
   }
 

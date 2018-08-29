@@ -72,8 +72,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
       'active_hours[days][thursday][start]' => -1,
       'active_hours[days][thursday][end]' => 18,
     ];
-    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
-    $this->assertRaw(t('The configuration options have been saved.'));
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, 'Save configuration');
+    $this->assertRaw('The configuration options have been saved.');
 
     // Check values are saved and form reflects this.
     $this->assertFieldChecked('edit-active-hours-status');
@@ -90,7 +90,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
     ];
     $ranges_actual = \Drupal::config('sms_user.settings')
       ->get('active_hours.ranges');
-    $this->assertEqual($ranges_expected, $ranges_actual);
+    $this->assertEquals($ranges_expected, $ranges_actual);
   }
 
   /**
@@ -103,8 +103,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
       'active_hours[days][wednesday][end]' => 9,
     ];
 
-    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
-    $this->assertRaw(t('End time must be greater than start time.'));
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, 'Save configuration');
+    $this->assertRaw('End time must be greater than start time.');
 
     // Active hours enabled but no days.
     $edit = [
@@ -112,8 +112,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
       'active_hours[days][wednesday][start]' => -1,
       'active_hours[days][wednesday][end]' => 24,
     ];
-    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
-    $this->assertRaw(t('If active hours hours are enabled there must be at least one enabled day.'));
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, 'Save configuration');
+    $this->assertRaw('If active hours hours are enabled there must be at least one enabled day.');
   }
 
   /**
@@ -123,8 +123,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
     $edit = [
       'account_registration[behaviour]' => 'none',
     ];
-    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
-    $this->assertRaw(t('The configuration options have been saved.'));
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, 'Save configuration');
+    $this->assertRaw('The configuration options have been saved.');
 
     $settings = $this->config('sms_user.settings')->get('account_registration');
     $this->assertFalse($settings['unrecognized_sender']['status']);
@@ -152,8 +152,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
       'account_registration[all_options][reply_status]' => TRUE,
       'account_registration[all_options][reply][message]' => $reply_message,
     ];
-    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
-    $this->assertRaw(t('The configuration options have been saved.'));
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, 'Save configuration');
+    $this->assertRaw('The configuration options have been saved.');
 
     $settings = $this->config('sms_user.settings')->get('account_registration');
 
@@ -163,7 +163,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
 
     // Settings.
     $this->assertTrue($settings['unrecognized_sender']['reply']['status']);
-    $this->assertEqual($reply_message, $settings['unrecognized_sender']['reply']['message']);
+    $this->assertEquals($reply_message, $settings['unrecognized_sender']['reply']['message']);
   }
 
   /**
@@ -183,8 +183,8 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
       'account_registration[incoming_pattern_options][reply][message_success]' => $reply_message_success,
       'account_registration[incoming_pattern_options][reply][message_failure]' => $reply_message_failure,
     ];
-    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
-    $this->assertRaw(t('The configuration options have been saved.'));
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, 'Save configuration');
+    $this->assertRaw('The configuration options have been saved.');
 
     $settings = $this->config('sms_user.settings')->get('account_registration');
 
@@ -193,11 +193,11 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
     $this->assertTrue($settings['incoming_pattern']['status']);
 
     // Settings.
-    $this->assertEqual($incoming_message, $settings['incoming_pattern']['incoming_messages'][0]);
+    $this->assertEquals($incoming_message, $settings['incoming_pattern']['incoming_messages'][0]);
     $this->assertTrue($settings['incoming_pattern']['send_activation_email']);
     $this->assertTrue($settings['incoming_pattern']['reply']['status']);
-    $this->assertEqual($reply_message_success, $settings['incoming_pattern']['reply']['message']);
-    $this->assertEqual($reply_message_failure, $settings['incoming_pattern']['reply']['message_failure']);
+    $this->assertEquals($reply_message_success, $settings['incoming_pattern']['reply']['message']);
+    $this->assertEquals($reply_message_failure, $settings['incoming_pattern']['reply']['message_failure']);
   }
 
   /**
@@ -211,7 +211,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
       'account_registration[all_options][reply_status]' => TRUE,
       'account_registration[all_options][reply][message]' => '',
     ];
-    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, 'Save configuration');
     $this->assertRaw('Reply message must have a value if reply is enabled.', 'Validation failed for message on all unrecognised numbers when reply status is enabled.');
 
     $edit = [
@@ -219,7 +219,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
       'account_registration[incoming_pattern_options][reply_status]' => TRUE,
       'account_registration[incoming_pattern_options][reply][message_success]' => '',
     ];
-    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, 'Save configuration');
     $this->assertRaw('Reply message must have a value if reply is enabled.', 'Validation failed for message_success on incoming_pattern when reply status is enabled.');
 
     $edit = [
@@ -227,7 +227,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
       'account_registration[incoming_pattern_options][reply_status]' => TRUE,
       'account_registration[incoming_pattern_options][reply][message_failure]' => '',
     ];
-    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, 'Save configuration');
     $this->assertRaw('Reply message must have a value if reply is enabled.', 'Validation failed for message_failure on incoming_pattern when reply status is enabled.');
   }
 
@@ -241,7 +241,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
       'account_registration[behaviour]' => 'incoming_pattern',
       'account_registration[incoming_pattern_options][incoming_message]' => '',
     ];
-    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, 'Save configuration');
     $this->assertRaw('Incoming message must be filled if using pre-incoming_pattern option');
 
     $edit = [
@@ -249,7 +249,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
       'account_registration[incoming_pattern_options][send_activation_email]' => TRUE,
       'account_registration[incoming_pattern_options][incoming_message]' => $this->randomString(),
     ];
-    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, 'Save configuration');
     $this->assertRaw('Activation email cannot be sent if [email] placeholder is missing.');
 
     $edit = [
@@ -257,7 +257,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
       'account_registration[incoming_pattern_options][send_activation_email]' => TRUE,
       'account_registration[incoming_pattern_options][incoming_message]' => 'E [email] P [password]',
     ];
-    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, 'Save configuration');
     $this->assertRaw('Activation email cannot be sent if [password] placeholder is present.');
 
     // Placeholder seperation.
@@ -266,7 +266,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
       'account_registration[behaviour]' => 'incoming_pattern',
       'account_registration[incoming_pattern_options][incoming_message]' => 'Email [email][password]',
     ];
-    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, t('Save configuration'));
+    $this->drupalPostForm(Url::fromRoute('sms_user.options'), $edit, 'Save configuration');
     $this->assertRaw('There must be a separator between placeholders.');
   }
 
@@ -277,9 +277,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
    */
   public function testFormNoUserPhoneNumberSettings() {
     $this->drupalGet(Url::fromRoute('sms_user.options'));
-    $this->assertRaw(t('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings. <a href=":add">Add phone number settings</a>.', [
-      ':add' => Url::fromRoute('entity.phone_number_settings.add')->toString(),
-    ]), 'Warning message displayed for no phone number settings.');
+    $this->assertRaw('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings. <a href="' . Url::fromRoute('entity.phone_number_settings.add')->toString() . '">Add phone number settings</a>.', 'Warning message displayed for no phone number settings.');
 
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="all"]');
     $this->assertTrue(count($input) === 1, "The 'All unrecognised phone numbers' radio is disabled.");
@@ -296,7 +294,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
   public function testFormUserPhoneNumberSettings() {
     $this->createPhoneNumberSettings('user', 'user');
     $this->drupalGet(Url::fromRoute('sms_user.options'));
-    $this->assertNoRaw(t('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings.'), 'Warning message displayed for no phone number settings.');
+    $this->assertNoRaw('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings.', 'Warning message displayed for no phone number settings.');
 
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="all"]');
     $this->assertTrue(count($input) === 0, "The 'All unrecognised phone numbers' radio is not disabled.");
