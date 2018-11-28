@@ -4,5 +4,5 @@ type: module
 core: 8.x
 package: SMS Framework
 dependencies:
- - sms
- - user
+ - sms:sms
+ - drupal:user

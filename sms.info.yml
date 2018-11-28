@@ -7,5 +7,5 @@ project: smsframework
 configure: admin/config/smsframework
 dependencies:
   - drupal:system (>= 8.5)
-  - telephone
-  - dynamic_entity_reference
+  - drupal:telephone
+  - dynamic_entity_reference:dynamic_entity_reference
