@@ -4,4 +4,4 @@ description: Tools to assist building with the SMS Framework.
 core: 8.x
 package: SMS Framework
 dependencies:
-  - sms:sms
+  - smsframework:sms

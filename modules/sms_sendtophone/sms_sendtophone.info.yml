@@ -2,6 +2,6 @@ name: Send To Phone
 type: module
 description: Provides various tools for sending bits of information via SMS.
 dependencies:
-  - sms:sms
+  - smsframework:sms
 package: SMS Framework
 core: 8.x
