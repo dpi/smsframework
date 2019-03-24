@@ -21,9 +21,9 @@
     }
   ],
   "require": {
-    "drupal/core": "^8.0",
+    "drupal/core": "^8.5",
     "drupal/dynamic_entity_reference": "^1.0",
-    "drupal/telephone": "^8.0"
+    "drupal/telephone": "*"
   },
   "replace": {
     "drupal/sms_blast": "self.version",
