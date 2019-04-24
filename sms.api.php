@@ -44,6 +44,18 @@ class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSu
   /**
    * An example event subscriber.
    *
+   * @see \Drupal\sms\Event\SmsEvents::ENTITY_PHONE_NUMBERS
+   */
+  public function myEntityPhoneNumbers(\Drupal\sms\Event\SmsEntityPhoneNumber $event) {
+    // Entity to get phone numbers for.
+    $entity = $event->getEntity();
+    // Add a phone number for above entity.
+    $event->addPhoneNumber('+123456879');
+  }
+
+  /**
+   * An example event subscriber.
+   *
    * @see \Drupal\sms\Event\SmsEvents::MESSAGE_PRE_PROCESS
    */
   public function mySmsMessagePreprocess(\Drupal\sms\Event\SmsMessageEvent $event) {
@@ -97,6 +109,7 @@ class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSu
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
+    $events[\Drupal\sms\Event\SmsEvents::ENTITY_PHONE_NUMBERS][] = ['myEntityPhoneNumbers'];
     $events[\Drupal\sms\Event\SmsEvents::MESSAGE_PRE_PROCESS][] = ['mySmsMessagePreprocess'];
     $events[\Drupal\sms\Event\SmsEvents::MESSAGE_POST_PROCESS][] = ['mySmsMessagePostprocess'];
     $events[\Drupal\sms\Event\SmsEvents::MESSAGE_GATEWAY][] = ['mySmsMessageGateway'];
