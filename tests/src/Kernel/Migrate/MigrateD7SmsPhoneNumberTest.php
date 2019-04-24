@@ -33,6 +33,7 @@ class MigrateD7SmsPhoneNumberTest extends MigrateDrupal7TestBase {
     'sms',
     'telephone',
     'dynamic_entity_reference',
+    'filter',
   ];
 
   /**
