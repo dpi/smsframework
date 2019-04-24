@@ -16,6 +16,13 @@ use Drupal\sms\Direction;
  * @ConfigEntityType(
  *   id = "sms_gateway",
  *   label = @Translation("SMS Gateway"),
+ *   label_collection = @Translation("SMS Gateways"),
+ *   label_singular = @Translation("SMS gateway"),
+ *   label_plural = @Translation("SMS gateways"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count SMS gateway",
+ *     plural = "@count SMS gateways",
+ *   ),
  *   config_prefix = "gateway",
  *   admin_permission = "administer smsframework",
  *   entity_keys = {

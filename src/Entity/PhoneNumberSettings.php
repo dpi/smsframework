@@ -12,6 +12,13 @@ use Drupal\field\Entity\FieldConfig;
  * @ConfigEntityType(
  *   id = "phone_number_settings",
  *   label = @Translation("Phone number settings"),
+ *   label_collection = @Translation("Phone number settings"),
+ *   label_singular = @Translation("phone number settings"),
+ *   label_plural = @Translation("phone number settings"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count phone number settings",
+ *     plural = "@count phone number settings",
+ *   ),
  *   config_prefix = "phone",
  *   admin_permission = "administer smsframework",
  *   entity_keys = {
