@@ -69,9 +69,6 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
 
   /**
    * {@inheritdoc}
-   *
-   * @param array $data
-   *   - id: int: SMS message entity ID.
    */
   public function processItem($data) {
     if (isset($data['id'])) {

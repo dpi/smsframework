@@ -19,7 +19,7 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * The sender's name.
    *
-   * @var string|NULL
+   * @var string|null
    */
   protected $senderName;
 
@@ -56,22 +56,22 @@ class SmsMessage implements SmsMessageInterface {
    *
    * See \Drupal\sms\Direction constants for potential values.
    *
-   * @see \Drupal\sms\Direction
-   *
    * @var int
+   * @see \Drupal\sms\Direction
    */
   protected $direction;
 
   /**
+   * Other options to be used for the SMS.
+   *
    * @var string
-   *   Other options to be used for the sms.
    */
   protected $options = [];
 
   /**
    * The result associated with this SMS message.
    *
-   * @var \Drupal\sms\Message\SmsMessageResultInterface|NULL
+   * @var \Drupal\sms\Message\SmsMessageResultInterface|null
    */
   protected $result;
 

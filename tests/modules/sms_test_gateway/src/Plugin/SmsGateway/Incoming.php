@@ -15,7 +15,6 @@ use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Drupal\sms\SmsProcessingResponse;
 
 /**
- *
  * Defines a gateway supporting incoming route.
  *
  * @SmsGateway(
@@ -46,7 +45,7 @@ class Incoming extends SmsGatewayPluginBase {
    * @return \Drupal\sms\SmsProcessingResponse
    *   A SMS processing response task.
    */
-  function processIncoming(Request $request, SmsGatewayInterface $sms_gateway) {
+  public function processIncoming(Request $request, SmsGatewayInterface $sms_gateway) {
     $json = Json::decode($request->getContent());
     $raw_messages = $json['messages'];
 

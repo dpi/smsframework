@@ -15,14 +15,14 @@ class ActiveHours implements ActiveHoursInterface {
   /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface;
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * Whether active hours is enabled in configuration.
    *
-   * @var boolean|NULL
+   * @var bool|null
    *   Whether active hours is enabled in configuration or NULL if configuration
    *   has not been built yet.
    */

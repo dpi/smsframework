@@ -21,9 +21,9 @@ class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase {
   ];
 
   /**
-   * @var \Drupal\sms\Provider\SmsProviderInterface
-   *
    * The default SMS provider.
+   *
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $smsProvider;
 

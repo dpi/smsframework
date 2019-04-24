@@ -1,5 +1,7 @@
 <?php
 
+// phpcs:disable Drupal.NamingConventions.ValidVariableName.LowerCamelName
+
 namespace Drupal\sms\Annotation;
 
 use Drupal\Component\Annotation\Plugin;
@@ -37,14 +39,14 @@ class SmsGateway extends Plugin {
   /**
    * Whether the gateway supports receiving messages.
    *
-   * @var boolean
+   * @var bool
    */
   protected $incoming;
 
   /**
    * Whether to automatically create a route for receiving incoming messages.
    *
-   * @var boolean
+   * @var bool
    */
   protected $incoming_route;
 
@@ -56,34 +58,31 @@ class SmsGateway extends Plugin {
    * message is a SMS message entity. See the schedule aware gateway
    * implementation in the test modules for an example.
    *
-   * @var boolean
+   * @var bool
    */
   protected $schedule_aware;
 
   /**
    * Whether the gateway can pull reports.
    *
+   * @var bool
    * @see \Drupal\sms\Entity\SmsGatewayInterface::supportsReportsPull()
-   *
-   * @var boolean
    */
   protected $reports_pull;
 
   /**
    * Whether the gateway can handle reports pushed to the site.
    *
+   * @var bool
    * @see \Drupal\sms\Entity\SmsGatewayInterface::supportsReportsPush()
-   *
-   * @var boolean
    */
   protected $reports_push;
 
   /**
    * Whether the gateway supports queries of current credit balance.
    *
+   * @var bool
    * @see \Drupal\sms\Entity\SmsGatewayInterface::supportsCreditBalanceQuery()
-   *
-   * @var boolean
    */
   protected $credit_balance_available;
 

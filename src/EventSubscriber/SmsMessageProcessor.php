@@ -122,7 +122,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
 
     $message_recipients = $sms_message->getRecipients();
     $result_recipients = array_map(
-      function(SmsDeliveryReportInterface $report) {
+      function (SmsDeliveryReportInterface $report) {
         return $report->getRecipient();
       },
       $result->getReports()
@@ -220,7 +220,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    */
   protected function getGatewayForPhoneNumber($recipient) {
     $event = new RecipientGatewayEvent($recipient);
-    /** @var RecipientGatewayEvent $event */
+    /** @var \Drupal\sms\Event\RecipientGatewayEvent $event */
     $event = $this->eventDispatcher
       ->dispatch(SmsEvents::MESSAGE_GATEWAY, $event);
 

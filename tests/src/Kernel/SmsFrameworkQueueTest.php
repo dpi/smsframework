@@ -43,7 +43,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
   /**
    * The cron service.
    *
-   * @var \Drupal\Core\Cron;
+   * @var \Drupal\Core\Cron
    */
   protected $cronService;
 

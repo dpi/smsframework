@@ -17,17 +17,30 @@ use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
  * @group SMS Framework
  * @coversDefaultClass \Drupal\sms\Entity\SmsDeliveryReport
  */
-class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase  {
+class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
 
   use SmsFrameworkTestTrait;
+  // Remove 'test' prefix so it will not be run by test runner and override.
   use SmsFrameworkDeliveryReportTestTrait {
-    // Remove 'test' prefix so it will not be run by test runner and override.
     testTimeQueued as timeQueued;
     testTimeDelivered as timeDelivered;
   }
 
-  public static $modules = ['user', 'sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference', 'entity_test'];
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = [
+    'user',
+    'sms',
+    'sms_test_gateway',
+    'telephone',
+    'dynamic_entity_reference',
+    'entity_test',
+  ];
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
     $this->installEntitySchema('entity_test');

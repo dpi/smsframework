@@ -14,7 +14,7 @@
  * @param array $gateways
  *   An array of gateway definitions keyed by plugin ID.
  */
-function hook_sms_gateway_info_alter(&$gateways) {
+function hook_sms_gateway_info_alter(array &$gateways) {
   $gateways['log']['label'] = new \Drupal\Core\StringTranslation\TranslatableMarkup('The Logger');
 }
 

@@ -67,8 +67,8 @@ class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
     for ($i = 0; $i < 6; $i++) {
       /** @var \Drupal\user\UserInterface $user */
       $user = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
-      // Need to activate so when DER does entity validation it is included by the
-      // UserSelection plugin.
+      // Need to activate so when DER does entity validation it is included by
+      // the UserSelection plugin.
       $user->activate()->save();
       $entities[] = $user;
     }

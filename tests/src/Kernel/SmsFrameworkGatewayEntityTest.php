@@ -268,7 +268,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
    * @return \Drupal\sms\Entity\SmsGatewayInterface
    *   An unsaved gateway config entity.
    */
-  protected function createGateway($values = []) {
+  protected function createGateway(array $values = []) {
     return SmsGateway::create($values + [
       'plugin' => 'memory',
     ]);

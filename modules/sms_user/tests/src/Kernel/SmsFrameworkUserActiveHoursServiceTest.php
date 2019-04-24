@@ -290,7 +290,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    * @return \Drupal\user\UserInterface
    *   A saved user entity.
    */
-  protected function createUser($values = []) {
+  protected function createUser(array $values = []) {
     $user = User::create([
       'uid' => 1,
       'name' => $this->randomMachineName(),

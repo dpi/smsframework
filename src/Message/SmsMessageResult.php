@@ -12,7 +12,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
   /**
    * The error of the message, or NULL if unknown.
    *
-   * @var string|NULL
+   * @var string|null
    */
   protected $error = NULL;
 
@@ -35,7 +35,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
    *
    * This number is in the SMS gateway's chosen denomination.
    *
-   * @var float|NULL
+   * @var float|null
    */
   protected $creditsBalance = NULL;
 
@@ -44,7 +44,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
    *
    * This number is in the SMS gateway's chosen denomination.
    *
-   * @var float|NULL
+   * @var float|null
    */
   protected $creditsUsed = NULL;
 

@@ -3,7 +3,6 @@
 namespace Drupal\Tests\sms\Functional;
 
 use Drupal\sms\Direction;
-use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Message\SmsMessageReportStatus;
 use Drupal\sms\Message\SmsMessageResult;

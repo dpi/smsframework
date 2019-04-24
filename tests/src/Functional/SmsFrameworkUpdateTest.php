@@ -19,7 +19,12 @@ class SmsFrameworkUpdateTest extends UpdatePathTestBase {
 
   use SmsFrameworkTestTrait;
 
-  protected static $modules = ['user', 'telephone', 'dynamic_entity_reference', 'sms'];
+  protected static $modules = [
+    'user',
+    'telephone',
+    'dynamic_entity_reference',
+    'sms',
+  ];
 
   /**
    * {@inheritdoc}

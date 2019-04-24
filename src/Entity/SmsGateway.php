@@ -64,12 +64,12 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   /**
    * The plugin instance settings.
    *
+   * @var array
+   *
    * Access settings using:
    * @code
    *   $gateway->getPlugin()->getConfiguration();
    * @endcode
-   *
-   * @var array
    */
   protected $settings = [];
 
@@ -90,7 +90,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   /**
    * Whether messages sent to this gateway should be sent immediately.
    *
-   * @var boolean
+   * @var bool
    */
   protected $skip_queue;
 
@@ -123,7 +123,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   protected $retention_duration_outgoing;
 
   /**
-   * @inheritDoc
+   * {@inheritdoc}
    */
   public static function preCreate(EntityStorageInterface $storage, array &$values) {
     parent::preCreate($storage, $values);
@@ -138,7 +138,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   }
 
   /**
-   * @inheritDoc
+   * {@inheritdoc}
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);

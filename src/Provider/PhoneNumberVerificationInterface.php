@@ -3,7 +3,6 @@
 namespace Drupal\sms\Provider;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\sms\Message\SmsMessageInterface;
 
 /**
  * Interface for phone number provider.

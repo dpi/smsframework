@@ -167,7 +167,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * exception will be thrown if this method is called on an SmsMessage that
    * already has saved results.
    *
-   * @param \Drupal\sms\Message\SmsMessageResultInterface|NULL $result
+   * @param \Drupal\sms\Message\SmsMessageResultInterface|null $result
    *   The result to associate with this SMS message, or NULL if there is no
    *   result.
    *
@@ -208,7 +208,8 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
         ]);
       return $reports ? reset($reports) : NULL;
     }
-    return NULL;  }
+    return NULL;
+  }
 
   /**
    * {@inheritdoc}

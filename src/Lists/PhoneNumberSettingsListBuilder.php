@@ -50,8 +50,12 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
   }
 
   /**
-   * {@inheritdoc}
+   * Constructs a new PhoneNumberSettingsListBuilder.
    *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type definition.
+   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   *   The entity storage class.
    * @param \Drupal\Core\Entity\EntityStorageInterface $phone_number_verification_storage
    *   Storage for Phone Number Verification entities.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack

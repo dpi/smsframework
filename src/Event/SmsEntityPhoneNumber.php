@@ -20,10 +20,11 @@ class SmsEntityPhoneNumber extends Event {
   protected $entity;
 
   /**
-   * Whether the returned phone numbers must be verified, or NULL to get all
-   * phone numbers regardless of status.
+   * Whether the returned phone numbers must be verified.
    *
-   * @var boolean|NULL
+   * Use NULL to get all phone numbers regardless of status.
+   *
+   * @var bool|null
    */
   protected $verified;
 
@@ -39,7 +40,7 @@ class SmsEntityPhoneNumber extends Event {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to find phone numbers.
-   * @param boolean|NULL $verified
+   * @param bool|null $verified
    *   Whether the returned phone numbers must be verified, or NULL to get all
    *   phone numbers regardless of status.
    */
@@ -61,7 +62,7 @@ class SmsEntityPhoneNumber extends Event {
   /**
    * Get phone numbers with this verification state.
    *
-   * @return boolean|NULL
+   * @return bool|null
    *   Whether the returned phone numbers must be verified, or NULL to get all
    *   phone numbers regardless of status.
    */

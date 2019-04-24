@@ -128,7 +128,6 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
     $this->smsProvider->queue($sms_message);
   }
 
-
   /**
    * Ensure exception thrown if outgoing message is missing recipient reports.
    *

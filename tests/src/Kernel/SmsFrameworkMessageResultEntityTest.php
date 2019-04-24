@@ -20,8 +20,18 @@ class SmsFrameworkMessageResultEntityTest extends KernelTestBase {
 
   use SmsFrameworkMessageResultTestTrait;
 
-  public static $modules = ['user', 'sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference', 'entity_test'];
+  public static $modules = [
+    'user',
+    'sms',
+    'sms_test_gateway',
+    'telephone',
+    'dynamic_entity_reference',
+    'entity_test',
+  ];
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
     $this->installEntitySchema('entity_test');

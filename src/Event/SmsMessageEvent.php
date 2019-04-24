@@ -50,7 +50,7 @@ class SmsMessageEvent extends Event {
    * @return $this
    *   Returns this event for chaining.
    */
-  public function setMessages($messages) {
+  public function setMessages(array $messages) {
     $this->messages = $messages;
     return $this;
   }

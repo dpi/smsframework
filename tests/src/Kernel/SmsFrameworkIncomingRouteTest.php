@@ -3,7 +3,6 @@
 namespace Drupal\Tests\sms\Kernel;
 
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Drupal\Core\Url;
 
 /**
  * Tests incoming routes for gateway plugins.

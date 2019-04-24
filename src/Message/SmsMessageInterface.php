@@ -285,7 +285,7 @@ interface SmsMessageInterface {
    * @param string $recipient
    *   The number of the recipient for which the report is to be retrieved.
    *
-   * @return \Drupal\sms\Message\SmsDeliveryReportInterface|NULL
+   * @return \Drupal\sms\Message\SmsDeliveryReportInterface|null
    *   A delivery report object, or NULL if there is no report for the
    *   recipient.
    *

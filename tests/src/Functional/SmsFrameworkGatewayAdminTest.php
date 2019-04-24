@@ -6,7 +6,6 @@ use Drupal\Core\Url;
 use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsGateway;
-use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
 
 /**
  * Tests gateway administration user interface.

@@ -27,7 +27,7 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
    * A status code from \Drupal\sms\Message\SmsMessageStatus, or NULL if
    * unknown.
    *
-   * @var string|NULL
+   * @var string|null
    */
   protected $status = NULL;
 
@@ -48,14 +48,14 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
   /**
    * The timestamp when the message was queued, or NULL if unknown.
    *
-   * @var string|NULL
+   * @var string|null
    */
   protected $timeQueued = NULL;
 
   /**
    * The timestamp when the message was delivered, or NULL if unknown.
    *
-   * @var string|NULL
+   * @var string|null
    */
   protected $timeDelivered = NULL;
 
