@@ -3,6 +3,7 @@ description: Allows bulk text messages to be sent to registered users.
 type: module
 core: 8.x
 package: SMS Framework
+configure: sms_blast.blast
 dependencies:
  - smsframework:sms
  - drupal:user
