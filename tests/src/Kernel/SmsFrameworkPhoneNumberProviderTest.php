@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\entity_test\Entity\EntityTest;
 use Drupal\sms\Exception\NoPhoneNumberException;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -152,6 +153,34 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
       $return = $this->phoneNumberProvider->getPhoneNumbers($entity, TRUE);
       $this->assertEquals($phone_number_verified, $return);
     }
+  }
+
+  /**
+   * Tests getting a phone number, where no verification exists.
+   *
+   * Normally a phone number verification is maintained as field values change,
+   * via updatePhoneVerificationByEntity. However field values may exist before
+   * a phone number settings map exist, or values may be entered in manually,
+   * such as with migrate with hooks turned off.
+   *
+   * @covers ::getPhoneNumbers
+   */
+  public function testGetPhoneNumbersNoVerification() {
+    $phoneNumberSettings = $this->phoneNumberSettings;
+    $this->phoneNumberSettings->delete();
+
+    // Explicitly don't use createEntityWithPhoneNumber because we dont have
+    // phone number settings yet.
+    $entity = EntityTest::create([
+      $this->phoneField->getName() => '+123123123',
+    ]);
+    $entity->save();
+
+    // Recreate settings.
+    $phoneNumberSettings->save();
+
+    // Must check for verified:
+    $this->assertEquals([], $this->phoneNumberProvider->getPhoneNumbers($entity, TRUE));
   }
 
   /**

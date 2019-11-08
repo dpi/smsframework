@@ -66,7 +66,7 @@ class SmsEntityPhoneNumberProcessor implements EventSubscriberInterface {
       else {
         $verification = $this->phoneNumberVerification
           ->getPhoneVerificationByEntity($entity, $phone_number);
-        if (($verification->getStatus() == $verified)) {
+        if ($verification && $verification->getStatus() == $verified) {
           $event->addPhoneNumber($phone_number);
         }
       }
