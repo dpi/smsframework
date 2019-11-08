@@ -1,0 +1,20 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/php:7.3-cli
+    steps:
+      - run: sudo apt update
+      - run: sudo apt install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev
+      - run: sudo docker-php-ext-install gd
+      - run: composer global require hirak/prestissimo
+      - run: composer create-project drupal-composer/drupal-project:8.x-dev drupal --no-interaction
+      - checkout:
+          path: drupal/web/modules/contrib/smsframework
+      - run:
+          command: cd drupal/web/modules/contrib/smsframework &&
+            echo $(pwd) &&
+            /usr/local/bin/composer install &&
+            ./vendor/bin/phpstan analyse --no-progress -c phpstan.neon --level=max > phpstan-report.txt
+      - store_artifacts:
+          path: drupal/web/modules/contrib/smsframework/phpstan-report.txt

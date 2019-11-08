@@ -1,0 +1,17 @@
+parameters:
+  reportUnmatchedIgnoredErrors: false
+  customRulesetUsed: true
+  paths:
+    - .
+  excludes_analyse:
+    - *Test.php
+    - *TestBase.php
+    - *ServiceProvider.php
+    - vendor/
+  fileExtensions:
+    - module
+    - theme
+    - profile
+includes:
+  - vendor/mglaman/phpstan-drupal/extension.neon
+  - vendor/phpstan/phpstan-deprecation-rules/rules.neon
