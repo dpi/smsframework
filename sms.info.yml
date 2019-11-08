@@ -3,7 +3,7 @@ description: Provides an extensible API that facilitates communication between D
 package: SMS Framework
 core: 8.x
 type: module
-configure: admin/config/smsframework
+configure: sms.admin
 dependencies:
   - drupal:system (>= 8.5)
   - drupal:telephone
