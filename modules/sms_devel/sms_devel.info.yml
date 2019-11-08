@@ -3,6 +3,5 @@ type: module
 description: Tools to assist building with the SMS Framework.
 core: 8.x
 package: SMS Framework
-configure: sms_devel.message
 dependencies:
   - smsframework:sms
