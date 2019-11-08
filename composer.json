@@ -8,6 +8,12 @@
     "issues": "https://www.drupal.org/project/issues/smsframework",
     "source": "http://cgit.drupalcode.org/smsframework"
   },
+  "repositories": [
+      {
+          "type": "composer",
+          "url": "https://packages.drupal.org/8"
+      }
+  ],
   "authors": [
     {
       "name": "Aniebiet Udoh",
@@ -30,5 +36,10 @@
     "drupal/sms_devel": "self.version",
     "drupal/sms_sendtophone": "self.version",
     "drupal/sms_user": "self.version"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^0.11.19",
+    "mglaman/phpstan-drupal": "^0.11.12",
+    "phpstan/phpstan-deprecation-rules": "^0.11.2"
   }
 }

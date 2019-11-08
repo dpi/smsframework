@@ -1,0 +1,24 @@
+parameters:
+  # customRulesetUsed turns on the extensions in 'includes' section.
+  reportUnmatchedIgnoredErrors: false
+  customRulesetUsed: true
+  paths:
+    - src
+  excludes_analyse:
+    - *Test.php
+    - *TestBase.php
+    - *ServiceProvider.php
+  fileExtensions:
+    - module
+    - theme
+    - profile
+#  ignoreErrors:
+#    # Core incorrectly types range as NULL only.
+#    - '#\QueryInterface::range() expects null, int given.#'
+#    # Using Field API on entities gives these kinds of errors.
+#    - '#Property Drupal\\Core\\Field\\FieldItemListInterface::\$value \(string\) does not accept int.#'
+#    - '#Access to an undefined property Drupal\\Core\\Field\\FieldItemListInterface#'
+##    - '#Property Drupal\\Core\\Field\\FieldItemListInterface::.* (.*) does not accept#'
+includes:
+  - vendor/mglaman/phpstan-drupal/extension.neon
+  - vendor/phpstan/phpstan-deprecation-rules/rules.neon
