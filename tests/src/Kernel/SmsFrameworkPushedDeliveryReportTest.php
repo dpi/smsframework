@@ -39,8 +39,12 @@ class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase {
    */
   public function testDeliveryReportRoute() {
     $gateway = $this->createMemoryGateway();
-    $route = 'sms.delivery_report.receive.' . $gateway->id();
-    $this->routeProvider->getRouteByName($route);
+    $name = 'sms.delivery_report.receive.' . $gateway->id();
+    $route = $this->routeProvider->getRouteByName($name);
+    $this->assertEquals(
+      $gateway->getPushReportPath(),
+      $route->getPath()
+    );
   }
 
   /**
