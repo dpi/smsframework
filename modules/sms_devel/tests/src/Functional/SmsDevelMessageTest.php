@@ -46,12 +46,12 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = TRUE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertResponse(200);
-    $this->assertRaw('Message was processed, 1 delivery reports were generated.');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseContains('Message was processed, 1 delivery reports were generated.');
 
     $messages = $this->getTestMessages($this->gateway);
-    $this->assertEqual(1, count($messages));
-    $this->assertEqual($edit['message'], $messages[0]->getMessage());
+    $this->assertEquals(1, count($messages));
+    $this->assertEquals($edit['message'], $messages[0]->getMessage());
   }
 
   /**
@@ -63,13 +63,13 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = FALSE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertResponse(200);
-    $this->assertRaw('Message added to the outgoing queue.');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseContains('Message added to the outgoing queue.');
 
     $messages = SmsMessage::loadMultiple();
     $message = reset($messages);
-    $this->assertEqual($edit['message'], $message->getMessage(), 'Message is same');
-    $this->assertEqual(Direction::OUTGOING, $message->getDirection(), 'Message is outgoing');
+    $this->assertEquals($edit['message'], $message->getMessage(), 'Message is same');
+    $this->assertEquals(Direction::OUTGOING, $message->getDirection(), 'Message is outgoing');
   }
 
   /**
@@ -82,10 +82,10 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = TRUE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Receive'));
-    $this->assertResponse(200);
-    $this->assertRaw('Message was processed, 1 delivery reports were generated.');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseContains('Message was processed, 1 delivery reports were generated.');
 
-    $this->assertEqual($edit['message'], sms_test_gateway_get_incoming()['message']);
+    $this->assertEquals($edit['message'], sms_test_gateway_get_incoming()['message']);
   }
 
   /**
@@ -98,13 +98,13 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = FALSE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Receive'));
-    $this->assertResponse(200);
-    $this->assertRaw('Message added to the incoming queue.');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseContains('Message added to the incoming queue.');
 
     $messages = SmsMessage::loadMultiple();
     $message = reset($messages);
-    $this->assertEqual($edit['message'], $message->getMessage(), 'Message is same');
-    $this->assertEqual(Direction::INCOMING, $message->getDirection(), 'Message is incoming');
+    $this->assertEquals($edit['message'], $message->getMessage(), 'Message is same');
+    $this->assertEquals(Direction::INCOMING, $message->getDirection(), 'Message is incoming');
   }
 
   /**
@@ -114,8 +114,8 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['gateway'] = '';
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Receive'));
-    $this->assertResponse(200);
-    $this->assertRaw('Gateway must be selected if receiving a message.');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseContains('Gateway must be selected if receiving a message.');
   }
 
   /**
@@ -128,7 +128,7 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['automated'] = FALSE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     $messages = SmsMessage::loadMultiple();
     $message = reset($messages);
@@ -152,11 +152,11 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['send_on[date]'] = $date_user->format('Y-m-d');
     $edit['send_on[time]'] = $date_user->format('H:i:s');
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     $messages = SmsMessage::loadMultiple();
     $message = reset($messages);
-    $this->assertEqual($date->format('U'), $message->getSendTime(), 'Message has send time.');
+    $this->assertEquals($date->format('U'), $message->getSendTime(), 'Message has send time.');
   }
 
   /**
@@ -170,11 +170,80 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = TRUE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertResponse(200);
-    $this->assertRaw('Message could not be sent');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseContains('Message could not be sent');
 
     $messages = $this->getTestMessages($this->gateway);
-    $this->assertEqual(0, count($messages), 'No messages sent.');
+    $this->assertEquals(0, count($messages), 'No messages sent.');
+  }
+
+  /**
+   * Tests verbose message output.
+   */
+  function testVerboseReports() {
+    $edit['gateway'] = $this->gateway->id();
+    $edit['number'] = $this->randomPhoneNumbers(1)[0];
+    $edit['message'] = $this->randomString();
+    $edit['skip_queue'] = TRUE;
+    $edit['verbose'] = TRUE;
+
+    $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseContains('Message was processed, 1 delivery reports were generated.');
+
+    $first_row = '#edit-results > tbody > tr:nth-child(1)';
+    
+    // Result.
+    $selector = $first_row . ' > td:nth-child(1)';
+    $this->assertSession()->elementTextContains('css', $selector, '#0');
+
+    // Error.
+    $selector = $first_row . ' > td:nth-child(2)';
+    $this->assertSession()->elementTextContains('css', $selector, 'Success');
+
+    // Error Message.
+    $selector = $first_row . ' > td:nth-child(3)';
+    $this->assertSession()->elementTextContains('css', $selector, 'Undefined');
+
+    // Credits Used.
+    $selector = $first_row . ' > td:nth-child(4)';
+    $this->assertSession()->elementTextContains('css', $selector, 'Undefined');
+
+    // Credits Balance.
+    $selector = $first_row . ' > td:nth-child(5)';
+    $this->assertSession()->elementTextContains('css', $selector, 'Undefined');
+
+    $message = $this->getLastTestMessage($this->gateway);
+    $report = $message->getReports()[0];
+    $this->assertEquals($edit['number'], $report->getRecipient());
+
+    $first_row_first_report = '#edit-results > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(1)';
+
+    // Recipient.
+    $selector = $first_row_first_report . ' > td:nth-child(1)';
+    $this->assertSession()->elementTextContains('css', $selector, $report->getRecipient());
+
+    // Message ID.
+    $selector = $first_row_first_report . ' > td:nth-child(2)';
+    $this->assertSession()->elementTextContains('css', $selector, $report->getMessageId());
+
+    // Status.
+    $selector = $first_row_first_report . ' > td:nth-child(3)';
+    $this->assertSession()->elementTextContains('css', $selector, $report->getStatus());
+
+    // Status Message.
+    $selector = $first_row_first_report . ' > td:nth-child(4)';
+    $this->assertSession()->elementTextContains('css', $selector, $report->getStatusMessage());
+
+    // Time Delivered.
+    $date = DrupalDateTime::createFromTimestamp($report->getTimeDelivered());
+    $selector = $first_row_first_report . ' > td:nth-child(5)';
+    $this->assertSession()->elementTextContains('css', $selector, $date->format('c'));
+
+    // Time Queued.
+    $date = DrupalDateTime::createFromTimestamp($report->getTimeQueued());
+    $selector = $first_row_first_report . ' > td:nth-child(6)';
+    $this->assertSession()->elementTextContains('css', $selector, $date->format('c'));
   }
 
 }

@@ -11,6 +11,7 @@
         <testsuite name="SMS Framework">
             <directory>./tests</directory>
             <directory>./modules/sms_user/tests</directory>
+            <directory>./modules/sms_devel/tests</directory>
         </testsuite>
     </testsuites>
     <!-- Filter for coverage reports. -->
