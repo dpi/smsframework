@@ -22,7 +22,7 @@
   ],
   "require": {
     "php": "^7.3",
-    "drupal/core": "^8.9 ^9",
+    "drupal/core": "^8.9 || ^9",
     "drupal/dynamic_entity_reference": "^1.0",
     "drupal/telephone": "*"
   },
