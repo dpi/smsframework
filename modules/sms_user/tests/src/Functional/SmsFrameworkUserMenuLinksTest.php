@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\sms_user\Functional;
 
+use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
 use Drupal\Core\Url;
 
@@ -33,7 +34,9 @@ class SmsFrameworkUserMenuLinksTest extends SmsFrameworkBrowserTestBase {
    * Tests dynamic menu links are found.
    */
   public function testDynamicMenuLinks() {
-    entity_get_form_display('user', 'user', 'default')->save();
+    $entityDisplayRepo = \Drupal::service('entity_display.repository');
+    assert($entityDisplayRepo instanceof EntityDisplayRepositoryInterface);
+    $entityDisplayRepo->getFormDisplay('user', 'user', 'default')->save();
     $this->createPhoneNumberSettings('user', 'user');
     $this->drupalGet(Url::fromRoute('user.admin_index'));
     $this->assertLink('User phone number');
