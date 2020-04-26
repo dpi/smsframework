@@ -5,6 +5,7 @@
  * Token callbacks for the sms module.
  */
 
+use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Url;
 use Drupal\sms\Message\SmsMessageInterface;
@@ -52,8 +53,9 @@ function sms_tokens($type, $tokens, array $data, array $options, BubbleableMetad
       switch ($name) {
         case 'verification-url':
           $url_options = ['absolute' => TRUE];
-          $result = Url::fromRoute('sms.phone.verify', [], $url_options);
-          $replacements[$original] = $result->toString(TRUE);
+          $result = Url::fromRoute('sms.phone.verify', [], $url_options)->toString(TRUE);
+          assert($result instanceof GeneratedUrl);
+          $replacements[$original] = $result->getGeneratedUrl();
           break;
       }
     }
