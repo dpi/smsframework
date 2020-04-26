@@ -3,11 +3,11 @@
 namespace Drupal\sms;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Controller\ControllerResolverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 
 /**
  * Provides a controller for receiving incoming messages.
@@ -15,11 +15,11 @@ use Symfony\Component\HttpFoundation\Request;
 class SmsIncomingController extends ControllerBase {
 
   /**
-   * The controller resolver.
+   * The argument resolver.
    *
-   * @var \Drupal\Core\Controller\ControllerResolverInterface
+   * @var \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface
    */
-  protected $controllerResolver;
+  protected $argumentResolver;
 
   /**
    * The SMS Provider.
@@ -31,13 +31,13 @@ class SmsIncomingController extends ControllerBase {
   /**
    * Creates an incoming route controller.
    *
-   * @param \Drupal\Core\Controller\ControllerResolverInterface $controller_resolver
-   *   The controller resolver.
+   * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $controller_resolver
+   *   The argument resolver.
    * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
    *   The SMS service provider.
    */
-  public function __construct(ControllerResolverInterface $controller_resolver, SmsProviderInterface $sms_provider) {
-    $this->controllerResolver = $controller_resolver;
+  public function __construct(ArgumentResolverInterface $controller_resolver, SmsProviderInterface $sms_provider) {
+    $this->argumentResolver = $controller_resolver;
     $this->smsProvider = $sms_provider;
   }
 
@@ -46,7 +46,7 @@ class SmsIncomingController extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('controller_resolver'),
+      $container->get('http_kernel.controller.argument_resolver'),
       $container->get('sms.provider')
     );
   }
@@ -64,7 +64,7 @@ class SmsIncomingController extends ControllerBase {
    */
   public function processIncoming(Request $request, SmsGatewayInterface $sms_gateway) {
     $controller = [$sms_gateway->getPlugin(), 'processIncoming'];
-    $arguments = $this->controllerResolver
+    $arguments = $this->argumentResolver
       ->getArguments($request, $controller);
 
     /** @var \Drupal\sms\SmsProcessingResponse $response */
