@@ -5,8 +5,8 @@ namespace Drupal\sms\Plugin\Field\FieldWidget;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Drupal\telephone\Plugin\Field\FieldWidget\TelephoneDefaultWidget;
-use Drupal\Core\Routing\UrlGeneratorTrait;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -23,8 +23,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class SmsTelephoneWidget extends TelephoneDefaultWidget {
-
-  use UrlGeneratorTrait;
 
   /**
    * Time.
@@ -86,7 +84,7 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
     $date_formatter = \Drupal::service('date.formatter');
     $current_time = $this->time->getRequestTime();
 
-    $t_args['@url'] = $this->url('sms.phone.verify');
+    $t_args['@url'] = Url::fromRoute('sms.phone.verify')->toString();
     $lifetime = $config->getVerificationCodeLifetime() ?: 0;
 
     if (isset($items[$delta]->value)) {
