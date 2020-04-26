@@ -2,7 +2,8 @@
 
 namespace Drupal\sms\Plugin;
 
-use Drupal\Component\Plugin\ConfigurablePluginInterface;
+use Drupal\Component\Plugin\ConfigurableInterface;
+use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\sms\Message\SmsMessageInterface;
@@ -12,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Default implementation of SMS gateway plugin.
  */
-interface SmsGatewayPluginInterface extends ConfigurablePluginInterface, PluginFormInterface, PluginInspectionInterface {
+interface SmsGatewayPluginInterface extends ConfigurableInterface, DependentPluginInterface, PluginFormInterface, PluginInspectionInterface {
 
   /**
    * Sends an SMS.
