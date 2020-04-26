@@ -12,6 +12,9 @@ use Drupal\sms\Message\SmsMessageInterface;
  */
 class SmsFrameworkPhoneNumberTest extends SmsFrameworkBrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static $modules = ['entity_test'];
 
   /**

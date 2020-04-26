@@ -13,9 +13,7 @@ use Drupal\Core\Url;
 class SmsFrameworkUserMenuLinksTest extends SmsFrameworkBrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   public static $modules = ['sms_user'];
 

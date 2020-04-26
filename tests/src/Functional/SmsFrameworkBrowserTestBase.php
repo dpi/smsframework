@@ -15,6 +15,9 @@ abstract class SmsFrameworkBrowserTestBase extends BrowserTestBase {
 
   use SmsFrameworkTestTrait;
 
+  /**
+   * {@inheritdoc}
+   */
   public static $modules = [
     'sms',
     'sms_test_gateway',

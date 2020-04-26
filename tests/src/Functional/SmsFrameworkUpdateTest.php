@@ -19,6 +19,9 @@ class SmsFrameworkUpdateTest extends UpdatePathTestBase {
 
   use SmsFrameworkTestTrait;
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = [
     'user',
     'telephone',

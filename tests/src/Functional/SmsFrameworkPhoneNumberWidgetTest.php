@@ -14,6 +14,9 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBase {
 
   use CronRunTrait;
 
+  /**
+   * {@inheritdoc}
+   */
   public static $modules = ['entity_test'];
 
   /**

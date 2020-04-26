@@ -20,6 +20,9 @@ class SmsFrameworkMessageResultEntityTest extends KernelTestBase {
 
   use SmsFrameworkMessageResultTestTrait;
 
+  /**
+   * {@inheritdoc}
+   */
   public static $modules = [
     'user',
     'sms',

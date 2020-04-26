@@ -19,9 +19,7 @@ use Drupal\sms\Direction;
 class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   public static $modules = [
     'sms',

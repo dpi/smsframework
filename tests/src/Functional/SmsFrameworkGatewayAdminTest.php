@@ -15,9 +15,7 @@ use Drupal\sms\Entity\SmsGateway;
 class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   public static $modules = ['block'];
 

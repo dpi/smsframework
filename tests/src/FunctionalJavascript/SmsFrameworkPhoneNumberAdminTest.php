@@ -15,6 +15,9 @@ class SmsFrameworkPhoneNumberAdminTest extends JavascriptTestBase {
 
   use SmsFrameworkTestTrait;
 
+  /**
+   * {@inheritdoc}
+   */
   public static $modules = ['sms', 'block', 'entity_test'];
 
   /**

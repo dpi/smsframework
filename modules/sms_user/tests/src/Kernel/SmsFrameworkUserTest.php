@@ -15,9 +15,7 @@ use Drupal\sms\Direction;
 class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   public static $modules = [
     'system',

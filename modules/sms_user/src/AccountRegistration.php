@@ -128,7 +128,6 @@ class AccountRegistration implements AccountRegistrationInterface {
 
       // @todo autoconfirm the number?
       // @see https://www.drupal.org/node/2709911
-
       $t_args['%name'] = $user->label();
       $t_args['%uid'] = $user->id();
       \Drupal::logger('sms_user.account_registration.unrecognized_sender')
@@ -191,7 +190,6 @@ class AccountRegistration implements AccountRegistrationInterface {
 
           // @todo autoconfirm the number?
           // @see https://www.drupal.org/node/2709911
-
           $message = $this->settings('incoming_pattern.reply.message');
           $message = str_replace('[user:password]', $password, $message);
 

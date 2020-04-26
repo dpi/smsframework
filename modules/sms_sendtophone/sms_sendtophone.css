@@ -2,6 +2,6 @@
   background: #f9f7bc;
 }
 
-#sms-sendtophone-send-form .message-preview {
+.sms-sendtophone--message-preview {
   font-family: monospace;
 }

@@ -15,6 +15,9 @@ use Drupal\sms\Entity\PhoneNumberSettings;
  */
 class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static $modules = ['sms', 'user', 'sms_blast'];
 
   /**

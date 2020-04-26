@@ -116,7 +116,7 @@ class SendToPhoneForm extends FormBase {
         ];
         $form['message_preview'] = [
           '#type' => 'item',
-          '#markup' => '<p class="message-preview">' . $this->getRequest()->get('text') . '</p>',
+          '#markup' => '<p class="sms-sendtophone--message-preview">' . $this->getRequest()->get('text') . '</p>',
           '#title' => t('Message preview'),
         ];
         break;

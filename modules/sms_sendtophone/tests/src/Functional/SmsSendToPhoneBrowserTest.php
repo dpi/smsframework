@@ -17,6 +17,9 @@ use Drupal\sms\Entity\PhoneNumberSettings;
  */
 class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static $modules = [
     'sms',
     'sms_sendtophone',

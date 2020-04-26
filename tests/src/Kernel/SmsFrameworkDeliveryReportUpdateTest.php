@@ -21,6 +21,9 @@ class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
 
   use SmsFrameworkTestTrait;
 
+  /**
+   * {@inheritdoc}
+   */
   public static $modules = [
     'sms',
     'sms_test_gateway',

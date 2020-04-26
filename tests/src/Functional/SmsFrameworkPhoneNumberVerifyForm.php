@@ -11,6 +11,9 @@ use Drupal\Core\Url;
  */
 class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkBrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static $modules = ['entity_test'];
 
   /**
