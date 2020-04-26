@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\Core\Url;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\Component\Utility\Html;
 
@@ -44,7 +45,7 @@ class SmsFrameworkTokenTest extends SmsFrameworkKernelBase {
   public function testSmsTokens() {
     $url_options = ['absolute' => TRUE];
     $this->assertEquals(
-      \Drupal::url('sms.phone.verify', [], $url_options),
+      Url::fromRoute('sms.phone.verify', [], $url_options)->toString(),
       $this->tokenService->replace('[sms:verification-url]')
     );
   }
