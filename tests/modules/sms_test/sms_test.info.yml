@@ -2,4 +2,4 @@ name: SMS Test
 type: module
 description: Module for testing general integration, such as Drupal hooks.
 package: Testing
-core: 8.x
+core_version_requirement: ^8.9 || ^9
