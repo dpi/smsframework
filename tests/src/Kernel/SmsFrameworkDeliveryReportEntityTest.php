@@ -152,7 +152,8 @@ class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
    * @covers ::preSave
    */
   public function testSaveReportWithoutParent() {
-    $this->setExpectedException(EntityStorageException::class, 'No parent SMS message specified for SMS delivery report');
+    $this->expectException(EntityStorageException::class);
+    $this->expectExceptionMessage('No parent SMS message specified for SMS delivery report');
     /** @var \Drupal\sms\Entity\SmsMessageResult $result */
     $result = $this->createDeliveryReport()
       ->setMessageId($this->randomMachineName())

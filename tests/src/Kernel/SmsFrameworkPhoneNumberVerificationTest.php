@@ -124,7 +124,7 @@ class SmsFrameworkPhoneNumberVerificationTest extends SmsFrameworkKernelBase {
       'type' => $this->randomMachineName(),
     ]);
 
-    $this->setExpectedException(PhoneNumberSettingsException::class);
+    $this->expectException(PhoneNumberSettingsException::class);
     $this->phoneNumberVerificationProvider->getPhoneNumberSettingsForEntity($test_entity_random_bundle);
   }
 

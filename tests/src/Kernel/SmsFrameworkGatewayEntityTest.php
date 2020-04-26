@@ -63,7 +63,8 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
    */
   public function testGetRetentionDurationInvalidDirection() {
     $gateway = $this->createGateway();
-    $this->setExpectedException(\InvalidArgumentException::class, '0 is not a valid direction.');
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage('0 is not a valid direction.');
     $gateway->getRetentionDuration(0);
   }
 

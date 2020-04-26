@@ -135,7 +135,8 @@ trait SmsFrameworkMessageResultTestTrait {
     $balance = 'foobar';
     $result = $this->createMessageResult();
 
-    $this->setExpectedException(SmsException::class, 'Credit balance set is a string');
+    $this->expectException(SmsException::class);
+    $this->expectExceptionMessage('Credit balance set is a string');
     $result->setCreditsBalance($balance);
   }
 
@@ -164,7 +165,8 @@ trait SmsFrameworkMessageResultTestTrait {
     $used = 'foobar';
     $result = $this->createMessageResult();
 
-    $this->setExpectedException(SmsException::class, 'Credit used is a string');
+    $this->expectException(SmsException::class);
+    $this->expectExceptionMessage('Credit used is a string');
     $result->setCreditsUsed($used);
   }
 

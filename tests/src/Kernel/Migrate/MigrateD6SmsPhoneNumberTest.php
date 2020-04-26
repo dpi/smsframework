@@ -40,7 +40,8 @@ class MigrateD6SmsPhoneNumberTest extends MigrateDrupal6TestBase {
    * Tests that the requirements for the d7_sms_number migration are enforced.
    */
   public function testMigrationRequirements() {
-    $this->setExpectedException(RequirementsException::class, 'Missing migrations d6_user, phone_number_settings.');
+    $this->expectException(RequirementsException::class);
+    $this->expectExceptionMessage('Missing migrations d6_user, phone_number_settings.');
     $this->getMigration('d6_sms_number')->checkRequirements();
   }
 

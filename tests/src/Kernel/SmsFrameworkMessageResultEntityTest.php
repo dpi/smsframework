@@ -84,7 +84,8 @@ class SmsFrameworkMessageResultEntityTest extends KernelTestBase {
    * Tests saving a message result without a parent SMS message.
    */
   public function testSaveResultWithoutParent() {
-    $this->setExpectedException(EntityStorageException::class, 'No parent SMS message specified for SMS message result');
+    $this->expectException(EntityStorageException::class);
+    $this->expectExceptionMessage('No parent SMS message specified for SMS message result');
     /** @var \Drupal\sms\Entity\SmsMessageResult $result */
     $result = $this->createMessageResult()
       ->setCreditsUsed(rand(5, 10))

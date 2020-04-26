@@ -180,7 +180,8 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::OUTGOING)
       ->setMessage($this->randomString());
-    $this->setExpectedException(RecipientRouteException::class, 'There are no recipients');
+    $this->expectException(RecipientRouteException::class);
+    $this->expectExceptionMessage('There are no recipients');
     $this->smsProvider->send($sms_message);
     $this->assertEquals(0, count($this->getTestMessages($this->gateway)));
   }
@@ -192,7 +193,8 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::OUTGOING)
       ->addRecipients($this->randomPhoneNumbers());
-    $this->setExpectedException(SmsException::class, 'Can not queue SMS message because there are 1 validation error(s): [message]: This value should not be null.');
+    $this->expectException(SmsException::class);
+    $this->expectExceptionMessage('Can not queue SMS message because there are 1 validation error(s): [message]: This value should not be null.');
     $this->smsProvider->queue($sms_message);
   }
 
@@ -205,7 +207,8 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_message = SmsMessage::create()
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers());
-    $this->setExpectedException(SmsDirectionException::class, 'Missing direction for message.');
+    $this->expectException(SmsDirectionException::class);
+    $this->expectExceptionMessage('Missing direction for message.');
     $this->smsProvider->queue($sms_message);
   }
 
@@ -216,7 +219,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    */
   public function testSendNoFallbackGateway() {
     $this->setFallbackGateway(NULL);
-    $this->setExpectedException(RecipientRouteException::class);
+    $this->expectException(RecipientRouteException::class);
     $message = $this->createSmsMessage()
       ->addRecipients($this->randomPhoneNumbers());
     $this->smsProvider->send($message);
@@ -241,7 +244,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    */
   public function testQueueNoFallbackGateway() {
     $this->setFallbackGateway(NULL);
-    $this->setExpectedException(RecipientRouteException::class);
+    $this->expectException(RecipientRouteException::class);
     $message = $this->createSmsMessage()
       ->addRecipients($this->randomPhoneNumbers());
     $this->smsProvider->queue($message);
@@ -333,7 +336,8 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    * Test an exception is thrown if a message has no recipients.
    */
   public function testNoRecipients() {
-    $this->setExpectedException(RecipientRouteException::class, 'There are no recipients.');
+    $this->expectException(RecipientRouteException::class);
+    $this->expectExceptionMessage('There are no recipients.');
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::OUTGOING)
       ->setMessage($this->randomString());

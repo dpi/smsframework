@@ -52,7 +52,7 @@ class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase {
    */
   public function testDeliveryReportRouteNoSupportPush() {
     $gateway = $this->createMemoryGateway(['plugin' => 'capabilities_default']);
-    $this->setExpectedException(RouteNotFoundException::class);
+    $this->expectException(RouteNotFoundException::class);
     $route = 'sms.delivery_report.receive.' . $gateway->id();
     $this->routeProvider->getRouteByName($route);
   }

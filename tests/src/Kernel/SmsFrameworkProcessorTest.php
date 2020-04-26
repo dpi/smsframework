@@ -81,7 +81,8 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
       ->addRecipients($this->randomPhoneNumbers())
       ->setGateway($this->gatewayMemory);
 
-    $this->setExpectedException(SmsPluginReportException::class, 'Missing result for message.');
+    $this->expectException(SmsPluginReportException::class);
+    $this->expectExceptionMessage('Missing result for message.');
     $this->smsProvider->queue($sms_message);
   }
 
@@ -100,7 +101,8 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
       ->setResult($result);
 
     $recipient_count = count($sms_message->getRecipients());
-    $this->setExpectedException(SmsPluginReportException::class, "Missing reports for $recipient_count recipient(s).");
+    $this->expectException(SmsPluginReportException::class);
+    $this->expectExceptionMessage("Missing reports for $recipient_count recipient(s).");
     $this->smsProvider->queue($sms_message);
   }
 
@@ -124,7 +126,8 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers());
 
-    $this->setExpectedException(SmsPluginReportException::class, 'Missing result for message.');
+    $this->expectException(SmsPluginReportException::class);
+    $this->expectExceptionMessage('Missing result for message.');
     $this->smsProvider->queue($sms_message);
   }
 
@@ -149,7 +152,8 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers($delete_count + 1));
 
-    $this->setExpectedException(SmsPluginReportException::class, "Missing reports for $delete_count recipient(s).");
+    $this->expectException(SmsPluginReportException::class);
+    $this->expectExceptionMessage("Missing reports for $delete_count recipient(s).");
     $this->smsProvider->queue($sms_message);
   }
 
@@ -164,7 +168,8 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers());
 
-    $this->setExpectedException(SmsException::class, 'Gateway not set on incoming message');
+    $this->expectException(SmsException::class);
+    $this->expectExceptionMessage('Gateway not set on incoming message');
     $this->smsProvider->queue($sms_message);
   }
 
@@ -184,7 +189,8 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
       ->addRecipients($this->randomPhoneNumbers())
       ->setGateway($gateway);
 
-    $this->setExpectedException(SmsException::class, "Gateway `" . $gateway->id() . "` does not support incoming messages.");
+    $this->expectException(SmsException::class);
+    $this->expectExceptionMessage("Gateway `" . $gateway->id() . "` does not support incoming messages.");
     $this->smsProvider->queue($sms_message);
   }
 

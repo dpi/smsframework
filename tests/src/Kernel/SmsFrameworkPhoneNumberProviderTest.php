@@ -196,7 +196,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $sms_message
       ->setSenderNumber('+999888777')
       ->setMessage($this->randomString());
-    $this->setExpectedException(NoPhoneNumberException::class);
+    $this->expectException(NoPhoneNumberException::class);
     $this->phoneNumberProvider->sendMessage($entity, $sms_message);
   }
 

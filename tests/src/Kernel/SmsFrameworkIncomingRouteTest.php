@@ -46,7 +46,7 @@ class SmsFrameworkIncomingRouteTest extends SmsFrameworkKernelBase {
    */
   public function testIncomingRouteUnsupported() {
     $gateway = $this->createMemoryGateway(['plugin' => 'capabilities_default']);
-    $this->setExpectedException(RouteNotFoundException::class);
+    $this->expectException(RouteNotFoundException::class);
     $route = 'sms.incoming.receive.' . $gateway->id();
     $this->routeProvider->getRouteByName($route);
   }
