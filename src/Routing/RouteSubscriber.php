@@ -71,7 +71,7 @@ class RouteSubscriber implements ContainerInjectionInterface {
     foreach (SmsGateway::loadMultiple() as $id => $gateway) {
       if ($gateway->supportsReportsPush()) {
         $path = $gateway->getPushReportPath();
-        if (mb_strlen($path) >= 2 && Unicode::substr($path, 0, 1) == '/') {
+        if (mb_strlen($path) >= 2 && mb_substr($path, 0, 1) == '/') {
           $route = (new Route($path))
             ->setDefault('_controller', '\Drupal\sms\DeliveryReportController::processDeliveryReport')
             ->setDefault('_sms_gateway_push_endpoint', $id)
@@ -82,7 +82,7 @@ class RouteSubscriber implements ContainerInjectionInterface {
 
       if ($gateway->autoCreateIncomingRoute()) {
         $path = $gateway->getPushIncomingPath();
-        if (mb_strlen($path) >= 2 && Unicode::substr($path, 0, 1) == '/') {
+        if (mb_strlen($path) >= 2 && mb_substr($path, 0, 1) == '/') {
           $parameters['sms_gateway']['type'] = 'entity:sms_gateway';
           $route = (new Route($path))
             ->setDefault('sms_gateway', $id)

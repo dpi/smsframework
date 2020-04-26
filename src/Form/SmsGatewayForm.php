@@ -273,7 +273,7 @@ class SmsGatewayForm extends EntityForm {
 
       // Length must be more than 2 chars, including leading slash character.
       if ($path_length > 0) {
-        if (Unicode::substr($path, 0, 1) !== '/') {
+        if (mb_substr($path, 0, 1) !== '/') {
           $form_state->setError($element, $this->t("Path must begin with a '/' character."));
         }
         if ($path_length == 1) {
