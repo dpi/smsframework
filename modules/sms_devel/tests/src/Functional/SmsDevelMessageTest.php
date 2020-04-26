@@ -151,7 +151,7 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     // The user inputs field values in its own timezone, then it is auto
     // converted on field submission to UTC.
     $date_user = $date;
-    $date_user->setTimezone(timezone_open(drupal_get_user_timezone()));
+    $date_user->setTimezone(new \DateTimeZone(date_default_timezone_get()));
     $edit['send_on[date]'] = $date_user->format('Y-m-d');
     $edit['send_on[time]'] = $date_user->format('H:i:s');
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
