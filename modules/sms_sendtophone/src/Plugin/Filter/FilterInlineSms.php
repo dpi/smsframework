@@ -27,8 +27,6 @@ use Drupal\filter\Plugin\FilterBase;
  */
 class FilterInlineSms extends FilterBase {
 
-  use LinkGeneratorTrait;
-
   /**
    * {@inheritdoc}
    */
