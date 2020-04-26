@@ -2,6 +2,7 @@
 
 namespace Drupal\sms\Plugin\SmsGateway;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
@@ -30,6 +31,13 @@ class LogGateway extends SmsGatewayPluginBase implements ContainerFactoryPluginI
   protected $logger;
 
   /**
+   * Time.
+   *
+   * @var \Drupal\Component\Datetime\TimeInterface
+   */
+  protected $time;
+
+  /**
    * Constructs a LogGateway object.
    *
    * @param array $configuration
@@ -40,11 +48,14 @@ class LogGateway extends SmsGatewayPluginBase implements ContainerFactoryPluginI
    *   The plugin implementation definition.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    *   The logger factory.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   Time.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, LoggerChannelFactoryInterface $logger_factory) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, LoggerChannelFactoryInterface $logger_factory, TimeInterface $time) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $definition = $this->getPluginDefinition();
     $this->logger = $logger_factory->get($definition['provider'] . '.' . $definition['id']);
+    $this->time = $time;
   }
 
   /**
@@ -55,7 +66,8 @@ class LogGateway extends SmsGatewayPluginBase implements ContainerFactoryPluginI
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('logger.factory')
+      $container->get('logger.factory'),
+      $container->get('datetime.time'),
     );
   }
 
@@ -74,7 +86,7 @@ class LogGateway extends SmsGatewayPluginBase implements ContainerFactoryPluginI
         ->setRecipient($number)
         ->setStatus(SmsMessageReportStatus::DELIVERED)
         ->setStatusMessage('DELIVERED')
-        ->setTimeDelivered(REQUEST_TIME);
+        ->setTimeDelivered($this->time->getRequestTime());
       $result->addReport($report);
     }
 

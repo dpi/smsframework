@@ -2,11 +2,11 @@
 
 namespace Drupal\sms\Lists;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Drupal\sms\Provider\PhoneNumberVerificationInterface;
 use Drupal\Core\Entity\EntityInterface;
 
@@ -30,11 +30,11 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
   protected $phoneNumberVerificationProvider;
 
   /**
-   * Current request time.
+   * Time.
    *
-   * @var int
+   * @var \Drupal\Component\Datetime\TimeInterface
    */
-  protected $requestTime;
+  protected $time;
 
   /**
    * {@inheritdoc}
@@ -44,8 +44,8 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
       $entity_type,
       $container->get('entity.manager')->getStorage($entity_type->id()),
       $container->get('entity_type.manager')->getStorage('sms_phone_number_verification'),
-      $container->get('request_stack'),
-      $container->get('sms.phone_number.verification')
+      $container->get('sms.phone_number.verification'),
+      $container->get('datetime.time'),
     );
   }
 
@@ -58,19 +58,16 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
    *   The entity storage class.
    * @param \Drupal\Core\Entity\EntityStorageInterface $phone_number_verification_storage
    *   Storage for Phone Number Verification entities.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
    * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification_provider
    *   The phone number verification provider.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   Time.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, EntityStorageInterface $phone_number_verification_storage, RequestStack $request_stack, PhoneNumberVerificationInterface $phone_number_verification_provider) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, EntityStorageInterface $phone_number_verification_storage, PhoneNumberVerificationInterface $phone_number_verification_provider, TimeInterface $time) {
     parent::__construct($entity_type, $storage);
     $this->phoneNumberVerificationStorage = $phone_number_verification_storage;
     $this->phoneNumberVerificationProvider = $phone_number_verification_provider;
-    $this->requestTime = $request_stack
-      ->getCurrentRequest()
-      ->server
-      ->get('REQUEST_TIME');
+    $this->time = $time;
   }
 
   /**

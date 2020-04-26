@@ -40,7 +40,7 @@ class SmsFrameworkDeliveryReportTest extends SmsFrameworkBrowserTestBase {
 
     // Get the delivery reports url and simulate push delivery report.
     $url = $test_gateway->getPushReportUrl()->setAbsolute()->toString();
-    $delivered_time = REQUEST_TIME;
+    $delivered_time = \Drupal::time()->getRequestTime();
     $delivery_report = <<<EOF
 {
    "reports":[

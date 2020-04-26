@@ -117,7 +117,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
    */
   public function testQueueDelayed() {
     $sms_message = $this->createSmsMessage()
-      ->setSendTime(REQUEST_TIME + 9999);
+      ->setSendTime(\Drupal::time()->getRequestTime() + 9999);
 
     $this->smsProvider->queue($sms_message);
 
@@ -132,7 +132,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
     $gateway = $this->createMemoryGateway(['plugin' => 'memory_schedule_aware']);
 
     $sms_message = $this->createSmsMessage()
-      ->setSendTime(REQUEST_TIME + 9999)
+      ->setSendTime(\Drupal::time()->getRequestTime() + 9999)
       ->setGateway($gateway);
 
     $this->smsProvider->queue($sms_message);
@@ -178,7 +178,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
 
     $this->assertEquals(1, count($this->getTestMessages($this->gateway)), 'One message was sent.');
     $this->assertEquals(1, count($sms_messages), 'There are SMS entities in storage.');
-    $this->assertEquals(REQUEST_TIME, $sms_message_new->getProcessedTime());
+    $this->assertEquals(\Drupal::time()->getRequestTime(), $sms_message_new->getProcessedTime());
     $this->assertEquals(FALSE, $sms_message_new->isQueued());
   }
 

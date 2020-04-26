@@ -16,7 +16,7 @@ services:
     arguments: ['@event_dispatcher', '@sms.provider']
   sms.phone_number.verification:
     class: Drupal\sms\Provider\PhoneNumberVerification
-    arguments: ['@entity_type.manager', '@config.factory', '@token', '@sms.provider']
+    arguments: ['@entity_type.manager', '@config.factory', '@token', '@sms.provider', '@datetime.time']
   sms.queue:
     class: Drupal\sms\Provider\SmsQueueProcessor
     arguments: ['@entity_type.manager', '@queue', '@sms.provider']

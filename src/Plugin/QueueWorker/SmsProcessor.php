@@ -2,6 +2,7 @@
 
 namespace Drupal\sms\Plugin\QueueWorker;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -35,6 +36,13 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
   protected $smsMessageStorage;
 
   /**
+   * Time.
+   *
+   * @var \Drupal\Component\Datetime\TimeInterface
+   */
+  protected $time;
+
+  /**
    * Constructs a new SmsProcessor object.
    *
    * @param array $configuration
@@ -47,11 +55,14 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
    *   The entity type manager.
    * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
    *   The SMS provider.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   Time.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, EntityTypeManagerInterface $entity_type_manager, SmsProviderInterface $sms_provider) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, EntityTypeManagerInterface $entity_type_manager, SmsProviderInterface $sms_provider, TimeInterface $time) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->smsMessageStorage = $entity_type_manager->getStorage('sms');
     $this->smsProvider = $sms_provider;
+    $this->time = $time;
   }
 
   /**
@@ -63,7 +74,8 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
       $plugin_id,
       $plugin_definition,
       $container->get('entity_type.manager'),
-      $container->get('sms.provider')
+      $container->get('sms.provider'),
+      $container->get('datetime.time'),
     );
   }
 
@@ -98,7 +110,7 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
         }
         else {
           $sms_message
-            ->setProcessedTime(REQUEST_TIME)
+            ->setProcessedTime($this->time->getRequestTime())
             ->setQueued(FALSE)
             ->save();
         }

@@ -185,7 +185,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    */
   public function testCreatedTime() {
     $sms_message = $this->createSmsMessage();
-    $this->assertEquals(REQUEST_TIME, $sms_message->getCreatedTime());
+    $this->assertEquals(\Drupal::time()->getRequestTime(), $sms_message->getCreatedTime());
   }
 
   /**
@@ -196,7 +196,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    */
   public function testSendTime() {
     $sms_message1 = $this->createSmsMessage();
-    $this->assertEquals(REQUEST_TIME, $sms_message1->getSendTime());
+    $this->assertEquals(\Drupal::time()->getRequestTime(), $sms_message1->getSendTime());
 
     $time = (new DrupalDateTime('+7 days'))->format('U');
     $sms_message2 = $this->createSmsMessage();

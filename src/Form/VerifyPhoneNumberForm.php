@@ -2,6 +2,7 @@
 
 namespace Drupal\sms\Form;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Flood\FloodInterface;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -29,6 +30,13 @@ class VerifyPhoneNumberForm extends FormBase {
   protected $phoneNumberVerification;
 
   /**
+   * Time.
+   *
+   * @var \Drupal\Component\Datetime\TimeInterface
+   */
+  protected $time;
+
+  /**
    * Constructs a VerifyPhoneNumberForm object.
    *
    * @param \Drupal\Core\Flood\FloodInterface $flood
@@ -37,11 +45,14 @@ class VerifyPhoneNumberForm extends FormBase {
    *   The phone number verification service.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   Time.
    */
-  public function __construct(FloodInterface $flood, PhoneNumberVerificationInterface $phone_number_verification, MessengerInterface $messenger) {
+  public function __construct(FloodInterface $flood, PhoneNumberVerificationInterface $phone_number_verification, MessengerInterface $messenger, TimeInterface $time) {
     $this->flood = $flood;
     $this->phoneNumberVerification = $phone_number_verification;
     $this->setMessenger($messenger);
+    $this->time = $time;
   }
 
   /**
@@ -52,6 +63,7 @@ class VerifyPhoneNumberForm extends FormBase {
       $container->get('flood'),
       $container->get('sms.phone_number.verification'),
       $container->get('messenger'),
+      $container->get('datetime.time'),
     );
   }
 
@@ -95,7 +107,7 @@ class VerifyPhoneNumberForm extends FormBase {
       return;
     }
 
-    $current_time = $this->getRequest()->server->get('REQUEST_TIME');
+    $current_time = $this->time->getRequestTime();
     $code = $form_state->getValue('code');
     $phone_verification = $this->phoneNumberVerification
       ->getPhoneVerificationByCode($code);

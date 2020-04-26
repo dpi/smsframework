@@ -2,6 +2,7 @@
 
 namespace Drupal\sms\Provider;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Queue\QueueFactory;
 use Drupal\sms\Direction;
@@ -40,6 +41,13 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
   protected $smsProvider;
 
   /**
+   * Time.
+   *
+   * @var \Drupal\Component\Datetime\TimeInterface
+   */
+  protected $time;
+
+  /**
    * Creates a new instance of SmsQueueProcessor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -48,12 +56,15 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
    *   The queue service.
    * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
    *   The SMS provider.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   Time.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, QueueFactory $queue_factory, SmsProviderInterface $sms_provider) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, QueueFactory $queue_factory, SmsProviderInterface $sms_provider, TimeInterface $time) {
     $this->smsGatewayStorage = $entity_type_manager->getStorage('sms_gateway');
     $this->smsMessageStorage = $entity_type_manager->getStorage('sms');
     $this->queue = $queue_factory->get('sms.messages', FALSE);
     $this->smsProvider = $sms_provider;
+    $this->time = $time;
   }
 
   /**
@@ -70,7 +81,7 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
         ->condition('processed', NULL, 'IS NULL');
 
       if (!$sms_gateway->isScheduleAware()) {
-        $query->condition('send_on', REQUEST_TIME, '<=');
+        $query->condition('send_on', $this->time->getRequestTime(), '<=');
       }
 
       $ids += $query->execute();
@@ -108,7 +119,7 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
             ->condition('queued', 0)
             ->condition('direction', $direction)
             ->condition('processed', NULL, 'IS NOT NULL')
-            ->condition('processed', REQUEST_TIME - $lifetime, '<=')
+            ->condition('processed', $this->time->getRequestTime() - $lifetime, '<=')
             ->execute();
         }
       }

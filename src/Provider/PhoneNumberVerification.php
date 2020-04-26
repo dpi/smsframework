@@ -2,6 +2,7 @@
 
 namespace Drupal\sms\Provider;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -53,6 +54,13 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
   protected $configFactory;
 
   /**
+   * Time.
+   *
+   * @var \Drupal\Component\Datetime\TimeInterface
+   */
+  protected $time;
+
+  /**
    * Constructs a new PhoneNumberProvider object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -63,8 +71,10 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
    *   The token replacement system.
    * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
    *   The SMS provider.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   Time.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, ConfigFactoryInterface $config_factory, Token $token, SmsProviderInterface $sms_provider) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, ConfigFactoryInterface $config_factory, Token $token, SmsProviderInterface $sms_provider, TimeInterface $time) {
     $this->smsProvider = $sms_provider;
     $this->phoneNumberSettings = $entity_type_manager
       ->getStorage('phone_number_settings');
@@ -72,6 +82,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
       ->getStorage('sms_phone_number_verification');
     $this->token = $token;
     $this->configFactory = $config_factory;
+    $this->time = $time;
   }
 
   /**
@@ -243,7 +254,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
    * {@inheritdoc}
    */
   public function purgeExpiredVerifications() {
-    $current_time = \Drupal::request()->server->get('REQUEST_TIME');
+    $current_time = $this->time->getRequestTime();
 
     $verification_ids = [];
     foreach ($this->configFactory->listAll('sms.phone.') as $config_id) {

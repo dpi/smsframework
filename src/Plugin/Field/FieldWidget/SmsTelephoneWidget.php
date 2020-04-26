@@ -2,11 +2,14 @@
 
 namespace Drupal\sms\Plugin\Field\FieldWidget;
 
+use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\telephone\Plugin\Field\FieldWidget\TelephoneDefaultWidget;
 use Drupal\Core\Routing\UrlGeneratorTrait;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'sms_telephone' widget.
@@ -22,6 +25,47 @@ use Drupal\sms\Exception\PhoneNumberSettingsException;
 class SmsTelephoneWidget extends TelephoneDefaultWidget {
 
   use UrlGeneratorTrait;
+
+  /**
+   * Time.
+   *
+   * @var \Drupal\Component\Datetime\TimeInterface
+   */
+  protected $time;
+
+  /**
+   * Constructs a SmsTelephoneWidget object.
+   *
+   * @param string $plugin_id
+   *   The plugin_id for the widget.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The definition of the field to which the widget is associated.
+   * @param array $settings
+   *   The widget settings.
+   * @param array $third_party_settings
+   *   Any third party settings.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   Time.
+   */
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, TimeInterface $time) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
+    $this->time = $time;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static($plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['third_party_settings'],
+      $container->get('datetime.time'),
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -40,7 +84,7 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
 
     /** @var \Drupal\Core\Datetime\DateFormatter $date_formatter */
     $date_formatter = \Drupal::service('date.formatter');
-    $current_time = \Drupal::request()->server->get('REQUEST_TIME');
+    $current_time = $this->time->getRequestTime();
 
     $t_args['@url'] = $this->url('sms.phone.verify');
     $lifetime = $config->getVerificationCodeLifetime() ?: 0;
