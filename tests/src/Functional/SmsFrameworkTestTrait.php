@@ -5,7 +5,6 @@ namespace Drupal\Tests\sms\Functional;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
 use Drupal\sms\Entity\SmsGateway;
-use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsDeliveryReport;

@@ -7,7 +7,6 @@ use Drupal\sms\Exception\NoPhoneNumberException;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\sms\Entity\PhoneNumberSettings;
-use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Message\SmsMessage;
 
 /**

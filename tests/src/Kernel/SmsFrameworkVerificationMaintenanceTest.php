@@ -4,7 +4,6 @@ namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\PhoneNumberSettings;
 use Drupal\sms\Entity\PhoneNumberVerificationInterface;
-use Drupal\Component\Utility\Unicode;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\entity_test\Entity\EntityTest;

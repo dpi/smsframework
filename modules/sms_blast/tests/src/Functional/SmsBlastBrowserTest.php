@@ -5,7 +5,6 @@ namespace Drupal\Tests\sms_blast\Functional;
 use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Entity\PhoneNumberSettings;
 
 /**

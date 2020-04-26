@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\sms\Kernel;
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\entity_test\Entity\EntityTest;

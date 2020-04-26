@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\sms_sendtophone\Functional;
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;

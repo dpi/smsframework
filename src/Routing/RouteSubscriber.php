@@ -7,7 +7,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
-use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Entity\SmsGateway;
 
 /**

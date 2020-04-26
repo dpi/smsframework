@@ -8,7 +8,6 @@ use Drupal\sms\Entity\SmsMessage;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Component\Utility\Unicode;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\sms\Entity\PhoneNumberSettings;
 use Drupal\sms\Entity\SmsGatewayInterface;

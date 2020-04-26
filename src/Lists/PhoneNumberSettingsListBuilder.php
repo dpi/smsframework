@@ -99,7 +99,7 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
 
     $row['count_expired'] = $this->buildPhoneNumberVerificationQuery($entity_type_id, $bundle)
       ->condition('status', 0)
-      ->condition('created', ($this->requestTime - $lifetime), '<')
+      ->condition('created', ($this->time->getRequestTime() - $lifetime), '<')
       ->count()
       ->execute();
 

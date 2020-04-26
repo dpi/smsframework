@@ -4,7 +4,6 @@ namespace Drupal\sms_sendtophone\Plugin\Filter;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
-use Drupal\Core\Routing\LinkGeneratorTrait;
 use Drupal\Core\Url;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;

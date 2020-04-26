@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\sms\Functional;
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Tests\BrowserTestBase;
 

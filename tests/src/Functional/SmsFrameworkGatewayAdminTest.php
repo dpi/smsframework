@@ -3,7 +3,6 @@
 namespace Drupal\Tests\sms\Functional;
 
 use Drupal\Core\Url;
-use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsGateway;
 
