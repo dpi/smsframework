@@ -20,10 +20,7 @@ interface PhoneNumberProviderInterface {
    *   phone numbers regardless of status.
    *
    * @return string[]
-   *   An array of phone numbers, keyed by original field item index.
-   *
-   * @throws \Drupal\sms\Exception\PhoneNumberSettingsException
-   *   Thrown if entity is not configured for phone numbers.
+   *   An array of phone numbers.
    */
   public function getPhoneNumbers(EntityInterface $entity, $verified = TRUE);
 

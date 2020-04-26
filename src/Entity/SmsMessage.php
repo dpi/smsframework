@@ -23,6 +23,13 @@ use Drupal\sms\Message\SmsMessageResultInterface as StdMessageResultInterface;
  * @ContentEntityType(
  *   id = "sms",
  *   label = @Translation("SMS Message"),
+ *   label_collection = @Translation("SMS Messages"),
+ *   label_singular = @Translation("SMS message"),
+ *   label_plural = @Translation("SMS messages"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count SMS message",
+ *     plural = "@count SMS messages",
+ *   ),
  *   base_table = "sms",
  *   entity_keys = {
  *     "id" = "id",
@@ -160,7 +167,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * exception will be thrown if this method is called on an SmsMessage that
    * already has saved results.
    *
-   * @param \Drupal\sms\Message\SmsMessageResultInterface|NULL $result
+   * @param \Drupal\sms\Message\SmsMessageResultInterface|null $result
    *   The result to associate with this SMS message, or NULL if there is no
    *   result.
    *
@@ -201,7 +208,8 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
         ]);
       return $reports ? reset($reports) : NULL;
     }
-    return NULL;  }
+    return NULL;
+  }
 
   /**
    * {@inheritdoc}

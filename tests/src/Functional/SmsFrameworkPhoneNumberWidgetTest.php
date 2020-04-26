@@ -9,7 +9,6 @@ use Drupal\Tests\Traits\Core\CronRunTrait;
  * Tests phone numbers.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBase {
 

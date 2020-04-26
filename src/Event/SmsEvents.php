@@ -113,4 +113,13 @@ final class SmsEvents {
    */
   const DELIVERY_REPORT_POST_PROCESS = 'sms.report.post_process';
 
+  /**
+   * Resolve phone numbers for an entity.
+   *
+   * @Event
+   *
+   * @see \Drupal\sms\Event\SmsEntityPhoneNumber
+   */
+  const ENTITY_PHONE_NUMBERS = 'sms.entity_phone_numbers';
+
 }

@@ -9,7 +9,6 @@ use Drupal\sms\Direction;
  * Tests SMS Framework provider service.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase {
 
@@ -22,9 +21,9 @@ class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase {
   ];
 
   /**
-   * @var \Drupal\sms\Provider\SmsProviderInterface
-   *
    * The default SMS provider.
+   *
+   * @var \Drupal\sms\Provider\SmsProviderInterface
    */
   protected $smsProvider;
 

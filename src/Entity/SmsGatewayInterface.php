@@ -127,7 +127,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   /**
    * Whether the gateway supports receiving messages.
    *
-   * @return boolean
+   * @return bool
    *   Whether the gateway supports receiving messages.
    */
   public function supportsIncoming();
@@ -135,7 +135,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   /**
    * Whether to automatically create a route for receiving incoming messages.
    *
-   * @return boolean
+   * @return bool
    *   Whether to automatically create a route for receiving incoming messages.
    */
   public function autoCreateIncomingRoute();

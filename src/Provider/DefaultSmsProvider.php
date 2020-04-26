@@ -60,7 +60,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
         $violations = $sms_message->validate();
         foreach ($violations->getFieldNames() as $field_name) {
           foreach ($violations->getByField($field_name) as $violation) {
-            $errors[] = "[$field_name]: ". strip_tags((string) $violation->getMessage());
+            $errors[] = "[$field_name]: " . strip_tags((string) $violation->getMessage());
           }
         }
 

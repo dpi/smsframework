@@ -20,6 +20,13 @@ use Drupal\sms\Message\SmsDeliveryReportInterface as StdDeliveryReportInterface;
  * @ContentEntityType(
  *   id = "sms_report",
  *   label = @Translation("SMS Delivery Report"),
+ *   label_collection = @Translation("SMS Delivery Reports"),
+ *   label_singular = @Translation("SMS delivery report"),
+ *   label_plural = @Translation("SMS delivery reports"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count SMS delivery report",
+ *     plural = "@count SMS delivery reports",
+ *   ),
  *   base_table = "sms_report",
  *   revision_table = "sms_report_revision",
  *   entity_keys = {

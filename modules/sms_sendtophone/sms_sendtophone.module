@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Provides hooks for Send To Phone.
+ */
+
 use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -28,7 +33,9 @@ function sms_sendtophone_node_links_alter(array &$links, NodeInterface $node, ar
   try {
     $phone_numbers = $phone_number_provider->getPhoneNumbers($user);
   }
-  catch (PhoneNumberSettingsException $e) {}
+  catch (PhoneNumberSettingsException $e) {
+
+  }
 
   $types = \Drupal::config('sms_sendtophone.settings')->get('content_types');
   $build = [];
@@ -40,7 +47,7 @@ function sms_sendtophone_node_links_alter(array &$links, NodeInterface $node, ar
         ['type' => 'node', 'extra' => $node->id()],
         ['query' => \Drupal::destination()->getAsArray()]
       );
-      
+
       $build['sms_sendtophone'] = [
         'title' => t('Send to phone'),
         'url' => $url,
@@ -50,7 +57,7 @@ function sms_sendtophone_node_links_alter(array &$links, NodeInterface $node, ar
         ],
       ];
     }
-    else if ($user->isAuthenticated()) {
+    elseif ($user->isAuthenticated()) {
       // Show messages to encourage users to register their mobile number.
       if (!count($phone_numbers)) {
         $build['sms_sendtophone'] = [

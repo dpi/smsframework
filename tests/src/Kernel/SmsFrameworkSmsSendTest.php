@@ -11,7 +11,6 @@ use Drupal\sms\Direction;
  * Tests sending SMS messages.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
 

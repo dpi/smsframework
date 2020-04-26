@@ -18,7 +18,6 @@ use Drupal\sms\Direction;
  * Tests account registration.
  *
  * @group SMS Framework
- * @group legacy
  * @coversDefaultClass \Drupal\sms_user\AccountRegistration
  */
 class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelBase {

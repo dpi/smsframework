@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
  * Tests the update of SMS Delivery report entities.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
 
@@ -127,8 +126,8 @@ class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
       'message_id' => $message_id,
       'recipient' => $recipient,
       'status' => $status,
-      'status_time' =>  $status_time,
-      'status_message' =>  'Message ' . $status,
+      'status_time' => $status_time,
+      'status_message' => 'Message ' . $status,
     ];
     $request = new Request();
     $request->request->set('delivery_report', Json::encode(['reports' => $reports]));

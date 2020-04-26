@@ -14,13 +14,17 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
  * Update path test coverage for sms module.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsFrameworkUpdateTest extends UpdatePathTestBase {
 
   use SmsFrameworkTestTrait;
 
-  protected static $modules = ['user', 'telephone', 'dynamic_entity_reference', 'sms'];
+  protected static $modules = [
+    'user',
+    'telephone',
+    'dynamic_entity_reference',
+    'sms',
+  ];
 
   /**
    * {@inheritdoc}

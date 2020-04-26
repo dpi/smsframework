@@ -3,9 +3,8 @@ description: Provides an extensible API that facilitates communication between D
 package: SMS Framework
 core: 8.x
 type: module
-project: smsframework
-configure: admin/config/smsframework
+configure: sms.admin
 dependencies:
   - drupal:system (>= 8.5)
-  - telephone
-  - dynamic_entity_reference
+  - drupal:telephone
+  - dynamic_entity_reference:dynamic_entity_reference

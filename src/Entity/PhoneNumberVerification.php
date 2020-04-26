@@ -14,6 +14,13 @@ use Drupal\Core\Entity\EntityInterface;
  * @ContentEntityType(
  *   id = "sms_phone_number_verification",
  *   label = @Translation("Phone Number Verification"),
+ *   label_collection = @Translation("Phone Number Verifications"),
+ *   label_singular = @Translation("phone number verification"),
+ *   label_plural = @Translation("phone number verifications"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count phone number verification",
+ *     plural = "@count phone number verifications",
+ *   ),
  *   base_table = "sms_phone_number_verification",
  *   entity_keys = {
  *     "id" = "id",

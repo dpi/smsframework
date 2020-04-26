@@ -291,12 +291,12 @@ class PhoneNumberSettingsForm extends EntityForm {
    * @param string $bundle
    *   A bundle ID.
    * @param string $config_key
-   *   A config ID as found in sms.phone.*.*.fields.$config_key
+   *   A config ID as found in sms.phone.*.*.fields.$config_key.
    *
    * @return \Drupal\field\FieldConfigInterface
    *   A field config entity.
    */
-  static public function createNewField($entity_type_id, $bundle, $config_key) {
+  public static function createNewField($entity_type_id, $bundle, $config_key) {
     $entity_type_manager = \Drupal::entityTypeManager();
 
     // Definitions for field_storage_config.

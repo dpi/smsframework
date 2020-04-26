@@ -20,7 +20,7 @@ trait SmsFrameworkTestTrait {
   /**
    * Sets the fallback gateway.
    *
-   * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway|NULL
+   * @param \Drupal\sms\Entity\SmsGatewayInterface|null $sms_gateway
    *   The new site fallback SMS Gateway, or NULL to unset.
    */
   protected function setFallbackGateway(SmsGatewayInterface $sms_gateway = NULL) {
@@ -39,7 +39,7 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Entity\SmsGatewayInterface
    *   A saved memory gateway.
    */
-  protected function createMemoryGateway($values = []) {
+  protected function createMemoryGateway(array $values = []) {
     $id = isset($values['id']) ? $values['id'] : Unicode::strtolower($this->randomMachineName(16));
     $gateway = SmsGateway::create($values + [
       'plugin' => 'memory',
@@ -61,7 +61,7 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Message\SmsMessageInterface[]
    *   An array of SMS messages sent to a 'Memory' gateway.
    */
-  function getTestMessages(SmsGatewayInterface $sms_gateway) {
+  public function getTestMessages(SmsGatewayInterface $sms_gateway) {
     $gateway_id = $sms_gateway->id();
     $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
     return isset($sms_messages[$gateway_id]) ? $sms_messages[$gateway_id] : [];
@@ -211,7 +211,7 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\Core\Entity\EntityInterface
    *   An entity with phone numbers.
    */
-  protected function createEntityWithPhoneNumber(PhoneNumberSettingsInterface $phone_number_settings, $phone_numbers = []) {
+  protected function createEntityWithPhoneNumber(PhoneNumberSettingsInterface $phone_number_settings, array $phone_numbers = []) {
     $entity_type = $phone_number_settings->getPhoneNumberEntityTypeId();
     $field_name = $phone_number_settings->getFieldName('phone_number');
     $entity_type_manager = \Drupal::entityTypeManager();
@@ -279,7 +279,7 @@ trait SmsFrameworkTestTrait {
    */
   protected function createMessageResult(SmsMessageInterface $sms_message) {
     $reports = array_map(
-      function($recipient) {
+      function ($recipient) {
         return (new SmsDeliveryReport())
           ->setRecipient($recipient);
       },

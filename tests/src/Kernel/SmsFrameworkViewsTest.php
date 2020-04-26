@@ -16,7 +16,6 @@ use Drupal\sms\Direction;
  * Tests SMS Framework integration with Views.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsFrameworkViewsTest extends ViewsKernelTestBase {
 
@@ -94,7 +93,7 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     $user2 = User::create(['name' => $this->randomMachineName()]);
 
     $message1 = SmsMessage::create(['created' => 892818493]);
-    /** @var SmsMessageInterface $message1 */
+    /** @var \Drupal\sms\Entity\SmsMessageInterface $message1 */
     $message1
       ->setSenderEntity($user1)
       ->addRecipients($this->randomPhoneNumbers(2))

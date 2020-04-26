@@ -32,7 +32,7 @@ class SmsSendWidget extends WidgetBase {
       '#description' => $this->getSetting('description'),
       '#maxlength' => $field->getSetting('max_length'),
       '#weight' => $this->getSetting('weight'),
-      ];
+    ];
     if ($this->getSetting('rows') == 1) {
       $element['#type'] = 'textfield';
     }

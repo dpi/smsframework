@@ -9,7 +9,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\Core\Routing\RequestContext;
-use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginManagerInterface;
@@ -267,7 +266,7 @@ class SmsGatewayForm extends EntityForm {
       $path = $form_state->getValue($parents);
       $path_length = Unicode::strlen($path);
 
-      // Length must be more than 2 characters, including leading slash character.
+      // Length must be more than 2 chars, including leading slash character.
       if ($path_length > 0) {
         if (Unicode::substr($path, 0, 1) !== '/') {
           $form_state->setError($element, $this->t("Path must begin with a '/' character."));

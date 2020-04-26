@@ -34,7 +34,7 @@ class SmsProcessingResponse {
   /**
    * Set an array of messages to process.
    *
-   * @param \Drupal\sms\Message\SmsMessageInterface[]
+   * @param \Drupal\sms\Message\SmsMessageInterface[] $messages
    *   An array of messages to process.
    *
    * @return $this

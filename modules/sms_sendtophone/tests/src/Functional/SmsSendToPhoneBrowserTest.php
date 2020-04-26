@@ -14,7 +14,6 @@ use Drupal\sms\Entity\PhoneNumberSettings;
  * Integration tests for the SMS SendToPhone Module.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
 
@@ -160,8 +159,8 @@ class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
       'type' => array_pop($type_names),
       'body' => [
         [
-        'value' => "[sms]{$node_body}[/sms]",
-        'format' => 'plain_text',
+          'value' => "[sms]{$node_body}[/sms]",
+          'format' => 'plain_text',
         ],
       ],
     ]);

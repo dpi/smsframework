@@ -2,8 +2,7 @@
 
 /**
  * @file
- * The core of the SMS Framework. Provides gateway management and API for
- * sending and receiving SMS messages.
+ * Provides hooks for SMS Framework.
  */
 
 use Drupal\Core\Entity\EntityInterface;
@@ -52,8 +51,8 @@ function sms_entity_delete(EntityInterface $entity) {
  * Respond to saving entities after they have been written to storage.
  *
  * @link https://www.drupal.org/node/2221347
- * @see sms_entity_insert().
- * @see sms_entity_update().
+ * @see sms_entity_insert()
+ * @see sms_entity_update()
  */
 function _sms_entity_postsave(EntityInterface $entity) {
   if ($entity instanceof ContentEntityInterface) {

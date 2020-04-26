@@ -9,7 +9,6 @@ use Drupal\Core\Url;
  * Tests dynamically created SMS User menu links.
  *
  * @group SMS User
- * @group legacy
  */
 class SmsFrameworkUserMenuLinksTest extends SmsFrameworkBrowserTestBase {
 

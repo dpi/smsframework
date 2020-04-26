@@ -9,7 +9,6 @@ use Drupal\sms\Direction;
  * Tests behaviour of SMS Framework message queue.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
 
@@ -44,7 +43,7 @@ class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
   /**
    * The cron service.
    *
-   * @var \Drupal\Core\Cron;
+   * @var \Drupal\Core\Cron
    */
   protected $cronService;
 

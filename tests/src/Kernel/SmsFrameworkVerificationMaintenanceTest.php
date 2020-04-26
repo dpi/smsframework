@@ -13,7 +13,6 @@ use Drupal\entity_test\Entity\EntityTest;
  * Tests verification maintenance executed during cron.
  *
  * @group SMS Framework
- * @group legacy
  */
 class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
 

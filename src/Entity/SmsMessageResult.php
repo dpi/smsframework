@@ -19,6 +19,13 @@ use Drupal\sms\Message\SmsMessageResultInterface as StdMessageResultInterface;
  * @ContentEntityType(
  *   id = "sms_result",
  *   label = @Translation("SMS Message Result"),
+ *   label_collection = @Translation("SMS Message Results"),
+ *   label_singular = @Translation("SMS message result"),
+ *   label_plural = @Translation("SMS message results"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count SMS message result",
+ *     plural = "@count SMS message results",
+ *   ),
  *   base_table = "sms_result",
  *   entity_keys = {
  *     "id" = "id",

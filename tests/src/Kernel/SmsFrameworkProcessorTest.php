@@ -12,7 +12,6 @@ use Drupal\sms\Message\SmsMessageResult;
  * Tests functionality provided by the SMS message event subscriber.
  *
  * @group SMS Framework
- * @group legacy
  * @coversDefaultClass \Drupal\sms\EventSubscriber\SmsMessageProcessor
  */
 class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
@@ -128,7 +127,6 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
     $this->setExpectedException(SmsPluginReportException::class, 'Missing result for message.');
     $this->smsProvider->queue($sms_message);
   }
-
 
   /**
    * Ensure exception thrown if outgoing message is missing recipient reports.

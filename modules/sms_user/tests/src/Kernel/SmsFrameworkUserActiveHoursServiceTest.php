@@ -14,7 +14,6 @@ use Drupal\sms\Direction;
  * Using absolute dates to prevent random test failures.
  *
  * @group SMS Framework
- * @group legacy
  * @coversDefaultClass \Drupal\sms_user\ActiveHours
  */
 class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
@@ -291,7 +290,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    * @return \Drupal\user\UserInterface
    *   A saved user entity.
    */
-  protected function createUser($values = []) {
+  protected function createUser(array $values = []) {
     $user = User::create([
       'uid' => 1,
       'name' => $this->randomMachineName(),

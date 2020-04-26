@@ -14,7 +14,7 @@
  * @param array $gateways
  *   An array of gateway definitions keyed by plugin ID.
  */
-function hook_sms_gateway_info_alter(&$gateways) {
+function hook_sms_gateway_info_alter(array &$gateways) {
   $gateways['log']['label'] = new \Drupal\Core\StringTranslation\TranslatableMarkup('The Logger');
 }
 
@@ -40,6 +40,18 @@ function hook_sms_gateway_info_alter(&$gateways) {
  * @see \Drupal\sms_test\EventSubscriber\SmsTestEventSubscriber
  */
 class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSubscriberInterface {
+
+  /**
+   * An example event subscriber.
+   *
+   * @see \Drupal\sms\Event\SmsEvents::ENTITY_PHONE_NUMBERS
+   */
+  public function myEntityPhoneNumbers(\Drupal\sms\Event\SmsEntityPhoneNumber $event) {
+    // Entity to get phone numbers for.
+    $entity = $event->getEntity();
+    // Add a phone number for above entity.
+    $event->addPhoneNumber('+123456879');
+  }
 
   /**
    * An example event subscriber.
@@ -97,6 +109,7 @@ class MySmsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSu
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
+    $events[\Drupal\sms\Event\SmsEvents::ENTITY_PHONE_NUMBERS][] = ['myEntityPhoneNumbers'];
     $events[\Drupal\sms\Event\SmsEvents::MESSAGE_PRE_PROCESS][] = ['mySmsMessagePreprocess'];
     $events[\Drupal\sms\Event\SmsEvents::MESSAGE_POST_PROCESS][] = ['mySmsMessagePostprocess'];
     $events[\Drupal\sms\Event\SmsEvents::MESSAGE_GATEWAY][] = ['mySmsMessageGateway'];
