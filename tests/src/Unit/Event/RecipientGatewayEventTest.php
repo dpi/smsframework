@@ -26,14 +26,14 @@ class RecipientGatewayEventTest extends UnitTestCase {
     $number = $this->randomPhoneNumbers()[0];
     $event = $this->createEvent($number);
 
-    $gateway = $this->getMock(SmsGatewayInterface::class);
+    $gateway = $this->createMock(SmsGatewayInterface::class);
     $gateway
       ->expects($this->any())
       ->method('id')
       ->willReturn('gateway_first');
     $event->addGateway($gateway, 100);
 
-    $gateway = $this->getMock(SmsGatewayInterface::class);
+    $gateway = $this->createMock(SmsGatewayInterface::class);
     $gateway
       ->expects($this->any())
       ->method('id')
@@ -80,14 +80,14 @@ class RecipientGatewayEventTest extends UnitTestCase {
   public function testGetGateways() {
     $event = $this->createEvent($this->randomPhoneNumbers()[0]);
 
-    $gateway = $this->getMock(SmsGatewayInterface::class);
+    $gateway = $this->createMock(SmsGatewayInterface::class);
     $gateway
       ->expects($this->any())
       ->method('id')
       ->willReturn('gateway_1');
     $event->addGateway($gateway, 200);
 
-    $gateway = $this->getMock(SmsGatewayInterface::class);
+    $gateway = $this->createMock(SmsGatewayInterface::class);
     $gateway
       ->expects($this->any())
       ->method('id')
@@ -109,21 +109,21 @@ class RecipientGatewayEventTest extends UnitTestCase {
   public function testGatewayRemove() {
     $event = $this->createEvent($this->randomPhoneNumbers()[0]);
 
-    $gateway = $this->getMock(SmsGatewayInterface::class);
+    $gateway = $this->createMock(SmsGatewayInterface::class);
     $gateway
       ->expects($this->any())
       ->method('id')
       ->willReturn('gateway_1');
     $event->addGateway($gateway, 200);
 
-    $gateway = $this->getMock(SmsGatewayInterface::class);
+    $gateway = $this->createMock(SmsGatewayInterface::class);
     $gateway
       ->expects($this->any())
       ->method('id')
       ->willReturn('gateway_1');
     $event->addGateway($gateway, 400);
 
-    $gateway = $this->getMock(SmsGatewayInterface::class);
+    $gateway = $this->createMock(SmsGatewayInterface::class);
     $gateway
       ->expects($this->any())
       ->method('id')
@@ -144,21 +144,21 @@ class RecipientGatewayEventTest extends UnitTestCase {
   public function testGatewayRemoveAllSameId() {
     $event = $this->createEvent($this->randomPhoneNumbers()[0]);
 
-    $gateway = $this->getMock(SmsGatewayInterface::class);
+    $gateway = $this->createMock(SmsGatewayInterface::class);
     $gateway
       ->expects($this->any())
       ->method('id')
       ->willReturn('gateway_1');
     $event->addGateway($gateway, 200);
 
-    $gateway = $this->getMock(SmsGatewayInterface::class);
+    $gateway = $this->createMock(SmsGatewayInterface::class);
     $gateway
       ->expects($this->any())
       ->method('id')
       ->willReturn('gateway_1');
     $event->addGateway($gateway, 400);
 
-    $gateway = $this->getMock(SmsGatewayInterface::class);
+    $gateway = $this->createMock(SmsGatewayInterface::class);
     $gateway
       ->expects($this->any())
       ->method('id')
