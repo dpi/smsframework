@@ -269,7 +269,7 @@ class SmsGatewayForm extends EntityForm {
     foreach ($path_elements_parents as $parents) {
       $element = NestedArray::getValue($form, $parents);
       $path = $form_state->getValue($parents);
-      $path_length = Unicode::strlen($path);
+      $path_length = mb_strlen($path);
 
       // Length must be more than 2 chars, including leading slash character.
       if ($path_length > 0) {
