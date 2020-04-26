@@ -63,7 +63,7 @@ abstract class SmsFrameworkBrowserTestBase extends BrowserTestBase {
     $field_storage = $entity_type_manager->getStorage('field_storage_config')
       ->create([
         'entity_type' => $entity_type_id,
-        'field_name' => Unicode::strtolower($this->randomMachineName()),
+        'field_name' => mb_strtolower($this->randomMachineName()),
         'type' => 'telephone',
       ]);
     $field_storage

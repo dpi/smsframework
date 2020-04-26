@@ -95,7 +95,7 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
 
     $edit = [
       'label' => $this->randomString(),
-      'id' => Unicode::strtolower($this->randomMachineName()),
+      'id' => mb_strtolower($this->randomMachineName()),
       'status' => TRUE,
       'plugin_id' => 'memory',
     ];

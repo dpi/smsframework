@@ -39,7 +39,7 @@ class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
 
     $phone_field = FieldStorageConfig::create([
       'entity_type' => 'user',
-      'field_name' => Unicode::strtolower($this->randomMachineName()),
+      'field_name' => mb_strtolower($this->randomMachineName()),
       'type' => 'telephone',
     ]);
     $phone_field->save();

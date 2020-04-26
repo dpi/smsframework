@@ -40,7 +40,7 @@ trait SmsFrameworkTestTrait {
    *   A saved memory gateway.
    */
   protected function createMemoryGateway(array $values = []) {
-    $id = isset($values['id']) ? $values['id'] : Unicode::strtolower($this->randomMachineName(16));
+    $id = isset($values['id']) ? $values['id'] : mb_strtolower($this->randomMachineName(16));
     $gateway = SmsGateway::create($values + [
       'plugin' => 'memory',
       'id' => $id,
