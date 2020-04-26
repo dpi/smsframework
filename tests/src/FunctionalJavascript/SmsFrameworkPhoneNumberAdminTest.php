@@ -82,7 +82,6 @@ class SmsFrameworkPhoneNumberAdminTest extends WebDriverTestBase {
       ->click();
 
     $this->drupalGet('admin/config/smsframework/phone_number/entity_test.entity_test');
-    $session->statusCodeEquals(200);
     $session->optionExists('edit-field-mapping-phone-number', $field_telephone->getName())
       ->hasAttribute('selected');
   }

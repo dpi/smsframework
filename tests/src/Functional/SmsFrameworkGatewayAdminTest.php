@@ -241,7 +241,6 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
       'sms_gateway' => $gateway->id(),
     ]));
 
-    $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains('Edit gateway');
     $this->assertSession()->fieldNotExists('incoming_messages[push_path]');
     $this->assertSession()->responseContains(t('This gateway does not support receiving messages.'));

@@ -19,7 +19,7 @@ services:
     arguments: ['@entity_type.manager', '@config.factory', '@token', '@sms.provider', '@datetime.time']
   sms.queue:
     class: Drupal\sms\Provider\SmsQueueProcessor
-    arguments: ['@entity_type.manager', '@queue', '@sms.provider']
+    arguments: ['@entity_type.manager', '@queue', '@sms.provider', '@datetime.time']
   sms.sms_message_processor:
     class: Drupal\sms\EventSubscriber\SmsMessageProcessor
     arguments: ['@event_dispatcher', '@config.factory']

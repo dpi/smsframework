@@ -53,7 +53,8 @@ class SmsDevelMessageForm extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('sms.provider')
+      $container->get('sms.provider'),
+      $container->get('messenger'),
     );
   }
 
