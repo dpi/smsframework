@@ -2,4 +2,4 @@ name: SMS Test Views
 type: module
 description: Module for testing SMS views.
 package: Testing
-core: 8.x
+core_version_requirement: ^8.9 || ^9
