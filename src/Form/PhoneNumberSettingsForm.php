@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -58,11 +59,14 @@ class PhoneNumberSettingsForm extends EntityForm {
    *   The entity type bundle info.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityFieldManagerInterface $entity_field_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityFieldManagerInterface $entity_field_manager, MessengerInterface $messenger) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityFieldManager = $entity_field_manager;
+    $this->setMessenger($messenger);
   }
 
   /**
@@ -72,7 +76,8 @@ class PhoneNumberSettingsForm extends EntityForm {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('messenger'),
     );
   }
 
@@ -126,7 +131,7 @@ class PhoneNumberSettingsForm extends EntityForm {
     $field_options['boolean'][self::CREATE_NEW_FIELD] = $this->t('- Create a new boolean field -');
 
     if ($entity_bundle = $form_state->getValue('entity_bundle', $bundle_default_value ?: NULL)) {
-      list($entity_type_id, $bundle) = explode('|', $entity_bundle);
+      [$entity_type_id, $bundle] = explode('|', $entity_bundle);
       if (!empty($entity_type_id) && !empty($bundle)) {
         $field_definitions = $this->entityFieldManager
           ->getFieldDefinitions($entity_type_id, $bundle);
@@ -232,7 +237,7 @@ class PhoneNumberSettingsForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $config = &$this->entity;
 
-    list($entity_type_id, $bundle) = explode('|', $form_state->getValue('entity_bundle'));
+    [$entity_type_id, $bundle] = explode('|', $form_state->getValue('entity_bundle'));
     $config
       ->setPhoneNumberEntityTypeId($entity_type_id)
       ->setPhoneNumberBundle($bundle);
@@ -274,10 +279,10 @@ class PhoneNumberSettingsForm extends EntityForm {
     $t_args['%id'] = $config->id();
 
     if ($saved == SAVED_NEW) {
-      drupal_set_message($this->t('Phone number settings %id created.', $t_args));
+      $this->messenger()->addMessage($this->t('Phone number settings %id created.', $t_args));
     }
     else {
-      drupal_set_message($this->t('Phone number settings %id saved.', $t_args));
+      $this->messenger()->addMessage($this->t('Phone number settings %id saved.', $t_args));
     }
 
     $form_state->setRedirectUrl(Url::fromRoute('sms.phone_number_settings.list'));

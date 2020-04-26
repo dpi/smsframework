@@ -3,13 +3,34 @@
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Form controller to delete phone number settings.
  */
 class PhoneNumberSettingsDeleteForm extends EntityConfirmFormBase {
+
+  /**
+   * Constructs a new PhoneNumberSettingsDeleteForm.
+   *
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
+   */
+  public function __construct(MessengerInterface $messenger) {
+    $this->setMessenger($messenger);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('messenger'),
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -40,7 +61,7 @@ class PhoneNumberSettingsDeleteForm extends EntityConfirmFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
 
-    drupal_set_message($this->t('Phone number settings %label was deleted.', [
+    $this->messenger()->addMessage($this->t('Phone number settings %label was deleted.', [
       '%label' => $this->entity->label(),
     ]));
 

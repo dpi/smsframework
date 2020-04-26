@@ -4,6 +4,7 @@ namespace Drupal\sms_blast;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\sms\Provider\PhoneNumberProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -35,11 +36,14 @@ class SmsBlastForm extends FormBase {
    *   The entity type manager.
    * @param \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider
    *   The phone number provider.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, PhoneNumberProviderInterface $phone_number_provider) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, PhoneNumberProviderInterface $phone_number_provider, MessengerInterface $messenger) {
     $this->phoneNumberVerificationStorage = $entity_type_manager
       ->getStorage('sms_phone_number_verification');
     $this->phoneNumberProvider = $phone_number_provider;
+    $this->setMessenger($messenger);
   }
 
   /**
@@ -48,7 +52,8 @@ class SmsBlastForm extends FormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('sms.phone_number')
+      $container->get('sms.phone_number'),
+      $container->get('messenger'),
     );
   }
 
@@ -111,10 +116,10 @@ class SmsBlastForm extends FormBase {
     }
 
     if ($success > 0) {
-      drupal_set_message($this->formatPlural($success, 'Message sent to @count user.', 'Message sent to @count users.'));
+      $this->messenger()->addMessage($this->formatPlural($success, 'Message sent to @count user.', 'Message sent to @count users.'));
     }
     if ($failure > 0) {
-      drupal_set_message($this->formatPlural($failure, 'Message could not be sent to @count user.', 'Message could not be sent to @count users.'), 'error');
+      $this->messenger()->addError($this->formatPlural($failure, 'Message could not be sent to @count user.', 'Message could not be sent to @count users.'));
     }
   }
 

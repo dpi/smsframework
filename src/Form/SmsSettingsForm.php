@@ -4,6 +4,7 @@ namespace Drupal\sms\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Routing\RouteBuilderInterface;
@@ -30,7 +31,7 @@ class SmsSettingsForm extends ConfigFormBase {
   protected $requestContext;
 
   /**
-   * Constructs a SmsSettingsForm object.
+   * Constructs a new SmsSettingsForm.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
@@ -38,11 +39,14 @@ class SmsSettingsForm extends ConfigFormBase {
    *   The route builder.
    * @param \Drupal\Core\Routing\RequestContext $request_context
    *   The request context.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, RouteBuilderInterface $route_builder, RequestContext $request_context) {
+  public function __construct(ConfigFactoryInterface $config_factory, RouteBuilderInterface $route_builder, RequestContext $request_context, MessengerInterface $messenger) {
     parent::__construct($config_factory);
     $this->routeBuilder = $route_builder;
     $this->requestContext = $request_context;
+    $this->setMessenger($messenger);
   }
 
   /**
@@ -52,7 +56,8 @@ class SmsSettingsForm extends ConfigFormBase {
     return new static(
       $container->get('config.factory'),
       $container->get('router.builder'),
-      $container->get('router.request_context')
+      $container->get('router.request_context'),
+      $container->get('messenger'),
     );
   }
 
@@ -126,7 +131,7 @@ class SmsSettingsForm extends ConfigFormBase {
       ->set('page.verify', $path_verify)
       ->save();
 
-    drupal_set_message($this->t('SMS settings saved.'));
+    $this->messenger()->addMessage($this->t('SMS settings saved.'));
   }
 
   /**

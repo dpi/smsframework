@@ -2,14 +2,40 @@
 
 namespace Drupal\sms_sendtophone\Form;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\node\Entity\NodeType;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines admin overview form.
  */
 class AdminOverviewForm extends ConfigFormBase {
+
+  /**
+   * Constructs a new AdminOverviewForm.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The factory for configuration objects.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory, MessengerInterface $messenger) {
+    parent::__construct($config_factory);
+    $this->setMessenger($messenger);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('messenger'),
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -45,7 +71,7 @@ class AdminOverviewForm extends ConfigFormBase {
       ->set('content_types', array_filter($form_state->getValue('content_types')))
       ->save();
 
-    drupal_set_message($this->t('The configuration options have been saved.'));
+    $this->messenger()->addMessage($this->t('The configuration options have been saved.'));
   }
 
   /**

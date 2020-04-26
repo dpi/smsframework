@@ -2,6 +2,7 @@
 
 namespace Drupal\sms_user\Form;
 
+use Drupal\Core\Messenger\MessengerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -25,16 +26,19 @@ class AdminSettingsForm extends ConfigFormBase {
   protected $phoneNumberVerificationProvider;
 
   /**
-   * Constructs a \Drupal\sms_user\Form\AdminSettingsForm object.
+   * Constructs a new AdminSettingsForm.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
    * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification_provider
    *   The phone number verification provider.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, PhoneNumberVerificationInterface $phone_number_verification_provider) {
+  public function __construct(ConfigFactoryInterface $config_factory, PhoneNumberVerificationInterface $phone_number_verification_provider, MessengerInterface $messenger) {
     parent::__construct($config_factory);
     $this->phoneNumberVerificationProvider = $phone_number_verification_provider;
+    $this->setMessenger($messenger);
   }
 
   /**
@@ -43,7 +47,8 @@ class AdminSettingsForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
-      $container->get('sms.phone_number.verification')
+      $container->get('sms.phone_number.verification'),
+      $container->get('messenger'),
     );
   }
 
@@ -180,7 +185,7 @@ class AdminSettingsForm extends ConfigFormBase {
     $user_phone_settings_exist = $this->phoneNumberVerificationProvider
       ->getPhoneNumberSettings('user', 'user') instanceof PhoneNumberSettingsInterface;
     if (!$user_phone_settings_exist) {
-      drupal_set_message($this->t('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings. <a href=":add">Add phone number settings</a>.', [
+      $this->messenger()->addMessage($this->t('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings. <a href=":add">Add phone number settings</a>.', [
         ':add' => Url::fromRoute('entity.phone_number_settings.add')->toString(),
       ]), 'warning');
     }

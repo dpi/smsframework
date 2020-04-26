@@ -3,13 +3,34 @@
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Form controller to delete SMS Gateway.
  */
 class SmsGatewayDeleteForm extends EntityConfirmFormBase {
+
+  /**
+   * Constructs a new SmsGatewayDeleteForm.
+   *
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
+   */
+  public function __construct(MessengerInterface $messenger) {
+    $this->setMessenger($messenger);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('messenger'),
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -40,7 +61,7 @@ class SmsGatewayDeleteForm extends EntityConfirmFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
 
-    drupal_set_message($this->t('Gateway %label was deleted.', [
+    $this->messenger()->addMessage($this->t('Gateway %label was deleted.', [
       '%label' => $this->entity->label(),
     ]));
 

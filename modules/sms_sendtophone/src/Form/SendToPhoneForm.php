@@ -3,6 +3,7 @@
 namespace Drupal\sms_sendtophone\Form;
 
 use Drupal\Core\Form\FormBase;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -37,9 +38,12 @@ class SendToPhoneForm extends FormBase {
    *
    * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
    *   The SMS service provider.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
    */
-  public function __construct(SmsProviderInterface $sms_provider) {
+  public function __construct(SmsProviderInterface $sms_provider, MessengerInterface $messenger) {
     $this->smsProvider = $sms_provider;
+    $this->setMessenger($messenger);
   }
 
   /**
@@ -47,7 +51,8 @@ class SendToPhoneForm extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('sms.provider')
+      $container->get('sms.provider'),
+      $container->get('messenger'),
     );
   }
 
@@ -177,12 +182,12 @@ class SendToPhoneForm extends FormBase {
 
     try {
       $this->smsProvider->queue($sms_message);
-      drupal_set_message($this->t('Message has been sent.'));
+      $this->messenger()->addMessage($this->t('Message has been sent.'));
     }
     catch (\Exception $e) {
-      drupal_set_message($this->t('Message could not be sent: @error', [
+      $this->messenger()->addError($this->t('Message could not be sent: @error', [
         '@error' => $e->getMessage(),
-      ]), 'error');
+      ]));
     }
   }
 
