@@ -296,7 +296,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function isAutomated() {
-    return $this->get('automated')->value;
+    return (bool) $this->get('automated')->value;
   }
 
   /**
@@ -392,7 +392,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function isQueued() {
-    return (boolean) $this->get('queued')->value;
+    return (bool) $this->get('queued')->value;
   }
 
   /**
