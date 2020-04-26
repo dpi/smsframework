@@ -2,8 +2,7 @@
 
 namespace Drupal\Tests\sms\FunctionalJavascript;
 
-use Drupal\Component\Utility\Unicode;
-use Drupal\FunctionalJavascriptTests\JavascriptTestBase;
+use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
 
 /**
@@ -11,7 +10,7 @@ use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
  *
  * @group SMS Framework
  */
-class SmsFrameworkPhoneNumberAdminTest extends JavascriptTestBase {
+class SmsFrameworkPhoneNumberAdminTest extends WebDriverTestBase {
 
   use SmsFrameworkTestTrait;
 
