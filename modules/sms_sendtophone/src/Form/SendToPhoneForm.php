@@ -3,6 +3,7 @@
 namespace Drupal\sms_sendtophone\Form;
 
 use Drupal\Core\Form\FormBase;
+use Drupal\Core\Link;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -90,8 +91,8 @@ class SendToPhoneForm extends FormBase {
         $form['message'] = [
           '#markup' => $this->t('You do not have permission to send messages. You may need to @signin or @register for an account to send messages to a mobile phone.',
             [
-              '@signin' => $this->l('sign in', Url::fromRoute('user.page', [], $destination)),
-              '@register' => $this->l('register', Url::fromRoute('user.register', [], $destination)),
+              '@signin' => Link::fromTextAndUrl($this->t('sign in'), Url::fromRoute('user.page', [], $destination)),
+              '@register' => Link::fromTextAndUrl($this->t('register'), Url::fromRoute('user.register', [], $destination)),
             ]),
         ];
       }
