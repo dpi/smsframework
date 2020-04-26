@@ -25,6 +25,11 @@ abstract class SmsFrameworkBrowserTestBase extends BrowserTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'classy';
+
+  /**
    * The gateway manager.
    *
    * @var \Drupal\sms\Plugin\SmsGatewayPluginManagerInterface

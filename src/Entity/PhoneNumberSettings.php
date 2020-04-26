@@ -39,6 +39,16 @@ use Drupal\field\Entity\FieldConfig;
  *     "edit-form" = "/admin/config/smsframework/phone_number/{phone_number_settings}",
  *     "delete-form" = "/admin/config/smsframework/phone_number/{phone_number_settings}/delete",
  *   },
+ *   config_export = {
+ *     "id",
+ *     "entity_type",
+ *     "bundle",
+ *     "automated_optout",
+ *     "verification_message",
+ *     "verification_code_lifetime",
+ *     "purge_verification_phone_number",
+ *     "fields",
+ *   },
  * )
  */
 class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSettingsInterface {

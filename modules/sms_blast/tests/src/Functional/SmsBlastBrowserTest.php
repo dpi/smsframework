@@ -20,6 +20,11 @@ class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
   public static $modules = ['sms', 'user', 'sms_blast'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'classy';
+
+  /**
    * Phone number settings of user entity type.
    *
    * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface

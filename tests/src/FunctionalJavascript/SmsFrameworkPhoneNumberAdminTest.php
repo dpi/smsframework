@@ -17,6 +17,11 @@ class SmsFrameworkPhoneNumberAdminTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $defaultTheme = 'classy';
+
+  /**
+   * {@inheritdoc}
+   */
   public static $modules = ['sms', 'block', 'entity_test'];
 
   /**

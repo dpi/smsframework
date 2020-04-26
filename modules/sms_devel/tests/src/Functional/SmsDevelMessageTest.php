@@ -21,6 +21,11 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
   public static $modules = ['sms_devel'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'classy';
+
+  /**
    * A memory gateway.
    *
    * @var \Drupal\sms\Entity\SmsGatewayInterface

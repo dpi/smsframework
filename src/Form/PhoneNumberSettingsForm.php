@@ -94,7 +94,7 @@ class PhoneNumberSettingsForm extends EntityForm {
 
     // Generate a list of field-able bundles.
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type) {
-      if ($entity_type->isSubclassOf(ContentEntityInterface::class)) {
+      if ($entity_type->entityClassImplements(ContentEntityInterface::class)) {
         foreach ($this->entityTypeBundleInfo->getBundleInfo($entity_type->id()) as $bundle => $bundle_info) {
           // Do not show combinations with pre-existing phone number settings.
           // But, make sure all options are available on existing phone

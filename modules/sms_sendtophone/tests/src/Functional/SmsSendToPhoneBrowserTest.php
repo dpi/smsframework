@@ -29,6 +29,11 @@ class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'classy';
+
+  /**
    * The phone field for testing.
    *
    * @var \Drupal\field\FieldStorageConfigInterface

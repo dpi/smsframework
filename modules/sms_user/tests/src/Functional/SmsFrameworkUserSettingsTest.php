@@ -18,6 +18,11 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
   public static $modules = ['sms_user'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'classy';
+
+  /**
    * List of days in a week, starting from 'sunday' through to 'saturday'.
    *
    * @var string[]

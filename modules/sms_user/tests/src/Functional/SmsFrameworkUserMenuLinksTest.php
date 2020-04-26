@@ -21,6 +21,11 @@ class SmsFrameworkUserMenuLinksTest extends SmsFrameworkBrowserTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $defaultTheme = 'classy';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
     $user = $this->drupalCreateUser([

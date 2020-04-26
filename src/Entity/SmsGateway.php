@@ -43,6 +43,17 @@ use Drupal\sms\Direction;
  *     "edit-form" = "/admin/config/smsframework/gateways/{sms_gateway}",
  *     "delete-form" = "/admin/config/smsframework/gateways/{sms_gateway}/delete",
  *   },
+ *   config_export = {
+ *     "id",
+ *     "label",
+ *     "plugin",
+ *     "settings",
+ *     "skip_queue",
+ *     "incoming_push_path",
+ *     "reports_push_path",
+ *     "retention_duration_incoming",
+ *     "retention_duration_outgoing",
+ *   },
  * )
  */
 class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, EntityWithPluginCollectionInterface {
