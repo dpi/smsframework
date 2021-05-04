@@ -26,7 +26,7 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
+  public static $modules = [
     'user', 'sms', 'sms_test_gateway', 'sms_test_views', 'telephone',
     'dynamic_entity_reference', 'field',
   ];
