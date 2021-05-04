@@ -35,7 +35,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference', 'user',
     'sms_test_time',
     'entity_test',

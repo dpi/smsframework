@@ -19,7 +19,7 @@ class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['sms', 'user', 'sms_blast'];
+  protected static $modules = ['sms', 'user', 'sms_blast'];
 
   /**
    * {@inheritdoc}

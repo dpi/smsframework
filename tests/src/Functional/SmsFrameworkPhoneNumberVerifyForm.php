@@ -16,7 +16,7 @@ class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['entity_test'];
+  protected static $modules = ['entity_test'];
 
   /**
    * Test phone number verification form.

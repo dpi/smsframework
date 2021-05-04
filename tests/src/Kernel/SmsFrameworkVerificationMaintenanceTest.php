@@ -20,7 +20,7 @@ class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'sms', 'sms_test_gateway', 'entity_test', 'user', 'field', 'telephone',
     'dynamic_entity_reference',
   ];

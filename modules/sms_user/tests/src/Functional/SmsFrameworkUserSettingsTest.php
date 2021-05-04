@@ -17,7 +17,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['sms_user'];
+  protected static $modules = ['sms_user'];
 
   /**
    * {@inheritdoc}
