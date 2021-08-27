@@ -21,7 +21,7 @@
     }
   ],
   "require": {
-    "php": "^7.3",
+    "php": "^7.3 || ^8",
     "drupal/core": "^8.9 || ^9",
     "drupal/dynamic_entity_reference": "^1.0",
     "drupal/telephone": "*"
