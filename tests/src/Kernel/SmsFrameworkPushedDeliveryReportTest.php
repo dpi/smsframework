@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\Core\Routing\RouteProviderInterface;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
@@ -11,7 +12,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
  *
  * @group SMS Framework
  */
-class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase {
+final class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase {
 
   /**
    * {@inheritdoc}
@@ -26,12 +27,12 @@ class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase {
    *
    * @var \Drupal\Core\Routing\RouteProviderInterface
    */
-  protected $routeProvider;
+  private RouteProviderInterface $routeProvider;
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->routeProvider = $this->container->get('router.route_provider');
   }
@@ -39,7 +40,7 @@ class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase {
   /**
    * Tests route exists for gateway with pushed reports.
    */
-  public function testDeliveryReportRoute() {
+  public function testDeliveryReportRoute(): void {
     $gateway = $this->createMemoryGateway();
     $name = 'sms.delivery_report.receive.' . $gateway->id();
     $route = $this->routeProvider->getRouteByName($name);
@@ -52,7 +53,7 @@ class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase {
   /**
    * Tests route access delivery report URL for gateway without pushed reports.
    */
-  public function testDeliveryReportRouteNoSupportPush() {
+  public function testDeliveryReportRouteNoSupportPush(): void {
     $gateway = $this->createMemoryGateway(['plugin' => 'capabilities_default']);
     $this->expectException(RouteNotFoundException::class);
     $route = 'sms.delivery_report.receive.' . $gateway->id();

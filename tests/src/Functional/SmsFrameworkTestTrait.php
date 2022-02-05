@@ -40,8 +40,8 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Entity\SmsGatewayInterface
    *   A saved memory gateway.
    */
-  protected function createMemoryGateway(array $values = []) {
-    $id = isset($values['id']) ? $values['id'] : mb_strtolower($this->randomMachineName(16));
+  protected function createMemoryGateway(array $values = []): SmsGatewayInterface {
+    $id = $values['id'] ?? mb_strtolower($this->randomMachineName(16));
     $gateway = SmsGateway::create($values + [
       'plugin' => 'memory',
       'id' => $id,
@@ -62,7 +62,7 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Message\SmsMessageInterface[]
    *   An array of SMS messages sent to a 'Memory' gateway.
    */
-  public function getTestMessages(SmsGatewayInterface $sms_gateway) {
+  public function getTestMessages(SmsGatewayInterface $sms_gateway): array {
     $gateway_id = $sms_gateway->id();
     $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
     return isset($sms_messages[$gateway_id]) ? $sms_messages[$gateway_id] : [];
@@ -109,7 +109,7 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Message\SmsMessageInterface[]
    *   An array of messages received by a gateway.
    */
-  protected function getIncomingMessages(SmsGatewayInterface $sms_gateway) {
+  protected function getIncomingMessages(SmsGatewayInterface $sms_gateway): array {
     $gateway_id = $sms_gateway->id();
     $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.incoming', []);
     return isset($sms_messages[$gateway_id]) ? $sms_messages[$gateway_id] : [];
@@ -156,7 +156,7 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
    *   An array of SMS reports for messages sent to 'Memory' gateway.
    */
-  protected function getTestMessageReports(SmsGatewayInterface $sms_gateway) {
+  protected function getTestMessageReports(SmsGatewayInterface $sms_gateway): array {
     $gateway_id = $sms_gateway->id();
     $sms_reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
     return isset($sms_reports[$gateway_id]) ? $sms_reports[$gateway_id] : [];
@@ -197,7 +197,7 @@ trait SmsFrameworkTestTrait {
   /**
    * Resets the SMS reports stored in memory by 'Memory' gateway.
    */
-  protected function resetTestMessageReports() {
+  protected function resetTestMessageReports(): void {
     \Drupal::state()->set('sms_test_gateway.memory.report', []);
   }
 
@@ -212,7 +212,7 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\Core\Entity\EntityInterface
    *   An entity with phone numbers.
    */
-  protected function createEntityWithPhoneNumber(PhoneNumberSettingsInterface $phone_number_settings, array $phone_numbers = []) {
+  protected function createEntityWithPhoneNumber(PhoneNumberSettingsInterface $phone_number_settings, array $phone_numbers = []): EntityInterface {
     $entity_type = $phone_number_settings->getPhoneNumberEntityTypeId();
     $field_name = $phone_number_settings->getFieldName('phone_number');
     $entity_type_manager = \Drupal::entityTypeManager();
@@ -278,7 +278,7 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Message\SmsMessageResult
    *   A message result with reports for each message recipient.
    */
-  protected function createMessageResult(SmsMessageInterface $sms_message) {
+  protected function createMessageResult(SmsMessageInterface $sms_message): SmsMessageResult {
     $reports = array_map(
       function ($recipient) {
         return (new SmsDeliveryReport())
@@ -301,7 +301,7 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Message\SmsMessageInterface
    *   A random SMS message by the specified user.
    */
-  protected function randomSmsMessage($uid = 1) {
+  protected function randomSmsMessage(int $uid = 1): SmsMessageInterface {
     $phone_numbers = $this->randomPhoneNumbers(1);
     return new SmsMessage($phone_numbers[0], $this->randomPhoneNumbers(), $this->randomString(), [], $uid);
   }
@@ -315,7 +315,7 @@ trait SmsFrameworkTestTrait {
    * @return array
    *   An array of phone numbers.
    */
-  protected function randomPhoneNumbers($quantity = NULL) {
+  protected function randomPhoneNumbers($quantity = NULL): array {
     $quantity = isset($quantity) ? $quantity : rand(2, 20);
     $numbers = [];
     for ($i = 0; $i < $quantity; $i++) {

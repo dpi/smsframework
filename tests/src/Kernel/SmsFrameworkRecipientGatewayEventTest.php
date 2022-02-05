@@ -6,13 +6,14 @@ namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Direction;
+use Drupal\sms\Provider\SmsProviderInterface;
 
 /**
  * Tests SMS Framework provider service.
  *
  * @group SMS Framework
  */
-class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase {
+final class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase {
 
   /**
    * {@inheritdoc}
@@ -27,12 +28,12 @@ class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase {
    *
    * @var \Drupal\sms\Provider\SmsProviderInterface
    */
-  protected $smsProvider;
+  private SmsProviderInterface $smsProvider;
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('sms');
     $this->smsProvider = $this->container->get('sms.provider');
@@ -44,7 +45,7 @@ class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase {
    *
    * @see \Drupal\sms_test\EventSubscriber\SmsTestEventSubscriber
    */
-  public function testGatewayEventSubscriber() {
+  public function testGatewayEventSubscriber(): void {
     $gateway_200 = $this->createMemoryGateway(['id' => 'test_gateway_200']);
     $gateway_200
       ->setSkipQueue(TRUE)
@@ -63,11 +64,11 @@ class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase {
       ->addRecipients($this->randomPhoneNumbers());
 
     $sms_messages = $this->smsProvider->queue($sms_message);
-    $this->assertEquals(1, count($sms_messages), 'One message dispatched.');
+    $this->assertCount(1, $sms_messages, 'One message dispatched.');
     $this->assertEquals('test_gateway_400', $sms_messages[0]->getGateway()->id());
 
-    $this->assertEquals(0, count($this->getTestMessages($gateway_200)), 'Message not sent through gateway_200');
-    $this->assertEquals(1, count($this->getTestMessages($gateway_400)), 'Message sent through gateway_400');
+    $this->assertCount(0, $this->getTestMessages($gateway_200), 'Message not sent through gateway_200');
+    $this->assertCount(1, $this->getTestMessages($gateway_400), 'Message sent through gateway_400');
   }
 
 }

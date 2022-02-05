@@ -20,7 +20,7 @@ trait SmsFrameworkMessageResultTestTrait {
    * @covers ::getError
    * @covers ::setError
    */
-  public function testError() {
+  public function testError(): void {
     $result = $this->createMessageResult();
     $this->assertNull($result->getError(), 'Default value is NULL');
 
@@ -37,7 +37,7 @@ trait SmsFrameworkMessageResultTestTrait {
    * @covers ::getErrorMessage
    * @covers ::setErrorMessage
    */
-  public function testErrorMessage() {
+  public function testErrorMessage(): void {
     $result = $this->createMessageResult();
     $this->assertEquals('', $result->getErrorMessage(), 'Default value is empty string');
 
@@ -53,7 +53,7 @@ trait SmsFrameworkMessageResultTestTrait {
    *
    * @covers ::getReport
    */
-  public function testGetReport() {
+  public function testGetReport(): void {
     $result = $this->createMessageResult();
     $recipient = '123123123';
     $this->assertNull($result->getReport($recipient), 'No report found');
@@ -71,7 +71,7 @@ trait SmsFrameworkMessageResultTestTrait {
    * @covers ::getReports
    * @covers ::setReports
    */
-  public function testReports() {
+  public function testReports(): void {
     $result = $this->createMessageResult();
     $recipient = '123123123';
 
@@ -81,7 +81,7 @@ trait SmsFrameworkMessageResultTestTrait {
     $this->assertTrue($return instanceof SmsMessageResultInterface);
 
     $reports = $result->getReports();
-    $this->assertEquals(1, count($reports));
+    $this->assertCount(1, $reports);
     $this->assertTrue($reports[0] instanceof SmsDeliveryReportInterface);
 
     // Verify that a second ::setReports() call clears what was there before.
@@ -90,7 +90,7 @@ trait SmsFrameworkMessageResultTestTrait {
     $result->setReports([$report2]);
 
     $reports = $result->getReports();
-    $this->assertEquals(1, count($reports));
+    $this->assertCount(1, $reports);
   }
 
   /**
@@ -98,10 +98,10 @@ trait SmsFrameworkMessageResultTestTrait {
    *
    * @covers ::addReport
    */
-  public function testAddReport() {
+  public function testAddReport(): void {
     $result = $this->createMessageResult();
 
-    $this->assertEquals(0, count($result->getReports()), 'There are zero reports.');
+    $this->assertCount(0, $result->getReports(), 'There are zero reports.');
 
     $report = (new SmsDeliveryReport())
       ->setRecipient('123123123');
@@ -109,7 +109,7 @@ trait SmsFrameworkMessageResultTestTrait {
     $return = $result->addReport($report);
     $this->assertTrue($return instanceof SmsMessageResultInterface, 'Return type is a result object');
 
-    $this->assertEquals(1, count($result->getReports()), 'There is one report.');
+    $this->assertCount(1, $result->getReports(), 'There is one report.');
   }
 
   /**
@@ -118,7 +118,7 @@ trait SmsFrameworkMessageResultTestTrait {
    * @covers ::getCreditsBalance
    * @covers ::setCreditsBalance
    */
-  public function testCreditsBalance() {
+  public function testCreditsBalance(): void {
     $result = $this->createMessageResult();
     $this->assertNull($result->getCreditsBalance(), 'No credit balance set');
 
@@ -133,7 +133,7 @@ trait SmsFrameworkMessageResultTestTrait {
    *
    * @covers ::setCreditsBalance
    */
-  public function testCreditsBalanceIncorrectType() {
+  public function testCreditsBalanceIncorrectType(): void {
     $balance = 'foobar';
     $result = $this->createMessageResult();
 
@@ -148,7 +148,7 @@ trait SmsFrameworkMessageResultTestTrait {
    * @covers ::getCreditsUsed
    * @covers ::setCreditsUsed
    */
-  public function testCreditsUsed() {
+  public function testCreditsUsed(): void {
     $result = $this->createMessageResult();
     $this->assertNull($result->getCreditsUsed(), 'No credits used set');
 
@@ -163,7 +163,7 @@ trait SmsFrameworkMessageResultTestTrait {
    *
    * @covers ::setCreditsUsed
    */
-  public function testCreditsUsedIncorrectType() {
+  public function testCreditsUsedIncorrectType(): void {
     $used = 'foobar';
     $result = $this->createMessageResult();
 
@@ -178,6 +178,6 @@ trait SmsFrameworkMessageResultTestTrait {
    * @return \Drupal\sms\Message\SmsMessageResultInterface
    *   A result for testing.
    */
-  abstract protected function createMessageResult();
+  abstract protected function createMessageResult(): SmsMessageResultInterface;
 
 }

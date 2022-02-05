@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 
 use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
  * Defines a gateway with defective return values for its' send method.
@@ -15,17 +16,13 @@ use Drupal\sms\Message\SmsMessageInterface;
  *   outgoing_message_max_recipients = -1
  * )
  */
-class MemoryOutgoingResult extends Memory {
+final class MemoryOutgoingResult extends Memory {
 
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms_message) {
+  public function send(SmsMessageInterface $sms_message): SmsMessageResultInterface {
     $result = parent::send($sms_message);
-
-    if (\Drupal::state()->get('sms_test_gateway.memory_outgoing_result.missing_result')) {
-      return NULL;
-    }
 
     $delete_reports = \Drupal::state()->get('sms_test_gateway.memory_outgoing_result.delete_reports');
     if ($delete_reports > 0) {

@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\sms\Functional;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\sms\Entity\PhoneNumberVerification;
@@ -13,7 +14,7 @@ use Drupal\sms\Entity\PhoneNumberVerification;
  *
  * @group SMS Framework
  */
-class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase {
+final class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase {
 
   /**
    * {@inheritdoc}
@@ -25,12 +26,12 @@ class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase {
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->entityTypeManager = $this->container->get('entity_type.manager');
 
@@ -48,10 +49,10 @@ class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase {
   /**
    * Tests phone number list.
    */
-  public function testPhoneNumberList() {
+  public function testPhoneNumberList(): void {
     $this->drupalGet('admin/config/smsframework/phone_number');
-    $this->assertRaw(t('No phone number settings found.'));
-    $this->assertLinkByHref('admin/config/smsframework/phone_number/add');
+    $this->assertSession()->responseContains(t('No phone number settings found.'));
+    $this->assertSession()->linkByHrefExists('admin/config/smsframework/phone_number/add');
 
     // Ensure statistics are appearing on list.
     $this->createPhoneNumberSettings('entity_test', 'entity_test');
@@ -86,7 +87,7 @@ class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase {
     }
 
     $this->drupalGet('admin/config/smsframework/phone_number');
-    $this->assertRaw('<td>entity_test</td>
+    $this->assertSession()->responseContains('<td>entity_test</td>
                       <td>' . $quantity[0] . '</td>
                       <td>' . $quantity[1] . '</td>
                       <td>' . ($quantity[0] + $quantity[2]) . '</td>
@@ -96,10 +97,10 @@ class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase {
   /**
    * CRUD a phone number settings via UI.
    */
-  public function testPhoneNumberCrud() {
+  public function testPhoneNumberCrud(): void {
     // Add a new phone number config.
     $this->drupalGet('admin/config/smsframework/phone_number/add');
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     $edit = [
       'entity_bundle' => 'entity_test|entity_test',
@@ -107,48 +108,49 @@ class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase {
     ];
     $this->drupalPostForm('admin/config/smsframework/phone_number/add', $edit, t('Save'));
 
-    $this->assertUrl('admin/config/smsframework/phone_number');
+    $this->assertSession()->addressEquals('admin/config/smsframework/phone_number');
     $t_args = ['%id' => 'entity_test.entity_test'];
-    $this->assertRaw(t('Phone number settings %id created.', $t_args));
-    $this->assertRaw('<td>entity_test</td>
+    $this->assertSession()->responseContains(t('Phone number settings %id created.', $t_args));
+    $this->assertSession()->responseContains('<td>entity_test</td>
                       <td>entity_test</td>', 'Phone number settings displayed as row.');
-    $this->assertLinkByHref('admin/config/smsframework/phone_number/entity_test.entity_test');
-    $this->assertLinkByHref('admin/config/smsframework/phone_number/entity_test.entity_test/delete');
+    $this->assertSession()->linkByHrefExists('admin/config/smsframework/phone_number/entity_test.entity_test');
+    $this->assertSession()->linkByHrefExists('admin/config/smsframework/phone_number/entity_test.entity_test/delete');
 
     // Ensure a phone number config cannot have the same bundle as pre-existing.
     $this->drupalGet('admin/config/smsframework/phone_number/add');
-    $this->assertNoOption('edit-entity-bundle', 'entity_test|entity_test');
+    $this->assertSession()->optionNotExists('edit-entity-bundle', 'entity_test|entity_test');
 
     // Edit phone number settings.
     $this->drupalGet('admin/config/smsframework/phone_number/entity_test.entity_test');
-    $this->assertField('field_mapping[phone_number]', 'Phone number field exists.');
-    $this->assertNoField('entity_bundle', 'Bundle field does not exist.');
-    $this->assertOptionSelected('edit-field-mapping-phone-number', 'phone_number');
+    $this->assertSession()->fieldExists('field_mapping[phone_number]');
+    $this->assertSession()->fieldNotExists('entity_bundle');
+    $optionElement = $this->assertSession()->optionExists('edit-field-mapping-phone-number', 'phone_number');
+    $this->assertTrue($optionElement->hasAttribute('selected'));
 
     // Ensure edit form is saving correctly.
     $edit = [
       'code_lifetime' => '7777',
     ];
     $this->drupalPostForm('admin/config/smsframework/phone_number/entity_test.entity_test', $edit, t('Save'));
-    $this->assertEqual(7777, $this->config('sms.phone.entity_test.entity_test')->get('verification_code_lifetime'));
+    $this->assertEquals(7777, $this->config('sms.phone.entity_test.entity_test')->get('verification_code_lifetime'));
 
     // Delete new phone number settings.
     $this->drupalGet('admin/config/smsframework/phone_number/entity_test.entity_test/delete');
-    $this->assertRaw(t('Are you sure you want to delete SMS phone number settings %label?', [
+    $this->assertSession()->responseContains(t('Are you sure you want to delete SMS phone number settings %label?', [
       '%label' => 'entity_test.entity_test',
     ]));
     $this->drupalPostForm('admin/config/smsframework/phone_number/entity_test.entity_test/delete', [], t('Delete'));
-    $this->assertUrl('admin/config/smsframework/phone_number');
-    $this->assertRaw(t('Phone number settings %label was deleted.', [
+    $this->assertSession()->addressEquals('admin/config/smsframework/phone_number');
+    $this->assertSession()->responseContains(t('Phone number settings %label was deleted.', [
       '%label' => 'entity_test.entity_test',
     ]));
-    $this->assertRaw('No phone number settings found.');
+    $this->assertSession()->responseContains('No phone number settings found.');
   }
 
   /**
    * Test field creation for new phone number settings.
    */
-  public function testPhoneNumberFieldCreate() {
+  public function testPhoneNumberFieldCreate(): void {
     $field_name_telephone = 'phone_number';
 
     // Test the unique field name generator by creating pre-existing fields.
@@ -171,8 +173,9 @@ class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase {
 
     // Ensure field name is associated with config.
     $this->drupalGet('admin/config/smsframework/phone_number/entity_test.entity_test');
-    $this->assertResponse(200);
-    $this->assertOptionSelected('edit-field-mapping-phone-number', $field_name_telephone);
+    $this->assertSession()->statusCodeEquals(200);
+    $optionElement = $this->assertSession()->optionExists('edit-field-mapping-phone-number', $field_name_telephone);
+    $this->assertTrue($optionElement->hasAttribute('selected'));
   }
 
 }

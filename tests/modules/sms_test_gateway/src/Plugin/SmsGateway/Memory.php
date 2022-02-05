@@ -7,6 +7,7 @@ namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Random;
 use Drupal\sms\Message\SmsDeliveryReport;
+use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Drupal\sms\Plugin\SmsGateway\SmsIncomingEventProcessorInterface;
 use Drupal\sms\Event\SmsMessageEvent;
@@ -36,7 +37,7 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
   /**
    * {@inheritdoc}
    */
-  public function defaultConfiguration() {
+  public function defaultConfiguration(): array {
     return [
       'widget' => '',
       // Store the ID of gateway config. See static::send().
@@ -47,7 +48,7 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $form = parent::buildConfigurationForm($form, $form_state);
     $config = $this->getConfiguration();
 
@@ -71,7 +72,7 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms_message) {
+  public function send(SmsMessageInterface $sms_message): SmsMessageResultInterface {
     $gateway_id = $this->configuration['gateway_id'];
 
     // Message.
@@ -108,7 +109,7 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
   /**
    * {@inheritdoc}
    */
-  public function parseDeliveryReports(Request $request, Response $response) {
+  public function parseDeliveryReports(Request $request, Response $response): array {
     $gateway_id = $this->configuration['gateway_id'];
     $memory_reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
 
@@ -147,7 +148,7 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
   /**
    * {@inheritdoc}
    */
-  public function getDeliveryReports(array $message_ids = NULL) {
+  public function getDeliveryReports(array $message_ids = NULL): array {
     return [];
   }
 
@@ -160,7 +161,7 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
    *   An array of delivery reports.
    */
-  protected function randomDeliveryReports(SmsMessageInterface $sms_message) {
+  protected function randomDeliveryReports(SmsMessageInterface $sms_message): array {
     $random = new Random();
     $request_time = \Drupal::time()->getRequestTime();
     $reports = [];
@@ -180,7 +181,7 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
   /**
    * {@inheritdoc}
    */
-  public function getCreditsBalance() {
+  public function getCreditsBalance(): ?float {
     return 13.36;
   }
 

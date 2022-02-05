@@ -13,12 +13,12 @@ use Drupal\sms\Direction;
  *
  * @group SMS Framework
  */
-class SmsFrameworkBrowserTest extends SmsFrameworkBrowserTestBase {
+final class SmsFrameworkBrowserTest extends SmsFrameworkBrowserTestBase {
 
   /**
    * Tests queue statistics located on Drupal report page.
    */
-  public function testQueueReport() {
+  public function testQueueReport(): void {
     $gateway = $this->createMemoryGateway();
 
     /** @var \Drupal\sms\Provider\SmsProviderInterface $provider */
@@ -46,8 +46,8 @@ class SmsFrameworkBrowserTest extends SmsFrameworkBrowserTestBase {
     $this->drupalLogin($this->rootUser);
     $this->drupalGet(Url::fromRoute('system.status'));
 
-    $this->assertRaw('There are 2 messages in the incoming queue.');
-    $this->assertRaw('There are 4 messages in the outgoing queue.');
+    $this->assertSession()->responseContains('There are 2 messages in the incoming queue.');
+    $this->assertSession()->responseContains('There are 4 messages in the outgoing queue.');
   }
 
 }

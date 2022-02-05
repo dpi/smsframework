@@ -48,7 +48,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->activeHoursService = $this->container->get('sms_user.active_hours');
     $this->smsProvider = $this->container->get('sms.provider');
@@ -59,7 +59,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Test if in hours if active hours is disabled and out of active hours.
    */
-  public function testInHoursActiveHoursOff() {
+  public function testInHoursActiveHoursOff(): void {
     $this->activeHoursStatus(FALSE);
     $this->setActiveHours([['start' => '2016-03-13 sunday 9:00', 'end' => '2016-03-13 sunday 17:00']]);
     $user = $this->createUser(['timezone' => 'America/New_York']);
@@ -71,7 +71,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Test if in hours with different timezone.
    */
-  public function testInHoursDifferentTimezone() {
+  public function testInHoursDifferentTimezone(): void {
     $this->activeHoursStatus(TRUE);
     $this->setActiveHours([['start' => '2016-03-13 sunday 9:00', 'end' => '2016-03-13 sunday 17:00']]);
     $user = $this->createUser(['timezone' => 'America/New_York']);
@@ -83,7 +83,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Test if in hours with same timezone.
    */
-  public function testInHoursSameTimezone() {
+  public function testInHoursSameTimezone(): void {
     $this->activeHoursStatus(TRUE);
     $this->setActiveHours([['start' => '2016-03-13 sunday 9:00', 'end' => '2016-03-13 sunday 17:00']]);
     $user = $this->createUser(['timezone' => 'America/New_York']);
@@ -95,7 +95,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Test if in hours with day not in active hours.
    */
-  public function testInHoursDifferentDay() {
+  public function testInHoursDifferentDay(): void {
     $this->activeHoursStatus(TRUE);
     $this->setActiveHours([['start' => '2016-03-14 monday 9:00', 'end' => '2016-03-14 monday 17:00']]);
     $user = $this->createUser(['timezone' => 'America/New_York']);
@@ -107,7 +107,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Test if in hours for 24 hours with same timezone.
    */
-  public function testInHoursAllDay() {
+  public function testInHoursAllDay(): void {
     $this->activeHoursStatus(TRUE);
     $this->setActiveHours([['start' => '2016-03-16 wednesday', 'end' => '2016-03-16 wednesday +1 day']]);
     $user = $this->createUser(['timezone' => 'America/New_York']);
@@ -131,7 +131,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Test if in hours for 24 hours with different timezone.
    */
-  public function testInHoursAllDayDifferentTimezone() {
+  public function testInHoursAllDayDifferentTimezone(): void {
     $this->activeHoursStatus(TRUE);
     $this->setActiveHours([['start' => '2016-03-16 wednesday', 'end' => '2016-03-16 wednesday +1 day']]);
     $user = $this->createUser(['timezone' => 'America/New_York']);
@@ -155,7 +155,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Test no next time when no ranges are set.
    */
-  public function testFindNextTimeNoRanges() {
+  public function testFindNextTimeNoRanges(): void {
     $user = $this->createUser();
     $this->assertFalse($this->activeHoursService->findNextTime($user));
   }
@@ -163,7 +163,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Test getting the range for today when within todays range.
    */
-  public function testFindNextTimeSameDay() {
+  public function testFindNextTimeSameDay(): void {
     $this->setActiveHours([
       ['start' => '2016-03-15 tuesday 9:00', 'end' => '2016-03-15 tuesday 17:00'],
       ['start' => '2016-03-16 wednesday 9:00', 'end' => '2016-03-16 wednesday 17:00'],
@@ -179,7 +179,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Test getting a range for next day when out of hours when a range was today.
    */
-  public function testFindNextTimeSameDayOutOfHours() {
+  public function testFindNextTimeSameDayOutOfHours(): void {
     $this->setActiveHours([
       ['start' => '2016-03-15 tuesday 9:00', 'end' => '2016-03-15 tuesday 17:00'],
       ['start' => '2016-03-12 saturday 9:00', 'end' => '2016-03-12 saturday 17:00'],
@@ -195,7 +195,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Tests getting date ranges.
    */
-  public function testGetRanges() {
+  public function testGetRanges(): void {
     $this->setActiveHours([
       ['start' => '2016-03-15 tuesday 9:00', 'end' => '2016-03-15 tuesday 17:00'],
       ['start' => '2016-03-16 wednesday 9:00', 'end' => '2016-03-16 wednesday 17:00'],
@@ -220,7 +220,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    * Checks invokation of sms_user_entity_presave(). This happens when queue()
    * is called and the SMS message is saved.
    */
-  public function testDelaySmsMessage() {
+  public function testDelaySmsMessage(): void {
     $timestamp = (new DrupalDateTime('next tuesday 9:00'))->format('U');
     $this->activeHoursStatus(TRUE);
     $this->setActiveHours([
@@ -242,7 +242,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Tests delay was not applied to a SMS message if it is tagged as automated.
    */
-  public function testDelaySmsMessageNotAutomated() {
+  public function testDelaySmsMessageNotAutomated(): void {
     $timestamp = (new DrupalDateTime('next tuesday 9:00'))->format('U');
     $this->activeHoursStatus(TRUE);
     $this->setActiveHours([

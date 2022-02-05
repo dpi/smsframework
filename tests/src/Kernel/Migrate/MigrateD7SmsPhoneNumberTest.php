@@ -16,14 +16,14 @@ use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
  *
  * @see \Drupal\Tests\sms\Kernel\Migrate\MigratePhoneNumberTestTrait
  */
-class MigrateD7SmsPhoneNumberTest extends MigrateDrupal7TestBase {
+final class MigrateD7SmsPhoneNumberTest extends MigrateDrupal7TestBase {
 
   use MigratePhoneNumberTestTrait;
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->loadFixture(__DIR__ . '/../../../fixtures/migrate/drupal7.php');
   }
@@ -56,7 +56,7 @@ class MigrateD7SmsPhoneNumberTest extends MigrateDrupal7TestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getMigrationsToTest() {
+  protected function getMigrationsToTest(): array {
     return [
       'd7_filter_format',
       'd7_user_role',
@@ -69,7 +69,7 @@ class MigrateD7SmsPhoneNumberTest extends MigrateDrupal7TestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getMigrationsToRollback() {
+  protected function getMigrationsToRollback(): array {
     return [
       'd7_sms_number',
       'phone_number_settings',
@@ -79,14 +79,14 @@ class MigrateD7SmsPhoneNumberTest extends MigrateDrupal7TestBase {
   /**
    * File path to the DB fixture for sms_user table and records.
    */
-  protected function smsUserFixtureFilePath() {
+  protected function smsUserFixtureFilePath(): string {
     return __DIR__ . '/../../../fixtures/migrate/sms_user_drupal7.php';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function confirmationMessageFixturePath() {
+  protected function confirmationMessageFixturePath(): string {
     return __DIR__ . '/../../../fixtures/migrate/sms_confirmation_message_d7.php';
   }
 

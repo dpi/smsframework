@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\sms_test\EventSubscriber;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Event\SmsEvents;
@@ -13,7 +13,7 @@ use Drupal\sms\Event\RecipientGatewayEvent;
 /**
  * Test event subscriber.
  */
-class SmsTestEventSubscriber implements EventSubscriberInterface {
+final class SmsTestEventSubscriber implements EventSubscriberInterface {
 
   /**
    * Adds a gateway with ID 'test_gateway_200', with weight '200'.
@@ -58,7 +58,7 @@ class SmsTestEventSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[SmsEvents::MESSAGE_GATEWAY][] = ['testAddGateway200'];
     $events[SmsEvents::MESSAGE_GATEWAY][] = ['testAddGateway400'];
 

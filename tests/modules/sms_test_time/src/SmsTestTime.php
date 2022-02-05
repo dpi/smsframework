@@ -9,21 +9,21 @@ use Drupal\Component\Datetime\TimeInterface;
 /**
  * Time service with a predictable time.
  */
-class SmsTestTime implements TimeInterface {
+final class SmsTestTime implements TimeInterface {
 
   /**
    * Original time service.
    *
    * @var \Drupal\Component\Datetime\TimeInterface
    */
-  protected $original;
+  protected TimeInterface $original;
 
   /**
    * Date for testing.
    *
-   * @var \DateTime
+   * @var \DateTimeInterface
    */
-  protected $date;
+  protected \DateTimeInterface $date;
 
   /**
    * SmsTestTime constructor.
@@ -39,29 +39,29 @@ class SmsTestTime implements TimeInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRequestTime() {
-    return $this->date->format('U');
+  public function getRequestTime(): int {
+    return (int) $this->date->getTimestamp();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getRequestMicroTime() {
-    return $this->date->format('U.u');
+  public function getRequestMicroTime(): float {
+    return (float) $this->date->format('U.u');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCurrentTime() {
-    return $this->date->format('U');
+  public function getCurrentTime(): int {
+    return (int) $this->date->getTimestamp();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCurrentMicroTime() {
-    return $this->date->format('U.u');
+  public function getCurrentMicroTime(): float {
+    return (float) $this->date->format('U.u');
   }
 
 }

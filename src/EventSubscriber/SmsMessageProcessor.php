@@ -224,7 +224,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
     $event = new RecipientGatewayEvent($recipient);
     /** @var \Drupal\sms\Event\RecipientGatewayEvent $event */
     $event = $this->eventDispatcher
-      ->dispatch(SmsEvents::MESSAGE_GATEWAY, $event);
+      ->dispatch($event, SmsEvents::MESSAGE_GATEWAY);
 
     $gateways = $event->getGatewaysSorted();
     // Use the gateway with the greatest weight.

@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
@@ -19,7 +21,7 @@ use Drupal\sms\Direction;
  *
  * @group SMS Framework
  */
-class SmsFrameworkViewsTest extends ViewsKernelTestBase {
+final class SmsFrameworkViewsTest extends ViewsKernelTestBase {
 
   use SmsFrameworkTestTrait;
 
@@ -43,14 +45,14 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
    *
    * @var \Drupal\sms\Provider\SmsProviderInterface
    */
-  protected $smsProvider;
+  private SmsProviderInterface $smsProvider;
 
   /**
    * A memory gateway.
    *
    * @var \Drupal\sms\Entity\SmsGatewayInterface
    */
-  protected $gateway;
+  private SmsGatewayInterface $gateway;
 
   /**
    * {@inheritdoc}
@@ -74,7 +76,7 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
   /**
    * Tests view of SMS entities with join to recipient table.
    */
-  public function testSms() {
+  public function testSms(): void {
     // Create a role and user which has permission to view the entity links
     // generated for 'gateway', 'sender_entity__target_id', and
     // 'recipient_entity__target_id' columns.

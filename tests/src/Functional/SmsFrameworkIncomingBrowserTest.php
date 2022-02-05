@@ -5,32 +5,34 @@ declare(strict_types = 1);
 namespace Drupal\Tests\sms\Functional;
 
 use Drupal\Core\Url;
+use Drupal\sms\Entity\SmsGatewayInterface;
+use GuzzleHttp\Client;
 
 /**
  * Tests incoming route endpoint.
  *
  * @group SMS Framework
  */
-class SmsFrameworkIncomingBrowserTest extends SmsFrameworkBrowserTestBase {
+final class SmsFrameworkIncomingBrowserTest extends SmsFrameworkBrowserTestBase {
 
   /**
    * The HTTP client.
    *
    * @var \GuzzleHttp\Client
    */
-  protected $httpClient;
+  protected Client $httpClient;
 
   /**
    * An incoming gateway instance.
    *
    * @var \Drupal\sms\Entity\SmsGatewayInterface
    */
-  protected $incomingGateway;
+  protected SmsGatewayInterface $incomingGateway;
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->httpClient = $this->container->get('http_client');
 
@@ -44,7 +46,7 @@ class SmsFrameworkIncomingBrowserTest extends SmsFrameworkBrowserTestBase {
   /**
    * Test incoming route endpoint provided by 'incoming' gateway.
    */
-  public function testIncomingRouteEndpoint() {
+  public function testIncomingRouteEndpoint(): void {
     $messages[0] = [
       'message' => $this->randomString(),
       'recipients' => $this->randomPhoneNumbers(),
@@ -73,7 +75,7 @@ class SmsFrameworkIncomingBrowserTest extends SmsFrameworkBrowserTestBase {
     $this->assertEmpty((string) $response->getBody(), 'Response body is empty.');
 
     $incoming_messages = $this->getIncomingMessages($this->incomingGateway);
-    $this->assertEquals(count($messages), count($incoming_messages), 'There are 2 messages');
+    $this->assertCount(count($messages), $incoming_messages, 'There are 2 messages');
     foreach ($messages as $i => $message) {
       $this->assertEquals($message['message'], $incoming_messages[$i]->getMessage(), "Message $i contents are same.");
       $this->assertEquals($message['recipients'], $incoming_messages[$i]->getRecipients(), "Message $i recipients are same.");

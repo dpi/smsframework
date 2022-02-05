@@ -5,7 +5,9 @@ declare(strict_types = 1);
 namespace Drupal\Tests\sms\Unit\Message;
 
 use Drupal\Component\Uuid\Php;
+use Drupal\Component\Uuid\UuidInterface;
 use Drupal\sms\Message\SmsMessage;
+use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Tests\sms\Functional\SmsFrameworkMessageTestTrait;
 
@@ -15,7 +17,7 @@ use Drupal\Tests\sms\Functional\SmsFrameworkMessageTestTrait;
  * @group SMS Framework
  * @coversDefaultClass \Drupal\sms\Message\SmsMessage
  */
-class SmsMessageTest extends UnitTestCase {
+final class SmsMessageTest extends UnitTestCase {
 
   use SmsFrameworkMessageTestTrait;
 
@@ -25,7 +27,7 @@ class SmsMessageTest extends UnitTestCase {
    * @return \Drupal\sms\Message\SmsMessageInterface
    *   A SMS message object for testing.
    */
-  protected function createSmsMessage() {
+  protected function createSmsMessage(): SmsMessageInterface {
     return new TestSmsMessage();
   }
 
@@ -34,12 +36,12 @@ class SmsMessageTest extends UnitTestCase {
 /**
  * Mock class for testing.
  */
-class TestSmsMessage extends SmsMessage {
+final class TestSmsMessage extends SmsMessage {
 
   /**
    * {@inheritdoc}
    */
-  protected function uuidGenerator() {
+  protected function uuidGenerator(): UuidInterface {
     return new Php();
   }
 

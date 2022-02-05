@@ -4,6 +4,9 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
 use Drupal\sms\Exception\SmsDirectionException;
 use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Exception\RecipientRouteException;
@@ -15,6 +18,7 @@ use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Direction;
 use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Message\SmsMessageResultInterface;
+use Drupal\sms\Provider\SmsProviderInterface;
 
 /**
  * Tests SMS Framework provider service.
@@ -22,7 +26,7 @@ use Drupal\sms\Message\SmsMessageResultInterface;
  * @group SMS Framework
  * @coversDefaultClass \Drupal\sms\Provider\DefaultSmsProvider
  */
-class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
+final class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
   /**
    * {@inheritdoc}
@@ -37,33 +41,33 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $smsStorage;
+  private EntityStorageInterface $smsStorage;
 
   /**
    * The SMS provider.
    *
    * @var \Drupal\sms\Provider\SmsProviderInterface
    */
-  protected $smsProvider;
+  private SmsProviderInterface $smsProvider;
 
   /**
    * A memory gateway.
    *
    * @var \Drupal\sms\Entity\SmsGatewayInterface
    */
-  protected $gateway;
+  private SmsGatewayInterface $gateway;
 
   /**
    * An incoming gateway.
    *
    * @var \Drupal\sms\Entity\SmsGatewayInterface
    */
-  protected $incomingGateway;
+  private SmsGatewayInterface $incomingGateway;
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->installEntitySchema('sms');
@@ -83,15 +87,15 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    *
    * @covers ::send
    */
-  public function testSend() {
+  public function testSend(): void {
     $message = $this->createSmsMessage()
       ->addRecipients($this->randomPhoneNumbers());
 
     $sms_messages = $this->smsProvider->send($message);
 
-    $this->assertEquals(1, count($sms_messages), 'Return value contains 1 item.');
+    $this->assertCount(1, $sms_messages, 'Return value contains 1 item.');
     $this->assertTrue($sms_messages[0] instanceof StandardSmsMessageInterface, 'Return value is a SMS message.');
-    $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
+    $this->assertCount(1, $this->getTestMessages($this->gateway));
     $this->assertTrue($sms_messages[0]->getResult() instanceof SmsMessageResultInterface);
   }
 
@@ -100,7 +104,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    *
    * @covers ::send
    */
-  public function testSendNoDirection() {
+  public function testSendNoDirection(): void {
     $sms_message = SmsMessage::create()
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers())
@@ -110,7 +114,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->smsProvider->send($sms_message);
 
     $messages = $this->getTestMessages($this->gateway);
-    $this->assertEquals(1, count($messages), 'Message was added to outgoing queue without direction being explicitly set');
+    $this->assertCount(1, ($messages), 'Message was added to outgoing queue without direction being explicitly set');
     $this->assertEquals(Direction::OUTGOING, $messages[0]->getDirection(), 'Message direction set to outgoing.');
   }
 
@@ -119,7 +123,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    *
    * @covers ::incoming
    */
-  public function testIncoming() {
+  public function testIncoming(): void {
     $message = $this->randomString();
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::INCOMING)
@@ -130,7 +134,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $sms_messages = $this->smsProvider->incoming($sms_message);
 
     $this->assertEquals($message, sms_test_gateway_get_incoming()['message'], 'Message was received.');
-    $this->assertEquals(1, count($sms_messages), 'Return value contains 1 item.');
+    $this->assertCount(1, $sms_messages, 'Return value contains 1 item.');
     $this->assertTrue($sms_messages[0] instanceof StandardSmsMessageInterface, 'Return value is a SMS message.');
     $this->assertTrue($sms_messages[0]->getResult() instanceof SmsMessageResultInterface);
   }
@@ -140,7 +144,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    *
    * @covers ::incoming
    */
-  public function testIncomingNoDirection() {
+  public function testIncomingNoDirection(): void {
     $sms_message = SmsMessage::create()
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers())
@@ -151,14 +155,14 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->smsProvider->incoming($sms_message);
 
     $messages = $this->getIncomingMessages($this->incomingGateway);
-    $this->assertEquals(1, count($messages), 'Message was added to incoming queue without direction being explicitly set');
+    $this->assertCount(1, $messages, 'Message was added to incoming queue without direction being explicitly set');
     $this->assertEquals(Direction::INCOMING, $messages[0]->getDirection(), 'Message direction set to incoming.');
   }
 
   /**
    * Ensures incoming message without recipients do not trigger exception.
    */
-  public function testIncomingNoRecipients() {
+  public function testIncomingNoRecipients(): void {
     $this->incomingGateway
       ->setSkipQueue(TRUE)
       ->save();
@@ -172,26 +176,26 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->smsProvider->queue($sms_message);
 
     $messages = $this->getIncomingMessages($this->incomingGateway);
-    $this->assertEquals(1, count($messages), 'Message was added to incoming queue without recipients.');
+    $this->assertCount(1, $messages, 'Message was added to incoming queue without recipients.');
   }
 
   /**
    * Ensure no messages sent if no recipients.
    */
-  public function testNoSendNoRecipients() {
+  public function testNoSendNoRecipients(): void {
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::OUTGOING)
       ->setMessage($this->randomString());
     $this->expectException(RecipientRouteException::class);
     $this->expectExceptionMessage('There are no recipients');
     $this->smsProvider->send($sms_message);
-    $this->assertEquals(0, count($this->getTestMessages($this->gateway)));
+    $this->assertCount(0, $this->getTestMessages($this->gateway));
   }
 
   /**
    * Ensures validation failure if no message.
    */
-  public function testNoSendNoMessage() {
+  public function testNoSendNoMessage(): void {
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::OUTGOING)
       ->addRecipients($this->randomPhoneNumbers());
@@ -205,7 +209,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    *
    * @covers ::queue
    */
-  public function testQueueNoDirection() {
+  public function testQueueNoDirection(): void {
     $sms_message = SmsMessage::create()
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers());
@@ -219,7 +223,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    *
    * @covers ::send
    */
-  public function testSendNoFallbackGateway() {
+  public function testSendNoFallbackGateway(): void {
     $this->setFallbackGateway(NULL);
     $this->expectException(RecipientRouteException::class);
     $message = $this->createSmsMessage()
@@ -230,12 +234,12 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   /**
    * Test message is saved.
    */
-  public function testQueueBasic() {
+  public function testQueueBasic(): void {
     $sms_message = $this->createSmsMessage()
       ->addRecipients($this->randomPhoneNumbers());
     $return = $this->smsProvider->queue($sms_message);
-    $this->assertEquals(1, count(SmsMessage::loadMultiple()), 'SMS message saved.');
-    $this->assertEquals(1, count($return));
+    $this->assertCount(1, SmsMessage::loadMultiple(), 'SMS message saved.');
+    $this->assertCount(1, $return);
     $this->assertTrue($return[0] instanceof SmsMessageInterface);
   }
 
@@ -244,7 +248,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    *
    * @covers ::send
    */
-  public function testQueueNoFallbackGateway() {
+  public function testQueueNoFallbackGateway(): void {
     $this->setFallbackGateway(NULL);
     $this->expectException(RecipientRouteException::class);
     $message = $this->createSmsMessage()
@@ -255,20 +259,20 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   /**
    * Test message is sent immediately.
    */
-  public function testSkipQueue() {
+  public function testSkipQueue(): void {
     $this->gateway
       ->setSkipQueue(TRUE)
       ->save();
     $sms_message = $this->createSmsMessage()
       ->addRecipients($this->randomPhoneNumbers());
     $this->smsProvider->queue($sms_message);
-    $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
+    $this->assertCount(1, $this->getTestMessages($this->gateway));
   }
 
   /**
    * Test sending standard SMS object queue in.
    */
-  public function testQueueIn() {
+  public function testQueueIn(): void {
     $sms_message = new StandardSmsMessage();
     $sms_message
       ->addRecipients($this->randomPhoneNumbers())
@@ -279,14 +283,14 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
     $sms_messages = $this->smsStorage
       ->loadByProperties(['direction' => Direction::INCOMING]);
-    $this->assertEquals(0, count($sms_messages), 'There is zero SMS message in the incoming queue.');
+    $this->assertCount(0, $sms_messages, 'There is zero SMS message in the incoming queue.');
 
     $this->smsProvider
       ->queue($sms_message);
 
     $sms_messages = $this->smsStorage
       ->loadByProperties(['direction' => Direction::INCOMING]);
-    $this->assertEquals(1, count($sms_messages), 'There is one SMS message in the incoming queue.');
+    $this->assertCount(1, $sms_messages, 'There is one SMS message in the incoming queue.');
 
     $sms_message_loaded = reset($sms_messages);
     $this->assertEquals(Direction::INCOMING, $sms_message_loaded->getDirection());
@@ -295,7 +299,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   /**
    * Test sending standard SMS object queue out.
    */
-  public function testQueueOut() {
+  public function testQueueOut(): void {
     $sms_message = new StandardSmsMessage();
     $sms_message
       ->addRecipients($this->randomPhoneNumbers())
@@ -304,13 +308,13 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
     $sms_messages = $this->smsStorage
       ->loadByProperties(['direction' => Direction::OUTGOING]);
-    $this->assertEquals(0, count($sms_messages), 'There is zero SMS message in the outgoing queue.');
+    $this->assertCount(0, $sms_messages, 'There is zero SMS message in the outgoing queue.');
 
     $this->smsProvider->queue($sms_message);
 
     $sms_messages = $this->smsStorage
       ->loadByProperties(['direction' => Direction::OUTGOING]);
-    $this->assertEquals(1, count($sms_messages), 'There is one SMS message in the outgoing queue.');
+    $this->assertCount(1, $sms_messages, 'There is one SMS message in the outgoing queue.');
 
     $sms_message_loaded = reset($sms_messages);
     $this->assertEquals(Direction::OUTGOING, $sms_message_loaded->getDirection());
@@ -319,7 +323,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   /**
    * Test sending standard SMS object queue out skips queue.
    */
-  public function testQueueOutSkipQueue() {
+  public function testQueueOutSkipQueue(): void {
     $this->gateway
       ->setSkipQueue(TRUE)
       ->save();
@@ -331,13 +335,13 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
       ->setDirection(Direction::OUTGOING);
 
     $this->smsProvider->queue($sms_message);
-    $this->assertEquals(1, count($this->getTestMessages($this->gateway)), 'One standard SMS send skipped queue.');
+    $this->assertCount(1, $this->getTestMessages($this->gateway), 'One standard SMS send skipped queue.');
   }
 
   /**
    * Test an exception is thrown if a message has no recipients.
    */
-  public function testNoRecipients() {
+  public function testNoRecipients(): void {
     $this->expectException(RecipientRouteException::class);
     $this->expectExceptionMessage('There are no recipients.');
     $sms_message = SmsMessage::create()
@@ -349,7 +353,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   /**
    * Test message is split into multiple messages if gateway demands it.
    */
-  public function testChunking() {
+  public function testChunking(): void {
     $gateway_chunked = SmsGateway::create([
       'plugin' => 'memory_chunked',
       'id' => 'memory_chunked',
@@ -362,27 +366,27 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
       ->addRecipients(['123123123', '456456456', '789789789']);
     $return = $this->smsProvider->queue($sms_message);
 
-    $this->assertEquals(2, count(SmsMessage::loadMultiple()), 'One SMS message has been split into two.');
-    $this->assertEquals(2, count($return), 'Provider queue method returned two messages.');
+    $this->assertCount(2, SmsMessage::loadMultiple(), 'One SMS message has been split into two.');
+    $this->assertCount(2, $return, 'Provider queue method returned two messages.');
   }
 
   /**
    * Test message is not into multiple messages if gateway defines no chunking.
    */
-  public function testNoChunking() {
+  public function testNoChunking(): void {
     $sms_message = $this->createSmsMessage()
       ->setGateway($this->gateway)
       ->addRecipients($this->randomPhoneNumbers());
 
     $this->smsProvider->queue($sms_message);
 
-    $this->assertEquals(1, count(SmsMessage::loadMultiple()), 'SMS message has not been split.');
+    $this->assertCount(1, SmsMessage::loadMultiple(), 'SMS message has not been split.');
   }
 
   /**
    * Test incoming messages do not get chunked.
    */
-  public function testIncomingNotChunked() {
+  public function testIncomingNotChunked(): void {
     $this->incomingGateway
       ->setSkipQueue(TRUE)
       ->save();
@@ -397,13 +401,13 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
     $this->smsProvider->queue($message);
 
     $incoming_messages = $this->getIncomingMessages($this->incomingGateway);
-    $this->assertEquals(1, count($incoming_messages), 'There is one incoming message.');
+    $this->assertCount(1, $incoming_messages, 'There is one incoming message.');
   }
 
   /**
    * Ensure events are executed when a message added to the outgoing queue.
    */
-  public function testEventsQueueOutgoing() {
+  public function testEventsQueueOutgoing(): void {
     $sms_message = $this->createSmsMessage()
       ->setGateway($this->gateway)
       ->setDirection(Direction::OUTGOING)
@@ -437,7 +441,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    * Ensure events are executed when a message added to the outgoing queue and
    * the gateway is set to skip queue.
    */
-  public function testEventsQueueOutgoingSkipQueue() {
+  public function testEventsQueueOutgoingSkipQueue(): void {
     $this->gateway
       ->setSkipQueue(TRUE)
       ->save();
@@ -464,7 +468,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   /**
    * Ensure events are executed when a message added to the incoming queue.
    */
-  public function testEventsQueueIncoming() {
+  public function testEventsQueueIncoming(): void {
     $sms_message = $this->createSmsMessage()
       ->setGateway($this->gateway)
       ->setDirection(Direction::INCOMING)
@@ -500,7 +504,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    * Ensure events are executed when a message added to the incoming queue and
    * the gateway is set to skip queue.
    */
-  public function testEventsQueueIncomingSkipQueue() {
+  public function testEventsQueueIncomingSkipQueue(): void {
     $this->gateway
       ->setSkipQueue(TRUE)
       ->save();
@@ -529,7 +533,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   /**
    * Ensure events are executed when a message is sent.
    */
-  public function testEventsOutgoing() {
+  public function testEventsOutgoing(): void {
     $sms_message = $this->createSmsMessage()
       ->setGateway($this->gateway)
       ->setDirection(Direction::OUTGOING)
@@ -550,7 +554,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   /**
    * Ensure events are executed when a message is received.
    */
-  public function testEventsIncoming() {
+  public function testEventsIncoming(): void {
     $sms_message = $this->createSmsMessage()
       ->setGateway($this->gateway)
       ->setDirection(Direction::INCOMING)
@@ -579,7 +583,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
    * @return \Drupal\sms\Entity\SmsMessageInterface
    *   A SMS message entity for testing.
    */
-  protected function createSmsMessage(array $values = []) {
+  protected function createSmsMessage(array $values = []): SmsMessageEntityInterface {
     return SmsMessage::create($values)
       ->setDirection(Direction::OUTGOING)
       ->setMessage($this->randomString());

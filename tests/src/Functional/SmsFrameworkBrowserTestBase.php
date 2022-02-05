@@ -5,6 +5,9 @@ declare(strict_types = 1);
 namespace Drupal\Tests\sms\Functional;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\sms\Entity\PhoneNumberSettingsInterface;
+use Drupal\sms\Plugin\SmsGatewayPluginManagerInterface;
+use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -36,19 +39,19 @@ abstract class SmsFrameworkBrowserTestBase extends BrowserTestBase {
    *
    * @var \Drupal\sms\Plugin\SmsGatewayPluginManagerInterface
    */
-  protected $gatewayManager;
+  protected SmsGatewayPluginManagerInterface $gatewayManager;
 
   /**
    * The default SMS provider service.
    *
    * @var \Drupal\sms\Provider\SmsProviderInterface
    */
-  protected $defaultSmsProvider;
+  protected SmsProviderInterface $defaultSmsProvider;
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->gatewayManager = $this->container->get('plugin.manager.sms_gateway');
     $this->defaultSmsProvider = $this->container->get('sms.provider');
@@ -62,7 +65,7 @@ abstract class SmsFrameworkBrowserTestBase extends BrowserTestBase {
    * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface
    *   A phone number settings entity.
    */
-  protected function createPhoneNumberSettings($entity_type_id, $bundle) {
+  protected function createPhoneNumberSettings($entity_type_id, $bundle): PhoneNumberSettingsInterface {
     $entity_type_manager = \Drupal::entityTypeManager();
 
     /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */

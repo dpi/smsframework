@@ -6,6 +6,7 @@ namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 
 use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
 use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
  * Defines a gateway which is aware of scheduled send time.
@@ -16,19 +17,19 @@ use Drupal\sms\Message\SmsMessageInterface;
  *   schedule_aware = TRUE,
  * )
  */
-class ScheduleAware extends Memory {
+final class ScheduleAware extends Memory {
 
   /**
    * {@inheritdoc}
    */
-  public function defaultConfiguration() {
+  public function defaultConfiguration(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms) {
+  public function send(SmsMessageInterface $sms): SmsMessageResultInterface {
     if ($sms instanceof SmsMessageEntityInterface) {
       return parent::send($sms);
     }

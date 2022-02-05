@@ -15,7 +15,7 @@ use Drupal\sms\Message\SmsMessageInterface;
  *   label = @Translation("No Incoming"),
  * )
  */
-class NoIncoming extends SmsGatewayPluginBase {
+final class NoIncoming extends SmsGatewayPluginBase {
 
   /**
    * {@inheritdoc}

@@ -18,7 +18,7 @@ use Drupal\sms\Message\SmsMessageInterface;
  *   label = @Translation("Default annotation capabilities")
  * )
  */
-class DefaultCapabilities extends SmsGatewayPluginBase {
+final class DefaultCapabilities extends SmsGatewayPluginBase {
 
   /**
    * {@inheritdoc}

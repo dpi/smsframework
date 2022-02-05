@@ -23,7 +23,7 @@ use Drupal\user\Entity\User;
  * @group SMS Framework
  * @coversDefaultClass \Drupal\sms\Entity\SmsMessage
  */
-class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
+final class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
 
   use SmsFrameworkTestTrait;
   use SmsFrameworkMessageTestTrait {
@@ -44,7 +44,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('sms');
     $this->installEntitySchema('sms_result');
@@ -62,14 +62,14 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    * @return \Drupal\sms\Entity\SmsMessageInterface
    *   A SMS message object for testing.
    */
-  protected function createSmsMessage(array $values = []) {
+  protected function createSmsMessage(array $values = []): SmsMessageInterface {
     return SmsMessage::create($values);
   }
 
   /**
    * Tests validation violation when message is empty.
    */
-  public function testMessageEmpty() {
+  public function testMessageEmpty(): void {
     $sms_message = $this->createSmsMessage();
     $this->assertTrue(in_array('message', $sms_message->validate()->getFieldNames()));
   }
@@ -77,7 +77,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  public function testUid() {
+  public function testUid(): void {
     // User must exist or setUid will throw an exception.
     User::create(['uid' => 22, 'name' => 'user'])
       ->save();
@@ -87,7 +87,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   /**
    * Test sender name is correct when sender name or sender entity is set.
    */
-  public function testSenderNameWithSenderEntity() {
+  public function testSenderNameWithSenderEntity(): void {
     $sender_name = $this->randomMachineName();
     $sender = EntityTest::create()
       ->setName($this->randomMachineName());
@@ -109,7 +109,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    * @covers ::getDirection
    * @covers ::setDirection
    */
-  public function testDirectionEntityValidation() {
+  public function testDirectionEntityValidation(): void {
     // Check for validation violation for missing direction.
     $sms_message1 = $this->createSmsMessage();
     $this->assertTrue(in_array('direction', $sms_message1->validate()->getFieldNames()));
@@ -121,7 +121,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    * @covers ::getGateway
    * @covers ::setGateway
    */
-  public function testGateway() {
+  public function testGateway(): void {
     // Check for validation violation for missing gateway.
     $sms_message1 = $this->createSmsMessage();
     $this->assertTrue(in_array('gateway', $sms_message1->validate()->getFieldNames()));
@@ -138,7 +138,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    * @covers ::getSenderEntity
    * @covers ::setSenderEntity
    */
-  public function testSenderEntity() {
+  public function testSenderEntity(): void {
     $sms_message1 = $this->createSmsMessage();
     $this->assertEquals(NULL, $sms_message1->getSenderEntity());
 
@@ -155,7 +155,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    * @covers ::getRecipientEntity
    * @covers ::setRecipientEntity
    */
-  public function testRecipientEntity() {
+  public function testRecipientEntity(): void {
     $sms_message1 = $this->createSmsMessage();
     $this->assertEquals(NULL, $sms_message1->getRecipientEntity());
 
@@ -172,7 +172,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    * @covers ::isQueued
    * @covers ::setQueued
    */
-  public function testQueued() {
+  public function testQueued(): void {
     $sms_message1 = $this->createSmsMessage();
     $this->assertFalse($sms_message1->isQueued());
 
@@ -186,7 +186,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    *
    * @covers ::getCreatedTime
    */
-  public function testCreatedTime() {
+  public function testCreatedTime(): void {
     $sms_message = $this->createSmsMessage();
     // This test is currently marked as risky because CreatedItem still relies
     // on the REQUEST_TIME constant value, which used to be safe to rely on
@@ -202,7 +202,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    * @covers ::getSendTime
    * @covers ::setSendTime
    */
-  public function testSendTime() {
+  public function testSendTime(): void {
     $sms_message1 = $this->createSmsMessage();
     // This test is currently marked as risky because CreatedItem still relies
     // on the REQUEST_TIME constant value, which used to be safe to rely on
@@ -222,7 +222,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    * @covers ::getProcessedTime
    * @covers ::setProcessedTime
    */
-  public function testProcessedTime() {
+  public function testProcessedTime(): void {
     $sms_message1 = $this->createSmsMessage();
     $this->assertEquals(NULL, $sms_message1->getProcessedTime());
 
@@ -237,7 +237,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    *
    * @covers ::chunkByRecipients
    */
-  public function testChunkByRecipientsEntity() {
+  public function testChunkByRecipientsEntity(): void {
     $sms_message = $this->createSmsMessage();
     $sms_message->addRecipients(['100', '200']);
     $sms_messages = $sms_message->chunkByRecipients(1);
@@ -248,7 +248,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   /**
    * Ensure data from standard SMS message are passed to SMS message entity.
    */
-  public function testConvertToEntityFromStandardSmsMessage() {
+  public function testConvertToEntityFromStandardSmsMessage(): void {
     // Need ID otherwise we have to install system module and 'sequences' table.
     $user = User::create(['uid' => 1, 'name' => 'user']);
     $user->save();
@@ -280,7 +280,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $this->assertEquals($original->getOption('bar'), $sms_message->getOption('bar'));
     $this->assertEquals($original->getGateway(), $sms_message->getGateway());
     $this->assertEquals($original->getResult()->getErrorMessage(), $sms_message->getResult()->getErrorMessage());
-    $this->assertEquals(count($original->getReports()), count($sms_message->getReports()));
+    $this->assertCount(count($original->getReports()), $sms_message->getReports());
     $this->assertEquals($original->getReport('123123123')->getRecipient(),
       $sms_message->getReport('123123123')->getRecipient());
     $this->assertEquals($original->getReport('456456456')->getRecipient(),
@@ -290,7 +290,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   /**
    * Ensure there is no data loss if an entity is passed to the converter.
    */
-  public function testConvertToEntityFromEntitySmsMessage() {
+  public function testConvertToEntityFromEntitySmsMessage(): void {
     $recipient = EntityTest::create()
       ->setName($this->randomMachineName());
     $recipient->save();
@@ -308,7 +308,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests saving and retrieval of complete entity.
    */
-  public function testSaveAndRetrieveSmsMessage() {
+  public function testSaveAndRetrieveSmsMessage(): void {
     /** @var \Drupal\sms\Entity\SmsMessageInterface $sms_message */
     $sms_message = SmsMessage::create()
       ->setMessage($this->randomMachineName(100))
@@ -324,8 +324,8 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $this->assertEquals($sms_message->getDirection(), $saved->getDirection());
     $this->assertEquals($sms_message->getRecipients(), $saved->getRecipients());
     $this->assertEquals($sms_message->getResult()->getErrorMessage(), $saved->getResult()->getErrorMessage());
-    $this->assertEquals(count($sms_message->getReports()), count($saved->getReports()));
-    $this->assertEquals(2, count($sms_message->getReports()));
+    $this->assertCount(count($sms_message->getReports()), $saved->getReports());
+    $this->assertCount(2, $sms_message->getReports());
   }
 
   /**
@@ -333,7 +333,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    *
    * @covers ::getResult
    */
-  public function testGetResultNoResult() {
+  public function testGetResultNoResult(): void {
     $sms_message = SmsMessage::create();
     $this->assertNull($sms_message->getResult());
   }
@@ -341,7 +341,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests cascade delete on the SMS message, result and reports.
    */
-  public function testCascadeDelete() {
+  public function testCascadeDelete(): void {
     /** @var \Drupal\sms\Entity\SmsMessageInterface $sms_message */
     $sms_message = SmsMessage::create()
       ->setMessage($this->getRandomGenerator()->paragraphs())
@@ -358,7 +358,7 @@ class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
 
     $this->assertInstanceOf(SmsMessageResultInterface::class, $sms_message->getResult());
     $this->assertInstanceOf(SmsMessageInterface::class, SmsMessage::load($sms_message->id()));
-    $this->assertEquals(count($sms_reports), count(SmsDeliveryReport::loadMultiple()));
+    $this->assertCount(count($sms_reports), SmsDeliveryReport::loadMultiple());
 
     // Delete the message and confirm that all has been removed.
     $sms_message->delete();

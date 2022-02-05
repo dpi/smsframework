@@ -11,7 +11,7 @@ use Drupal\sms\Event\SmsMessageEvent;
 /**
  * Test event subscriber.
  */
-class SmsTestGatewayEventSubscriber implements EventSubscriberInterface {
+final class SmsTestGatewayEventSubscriber implements EventSubscriberInterface {
 
   /**
    * Store incoming messages in memory.
@@ -47,7 +47,7 @@ class SmsTestGatewayEventSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[SmsEvents::MESSAGE_INCOMING_POST_PROCESS][] = ['memoryIncomingMessage'];
     return $events;
   }

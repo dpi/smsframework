@@ -17,7 +17,7 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
  *
  * @group SMS Framework
  */
-class SmsFrameworkUpdateTest extends UpdatePathTestBase {
+final class SmsFrameworkUpdateTest extends UpdatePathTestBase {
 
   use SmsFrameworkTestTrait;
 
@@ -34,7 +34,7 @@ class SmsFrameworkUpdateTest extends UpdatePathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setDatabaseDumpFiles() {
+  protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../../core/modules/system/tests/fixtures/update/drupal-8.8.0.bare.standard.php.gz',
       __DIR__ . '/../../../tests/fixtures/update/sms-8.x-1.x-result-field-2836157.php.gz',
@@ -44,7 +44,7 @@ class SmsFrameworkUpdateTest extends UpdatePathTestBase {
   /**
    * Tests sms_update_8101.
    */
-  public function testSmsUpdate8101() {
+  public function testSmsUpdate8101(): void {
     $db_schema = \Drupal::database()->schema();
     // Check that the sms tables exist but the others don't.
     $this->assertTrue($db_schema->tableExists('sms'));
@@ -67,8 +67,8 @@ class SmsFrameworkUpdateTest extends UpdatePathTestBase {
     // Confirm that the existing SMS message was not clobbered.
     /** @var \Drupal\sms\Entity\SmsMessageInterface[] $sms_messages */
     $sms_messages = SmsMessage::loadMultiple();
-    $this->assertEqual(1, count($sms_messages));
-    $this->assertEqual(2, count($sms_messages[1]->getRecipients()));
+    $this->assertCount(1, $sms_messages);
+    $this->assertCount(2, $sms_messages[1]->getRecipients());
     $this->assertNull($sms_messages[1]->getResult());
 
     // Create new SMS with delivery report and save it.
@@ -92,9 +92,9 @@ class SmsFrameworkUpdateTest extends UpdatePathTestBase {
     \Drupal::entityTypeManager()->getStorage('sms')->resetCache();
 
     $sms_messages = SmsMessage::loadMultiple();
-    $this->assertEqual(2, count($sms_messages));
+    $this->assertCount(2, $sms_messages);
     $this->assertTrue($sms_messages[2]->getResult() instanceof SmsMessageResultInterface);
-    $this->assertEqual(count($sms_message->getRecipients()), count($sms_messages[2]->getResult()->getReports()));
+    $this->assertCount(count($sms_message->getRecipients()), $sms_messages[2]->getResult()->getReports());
   }
 
 }

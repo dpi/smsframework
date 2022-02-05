@@ -10,6 +10,7 @@ use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsDeliveryReport;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageReportStatus;
+use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
 use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @group SMS Framework
  */
-class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
+final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
 
   use SmsFrameworkTestTrait;
 
@@ -39,12 +40,12 @@ class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
    *
    * @var \Drupal\sms\Provider\SmsProviderInterface
    */
-  protected $defaultSmsProvider;
+  private SmsProviderInterface $defaultSmsProvider;
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->httpClient = $this->container->get('http_client');
     $this->defaultSmsProvider = $this->container->get('sms.provider');
@@ -57,7 +58,7 @@ class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
   /**
    * Tests that delivery reports are updated after initial sending.
    */
-  public function testDeliveryReportUpdate() {
+  public function testDeliveryReportUpdate(): void {
     $user = User::create();
     $request_time = $this->container->get('datetime.time')->getRequestTime();
 
@@ -80,7 +81,7 @@ class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
     $this->defaultSmsProvider->queue($sms_message);
     $this->container->get('cron')->run();
     $saved_reports = SmsDeliveryReport::loadMultiple();
-    $this->assertEquals(2, count($saved_reports));
+    $this->assertCount(2, $saved_reports);
     $this->assertEquals(SmsMessageReportStatus::QUEUED, $saved_reports[1]->getStatus());
     $this->assertEquals(SmsMessageReportStatus::QUEUED, $saved_reports[2]->getStatus());
 
@@ -126,7 +127,7 @@ class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
    * @return \Symfony\Component\HttpFoundation\Request
    *   A request object containing JSON-encoded delivery reports.
    */
-  protected function buildDeliveryReportRequest($message_id, $recipient, $status, $status_time) {
+  protected function buildDeliveryReportRequest($message_id, $recipient, $status, $status_time): Request {
     $reports[] = [
       'message_id' => $message_id,
       'recipient' => $recipient,

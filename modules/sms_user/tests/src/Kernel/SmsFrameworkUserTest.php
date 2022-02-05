@@ -47,7 +47,7 @@ class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->installSchema('system', ['sequences']);
     $this->installConfig('sms_user');
@@ -65,7 +65,7 @@ class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
    * Ensure sms_user.account_registration service does not crash and burn if
    * there are no phone number settings for user.user.
    */
-  public function testAccountRegistrationNoPhoneSettings() {
+  public function testAccountRegistrationNoPhoneSettings(): void {
     $this->config('sms_user.settings')
       ->set('account_registration.unrecognized_sender.status', 1)
       ->set('account_registration.unrecognized_sender.reply.status', 1)

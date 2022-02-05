@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\sms\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event fired when SMS messages are processed.

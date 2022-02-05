@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\sms\FunctionalJavascript;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
 
@@ -12,7 +13,7 @@ use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
  *
  * @group SMS Framework
  */
-class SmsFrameworkPhoneNumberAdminTest extends WebDriverTestBase {
+final class SmsFrameworkPhoneNumberAdminTest extends WebDriverTestBase {
 
   use SmsFrameworkTestTrait;
 
@@ -31,12 +32,12 @@ class SmsFrameworkPhoneNumberAdminTest extends WebDriverTestBase {
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->entityTypeManager = $this->container->get('entity_type.manager');
 

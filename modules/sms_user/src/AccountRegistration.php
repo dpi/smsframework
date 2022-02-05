@@ -121,7 +121,9 @@ class AccountRegistration implements AccountRegistrationInterface {
     $user->{$phone_field_name}[] = $sender_number;
 
     // Password.
-    $password = user_password();
+    /** @var \Drupal\Core\Password\PasswordGeneratorInterface $passwordGenerator */
+    $passwordGenerator = \Drupal::service('password_generator');
+    $password = $passwordGenerator->generate();
     $user->setPassword($password);
 
     $validate = $this->removeAcceptableViolations($user->validate());
@@ -183,7 +185,9 @@ class AccountRegistration implements AccountRegistrationInterface {
           $user->setEmail($matches['email'][0]);
         }
 
-        $password = (!empty($matches['password'][0]) && $contains_password) ? $matches['password'][0] : user_password();
+        /** @var \Drupal\Core\Password\PasswordGeneratorInterface $passwordGenerator */
+        $passwordGenerator = \Drupal::service('password_generator');
+        $password = (!empty($matches['password'][0]) && $contains_password) ? $matches['password'][0] : $passwordGenerator->generate();
         $user->setPassword($password);
 
         $validate = $this->removeAcceptableViolations($user->validate(), $incoming_form);
