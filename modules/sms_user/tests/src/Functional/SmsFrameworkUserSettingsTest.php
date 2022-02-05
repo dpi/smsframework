@@ -42,10 +42,10 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
     $this->drupalLogin($account);
 
     // Build list of days.
-    $timestamp = strtotime('next Sunday');
-    while (($day = strtolower(strftime('%A', $timestamp))) && !in_array($day, $this->days)) {
+    $date = new \DateTime('next Sunday');
+    while (($day = strtolower($date->format('l'))) && !in_array($day, $this->days)) {
       $this->days[] = $day;
-      $timestamp = strtotime('+1 day', $timestamp);
+      $date->modify('+1 day');
     }
   }
 

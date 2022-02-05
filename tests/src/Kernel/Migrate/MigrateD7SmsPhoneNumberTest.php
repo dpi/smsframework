@@ -45,10 +45,10 @@ class MigrateD7SmsPhoneNumberTest extends MigrateDrupal7TestBase {
     // @todo Work out a better fix https://www.drupal.org/project/smsframework/issues/2951758
     if (method_exists($this, 'expectException')) {
       $this->expectException(RequirementsException::class);
-      $this->expectExceptionMessageRegExp('/Missing migrations (d7_user|phone_number_settings), (d7_user|phone_number_settings)/');
+      $this->expectExceptionMessageMatches('/Missing migrations (d7_user|phone_number_settings), (d7_user|phone_number_settings)/');
     }
     else {
-      $this->setExpectedExceptionRegExp(RequirementsException::class, '/Missing migrations (d7_user|phone_number_settings), (d7_user|phone_number_settings)/');
+      $this->expectExceptionMessageMatches(RequirementsException::class, '/Missing migrations (d7_user|phone_number_settings), (d7_user|phone_number_settings)/');
     }
     $this->getMigration('d7_sms_number')->checkRequirements();
   }

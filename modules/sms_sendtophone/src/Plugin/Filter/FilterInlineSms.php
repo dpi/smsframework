@@ -37,7 +37,7 @@ class FilterInlineSms extends FilterBase {
 
     $type = ($this->settings['display'] == 'icon') ? 'icon' : 'text';
     foreach ($matches as $match) {
-      $text = str_replace($match[0], $this->theme($match[1], $type), $text);
+      $text = str_replace($match[0], (string) $this->theme($match[1], $type), $text);
     }
     return new FilterProcessResult($text);
   }

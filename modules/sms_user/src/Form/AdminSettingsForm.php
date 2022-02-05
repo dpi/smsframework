@@ -129,10 +129,10 @@ class AdminSettingsForm extends ConfigFormBase {
     unset($end_hours[0]);
     $end_hours[24] = $this->t('- End of day -');
 
-    $timestamp = strtotime('next Sunday');
+    $date = new \DateTime('next Sunday');
     for ($i = 0; $i < 7; $i++) {
       $row = ['#tree' => TRUE];
-      $day = strftime('%A', $timestamp);
+      $day = $date->format('l');
       $day_lower = strtolower($day);
 
       $row['day']['#plain_text'] = $day;
@@ -161,7 +161,7 @@ class AdminSettingsForm extends ConfigFormBase {
         ],
       ];
 
-      $timestamp = strtotime('+1 day', $timestamp);
+      $date->modify('+1 day');
       $form['active_hours']['days_container']['days'][$day_lower] = $row;
     }
 

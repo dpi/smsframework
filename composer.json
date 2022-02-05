@@ -21,9 +21,9 @@
     }
   ],
   "require": {
-    "php": "^7.3 || ^8",
-    "drupal/core": "^8.9 || ^9",
-    "drupal/dynamic_entity_reference": "^1.0",
+    "php": ">=7.4",
+    "drupal/core": "^9.2",
+    "drupal/dynamic_entity_reference": "^1 || ^2",
     "drupal/telephone": "*"
   },
   "replace": {

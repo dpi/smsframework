@@ -22,6 +22,6 @@
   ],
   "require": {
     "drupal/user": "^8.5",
-    "drupal/smsframework": "^1.0"
+    "drupal/smsframework": "*"
   }
 }
