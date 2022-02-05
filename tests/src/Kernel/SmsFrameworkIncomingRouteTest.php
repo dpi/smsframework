@@ -16,7 +16,7 @@ class SmsFrameworkIncomingRouteTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'system', 'sms', 'entity_test', 'user', 'field', 'telephone',
     'dynamic_entity_reference', 'sms_test_gateway', 'basic_auth',
   ];

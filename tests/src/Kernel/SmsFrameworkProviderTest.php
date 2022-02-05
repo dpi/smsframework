@@ -27,7 +27,7 @@ class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'sms', 'sms_test', 'sms_test_gateway', 'field', 'telephone',
     'dynamic_entity_reference',
   ];

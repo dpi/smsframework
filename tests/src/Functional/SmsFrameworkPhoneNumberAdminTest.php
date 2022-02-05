@@ -18,7 +18,7 @@ class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['block', 'entity_test'];
+  protected static $modules = ['block', 'entity_test'];
 
   /**
    * The entity type manager.

@@ -20,7 +20,7 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['sms_devel'];
+  protected static $modules = ['sms_devel'];
 
   /**
    * {@inheritdoc}

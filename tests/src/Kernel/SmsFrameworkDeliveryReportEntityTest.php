@@ -31,7 +31,7 @@ class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'user',
     'sms',
     'sms_test_gateway',

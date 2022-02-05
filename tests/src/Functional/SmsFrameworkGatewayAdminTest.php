@@ -18,7 +18,7 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['block'];
+  protected static $modules = ['block'];
 
   /**
    * SMS Gateway entity storage.
