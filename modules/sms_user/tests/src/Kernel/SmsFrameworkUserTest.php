@@ -19,7 +19,7 @@ class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'system',
     'sms',
     'sms_user',

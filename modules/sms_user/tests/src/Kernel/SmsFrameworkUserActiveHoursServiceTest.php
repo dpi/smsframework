@@ -23,7 +23,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'sms',
     'sms_user',
     'user',

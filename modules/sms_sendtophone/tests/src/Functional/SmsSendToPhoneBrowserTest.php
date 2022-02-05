@@ -21,7 +21,7 @@ class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'sms',
     'sms_sendtophone',
     'sms_test_gateway',
