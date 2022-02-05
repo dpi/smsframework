@@ -31,7 +31,7 @@ final class MigrateD6SmsPhoneNumberTest extends MigrateDrupal6TestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'sms',
     'telephone',
     'dynamic_entity_reference',
