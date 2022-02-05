@@ -39,29 +39,29 @@ class SmsTestTime implements TimeInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRequestTime() {
-    return $this->date->format('U');
+  public function getRequestTime(): int {
+    return (int) $this->date->getTimestamp();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getRequestMicroTime() {
-    return $this->date->format('U.u');
+  public function getRequestMicroTime(): float {
+    return (float) $this->date->format('U.u');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCurrentTime() {
-    return $this->date->format('U');
+  public function getCurrentTime(): int {
+    return (int) $this->date->getTimestamp();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCurrentMicroTime() {
-    return $this->date->format('U.u');
+  public function getCurrentMicroTime(): float {
+    return (float) $this->date->format('U.u');
   }
 
 }

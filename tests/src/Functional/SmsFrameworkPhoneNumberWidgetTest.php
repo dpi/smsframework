@@ -24,7 +24,7 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $account = $this->drupalCreateUser([
@@ -38,7 +38,7 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBase {
   /**
    * Test telephone widget using entity form.
    */
-  public function testPhoneNumberWidget() {
+  public function testPhoneNumberWidget(): void {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $field_phone_number = $phone_number_settings->getFieldName('phone_number');
     $form_field_phone_number = $field_phone_number . '[0][value]';
@@ -51,7 +51,7 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBase {
       '@url' => Url::fromRoute('sms.phone.verify')->toString(),
       '@time' => '1 hour',
     ];
-    $this->assertRaw(t('Enter a phone number. A verification code will be sent as an SMS message, you must enter the code into the <a href="@url">verification form</a> within @time.', $t_args));
+    $this->assertSession()->responseContains(t('Enter a phone number. A verification code will be sent as an SMS message, you must enter the code into the <a href="@url">verification form</a> within @time.', $t_args));
 
     // Create verification code, wait for confirmation.
     $edit = [
@@ -59,7 +59,7 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBase {
     ];
     $this->drupalPostForm($test_entity->toUrl('edit-form'), $edit, t('Save'));
 
-    $this->assertRaw(t('A verification code has been sent to this phone number. Go to the <a href="@url">verification form</a> and enter the code. The code will expire if it is not verified in', $t_args));
+    $this->assertSession()->responseContains(t('A verification code has been sent to this phone number. Go to the <a href="@url">verification form</a> and enter the code. The code will expire if it is not verified in', $t_args));
 
     $input = $this->xpath('//input[@name="' . $form_field_phone_number . '" and @disabled="disabled"]');
     $this->assertTrue(count($input) === 1, 'The phone number text field is disabled.');
@@ -72,7 +72,7 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBase {
 
     // Check phone number is verified.
     $this->drupalGet($test_entity->toUrl('edit-form'));
-    $this->assertRaw(t('This phone number is verified. <strong>Warning:</strong> Modifying this phone number will remove verification.'));
+    $this->assertSession()->responseContains(t('This phone number is verified. <strong>Warning:</strong> Modifying this phone number will remove verification.'));
 
     $input = $this->xpath('//input[@name="' . $form_field_phone_number . '" and @disabled="disabled"]');
     $this->assertTrue(count($input) === 0, 'The phone number text field is enabled.');
@@ -81,7 +81,7 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBase {
   /**
    * Test behavior of widget when verification code expires.
    */
-  public function testPhoneNumberWidgetWithExpiredVerificationCode() {
+  public function testPhoneNumberWidgetWithExpiredVerificationCode(): void {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $test_entity = $this->createEntityWithPhoneNumber($phone_number_settings, ['+123123123']);
 
@@ -92,7 +92,7 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBase {
       ->save();
 
     $this->drupalGet($test_entity->toUrl('edit-form'));
-    $this->assertRaw(t('Verification code expired. Try again later.'));
+    $this->assertSession()->responseContains(t('Verification code expired. Try again later.'));
 
     $this->cronRun();
     $this->drupalGet($test_entity->toUrl('edit-form'));
@@ -104,14 +104,14 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBase {
 
     // Ensure phone number was purged.
     $field_phone_number = $phone_number_settings->getFieldName('phone_number');
-    $this->assertFieldByName($field_phone_number . '[0][value]', '');
-    $this->assertRaw(t('Enter a phone number. A verification code will be sent as an SMS message, you must enter the code into the <a href="@url">verification form</a> within @time.', $t_args));
+    $this->assertSession()->fieldExists($field_phone_number . '[0][value]', '');
+    $this->assertSession()->responseContains(t('Enter a phone number. A verification code will be sent as an SMS message, you must enter the code into the <a href="@url">verification form</a> within @time.', $t_args));
   }
 
   /**
    * Test behaviour of widget with phone number purge setting.
    */
-  public function testPhoneNumberPurgedFieldValueOnExpiration() {
+  public function testPhoneNumberPurgedFieldValueOnExpiration(): void {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $phone_number_settings
       ->setPurgeVerificationPhoneNumber(TRUE)
@@ -127,13 +127,13 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBase {
     // Ensure phone number value was removed from the field.
     $this->drupalGet($test_entity->toUrl('edit-form'));
     $field_phone_number = $phone_number_settings->getFieldName('phone_number');
-    $this->assertFieldByName($field_phone_number . '[0][value]', '');
+    $this->assertSession()->fieldExists($field_phone_number . '[0][value]', '');
   }
 
   /**
    * Test behaviour of widget with phone number purge setting.
    */
-  public function testPhoneNumberNotPurgedFieldValueOnExpiration() {
+  public function testPhoneNumberNotPurgedFieldValueOnExpiration(): void {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
     $phone_number_settings
       ->setPurgeVerificationPhoneNumber(FALSE)
@@ -152,9 +152,9 @@ class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBase {
       '@url' => Url::fromRoute('sms.phone.verify')->toString(),
       '@time' => '1 hour',
     ];
-    $this->assertRaw(t('Save this form to send a new verification code as an SMS message, you must enter the code into the <a href="@url">verification form</a> within @time.', $t_args));
+    $this->assertSession()->responseContains(t('Save this form to send a new verification code as an SMS message, you must enter the code into the <a href="@url">verification form</a> within @time.', $t_args));
     $field_phone_number = $phone_number_settings->getFieldName('phone_number');
-    $this->assertFieldByName($field_phone_number . '[0][value]', '+123123123');
+    $this->assertSession()->fieldExists($field_phone_number . '[0][value]', '+123123123');
   }
 
   // @todo test multi cardinality phone field.

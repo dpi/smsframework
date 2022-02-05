@@ -97,6 +97,8 @@ class FilterInlineSms extends FilterBase {
    * Themes the message using a text link.
    */
   protected function theme($text, $type = 'icon') {
+    /** @var \Drupal\Core\Extension\ExtensionPathResolver $extensionPathResolver */
+    $extensionPathResolver = \Drupal::service('extension.path.resolver');
     switch ($type) {
       case 'text':
         $markup = '(' . $this->settings['display_text'] . ')';
@@ -105,7 +107,7 @@ class FilterInlineSms extends FilterBase {
       case 'icon':
       default:
         if (!isset($this->settings["default_icon"]) || $this->settings["default_icon"] == 1) {
-          $icon_path = drupal_get_path('module', 'sms_sendtophone') . '/sms-send.gif';
+          $icon_path = $extensionPathResolver->getPath('module', 'sms_sendtophone') . '/sms-send.gif';
         }
         else {
           $icon_path = $this->settings["custom_icon_path"];

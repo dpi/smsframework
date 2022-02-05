@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\sms\Unit\Message;
 
+use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\Tests\sms\Functional\SmsFrameworkMessageResultTestTrait;
 use Drupal\Tests\UnitTestCase;
 use Drupal\sms\Message\SmsMessageResult;
@@ -21,7 +22,7 @@ class SmsFrameworkResultUnitTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  protected function createMessageResult() {
+  protected function createMessageResult(): SmsMessageResultInterface {
     return new SmsMessageResult();
   }
 

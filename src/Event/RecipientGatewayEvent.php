@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace Drupal\sms\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Drupal\sms\Entity\SmsGatewayInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event fired to determine valid gateways for a recipient.
@@ -82,8 +82,8 @@ class RecipientGatewayEvent extends Event {
   public function getGatewaysSorted() {
     $sorted = $this->gateways;
     uasort($sorted, function ($a, $b) {
-      list(, $priority_a) = $a;
-      list(, $priority_b) = $b;
+      [, $priority_a] = $a;
+      [, $priority_b] = $b;
       if ($priority_a == $priority_b) {
         return 0;
       }
@@ -92,8 +92,7 @@ class RecipientGatewayEvent extends Event {
 
     // Return the gateway object instead of tuples.
     $gateways = [];
-    foreach ($sorted as $tuple) {
-      list($gateway,) = $tuple;
+    foreach ($sorted as [$gateway]) {
       $gateways[] = $gateway;
     }
 
@@ -129,8 +128,7 @@ class RecipientGatewayEvent extends Event {
    *   Return this event for chaining.
    */
   public function removeGateway($gateway_id, $priority = NULL) {
-    foreach ($this->gateways as $k => $tuple) {
-      list($gateway, $gateway_priority) = $tuple;
+    foreach ($this->gateways as $k => [$gateway, $gateway_priority]) {
       if ($gateway_id == $gateway->id()) {
         if (!isset($priority) || ($priority == $gateway_priority)) {
           unset($this->gateways[$k]);

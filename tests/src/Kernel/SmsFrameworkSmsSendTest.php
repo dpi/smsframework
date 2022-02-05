@@ -33,7 +33,7 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->defaultSmsProvider = $this->container->get('sms.provider');
   }
@@ -43,7 +43,7 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
    *
    * See `sms.gateway.log.yml`.
    */
-  public function testGatewayInstall() {
+  public function testGatewayInstall(): void {
     $this->assertEquals(
       ['log'],
       array_keys(SmsGateway::loadMultiple())
@@ -53,7 +53,7 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
   /**
    * Test default gateway change in same request.
    */
-  public function testDefaultGatewayChange() {
+  public function testDefaultGatewayChange(): void {
     $gateways = [];
     $message_counts = [];
     for ($a = 0; $a < 3; $a++) {
@@ -74,7 +74,7 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
 
         $message_counts[$i]++;
         foreach ($gateways as $k => $gateway2) {
-          $this->assertEquals($message_counts[$k], count($this->getTestMessages($gateway2)));
+          $this->assertCount($message_counts[$k], $this->getTestMessages($gateway2));
         }
       }
     }
@@ -83,7 +83,7 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
   /**
    * Tests overriding default gateway with message option.
    */
-  public function testSmsSendSpecified() {
+  public function testSmsSendSpecified(): void {
     $test_gateway1 = $this->createMemoryGateway(['skip_queue' => TRUE]);
     $test_gateway2 = $this->createMemoryGateway(['skip_queue' => TRUE]);
     $this->setFallbackGateway($test_gateway1);
@@ -95,8 +95,8 @@ class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
 
     $sms_messages = $this->defaultSmsProvider->send($sms_message);
     $this->assertTrue($sms_messages[0]->getResult() instanceof SmsMessageResultInterface, 'Message successfully sent.');
-    $this->assertEquals(0, count($this->getTestMessages($test_gateway1)), 'Message not sent to the default gateway.');
-    $this->assertEquals(1, count($this->getTestMessages($test_gateway2)), 'Message sent to the specified gateway.');
+    $this->assertCount(0, $this->getTestMessages($test_gateway1), 'Message not sent to the default gateway.');
+    $this->assertCount(1, $this->getTestMessages($test_gateway2), 'Message sent to the specified gateway.');
   }
 
 }

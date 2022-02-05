@@ -48,7 +48,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->activeHoursService = $this->container->get('sms_user.active_hours');
     $this->smsProvider = $this->container->get('sms.provider');

@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\sms\Event;
 
 use Drupal\Core\Entity\EntityInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event fired when resolving phone numbers for an entity.

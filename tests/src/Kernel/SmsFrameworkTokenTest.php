@@ -33,7 +33,7 @@ class SmsFrameworkTokenTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->tokenService = $this->container->get('token');
     $this->installConfig(['system']);
@@ -43,7 +43,7 @@ class SmsFrameworkTokenTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'sms' tokens.
    */
-  public function testSmsTokens() {
+  public function testSmsTokens(): void {
     $url_options = ['absolute' => TRUE];
     $this->assertEquals(
       Url::fromRoute('sms.phone.verify', [], $url_options)->toString(),
@@ -56,7 +56,7 @@ class SmsFrameworkTokenTest extends SmsFrameworkKernelBase {
    *
    * Special case token.
    */
-  public function testVerificationCode() {
+  public function testVerificationCode(): void {
     $data['sms_verification_code'] = $this->randomMachineName();
     $this->assertEquals(
       $data['sms_verification_code'],
@@ -67,7 +67,7 @@ class SmsFrameworkTokenTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'sms-message' tokens.
    */
-  public function testSmsMessageTokens() {
+  public function testSmsMessageTokens(): void {
     $phone_numbers = ['+123123123', '+456456456'];
     $message = $this->randomString();
     $sms_message = new SmsMessage();

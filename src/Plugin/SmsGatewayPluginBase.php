@@ -47,7 +47,7 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
   /**
    * {@inheritdoc}
    */
-  public function defaultConfiguration() {
+  public function defaultConfiguration(): array {
     return [];
   }
 

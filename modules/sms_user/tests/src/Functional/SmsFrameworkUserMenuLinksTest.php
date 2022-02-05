@@ -28,7 +28,7 @@ class SmsFrameworkUserMenuLinksTest extends SmsFrameworkBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $user = $this->drupalCreateUser([
       'access administration pages',
@@ -46,7 +46,7 @@ class SmsFrameworkUserMenuLinksTest extends SmsFrameworkBrowserTestBase {
     $entityDisplayRepo->getFormDisplay('user', 'user', 'default')->save();
     $this->createPhoneNumberSettings('user', 'user');
     $this->drupalGet(Url::fromRoute('user.admin_index'));
-    $this->assertLink('User phone number');
+    $this->assertSession()->linkExists('User phone number');
   }
 
   /**
@@ -54,7 +54,7 @@ class SmsFrameworkUserMenuLinksTest extends SmsFrameworkBrowserTestBase {
    */
   public function testNoDynamicMenuLinks() {
     $this->drupalGet(Url::fromRoute('user.admin_index'));
-    $this->assertNoLink('User phone number');
+    $this->assertSession()->linkNotExists('User phone number');
   }
 
 }

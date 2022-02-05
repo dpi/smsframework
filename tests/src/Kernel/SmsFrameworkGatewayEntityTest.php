@@ -26,7 +26,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests skip queue.
    */
-  public function testSkipQueue() {
+  public function testSkipQueue(): void {
     $gateway = $this->createGateway();
     $this->assertFalse($gateway->getSkipQueue(), 'Default value does not skip queue.');
 
@@ -37,7 +37,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests incoming retention setting.
    */
-  public function testIncomingRetentionDuration() {
+  public function testIncomingRetentionDuration(): void {
     $gateway = $this->createGateway();
 
     // Default value.
@@ -50,7 +50,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests outgoing retention setting.
    */
-  public function testOutgoingRetentionDuration() {
+  public function testOutgoingRetentionDuration(): void {
     $gateway = $this->createGateway();
 
     // Default value.
@@ -63,7 +63,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests a bad retention direction.
    */
-  public function testGetRetentionDurationInvalidDirection() {
+  public function testGetRetentionDurationInvalidDirection(): void {
     $gateway = $this->createGateway();
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('0 is not a valid direction.');
@@ -73,7 +73,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests incoming message path.
    */
-  public function testPushIncomingPath() {
+  public function testPushIncomingPath(): void {
     $gateway = $this->createGateway(['plugin' => 'incoming']);
 
     $path = $gateway->getPushIncomingPath();
@@ -89,7 +89,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'incoming' annotation custom value.
    */
-  public function testSupportsIncoming() {
+  public function testSupportsIncoming(): void {
     $gateway = $this->createGateway(['plugin' => 'incoming']);
     $this->assertTrue($gateway->supportsIncoming());
   }
@@ -97,7 +97,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'incoming' annotation default value.
    */
-  public function testNotSupportsIncoming() {
+  public function testNotSupportsIncoming(): void {
     $gateway = $this->createGateway(['plugin' => 'capabilities_default']);
     $this->assertFalse($gateway->supportsIncoming());
   }
@@ -105,7 +105,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'incoming_route' annotation custom value.
    */
-  public function testAutoCreateIncomingRoute() {
+  public function testAutoCreateIncomingRoute(): void {
     $gateway = $this->createGateway(['plugin' => 'incoming']);
     $this->assertTrue($gateway->autoCreateIncomingRoute());
   }
@@ -113,7 +113,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'incoming_route' annotation default value.
    */
-  public function testNoAutoCreateIncomingRoute() {
+  public function testNoAutoCreateIncomingRoute(): void {
     $gateway = $this->createGateway(['plugin' => 'capabilities_default']);
     $this->assertFalse($gateway->autoCreateIncomingRoute());
   }
@@ -121,7 +121,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests incoming report path.
    */
-  public function testPushReportPath() {
+  public function testPushReportPath(): void {
     $gateway = $this->createGateway();
 
     $path = $gateway->getPushReportPath();
@@ -137,7 +137,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests incoming report url.
    */
-  public function testPushReportUrl() {
+  public function testPushReportUrl(): void {
     $gateway = $this->createGateway();
     $this->assertTrue($gateway->getPushReportUrl() instanceof Url);
   }
@@ -145,7 +145,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'supports pushed reports' annotation custom value.
    */
-  public function testSupportsReportsPushCustom() {
+  public function testSupportsReportsPushCustom(): void {
     $gateway = $this->createGateway([
       'plugin' => 'memory',
     ]);
@@ -155,7 +155,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'supports credit balance' annotation default value.
    */
-  public function testSupportsReportsPushDefault() {
+  public function testSupportsReportsPushDefault(): void {
     $gateway = $this->createGateway([
       'plugin' => 'capabilities_default',
     ]);
@@ -165,7 +165,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'supports pulling reports' annotation custom value.
    */
-  public function testSupportsReportsPullCustom() {
+  public function testSupportsReportsPullCustom(): void {
     $gateway = $this->createGateway([
       'plugin' => 'memory',
     ]);
@@ -175,7 +175,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'supports pulling balance' annotation default value.
    */
-  public function testSupportsReportsPullDefault() {
+  public function testSupportsReportsPullDefault(): void {
     $gateway = $this->createGateway([
       'plugin' => 'capabilities_default',
     ]);
@@ -185,7 +185,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'max outgoing recipients' annotation custom value.
    */
-  public function testGetMaxRecipientsOutgoingCustom() {
+  public function testGetMaxRecipientsOutgoingCustom(): void {
     $gateway = $this->createGateway([
       'plugin' => 'memory',
     ]);
@@ -195,7 +195,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'max outgoing recipients' annotation default value.
    */
-  public function testGetMaxRecipientsOutgoingDefault() {
+  public function testGetMaxRecipientsOutgoingDefault(): void {
     $gateway = $this->createGateway([
       'plugin' => 'capabilities_default',
     ]);
@@ -205,7 +205,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'incoming' annotation custom value.
    */
-  public function testSupportsIncomingCustom() {
+  public function testSupportsIncomingCustom(): void {
     $gateway = $this->createGateway([
       'plugin' => 'memory',
     ]);
@@ -215,7 +215,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'incoming' annotation default value.
    */
-  public function testSupportsIncomingDefault() {
+  public function testSupportsIncomingDefault(): void {
     $gateway = $this->createGateway([
       'plugin' => 'capabilities_default',
     ]);
@@ -225,7 +225,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'schedule aware annotation' custom value.
    */
-  public function testIsScheduleAwareCustom() {
+  public function testIsScheduleAwareCustom(): void {
     $gateway = $this->createGateway([
       'plugin' => 'memory_schedule_aware',
     ]);
@@ -235,7 +235,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'schedule aware annotation' default value.
    */
-  public function testIsScheduleAwareDefault() {
+  public function testIsScheduleAwareDefault(): void {
     $gateway = $this->createGateway([
       'plugin' => 'capabilities_default',
     ]);
@@ -245,7 +245,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'supports credit balance' annotation custom value.
    */
-  public function testSupportsCreditBalanceQueryCustom() {
+  public function testSupportsCreditBalanceQueryCustom(): void {
     $gateway = $this->createGateway([
       'plugin' => 'memory',
     ]);
@@ -255,7 +255,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   /**
    * Tests 'supports credit balance' annotation default value.
    */
-  public function testSupportsCreditBalanceQueryDefault() {
+  public function testSupportsCreditBalanceQueryDefault(): void {
     $gateway = $this->createGateway([
       'plugin' => 'capabilities_default',
     ]);
@@ -271,7 +271,7 @@ class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
    * @return \Drupal\sms\Entity\SmsGatewayInterface
    *   An unsaved gateway config entity.
    */
-  protected function createGateway(array $values = []) {
+  protected function createGateway(array $values = []): SmsGatewayInterface {
     return SmsGateway::create($values + [
       'plugin' => 'memory',
     ]);

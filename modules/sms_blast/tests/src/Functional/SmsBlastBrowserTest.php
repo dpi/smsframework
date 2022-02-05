@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\sms_blast\Functional;
 
+use Drupal\Core\Url;
 use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
@@ -36,7 +37,7 @@ class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->drupalLogin($this->drupalCreateUser(['Send SMS Blast']));
 
@@ -94,12 +95,14 @@ class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
     $this->resetTestMessages();
 
     $edit['message'] = $this->randomString();
-    $this->drupalPostForm('sms_blast', $edit, t('Send'));
-    $this->assertResponse(200);
-    $this->assertText('Message sent to 3 users.');
+
+    $this->drupalGet(Url::fromRoute('sms_blast.blast'));
+    $this->submitForm($edit, t('Send'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Message sent to 3 users.');
 
     // Get the resulting message that was sent and confirm.
-    $this->assertEqual(3, count($this->getTestMessages($this->gateway)), 'Sent three messages.');
+    $this->assertCount(3, $this->getTestMessages($this->gateway), 'Sent three messages.');
   }
 
 }

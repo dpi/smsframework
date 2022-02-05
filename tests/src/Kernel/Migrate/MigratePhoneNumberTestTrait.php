@@ -34,7 +34,7 @@ trait MigratePhoneNumberTestTrait {
 
     // Confirm new phone number settings is created.
     $settings = PhoneNumberSettings::loadMultiple();
-    $this->assertEquals(1, count($settings));
+    $this->assertCount(1, $settings);
     /** @var \Drupal\sms\Entity\PhoneNumberSettingsInterface $setting */
     $setting = reset($settings);
     $this->assertEquals(PhoneNumberSettingsPlugin::DEFAULT_VERIFICATION_MESSAGE, $setting->getVerificationMessage());
@@ -66,7 +66,7 @@ trait MigratePhoneNumberTestTrait {
     $this->executeMigration('phone_number_settings');
 
     $settings = PhoneNumberSettings::loadMultiple();
-    $this->assertEquals(1, count($settings));
+    $this->assertCount(1, $settings);
     /** @var \Drupal\sms\Entity\PhoneNumberSettingsInterface $setting */
     $setting = reset($settings);
     $expected_message = 'This is a custom confirmation message from [site:name]. Confirmation code: [sms-message:verification-code]';

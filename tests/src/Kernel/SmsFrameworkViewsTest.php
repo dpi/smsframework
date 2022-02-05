@@ -74,7 +74,7 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
   /**
    * Tests view of SMS entities with join to recipient table.
    */
-  public function testSms() {
+  public function testSms(): void {
     // Create a role and user which has permission to view the entity links
     // generated for 'gateway', 'sender_entity__target_id', and
     // 'recipient_entity__target_id' columns.

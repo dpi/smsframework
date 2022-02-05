@@ -9,6 +9,7 @@ use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Message\SmsMessageResultInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,7 +27,7 @@ interface SmsGatewayPluginInterface extends ConfigurableInterface, DependentPlug
    * @return \Drupal\sms\Message\SmsMessageResultInterface
    *   The result of the sms messaging operation.
    */
-  public function send(SmsMessageInterface $sms);
+  public function send(SmsMessageInterface $sms): SmsMessageResultInterface;
 
   /**
    * Returns the credit balance available on this gateway.

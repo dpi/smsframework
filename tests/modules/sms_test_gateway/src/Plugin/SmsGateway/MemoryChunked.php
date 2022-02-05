@@ -19,7 +19,7 @@ class MemoryChunked extends Memory {
   /**
    * {@inheritdoc}
    */
-  public function defaultConfiguration() {
+  public function defaultConfiguration(): array {
     return [];
   }
 

@@ -38,7 +38,7 @@ class SmsFrameworkIncomingRouteTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->routeProvider = $this->container->get('router.route_provider');
   }
@@ -46,7 +46,7 @@ class SmsFrameworkIncomingRouteTest extends SmsFrameworkKernelBase {
   /**
    * Tests route does not exist for gateway without incoming route.
    */
-  public function testIncomingRouteUnsupported() {
+  public function testIncomingRouteUnsupported(): void {
     $gateway = $this->createMemoryGateway(['plugin' => 'capabilities_default']);
     $this->expectException(RouteNotFoundException::class);
     $route = 'sms.incoming.receive.' . $gateway->id();
@@ -56,7 +56,7 @@ class SmsFrameworkIncomingRouteTest extends SmsFrameworkKernelBase {
   /**
    * Tests route exists for gateway with incoming route annotation.
    */
-  public function testIncomingRoute() {
+  public function testIncomingRoute(): void {
     $incoming_gateway = $this->createMemoryGateway(['plugin' => 'incoming']);
     $name = 'sms.incoming.receive.' . $incoming_gateway->id();
     $route = $this->routeProvider->getRouteByName($name);

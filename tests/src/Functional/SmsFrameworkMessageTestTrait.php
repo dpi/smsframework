@@ -22,7 +22,7 @@ trait SmsFrameworkMessageTestTrait {
   /**
    * Tests sender name.
    */
-  public function testSender() {
+  public function testSender(): void {
     $sender = $this->randomMachineName();
     $sms_message = $this->createSmsMessage();
     $sms_message->setSender($sender);
@@ -35,7 +35,7 @@ trait SmsFrameworkMessageTestTrait {
    * @covers ::getSenderNumber
    * @covers ::setSenderNumber
    */
-  public function testSenderNumber() {
+  public function testSenderNumber(): void {
     $number = '1234567890';
     $sms_message = $this->createSmsMessage();
     $sms_message->setSenderNumber($number);
@@ -48,7 +48,7 @@ trait SmsFrameworkMessageTestTrait {
    * @covers ::getMessage
    * @covers ::setMessage
    */
-  public function testMessage() {
+  public function testMessage(): void {
     $message = $this->randomMachineName();
     $sms_message1 = $this->createSmsMessage();
     $sms_message1->setMessage($message);
@@ -274,7 +274,7 @@ trait SmsFrameworkMessageTestTrait {
     $sms_message = $this->createSmsMessage();
     $sms_message->addRecipients(['100', '200', '300', '400', '500']);
     $sms_messages = $sms_message->chunkByRecipients(2);
-    $this->assertEquals(3, count($sms_messages));
+    $this->assertCount(3, $sms_messages);
     $this->assertEquals(['100', '200'], $sms_messages[0]->getRecipients());
     $this->assertEquals(['300', '400'], $sms_messages[1]->getRecipients());
     $this->assertEquals(['500'], $sms_messages[2]->getRecipients());

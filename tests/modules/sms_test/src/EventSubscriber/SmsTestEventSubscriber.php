@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\sms_test\EventSubscriber;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Event\SmsEvents;
@@ -58,7 +58,7 @@ class SmsTestEventSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[SmsEvents::MESSAGE_GATEWAY][] = ['testAddGateway200'];
     $events[SmsEvents::MESSAGE_GATEWAY][] = ['testAddGateway400'];
 

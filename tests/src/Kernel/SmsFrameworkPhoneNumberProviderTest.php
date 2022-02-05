@@ -65,7 +65,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('sms_phone_number_verification');
@@ -102,7 +102,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
    *
    * @covers ::getPhoneNumbers
    */
-  public function testGetPhoneNumbersUnverified() {
+  public function testGetPhoneNumbersUnverified(): void {
     $phone_numbers_all = ['+123123123', '+456456456'];
 
     // Test zero, one, multiple phone numbers.
@@ -126,7 +126,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
    *
    * @covers ::getPhoneNumbers
    */
-  public function testGetPhoneNumbersVerified() {
+  public function testGetPhoneNumbersVerified(): void {
     $phone_numbers_all = ['+123123123', '+456456456'];
 
     // Test zero, one, multiple phone numbers.
@@ -166,7 +166,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
    *
    * @covers ::getPhoneNumbers
    */
-  public function testGetPhoneNumbersNoVerification() {
+  public function testGetPhoneNumbersNoVerification(): void {
     $phoneNumberSettings = $this->phoneNumberSettings;
     $this->phoneNumberSettings->delete();
 
@@ -189,7 +189,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
    *
    * @covers ::sendMessage
    */
-  public function testSendMessageUnverified() {
+  public function testSendMessageUnverified(): void {
     $phone_numbers = ['+123123123'];
     $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
     $this->resetTestMessages();
@@ -206,7 +206,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
    *
    * @covers ::sendMessage
    */
-  public function testSendMessageVerified() {
+  public function testSendMessageVerified(): void {
     $phone_numbers = ['+123123123'];
     $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
     $this->resetTestMessages();
@@ -217,7 +217,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
       ->setSenderNumber('+999888777')
       ->setMessage($this->randomString());
     $this->phoneNumberProvider->sendMessage($entity, $sms_message);
-    $this->assertEquals(1, count($this->getTestMessages($this->gateway)));
+    $this->assertCount(1, $this->getTestMessages($this->gateway));
   }
 
   /**
@@ -225,7 +225,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
    *
    * @covers ::sendMessage
    */
-  public function testSendMessageOneMessage() {
+  public function testSendMessageOneMessage(): void {
     $phone_numbers = ['+123123123', '+456456456'];
     $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
     $this->resetTestMessages();

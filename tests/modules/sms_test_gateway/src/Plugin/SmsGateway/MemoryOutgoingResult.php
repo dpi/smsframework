@@ -20,7 +20,7 @@ class MemoryOutgoingResult extends Memory {
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms_message) {
+  public function send(SmsMessageInterface $sms_message): \Drupal\sms\Message\SmsMessageResultInterface|\Drupal\sms\Message\SmsMessageResult|null {
     $result = parent::send($sms_message);
 
     if (\Drupal::state()->get('sms_test_gateway.memory_outgoing_result.missing_result')) {

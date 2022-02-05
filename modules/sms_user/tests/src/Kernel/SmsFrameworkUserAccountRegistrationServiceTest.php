@@ -77,7 +77,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->installSchema('system', ['sequences']);
     $this->installConfig('sms_user');
@@ -134,8 +134,8 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
       ->save();
 
     $this->sendIncomingMessage('+123', $this->randomString());
-    $this->assertEquals(0, count($this->getTestMessages($this->gateway)), 'No messages were created');
-    $this->assertEquals(0, $this->countUsers(), 'No users exist.');
+    $this->assertCount(0, $this->getTestMessages($this->gateway), 'No messages were created');
+    $this->assertUserCount(0, 'No users exist.');
   }
 
   /**
@@ -168,10 +168,10 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     $this->createEntityWithPhoneNumber($this->phoneNumberSettings, [$sender_number]);
     $this->resetTestMessages();
 
-    $this->assertEquals(1, $this->countUsers());
+    $this->assertUserCount(1);
     $this->sendIncomingMessage($sender_number, $this->randomString());
-    $this->assertEquals(1, $this->countUsers());
-    $this->assertEquals(0, count($this->getTestMessages($this->gateway)));
+    $this->assertUserCount(1);
+    $this->assertCount(0, $this->getTestMessages($this->gateway));
   }
 
   /**
@@ -186,7 +186,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
       ->save();
 
     $this->sendIncomingMessage('+123123123', $this->randomString());
-    $this->assertEquals(1, $this->countUsers(), 'User created');
+    $this->assertUserCount(1, 'User created');
     $this->assertFalse($this->inTestMessages($this->gateway, $reply_message));
   }
 
@@ -202,7 +202,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
       ->save();
 
     $this->sendIncomingMessage('+123123123', $this->randomString());
-    $this->assertEquals(1, $this->countUsers(), 'User created');
+    $this->assertUserCount(1, 'User created');
     $this->assertTrue($this->inTestMessages($this->gateway, $reply_message));
   }
 
@@ -214,7 +214,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
       ->set('account_registration.unrecognized_sender.status', 1)
       ->save();
 
-    $this->assertEquals(0, $this->countUsers());
+    $this->assertUserCount(0);
     $this->sendIncomingMessage('+123123123', $this->randomString());
     $this->assertFalse(empty($this->getLastUser()->getAccountName()));
     $this->assertTrue(empty($this->getLastUser()->getEmail()));
@@ -315,7 +315,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
       ->set('account_registration.incoming_pattern.incoming_messages.0', "[username] [password]")
       ->save();
 
-    $this->assertEquals(0, $this->countUsers());
+    $this->assertUserCount(0);
 
     $username = $this->randomMachineName();
     $message = "$username " . $this->randomMachineName();
@@ -336,9 +336,9 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
       ->set('account_registration.incoming_pattern.reply.message', '[user:account-name] Foo [user:mail]')
       ->save();
 
-    $this->assertEquals(0, $this->countUsers());
+    $this->assertUserCount(0);
     $this->sendIncomingMessage('+123123123', $incoming_message);
-    $this->assertEquals(1, $this->countUsers());
+    $this->assertUserCount(1);
 
     // Check reply contains randomly generated username, and empty email token.
     $user = $this->getLastUser();
@@ -377,7 +377,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
 
     $incoming_message = $this->randomMachineName() . ' ' . $this->randomMachineName();
     $this->sendIncomingMessage('+123123123', $incoming_message);
-    $this->assertEquals(1, $this->countUsers(), 'User created');
+    $this->assertUserCount(1, 'User created');
     $this->assertFalse($this->inTestMessages($this->gateway, $reply_message));
   }
 
@@ -395,7 +395,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
 
     $incoming_message = $this->randomMachineName() . ' ' . $this->randomMachineName();
     $this->sendIncomingMessage('+123123123', $incoming_message);
-    $this->assertEquals(1, $this->countUsers(), 'User created');
+    $this->assertUserCount(1, 'User created');
     $this->assertTrue($this->inTestMessages($this->gateway, $reply_message));
   }
 
@@ -420,7 +420,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     $this->sendIncomingMessage('+123123123', 'E ' . $email . ' U ' . $username);
 
     $emails = $this->getMails();
-    $this->assertEquals(1, count($emails), 'One email was sent.');
+    $this->assertCount(1, $emails, 'One email was sent.');
     $this->assertMailString('to', $email, 1);
     $this->assertMailString('subject', $subject, 1);
     $this->assertMailString('body', 'Foo ' . $username . ' Bar', 1);
@@ -446,7 +446,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     $this->sendIncomingMessage('+123123123', 'E ' . $email . ' P ' . $password);
 
     $emails = $this->getMails();
-    $this->assertEquals(0, count($emails), 'Zero emails sent because incoming message contained password.');
+    $this->assertCount(0, $emails, 'Zero emails sent because incoming message contained password.');
   }
 
   /**
@@ -536,11 +536,13 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Count number of registered users.
    *
-   * @return int
-   *   Number of users in database.
+   * @param int $expectedUserCount
+   *   Number of users to expect in database.
+   * @param string $message
+   *   A message.
    */
-  protected function countUsers() {
-    return count(User::loadMultiple());
+  protected function assertUserCount(int $expectedUserCount, string $message = '') {
+    return $this->assertCount($expectedUserCount, User::loadMultiple(), $message);
   }
 
   /**

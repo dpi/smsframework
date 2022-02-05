@@ -37,7 +37,7 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $user = $this->drupalCreateUser(['sms_devel form']);
@@ -55,11 +55,12 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['message'] = $this->randomString();
     $edit['skip_queue'] = TRUE;
 
-    $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
+    $this->drupalGet(Url::fromRoute('sms_devel.message'));
+    $this->submitForm($edit, t('Send'));
     $this->assertSession()->responseContains('Message was processed, 1 delivery reports were generated.');
 
     $messages = $this->getTestMessages($this->gateway);
-    $this->assertEquals(1, count($messages));
+    $this->assertCount(1, $messages);
     $this->assertEquals($edit['message'], $messages[0]->getMessage());
   }
 
@@ -71,7 +72,8 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['message'] = $this->randomString();
     $edit['skip_queue'] = FALSE;
 
-    $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
+    $this->drupalGet(Url::fromRoute('sms_devel.message'));
+    $this->submitForm($edit, t('Send'));
     $this->assertSession()->responseContains('Message added to the outgoing queue.');
 
     $messages = SmsMessage::loadMultiple();
@@ -89,7 +91,8 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['gateway'] = $this->gateway->id();
     $edit['skip_queue'] = TRUE;
 
-    $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Receive'));
+    $this->drupalGet(Url::fromRoute('sms_devel.message'));
+    $this->submitForm($edit, t('Receive'));
     $this->assertSession()->responseContains('Message was processed, 1 delivery reports were generated.');
 
     $this->assertEquals($edit['message'], sms_test_gateway_get_incoming()['message']);
@@ -104,7 +107,8 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['gateway'] = $this->gateway->id();
     $edit['skip_queue'] = FALSE;
 
-    $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Receive'));
+    $this->drupalGet(Url::fromRoute('sms_devel.message'));
+    $this->submitForm($edit, t('Receive'));
     $this->assertSession()->responseContains('Message added to the incoming queue.');
 
     $messages = SmsMessage::loadMultiple();
@@ -119,7 +123,8 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
   public function testReceiveGatewayInvalid() {
     $edit['gateway'] = '';
 
-    $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Receive'));
+    $this->drupalGet(Url::fromRoute('sms_devel.message'));
+    $this->submitForm($edit, t('Receive'));
     $this->assertSession()->responseContains('Gateway must be selected if receiving a message.');
   }
 
@@ -132,7 +137,8 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = FALSE;
     $edit['automated'] = FALSE;
 
-    $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
+    $this->drupalGet(Url::fromRoute('sms_devel.message'));
+    $this->submitForm($edit, t('Send'));
 
     $messages = SmsMessage::loadMultiple();
     $message = reset($messages);
@@ -155,7 +161,8 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $date_user->setTimezone(new \DateTimeZone(date_default_timezone_get()));
     $edit['send_on[date]'] = $date_user->format('Y-m-d');
     $edit['send_on[time]'] = $date_user->format('H:i:s');
-    $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
+    $this->drupalGet(Url::fromRoute('sms_devel.message'));
+    $this->submitForm($edit, t('Send'));
 
     $messages = SmsMessage::loadMultiple();
     $message = reset($messages);
@@ -172,11 +179,12 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['message'] = $this->randomString();
     $edit['skip_queue'] = TRUE;
 
-    $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
+    $this->drupalGet(Url::fromRoute('sms_devel.message'));
+    $this->submitForm($edit, t('Send'));
     $this->assertSession()->responseContains('Message could not be sent');
 
     $messages = $this->getTestMessages($this->gateway);
-    $this->assertEquals(0, count($messages), 'No messages sent.');
+    $this->assertCount(0, $messages, 'No messages sent.');
   }
 
   /**
@@ -189,7 +197,8 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = TRUE;
     $edit['verbose'] = TRUE;
 
-    $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
+    $this->drupalGet(Url::fromRoute('sms_devel.message'));
+    $this->submitForm($edit, t('Send'));
     $this->assertSession()->responseContains('Message was processed, 1 delivery reports were generated.');
 
     $first_row = '#edit-results > tbody > tr:nth-child(1)';

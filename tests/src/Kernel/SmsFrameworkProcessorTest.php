@@ -57,7 +57,7 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->installEntitySchema('sms');
@@ -76,7 +76,7 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
    *
    * @covers ::ensureReportsPreprocess
    */
-  public function testIncomingNoResult() {
+  public function testIncomingNoResult(): void {
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::INCOMING)
       ->setMessage($this->randomString())
@@ -93,7 +93,7 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
    *
    * @covers ::ensureReportsPreprocess
    */
-  public function testIncomingMissingReports() {
+  public function testIncomingMissingReports(): void {
     $result = new SmsMessageResult();
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::INCOMING)
@@ -113,7 +113,7 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
    *
    * @covers ::ensureReportsPreprocess
    */
-  public function testOutgoingNoResult() {
+  public function testOutgoingNoResult(): void {
     $this->setFallbackGateway($this->gatewayOutgoingResult);
 
     \Drupal::state()->set('sms_test_gateway.memory_outgoing_result.missing_result', TRUE);
@@ -138,7 +138,7 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
    *
    * @covers ::ensureReportsPreprocess
    */
-  public function testOutgoingMissingReports() {
+  public function testOutgoingMissingReports(): void {
     $this->setFallbackGateway($this->gatewayOutgoingResult);
 
     $delete_count = rand(1, 5);
@@ -164,7 +164,7 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
    *
    * @covers ::ensureIncomingSupport
    */
-  public function testIncomingMissingGateway() {
+  public function testIncomingMissingGateway(): void {
     $sms_message = SmsMessage::create()
       ->setDirection(Direction::INCOMING)
       ->setMessage($this->randomString())
@@ -180,7 +180,7 @@ class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
    *
    * @covers ::ensureIncomingSupport
    */
-  public function testIncomingUnSupported() {
+  public function testIncomingUnSupported(): void {
     $gateway = $this->createMemoryGateway([
       'plugin' => 'capabilities_default',
     ]);
