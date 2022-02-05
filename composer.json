@@ -2,11 +2,11 @@
   "name": "drupal/smsframework",
   "description": "Provides an extensible API that facilitates communication between Drupal and various SMS gateways.",
   "type": "drupal-module",
-  "license": "GPL-2.0+",
+  "license": "GPL-2.0-or-later",
   "homepage": "http://drupal.org/project/smsframework",
   "support": {
     "issues": "https://www.drupal.org/project/issues/smsframework",
-    "source": "http://cgit.drupalcode.org/smsframework"
+    "source": "https://git.drupalcode.org/project/smsframework"
   },
   "authors": [
     {
