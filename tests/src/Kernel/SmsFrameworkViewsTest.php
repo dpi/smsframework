@@ -78,7 +78,10 @@ class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     // Create a role and user which has permission to view the entity links
     // generated for 'gateway', 'sender_entity__target_id', and
     // 'recipient_entity__target_id' columns.
-    $role = Role::create(['id' => $this->randomMachineName()]);
+    $role = Role::create([
+      'id' => $this->randomMachineName(),
+      'label' => 'Test role',
+    ]);
     $role->grantPermission('access user profiles');
     $role->grantPermission('administer smsframework');
     $role->save();
