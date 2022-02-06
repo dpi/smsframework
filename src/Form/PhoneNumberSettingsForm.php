@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\sms\Plugin\Field\FieldWidget\SmsTelephoneWidget;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -266,7 +267,7 @@ class PhoneNumberSettingsForm extends EntityForm {
           // Only change existing form formatter if it is using default
           // widget, or none at all.
           if (!$component || ($component && $component['type'] == 'telephone_default')) {
-            $component['type'] = 'sms_telephone';
+            $component['type'] = SmsTelephoneWidget::PLUGIN_ID;
             $entity_form_display
               ->setComponent($field_name, $component)
               ->save();
@@ -310,17 +311,17 @@ class PhoneNumberSettingsForm extends EntityForm {
     $definitions['field_storage']['phone_number']['type'] = 'telephone';
     $definitions['field_storage']['automated_opt_out']['type'] = 'boolean';
     // Definitions for field_config.
-    $definitions['field']['phone_number']['label'] = t('Phone number');
+    $definitions['field']['phone_number']['label'] = \t('Phone number');
     $definitions['field']['automated_opt_out'] = [
-      'label' => t('Opt out of SMS messages.'),
-      'description' => t('SMS messages requested by you are exempt.'),
+      'label' => \t('Opt out of SMS messages.'),
+      'description' => \t('SMS messages requested by you are exempt.'),
       'settings' => [
-        'on_label' => t('Do not receive SMS messages from this site.'),
-        'off_label' => t('Receive SMS messages from this site.'),
+        'on_label' => \t('Do not receive SMS messages from this site.'),
+        'off_label' => \t('Receive SMS messages from this site.'),
       ],
     ];
     // Definitions for form displays.
-    $definitions['form_display']['phone_number']['type'] = 'sms_telephone';
+    $definitions['form_display']['phone_number']['type'] = SmsTelephoneWidget::PLUGIN_ID;
     $definitions['form_display']['automated_opt_out']['type'] = 'boolean_checkbox';
 
     // Generate a unique field name.

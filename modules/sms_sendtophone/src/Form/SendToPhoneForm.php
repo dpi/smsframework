@@ -125,7 +125,7 @@ class SendToPhoneForm extends FormBase {
         $form['message_preview'] = [
           '#type' => 'item',
           '#markup' => '<p class="sms-sendtophone--message-preview">' . $this->getRequest()->get('text') . '</p>',
-          '#title' => t('Message preview'),
+          '#title' => $this->t('Message preview'),
         ];
         break;
 
@@ -134,8 +134,8 @@ class SendToPhoneForm extends FormBase {
           $node = Node::load($extra);
           $form['message_display'] = [
             '#type' => 'textarea',
-            '#title' => t('Message preview'),
-            '#description' => t('This URL will be sent to the phone.'),
+            '#title' => $this->t('Message preview'),
+            '#description' => $this->t('This URL will be sent to the phone.'),
             '#cols' => 35,
             '#rows' => 2,
             '#attributes' => ['disabled' => TRUE],
@@ -160,7 +160,7 @@ class SendToPhoneForm extends FormBase {
 
     $form['submit'] = [
       '#type' => 'submit',
-      '#value' => t('Send'),
+      '#value' => $this->t('Send'),
       '#weight' => 20,
     ];
 

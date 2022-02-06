@@ -9,6 +9,7 @@ use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Plugin\QueueWorker\SmsProcessor;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\sms\Provider\SmsQueueProcessorInterface;
 
@@ -86,7 +87,7 @@ final class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
     $sms_message_saved = SmsMessage::load($id);
 
     $this->assertTrue($sms_message_saved->isQueued(), 'SMS message is queued.');
-    $this->assertEquals(1, \Drupal::queue('sms.messages')->numberOfItems(), 'SMS message processor queue item created.');
+    $this->assertEquals(1, \Drupal::queue(SmsProcessor::PLUGIN_ID)->numberOfItems(), 'SMS message processor queue item created.');
   }
 
   /**

@@ -10,6 +10,8 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
+use Drupal\sms_sendtophone\Plugin\Field\FieldFormatter\SmsLinkFormatter;
+use Drupal\sms_sendtophone\Plugin\Filter\FilterInlineSms;
 use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
 use Drupal\sms\Entity\PhoneNumberSettings;
 
@@ -113,7 +115,8 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
     }
     // Ensure at least one type is enabled.
     $edit["content_types[page]"] = $expected['page'] = 'page';
-    $this->drupalPostForm('admin/config/smsframework/sendtophone', $edit, 'Save configuration');
+    $this->drupalGet('admin/config/smsframework/sendtophone');
+    $this->submitForm($edit, 'Save configuration');
     $saved = $this->config('sms_sendtophone.settings')->get('content_types', []);
     $this->assertEquals($expected, $saved);
 
@@ -144,7 +147,7 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
     $this->assertSession()->fieldValueEquals('message_display', $node->toUrl()->setAbsolute()->toString());
 
     // Click the send button there.
-    $this->drupalPostForm(NULL, ['number' => $phone_number], t('Send'));
+    $this->submitForm(['number' => $phone_number], 'Send');
 
     $sms_message = $this->getLastTestMessage($this->gateway);
     $this->assertTrue(in_array($phone_number, $sms_message->getRecipients()));
@@ -153,16 +156,19 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
 
   /**
    * Tests sendtophone filter integration.
+   *
+   * @covers \Drupal\sms_sendtophone\Form\SendToPhoneForm
    */
-  public function testSendToPhoneFilter() {
+  public function testSendToPhoneFilter(): void {
     $user = $this->drupalCreateUser(['administer filters']);
     $this->drupalLogin($user);
 
     $edit = [
-      'filters[filter_inline_sms][status]' => TRUE,
-      'filters[filter_inline_sms][settings][display]' => 'text',
+      'filters[' . FilterInlineSms::PLUGIN_ID . '][status]' => TRUE,
+      'filters[' . FilterInlineSms::PLUGIN_ID . '][settings][display]' => 'text',
     ];
-    $this->drupalPostForm('admin/config/content/formats/manage/plain_text', $edit, t('Save configuration'));
+    $this->drupalGet('admin/config/content/formats/manage/plain_text');
+    $this->submitForm($edit, 'Save configuration');
     // Create a new node sms markup and verify that a link is created.
     $type_names = array_keys(NodeType::loadMultiple());
     $node_body = $this->randomMachineName(30);
@@ -186,7 +192,7 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
     $user->save();
     $this->verifyPhoneNumber($user, $phone_number);
 
-    $this->drupalGet($node->toUrl());
+    $this->drupalGet($node->toUrl()->setOption('query', ['text' => $node_body]));
     // Confirm link was created for Send to phone.
     $this->assertSession()->pageTextContains("$node_body (Send to phone)");
 
@@ -195,9 +201,7 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
     $this->assertSession()->pageTextContains($node_body);
 
     // Submit phone number and confirm message received.
-    $this->drupalPostForm(NULL, [], t('Send'), [
-      'query' => ['text' => $node_body],
-    ]);
+    $this->submitForm([], 'Send');
 
     $sms_message = $this->getLastTestMessage($this->gateway);
     $this->assertEquals($sms_message->getMessage(), $node_body, 'Message body "' . $node_body . '" successfully sent.');
@@ -205,8 +209,10 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
 
   /**
    * Tests field format integration and widget.
+   *
+   * @covers \Drupal\sms_sendtophone\Form\SendToPhoneForm
    */
-  public function testFieldFormatAndWidget() {
+  public function testFieldFormatAndWidget(): void {
     // Create a custom field of type 'text' using the sms_sendtophone formatter.
     $bundles = array_keys(NodeType::loadMultiple());
     $field_name = mb_strtolower($this->randomMachineName());
@@ -214,14 +220,6 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
       'field_name' => $field_name,
       'entity_type' => 'node',
       'bundle' => $bundles[0],
-      // Need to verify this.
-      /*
-          'display' => array(
-            'teaser' => array(
-              'type' => 'sms_link',
-            )
-          ),
-      */
     ];
     $field_storage = FieldStorageConfig::create([
       'field_name' => $field_name,
@@ -253,7 +251,10 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
 
     // This is a quick-fix. Need to find out how to add display filters in code.
     $this->drupalLogin($this->rootUser);
-    $this->drupalPostForm('admin/structure/types/manage/article/display', ['fields[' . $field_name . '][type]' => 'sms_link'], 'Save');
+    $this->drupalGet('admin/structure/types/manage/article/display');
+    $this->submitForm([
+      'fields[' . $field_name . '][type]' => SmsLinkFormatter::PLUGIN_ID,
+    ], 'Save');
 
     // Confirm phone number.
     $user = $this->drupalCreateUser();
@@ -264,13 +265,13 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
     $this->drupalLogin($user);
 
     // Click send button.
-    $this->drupalGet('node/' . $test_node->id());
+    $this->drupalGet($test_node->toUrl()->setOption('query', ['text' => $random_text]));
     $this->assertSession()->pageTextContains($random_text);
     $this->assertSession()->pageTextContains($random_text . ' (Send to phone)');
     $this->clickLink('Send to phone');
 
     // Click the send button there.
-    $this->drupalPostForm(NULL, [], 'Send', ['query' => ['text' => $random_text]]);
+    $this->submitForm([], 'Send');
 
     $sms_message = $this->getLastTestMessage($this->gateway);
     $this->assertTrue(in_array($phone_number, $sms_message->getRecipients()), 'Message sent to correct number');

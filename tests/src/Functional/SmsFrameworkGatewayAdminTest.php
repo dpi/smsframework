@@ -8,6 +8,7 @@ use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Url;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsGateway;
+use Drupal\sms\Plugin\SmsGateway\LogGateway;
 
 /**
  * Tests gateway administration user interface.
@@ -70,12 +71,13 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
     // Test initial fallback gateway.
     $sms_gateway_fallback = SmsGateway::load($this->config('sms.settings')->get('fallback_gateway'));
 
-    $this->assertEquals($sms_gateway_fallback->id(), 'log', 'Initial fallback gateway is "log".');
+    $this->assertEquals($sms_gateway_fallback->id(), LogGateway::PLUGIN_ID, 'Initial fallback gateway is "log".');
 
     $this->drupalLogin($this->drupalCreateUser(['administer smsframework']));
 
     // Change fallback gateway.
-    $this->drupalPostForm(Url::fromRoute('sms.settings'), [
+    $this->drupalGet(Url::fromRoute('sms.settings'));
+    $this->submitForm([
       'fallback_gateway' => $test_gateway->id(),
     ], 'Save configuration');
     $this->assertSession()->statusCodeEquals(200);
@@ -100,7 +102,8 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
       'status' => TRUE,
       'plugin_id' => 'memory',
     ];
-    $this->drupalPostForm(Url::fromRoute('entity.sms_gateway.add'), $edit, t('Save'));
+    $this->drupalGet(Url::fromRoute('entity.sms_gateway.add'));
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->statusCodeEquals(200);
 
     $this->assertSession()->addressEquals(Url::fromRoute('entity.sms_gateway.edit_form', [
@@ -135,13 +138,13 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
     $this->assertSession()->fieldValueEquals('delivery_reports[push_path]', $test_gateway->getPushReportPath());
 
     // Memory gateway has a decoy configuration form.
-    $edit = [
-      'widget' => $this->randomString(),
+    $widget = $this->randomString();
+    $this->submitForm([
+      'widget' => $widget,
       'skip_queue' => '1',
       'retention_duration_incoming' => '3600',
       'retention_duration_outgoing' => '-1',
-    ];
-    $this->drupalPostForm(NULL, $edit, 'Save');
+    ], 'Save');
     $this->assertSession()->addressEquals(Url::fromRoute('sms.gateway.list'));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains('Gateway saved.');
@@ -153,13 +156,13 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
 
     // Gateway settings.
     $this->assertEquals(TRUE, $test_gateway->getSkipQueue());
-    $this->assertEquals($edit['retention_duration_incoming'], $test_gateway->getRetentionDuration(Direction::INCOMING));
-    $this->assertEquals($edit['retention_duration_outgoing'], $test_gateway->getRetentionDuration(Direction::OUTGOING));
+    $this->assertEquals('3600', $test_gateway->getRetentionDuration(Direction::INCOMING));
+    $this->assertEquals('-1', $test_gateway->getRetentionDuration(Direction::OUTGOING));
 
     // Plugin form.
     $config = $test_gateway->getPlugin()
       ->getConfiguration();
-    $this->assertEquals($edit['widget'], $config['widget'], 'Plugin configuration changed.');
+    $this->assertEquals($widget, $config['widget'], 'Plugin configuration changed.');
   }
 
   /**
@@ -196,7 +199,8 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
     $this->assertSession()->responseContains(t('Are you sure you want to delete SMS gateway %label?', [
       '%label' => $test_gateway->label(),
     ]));
-    $this->drupalPostForm($delete_url, [], t('Delete'));
+    $this->drupalGet($delete_url);
+    $this->submitForm([], 'Delete');
 
     $this->assertSession()->addressEquals(Url::fromRoute('sms.gateway.list'));
     $this->assertSession()->statusCodeEquals(200);
@@ -222,10 +226,9 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
       ->fieldValueEquals('incoming_messages[push_path]', $gateway->getPushIncomingPath());
 
     $incoming_route = '/' . $this->randomMachineName();
-    $edit = [
+    $this->submitForm([
       'incoming_messages[push_path]' => $incoming_route,
-    ];
-    $this->drupalPostForm(NULL, $edit, t('Save'));
+    ], 'Save');
 
     // Reload the gateway, check properties modified.
     $gateway = SmsGateway::load($gateway->id());

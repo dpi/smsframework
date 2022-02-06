@@ -14,7 +14,7 @@ use Drupal\filter\Plugin\FilterBase;
  * Provides a filter to align elements.
  *
  * @Filter(
- *   id = "filter_inline_sms",
+ *   id = \Drupal\sms_sendtophone\Plugin\Filter\FilterInlineSms::PLUGIN_ID,
  *   title = @Translation("Inline SMS"),
  *   description = @Translation("Highlights text between <code>[sms][/sms]</code> tags and appends a 'send to phone' button."),
  *   type = Drupal\filter\Plugin\FilterInterface::TYPE_MARKUP_LANGUAGE,
@@ -27,6 +27,8 @@ use Drupal\filter\Plugin\FilterBase;
  * )
  */
 class FilterInlineSms extends FilterBase {
+
+  public const PLUGIN_ID = 'filter_inline_sms';
 
   /**
    * {@inheritdoc}

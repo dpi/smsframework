@@ -106,7 +106,8 @@ final class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase
       'entity_bundle' => 'entity_test|entity_test',
       'field_mapping[phone_number]' => '!create',
     ];
-    $this->drupalPostForm('admin/config/smsframework/phone_number/add', $edit, t('Save'));
+    $this->drupalGet('admin/config/smsframework/phone_number/add');
+    $this->submitForm($edit, 'Save');
 
     $this->assertSession()->addressEquals('admin/config/smsframework/phone_number');
     $t_args = ['%id' => 'entity_test.entity_test'];
@@ -128,10 +129,10 @@ final class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase
     $this->assertTrue($optionElement->hasAttribute('selected'));
 
     // Ensure edit form is saving correctly.
-    $edit = [
+    $this->drupalGet('admin/config/smsframework/phone_number/entity_test.entity_test');
+    $this->submitForm([
       'code_lifetime' => '7777',
-    ];
-    $this->drupalPostForm('admin/config/smsframework/phone_number/entity_test.entity_test', $edit, t('Save'));
+    ], 'Save');
     $this->assertEquals(7777, $this->config('sms.phone.entity_test.entity_test')->get('verification_code_lifetime'));
 
     // Delete new phone number settings.
@@ -139,7 +140,8 @@ final class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase
     $this->assertSession()->responseContains(t('Are you sure you want to delete SMS phone number settings %label?', [
       '%label' => 'entity_test.entity_test',
     ]));
-    $this->drupalPostForm('admin/config/smsframework/phone_number/entity_test.entity_test/delete', [], t('Delete'));
+    $this->drupalGet('admin/config/smsframework/phone_number/entity_test.entity_test/delete');
+    $this->submitForm([], 'Delete');
     $this->assertSession()->addressEquals('admin/config/smsframework/phone_number');
     $this->assertSession()->responseContains(t('Phone number settings %label was deleted.', [
       '%label' => 'entity_test.entity_test',
@@ -161,11 +163,11 @@ final class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase
       'type' => 'telephone',
     ])->save();
 
-    $edit = [
+    $this->drupalGet('admin/config/smsframework/phone_number/add');
+    $this->submitForm([
       'entity_bundle' => 'entity_test|entity_test',
       'field_mapping[phone_number]' => '!create',
-    ];
-    $this->drupalPostForm('admin/config/smsframework/phone_number/add', $edit, t('Save'));
+    ], 'Save');
 
     $field_name_telephone .= '_2';
     $field_config = $field_storage->load('entity_test.' . $field_name_telephone);

@@ -24,7 +24,7 @@ final class RecipientGatewayEventTest extends UnitTestCase {
    *
    * @covers ::getGatewaysSorted
    */
-  public function testSortFunction() {
+  public function testSortFunction(): void {
     $number = $this->randomPhoneNumbers()[0];
     $event = $this->createEvent($number);
 
@@ -53,7 +53,7 @@ final class RecipientGatewayEventTest extends UnitTestCase {
    *
    * @covers ::getRecipient
    */
-  public function testRecipientConstructor() {
+  public function testRecipientConstructor(): void {
     $number = $this->randomPhoneNumbers()[0];
     $event = $this->createEvent($number);
     $this->assertEquals($number, $event->getRecipient(), 'Constructor recipient is set');
@@ -65,7 +65,7 @@ final class RecipientGatewayEventTest extends UnitTestCase {
    * @covers ::getRecipient
    * @covers ::setRecipient
    */
-  public function testRecipient() {
+  public function testRecipient(): void {
     $event = $this->createEvent($this->randomPhoneNumbers()[0]);
 
     $number = $this->randomPhoneNumbers()[0];
@@ -79,7 +79,7 @@ final class RecipientGatewayEventTest extends UnitTestCase {
    * @covers ::addGateway
    * @covers ::getGateways
    */
-  public function testGetGateways() {
+  public function testGetGateways(): void {
     $event = $this->createEvent($this->randomPhoneNumbers()[0]);
 
     $gateway = $this->createMock(SmsGatewayInterface::class);
@@ -108,7 +108,7 @@ final class RecipientGatewayEventTest extends UnitTestCase {
    *
    * @covers ::removeGateway
    */
-  public function testGatewayRemove() {
+  public function testGatewayRemove(): void {
     $event = $this->createEvent($this->randomPhoneNumbers()[0]);
 
     $gateway = $this->createMock(SmsGatewayInterface::class);
@@ -143,7 +143,7 @@ final class RecipientGatewayEventTest extends UnitTestCase {
    *
    * @covers ::removeGateway
    */
-  public function testGatewayRemoveAllSameId() {
+  public function testGatewayRemoveAllSameId(): void {
     $event = $this->createEvent($this->randomPhoneNumbers()[0]);
 
     $gateway = $this->createMock(SmsGatewayInterface::class);

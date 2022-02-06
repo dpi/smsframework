@@ -90,7 +90,7 @@ class VerifyPhoneNumberForm extends FormBase {
 
     $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => t('Verify code'),
+      '#value' => $this->t('Verify code'),
       '#button_type' => 'primary',
     ];
 

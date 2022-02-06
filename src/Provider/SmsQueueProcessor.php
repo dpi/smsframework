@@ -8,6 +8,7 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Queue\QueueFactory;
 use Drupal\sms\Direction;
+use Drupal\sms\Plugin\QueueWorker\SmsProcessor;
 
 /**
  * The SMS Queue Processor.
@@ -64,7 +65,7 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
   public function __construct(EntityTypeManagerInterface $entity_type_manager, QueueFactory $queue_factory, SmsProviderInterface $sms_provider, TimeInterface $time) {
     $this->smsGatewayStorage = $entity_type_manager->getStorage('sms_gateway');
     $this->smsMessageStorage = $entity_type_manager->getStorage('sms');
-    $this->queue = $queue_factory->get('sms.messages', FALSE);
+    $this->queue = $queue_factory->get(SmsProcessor::PLUGIN_ID, FALSE);
     $this->smsProvider = $sms_provider;
     $this->time = $time;
   }

@@ -200,9 +200,9 @@ class SmsGatewayForm extends EntityForm {
     ];
     $form['incoming_messages']['push_path'] = [
       '#type' => 'textfield',
-      '#title' => t('Pushed messages url'),
+      '#title' => $this->t('Pushed messages url'),
       '#default_value' => $sms_gateway->getPushIncomingPath(),
-      '#description' => t('The path where incoming messages are received.'),
+      '#description' => $this->t('The path where incoming messages are received.'),
       '#size' => 60,
       '#field_prefix' => $this->requestContext->getCompleteBaseUrl(),
       '#access' => !$sms_gateway->isNew() ? $sms_gateway->autoCreateIncomingRoute() : TRUE,
@@ -227,9 +227,9 @@ class SmsGatewayForm extends EntityForm {
     $form['delivery_reports']['#tree'] = TRUE;
     $form['delivery_reports']['push_path'] = [
       '#type' => 'textfield',
-      '#title' => t('Pushed delivery report Url'),
+      '#title' => $this->t('Pushed delivery report Url'),
       '#default_value' => $sms_gateway->getPushReportPath(),
-      '#description' => t('The path where pushed delivery reports are received.'),
+      '#description' => $this->t('The path where pushed delivery reports are received.'),
       '#size' => 60,
       '#field_prefix' => $this->requestContext->getCompleteBaseUrl(),
       '#access' => !$sms_gateway->isNew() ? $sms_gateway->supportsReportsPush() : TRUE,

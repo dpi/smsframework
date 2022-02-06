@@ -95,9 +95,9 @@ class SmsSettingsForm extends ConfigFormBase {
     $form['pages']['#tree'] = TRUE;
     $form['pages']['verify'] = [
       '#type' => 'textfield',
-      '#title' => t('Phone verification path'),
+      '#title' => $this->t('Phone verification path'),
       '#default_value' => $sms_settings->get('page.verify'),
-      '#description' => t('Path of the phone number verification form.'),
+      '#description' => $this->t('Path of the phone number verification form.'),
       '#size' => 30,
       '#required' => TRUE,
       '#field_prefix' => $this->requestContext->getCompleteBaseUrl(),

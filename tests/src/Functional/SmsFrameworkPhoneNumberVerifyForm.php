@@ -59,12 +59,14 @@ final class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkBrowserTestBas
 
     // Invalid code.
     $edit['code'] = $this->randomMachineName();
-    $this->drupalPostForm(Url::fromRoute('sms.phone.verify'), $edit, t('Verify code'));
+    $this->drupalGet(Url::fromRoute('sms.phone.verify'));
+    $this->submitForm($edit, 'Verify code');
     $this->assertSession()->pageTextContains(t('Invalid verification code.'));
 
     // Valid code.
     $edit['code'] = $code;
-    $this->drupalPostForm(Url::fromRoute('sms.phone.verify'), $edit, t('Verify code'));
+    $this->drupalGet(Url::fromRoute('sms.phone.verify'));
+    $this->submitForm($edit, 'Verify code');
     $this->assertSession()->pageTextContains(t('Phone number is now verified.'));
 
     // Reset verification code static cache.
@@ -88,9 +90,11 @@ final class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkBrowserTestBas
     $this->drupalLogin($account);
 
     $edit['code'] = $this->randomMachineName();
-    $this->drupalPostForm(Url::fromRoute('sms.phone.verify'), $edit, t('Verify code'));
+    $this->drupalGet(Url::fromRoute('sms.phone.verify'));
+    $this->submitForm($edit, 'Verify code');
     $this->assertSession()->responseNotContains(t('There has been too many failed verification attempts. Try again later.'));
-    $this->drupalPostForm(Url::fromRoute('sms.phone.verify'), $edit, t('Verify code'));
+    $this->drupalGet(Url::fromRoute('sms.phone.verify'));
+    $this->submitForm($edit, 'Verify code');
     $this->assertSession()->pageTextContains(t('There has been too many failed verification attempts. Try again later.'));
   }
 
@@ -109,10 +113,10 @@ final class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkBrowserTestBas
     $this->assertSession()->statusCodeEquals(200, 'Default phone number verification route exists at /verify');
 
     $path_verify = '/' . $this->randomMachineName() . '/' . $this->randomMachineName();
-    $edit = [
+    $this->drupalGet(Url::fromRoute('sms.settings'));
+    $this->submitForm([
       'pages[verify]' => $path_verify,
-    ];
-    $this->drupalPostForm(Url::fromRoute('sms.settings'), $edit, 'Save configuration');
+    ], 'Save configuration');
 
     // Ensure the route cache is rebuilt by getting the verify route.
     $this->drupalGet($path_verify);
