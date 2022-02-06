@@ -48,9 +48,7 @@ class PhoneNumberSettings extends EntityConfigBase {
 
     // Delete entity form display component.
     $entity_form_display = EntityFormDisplay::load($entity_type_id . '.' . $bundle . '.default');
-    if ($entity_form_display) {
-      $entity_form_display->removeComponent($field_name);
-    }
+    $entity_form_display?->removeComponent($field_name);
 
     // Delete the field storage and field instance.
     FieldStorageConfig::loadByName($entity_type_id, $field_name)->delete();

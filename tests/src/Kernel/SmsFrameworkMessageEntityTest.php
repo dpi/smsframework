@@ -262,7 +262,7 @@ final class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
       ->setSenderNumber($sender_number[0])
       ->addRecipients(['123123123', '456456456'])
       ->setMessage($this->randomMachineName())
-      ->setUid($user->id())
+      ->setUid((int) $user->id())
       ->setGateway($gateway)
       ->setOption('foo', $this->randomMachineName())
       ->setOption('bar', $this->randomMachineName())

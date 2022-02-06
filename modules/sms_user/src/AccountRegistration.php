@@ -6,6 +6,7 @@ namespace Drupal\sms_user;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Utility\Token;
+use Drupal\sms\Entity\PhoneNumberSettingsInterface;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\sms\Provider\PhoneNumberVerificationInterface;
 use Drupal\sms\Message\SmsMessageInterface;
@@ -23,57 +24,30 @@ use Drupal\user\UserInterface;
 class AccountRegistration implements AccountRegistrationInterface {
 
   /**
-   * The configuration factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * The token service.
-   *
-   * @var \Drupal\Core\Utility\Token
-   */
-  protected $token;
-
-  /**
-   * The SMS provider.
-   *
-   * @var \Drupal\sms\Provider\SmsProviderInterface
-   */
-  protected $smsProvider;
-
-  /**
-   * Phone number verification provider.
-   *
-   * @var \Drupal\sms\Provider\PhoneNumberVerificationInterface
-   */
-  protected $phoneNumberVerificationProvider;
-
-  /**
    * Phone number settings for user.user bundle.
    *
-   * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
+   * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface|null
    */
-  protected $userPhoneNumberSettings;
+  protected ?PhoneNumberSettingsInterface $userPhoneNumberSettings;
 
   /**
    * Constructs a AccountRegistration object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The configuration factory.
    * @param \Drupal\Core\Utility\Token $token
    *   The token replacement system.
-   * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
+   * @param \Drupal\sms\Provider\SmsProviderInterface $smsProvider
    *   The SMS provider.
-   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification_provider
+   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phoneNumberVerificationProvider
    *   The phone number verification provider.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, Token $token, SmsProviderInterface $sms_provider, PhoneNumberVerificationInterface $phone_number_verification_provider) {
-    $this->configFactory = $config_factory;
-    $this->token = $token;
-    $this->smsProvider = $sms_provider;
-    $this->phoneNumberVerificationProvider = $phone_number_verification_provider;
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    protected Token $token,
+    protected SmsProviderInterface $smsProvider,
+    protected PhoneNumberVerificationInterface $phoneNumberVerificationProvider,
+  ) {
   }
 
   /**

@@ -49,7 +49,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    *
    * @var \Drupal\sms\Message\SmsMessageResultInterface|null
    */
-  protected $result = NULL;
+  protected ?StdMessageResultInterface $result = NULL;
 
   /**
    * Following are implementors of plain SmsMessage interface.

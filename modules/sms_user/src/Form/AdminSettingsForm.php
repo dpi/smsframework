@@ -21,25 +21,21 @@ use Drupal\sms\Provider\PhoneNumberVerificationInterface;
 class AdminSettingsForm extends ConfigFormBase {
 
   /**
-   * Phone number verification provider.
-   *
-   * @var \Drupal\sms\Provider\PhoneNumberVerificationInterface
-   */
-  protected $phoneNumberVerificationProvider;
-
-  /**
    * Constructs a new AdminSettingsForm.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The factory for configuration objects.
-   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification_provider
+   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phoneNumberVerificationProvider
    *   The phone number verification provider.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, PhoneNumberVerificationInterface $phone_number_verification_provider, MessengerInterface $messenger) {
-    parent::__construct($config_factory);
-    $this->phoneNumberVerificationProvider = $phone_number_verification_provider;
+  public function __construct(
+    ConfigFactoryInterface $configFactory,
+    protected PhoneNumberVerificationInterface $phoneNumberVerificationProvider,
+    MessengerInterface $messenger,
+  ) {
+    parent::__construct($configFactory);
     $this->setMessenger($messenger);
   }
 

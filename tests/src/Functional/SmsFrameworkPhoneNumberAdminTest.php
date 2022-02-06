@@ -112,8 +112,7 @@ final class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase
     $this->assertSession()->addressEquals('admin/config/smsframework/phone_number');
     $t_args = ['%id' => 'entity_test.entity_test'];
     $this->assertSession()->responseContains(t('Phone number settings %id created.', $t_args));
-    $this->assertSession()->responseContains('<td>entity_test</td>
-                      <td>entity_test</td>', 'Phone number settings displayed as row.');
+    $this->assertSession()->responseContains('<td>entity_test</td>');
     $this->assertSession()->linkByHrefExists('admin/config/smsframework/phone_number/entity_test.entity_test');
     $this->assertSession()->linkByHrefExists('admin/config/smsframework/phone_number/entity_test.entity_test/delete');
 

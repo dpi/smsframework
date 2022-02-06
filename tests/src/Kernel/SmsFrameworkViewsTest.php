@@ -70,11 +70,13 @@ final class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     $this->gateway = $this->createMemoryGateway();
     $this->setFallbackGateway($this->gateway);
 
-    ViewTestData::createTestViews(get_class($this), ['sms_test_views']);
+    ViewTestData::createTestViews($this::class, ['sms_test_views']);
   }
 
   /**
    * Tests view of SMS entities with join to recipient table.
+   *
+   * @covers \Drupal\sms\Plugin\views\field\SmsMessageDirection
    */
   public function testSms(): void {
     // Create a role and user which has permission to view the entity links

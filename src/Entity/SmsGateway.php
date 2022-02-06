@@ -257,16 +257,11 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
    * {@inheritdoc}
    */
   public function getRetentionDuration($direction) {
-    switch ($direction) {
-      case Direction::INCOMING:
-        return (int) $this->retention_duration_incoming;
-
-      case Direction::OUTGOING:
-        return (int) $this->retention_duration_outgoing;
-
-      default:
-        throw new \InvalidArgumentException(sprintf('%s is not a valid direction.', $direction));
-    }
+    return match ($direction) {
+      Direction::INCOMING => (int) $this->retention_duration_incoming,
+      Direction::OUTGOING => (int) $this->retention_duration_outgoing,
+      default => throw new \InvalidArgumentException(sprintf('%s is not a valid direction.', $direction)),
+    };
   }
 
   /**

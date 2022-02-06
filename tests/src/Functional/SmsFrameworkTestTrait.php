@@ -25,7 +25,7 @@ trait SmsFrameworkTestTrait {
    *   The new site fallback SMS Gateway, or NULL to unset.
    */
   protected function setFallbackGateway(SmsGatewayInterface $sms_gateway = NULL) {
-    $sms_gateway = $sms_gateway ? $sms_gateway->id() : NULL;
+    $sms_gateway = $sms_gateway?->id();
     $this->config('sms.settings')
       ->set('fallback_gateway', $sms_gateway)
       ->save();

@@ -122,7 +122,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
    */
   public function getTimeQueued() {
     $queued = $this->getRevisionAtStatus(SmsMessageReportStatus::QUEUED);
-    return $queued ? $queued->getStatusTime() : NULL;
+    return $queued?->getStatusTime();
   }
 
   /**
@@ -140,7 +140,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
    */
   public function getTimeDelivered() {
     $delivered = $this->getRevisionAtStatus(SmsMessageReportStatus::DELIVERED);
-    return $delivered ? $delivered->getStatusTime() : NULL;
+    return $delivered?->getStatusTime();
   }
 
   /**

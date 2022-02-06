@@ -5,8 +5,10 @@ declare(strict_types = 1);
 namespace Drupal\sms\Provider;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Queue\QueueFactory;
+use Drupal\Core\Queue\QueueInterface;
 use Drupal\sms\Direction;
 use Drupal\sms\Plugin\QueueWorker\SmsProcessor;
 
@@ -20,54 +22,43 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $smsGatewayStorage;
+  protected EntityStorageInterface $smsGatewayStorage;
 
   /**
    * SMS message entity storage.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $smsMessageStorage;
+  protected EntityStorageInterface $smsMessageStorage;
 
   /**
    * The queue object.
    *
    * @var \Drupal\Core\Queue\QueueInterface
    */
-  protected $queue;
-
-  /**
-   * The SMS provider.
-   *
-   * @var \Drupal\sms\Provider\SmsProviderInterface
-   */
-  protected $smsProvider;
-
-  /**
-   * Time.
-   *
-   * @var \Drupal\Component\Datetime\TimeInterface
-   */
-  protected $time;
+  protected QueueInterface $queue;
 
   /**
    * Creates a new instance of SmsQueueProcessor.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Queue\QueueFactory $queue_factory
+   * @param \Drupal\Core\Queue\QueueFactory $queueQactory
    *   The queue service.
-   * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
+   * @param \Drupal\sms\Provider\SmsProviderInterface $smsProvider
    *   The SMS provider.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   Time.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, QueueFactory $queue_factory, SmsProviderInterface $sms_provider, TimeInterface $time) {
-    $this->smsGatewayStorage = $entity_type_manager->getStorage('sms_gateway');
-    $this->smsMessageStorage = $entity_type_manager->getStorage('sms');
-    $this->queue = $queue_factory->get(SmsProcessor::PLUGIN_ID, FALSE);
-    $this->smsProvider = $sms_provider;
-    $this->time = $time;
+  public function __construct(
+    EntityTypeManagerInterface $entityTypeManager,
+    QueueFactory $queueQactory,
+    protected SmsProviderInterface $smsProvider,
+    protected TimeInterface $time,
+  ) {
+    $this->smsGatewayStorage = $entityTypeManager->getStorage('sms_gateway');
+    $this->smsMessageStorage = $entityTypeManager->getStorage('sms');
+    $this->queue = $queueQactory->get(SmsProcessor::PLUGIN_ID, FALSE);
   }
 
   /**
