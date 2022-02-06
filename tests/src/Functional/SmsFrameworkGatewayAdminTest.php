@@ -138,8 +138,9 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
     $this->assertSession()->fieldValueEquals('delivery_reports[push_path]', $test_gateway->getPushReportPath());
 
     // Memory gateway has a decoy configuration form.
+    $widget = $this->randomString();
     $this->submitForm([
-      'widget' => $this->randomString(),
+      'widget' => $widget,
       'skip_queue' => '1',
       'retention_duration_incoming' => '3600',
       'retention_duration_outgoing' => '-1',
@@ -155,13 +156,13 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
 
     // Gateway settings.
     $this->assertEquals(TRUE, $test_gateway->getSkipQueue());
-    $this->assertEquals($edit['retention_duration_incoming'], $test_gateway->getRetentionDuration(Direction::INCOMING));
-    $this->assertEquals($edit['retention_duration_outgoing'], $test_gateway->getRetentionDuration(Direction::OUTGOING));
+    $this->assertEquals('3600', $test_gateway->getRetentionDuration(Direction::INCOMING));
+    $this->assertEquals('-1', $test_gateway->getRetentionDuration(Direction::OUTGOING));
 
     // Plugin form.
     $config = $test_gateway->getPlugin()
       ->getConfiguration();
-    $this->assertEquals($edit['widget'], $config['widget'], 'Plugin configuration changed.');
+    $this->assertEquals($widget, $config['widget'], 'Plugin configuration changed.');
   }
 
   /**
