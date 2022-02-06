@@ -54,7 +54,7 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create Basic page and Article node types.
