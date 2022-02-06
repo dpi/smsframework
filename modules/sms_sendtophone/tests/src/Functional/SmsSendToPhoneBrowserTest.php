@@ -159,7 +159,7 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
    *
    * @covers \Drupal\sms_sendtophone\Form\SendToPhoneForm
    */
-  public function testSendToPhoneFilter() {
+  public function testSendToPhoneFilter(): void {
     $user = $this->drupalCreateUser(['administer filters']);
     $this->drupalLogin($user);
 
@@ -212,7 +212,7 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
    *
    * @covers \Drupal\sms_sendtophone\Form\SendToPhoneForm
    */
-  public function testFieldFormatAndWidget() {
+  public function testFieldFormatAndWidget(): void {
     // Create a custom field of type 'text' using the sms_sendtophone formatter.
     $bundles = array_keys(NodeType::loadMultiple());
     $field_name = mb_strtolower($this->randomMachineName());

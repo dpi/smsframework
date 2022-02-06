@@ -25,7 +25,7 @@ trait MigratePhoneNumberTestTrait {
   /**
    * Tests migration of phone number settings based on legacy configuration.
    */
-  public function testPhoneSettingsMigration() {
+  public function testPhoneSettingsMigration(): void {
     $settings = PhoneNumberSettings::loadMultiple();
     $this->assertEquals([], $settings);
 
@@ -59,7 +59,7 @@ trait MigratePhoneNumberTestTrait {
   /**
    * Tests phone number migration with custom phone number verification message.
    */
-  public function testPhoneSettingsMigrationWithCustomVerificationMessage() {
+  public function testPhoneSettingsMigrationWithCustomVerificationMessage(): void {
     $this->loadFixture($this->confirmationMessageFixturePath());
 
     // Execute the phone number settings migration and confirm.
@@ -77,7 +77,7 @@ trait MigratePhoneNumberTestTrait {
   /**
    * Tests that the users' phone numbers verification status is migrated.
    */
-  public function testPhoneNumberMigration() {
+  public function testPhoneNumberMigration(): void {
     $this->loadFixture($this->smsUserFixtureFilePath());
 
     // Set up phone number verifications.
@@ -104,7 +104,7 @@ trait MigratePhoneNumberTestTrait {
   /**
    * Tests that conditions are reverted after rollback.
    */
-  public function testRollBack() {
+  public function testRollBack(): void {
     $this->loadFixture($this->smsUserFixtureFilePath());
     $this->installEntitySchema('sms');
     $this->installEntitySchema('sms_phone_number_verification');

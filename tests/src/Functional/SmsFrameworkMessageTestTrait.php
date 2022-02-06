@@ -60,7 +60,7 @@ trait SmsFrameworkMessageTestTrait {
    *
    * @covers ::getRecipients
    */
-  public function testRecipients() {
+  public function testRecipients(): void {
     $sms_message0 = $this->createSmsMessage();
 
     $sms_message1 = $this->createSmsMessage();
@@ -80,7 +80,7 @@ trait SmsFrameworkMessageTestTrait {
    *
    * @covers ::addRecipient
    */
-  public function testRecipientAdd() {
+  public function testRecipientAdd(): void {
     $recipient1 = '123123123';
     $recipient2 = '456456456';
     $sms_message1 = $this->createSmsMessage();
@@ -101,7 +101,7 @@ trait SmsFrameworkMessageTestTrait {
    *
    * @covers ::addRecipients
    */
-  public function testRecipientsAdd() {
+  public function testRecipientsAdd(): void {
     $recipient1 = '123123123';
     $recipient2 = '456456456';
     $sms_message2 = $this->createSmsMessage();
@@ -115,7 +115,7 @@ trait SmsFrameworkMessageTestTrait {
    *
    * @covers ::removeRecipient
    */
-  public function testRecipientRemove() {
+  public function testRecipientRemove(): void {
     $recipient1 = '123123123';
     $recipient2 = '456456456';
     $sms_message1 = $this->createSmsMessage();
@@ -131,7 +131,7 @@ trait SmsFrameworkMessageTestTrait {
    *
    * @covers ::removeRecipients
    */
-  public function testRecipientsRemove() {
+  public function testRecipientsRemove(): void {
     // Test multiple recipient remove.
     $recipients = ['123123123', '456456456', '234234234'];
     $sms_message = $this->createSmsMessage();
@@ -149,7 +149,7 @@ trait SmsFrameworkMessageTestTrait {
    * @covers ::getDirection
    * @covers ::setDirection
    */
-  public function testDirection() {
+  public function testDirection(): void {
     $sms_message2 = $this->createSmsMessage()
       ->setDirection(Direction::OUTGOING);
     $this->assertEquals(Direction::OUTGOING, $sms_message2->getDirection());
@@ -165,7 +165,7 @@ trait SmsFrameworkMessageTestTrait {
    * @covers ::setOption
    * @covers ::getOptions
    */
-  public function testOptionsSet() {
+  public function testOptionsSet(): void {
     $options = ['foo' => $this->randomMachineName()];
     $sms_message1 = $this->createSmsMessage();
     $sms_message1->setOption('foo', $options['foo']);
@@ -177,7 +177,7 @@ trait SmsFrameworkMessageTestTrait {
    *
    * @covers ::removeOption
    */
-  public function testOptionsRemove() {
+  public function testOptionsRemove(): void {
     $options = [
       'foo' => $this->randomMachineName(),
       'bar' => $this->randomMachineName(),
@@ -198,7 +198,7 @@ trait SmsFrameworkMessageTestTrait {
    * @covers ::getReport
    * @covers ::getReports
    */
-  public function testResults() {
+  public function testResults(): void {
     $error_message = $this->getRandomGenerator()->string();
     $recipients = ['2345678901', '1234567890'];
     $reports = array_combine($recipients, array_map(function ($recipient) {
@@ -226,7 +226,7 @@ trait SmsFrameworkMessageTestTrait {
    * @covers ::getUid
    * @covers ::setUid
    */
-  public function testUid() {
+  public function testUid(): void {
     $sms_message1 = $this->createSmsMessage();
 
     // Default value.
@@ -244,7 +244,7 @@ trait SmsFrameworkMessageTestTrait {
    * @covers ::setAutomated
    * @covers ::isAutomated
    */
-  public function testAutomated() {
+  public function testAutomated(): void {
     $sms_message1 = $this->createSmsMessage();
 
     // Default.
@@ -273,7 +273,7 @@ trait SmsFrameworkMessageTestTrait {
    *
    * @covers ::chunkByRecipients
    */
-  public function testsChunkByRecipients() {
+  public function testsChunkByRecipients(): void {
     $sms_message = $this->createSmsMessage();
     $sms_message->addRecipients(['100', '200', '300', '400', '500']);
     $sms_messages = $sms_message->chunkByRecipients(2);

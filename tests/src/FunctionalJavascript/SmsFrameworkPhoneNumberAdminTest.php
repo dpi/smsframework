@@ -55,7 +55,7 @@ final class SmsFrameworkPhoneNumberAdminTest extends WebDriverTestBase {
   /**
    * Test using existing fields for new phone number settings.
    */
-  public function testPhoneNumberFieldExisting() {
+  public function testPhoneNumberFieldExisting(): void {
     $field_storage = $this->entityTypeManager->getStorage('field_storage_config');
     $field_instance = $this->entityTypeManager->getStorage('field_config');
 

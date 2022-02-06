@@ -41,7 +41,7 @@ final class MigrateD7SmsPhoneNumberTest extends MigrateDrupal7TestBase {
   /**
    * Tests that the requirements for the d7_sms_number migration are enforced.
    */
-  public function testMigrationRequirements() {
+  public function testMigrationRequirements(): void {
     // @todo Work out a better fix https://www.drupal.org/project/smsframework/issues/2951758
     if (method_exists($this, 'expectException')) {
       $this->expectException(RequirementsException::class);
