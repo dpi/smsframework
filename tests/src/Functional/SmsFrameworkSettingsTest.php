@@ -30,7 +30,8 @@ final class SmsFrameworkSettingsTest extends SmsFrameworkBrowserTestBase {
   public function testSettingsForm(): void {
     $edit['fallback_gateway'] = '';
     $edit['pages[verify]'] = '/' . $this->randomMachineName();
-    $this->drupalPostForm(Url::fromRoute('sms.settings'), $edit, 'Save configuration');
+    $this->drupalGet(Url::fromRoute('sms.settings'));
+    $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->responseContains(t('SMS settings saved.'));
   }
 
@@ -41,7 +42,8 @@ final class SmsFrameworkSettingsTest extends SmsFrameworkBrowserTestBase {
     $gateway = $this->createMemoryGateway();
     $edit['fallback_gateway'] = $gateway->id();
     $edit['pages[verify]'] = '/' . $this->randomMachineName();
-    $this->drupalPostForm(Url::fromRoute('sms.settings'), $edit, 'Save configuration');
+    $this->drupalGet(Url::fromRoute('sms.settings'));
+    $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->responseContains(t('SMS settings saved.'));
   }
 
@@ -51,7 +53,8 @@ final class SmsFrameworkSettingsTest extends SmsFrameworkBrowserTestBase {
   public function testVerificationPathInvalid(): void {
     // Test invalid path.
     $edit['pages[verify]'] = $this->randomMachineName() . '/' . $this->randomMachineName();
-    $this->drupalPostForm(Url::fromRoute('sms.settings'), $edit, 'Save configuration');
+    $this->drupalGet(Url::fromRoute('sms.settings'));
+    $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->responseContains(t("Path must begin with a '/' character."));
   }
 

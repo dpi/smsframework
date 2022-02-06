@@ -18,12 +18,14 @@ use Drupal\sms\Message\SmsMessageResult;
  * Defines a logger gateway for testing and debugging.
  *
  * @SmsGateway(
- *   id = "log",
+ *   id = \Drupal\sms\Plugin\SmsGateway\LogGateway::PLUGIN_ID,
  *   label = @Translation("Drupal log"),
  *   outgoing_message_max_recipients = -1,
  * )
  */
 class LogGateway extends SmsGatewayPluginBase implements ContainerFactoryPluginInterface {
+
+  public const PLUGIN_ID = 'log';
 
   /**
    * A logger instance.

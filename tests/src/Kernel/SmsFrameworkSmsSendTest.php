@@ -8,6 +8,7 @@ use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Direction;
+use Drupal\sms\Plugin\SmsGateway\LogGateway;
 use Drupal\sms\Provider\SmsProviderInterface;
 
 /**
@@ -46,7 +47,7 @@ final class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
    */
   public function testGatewayInstall(): void {
     $this->assertEquals(
-      ['log'],
+      [LogGateway::PLUGIN_ID],
       array_keys(SmsGateway::loadMultiple())
     );
   }

@@ -54,10 +54,10 @@ final class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBas
     $this->assertSession()->responseContains(t('Enter a phone number. A verification code will be sent as an SMS message, you must enter the code into the <a href="@url">verification form</a> within @time.', $t_args));
 
     // Create verification code, wait for confirmation.
-    $edit = [
+    $this->drupalGet($test_entity->toUrl('edit-form'));
+    $this->submitForm([
       $form_field_phone_number => '+123123123',
-    ];
-    $this->drupalPostForm($test_entity->toUrl('edit-form'), $edit, t('Save'));
+    ], 'Save');
 
     $this->assertSession()->responseContains(t('A verification code has been sent to this phone number. Go to the <a href="@url">verification form</a> and enter the code. The code will expire if it is not verified in', $t_args));
 

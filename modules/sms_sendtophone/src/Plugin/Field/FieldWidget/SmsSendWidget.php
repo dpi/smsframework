@@ -12,7 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
  * Plugin implementation of the 'sms_sendtophone' widget.
  *
  * @FieldWidget(
- *   id = "sms_sendtophone",
+ *   id = \Drupal\sms_sendtophone\Plugin\Field\FieldWidget\SmsSendWidget::PLUGIN_ID,
  *   label = @Translation("Text Field and SMS send to phone"),
  *   field_types = {
  *     "text"
@@ -20,6 +20,8 @@ use Drupal\Core\Form\FormStateInterface;
  * )
  */
 class SmsSendWidget extends WidgetBase {
+
+  public const PLUGIN_ID = 'sms_sendtophone';
 
   /**
    * {@inheritdoc}
