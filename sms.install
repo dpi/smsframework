@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types = 1);
-
 /**
  * @file
  * Install, update and uninstall functions for SMS Framework.
  */
+
+declare(strict_types = 1);
 
 use Drupal\sms\Direction;
 
