@@ -23,8 +23,7 @@
   "require": {
     "php": ">=8",
     "drupal/core": "^9.4 || ^10",
-    "drupal/dynamic_entity_reference": "^3 || ^4",
-    "drupal/telephone": "*"
+    "drupal/dynamic_entity_reference": "^3 || ^4"
   },
   "replace": {
     "drupal/sms_blast": "self.version",
