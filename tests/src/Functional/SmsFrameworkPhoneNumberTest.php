@@ -106,7 +106,8 @@ final class SmsFrameworkPhoneNumberTest extends SmsFrameworkBrowserTestBase {
   protected function countVerificationCodes(EntityInterface $entity = NULL): int {
     $query = \Drupal::entityTypeManager()
       ->getStorage('sms_phone_number_verification')
-      ->getQuery();
+      ->getQuery()
+      ->accessCheck(FALSE);
 
     if ($entity) {
       $query->condition('entity__target_type', $entity->getEntityTypeId());

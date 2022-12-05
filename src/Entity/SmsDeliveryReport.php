@@ -237,6 +237,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
   public function getRevisionAtStatus($status) {
     $storage = $this->entityTypeManager()->getStorage($this->entityTypeId);
     $revision_ids = $storage->getQuery()
+      ->accessCheck(FALSE)
       ->allRevisions()
       ->condition($this->getEntityType()->getKey('id'), $this->id())
       ->condition('status', $status)

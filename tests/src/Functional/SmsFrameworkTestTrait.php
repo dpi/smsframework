@@ -263,6 +263,7 @@ trait SmsFrameworkTestTrait {
     $verification_ids = $verification_storage->getQuery()
       ->sort('created', 'DESC')
       ->range(0, 1)
+      ->accessCheck(FALSE)
       ->execute();
     $verifications = $verification_storage->loadMultiple($verification_ids);
 

@@ -221,6 +221,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
     /** @var static $phone_number_settings */
     foreach ($entities as $phone_number_settings) {
       $verification_ids += $verification_storage->getQuery()
+        ->accessCheck(FALSE)
         ->condition('entity__target_type', $phone_number_settings->getPhoneNumberEntityTypeId())
         ->condition('bundle', $phone_number_settings->getPhoneNumberBundle())
         ->execute();

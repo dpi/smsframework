@@ -22,7 +22,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
 
   /**
    * List of days in a week, starting from 'sunday' through to 'saturday'.

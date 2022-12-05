@@ -145,6 +145,7 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
   protected function buildPhoneNumberVerificationQuery($entity_type_id, $bundle) {
     return $this->phoneNumberVerificationStorage
       ->getQuery()
+      ->accessCheck(TRUE)
       ->condition('entity__target_type', $entity_type_id)
       ->condition('bundle', $bundle);
   }
