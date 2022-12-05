@@ -18,7 +18,8 @@ function sms_requirements($phase) {
   if ($phase == 'runtime') {
     $base_query = \Drupal::entityTypeManager()
       ->getStorage('sms')
-      ->getQuery();
+      ->getQuery()
+      ->accessCheck(FALSE);
 
     $query = clone $base_query;
     $count = $query

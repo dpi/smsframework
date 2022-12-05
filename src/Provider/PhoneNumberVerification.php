@@ -240,6 +240,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
       $lifetime = $config->get('verification_code_lifetime');
       if (!empty($lifetime)) {
         $verification_ids += $this->phoneNumberVerificationStorage->getQuery()
+          ->accessCheck(FALSE)
           ->condition('entity__target_type', $config->get('entity_type'))
           ->condition('bundle', $config->get('bundle'))
           ->condition('status', 0)
