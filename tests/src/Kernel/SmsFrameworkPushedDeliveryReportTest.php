@@ -14,9 +14,6 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
  */
 final class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'system', 'sms', 'entity_test', 'user', 'field', 'telephone',
     'dynamic_entity_reference', 'sms_test_gateway',
@@ -29,9 +26,6 @@ final class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase 
    */
   private RouteProviderInterface $routeProvider;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->routeProvider = $this->container->get('router.route_provider');

@@ -20,9 +20,6 @@ use Drupal\sms\Provider\SmsQueueProcessorInterface;
  */
 final class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'sms', 'sms_test_gateway', 'field', 'telephone', 'dynamic_entity_reference',
   ];
@@ -55,9 +52,6 @@ final class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
    */
   private CronInterface $cronService;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
 

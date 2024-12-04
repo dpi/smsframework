@@ -25,9 +25,6 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
 
   use AssertMailTrait;
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'system',
     'sms',
@@ -74,9 +71,6 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    */
   protected $phoneNumberSettings;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->installSchema('system', ['sequences']);

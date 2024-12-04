@@ -13,9 +13,6 @@ use Drupal\Core\Url;
  */
 final class SmsFrameworkSettingsTest extends SmsFrameworkBrowserTestBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $account = $this->drupalCreateUser([

@@ -38,9 +38,6 @@ final class SmsMessageTest extends UnitTestCase {
  */
 final class TestSmsMessage extends SmsMessage {
 
-  /**
-   * {@inheritdoc}
-   */
   protected function uuidGenerator(): UuidInterface {
     return new Php();
   }

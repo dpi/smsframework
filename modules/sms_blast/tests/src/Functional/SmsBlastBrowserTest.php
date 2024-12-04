@@ -18,14 +18,8 @@ use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
  */
 final class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = ['sms', 'user', 'sms_blast'];
 
-  /**
-   * {@inheritdoc}
-   */
   protected $defaultTheme = 'stark';
 
   /**
@@ -35,9 +29,6 @@ final class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
    */
   protected PhoneNumberSettingsInterface $phoneNumberSettings;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->drupalLogin($this->drupalCreateUser(['Send SMS Blast']));

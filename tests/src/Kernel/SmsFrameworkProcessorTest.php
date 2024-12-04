@@ -21,9 +21,6 @@ use Drupal\sms\Provider\SmsProviderInterface;
  */
 final class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'sms', 'sms_test', 'sms_test_gateway', 'field', 'telephone',
     'dynamic_entity_reference',
@@ -57,9 +54,6 @@ final class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
    */
   private SmsGatewayInterface $gatewayOutgoingResult;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
 

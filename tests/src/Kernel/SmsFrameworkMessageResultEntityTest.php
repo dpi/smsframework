@@ -23,9 +23,6 @@ final class SmsFrameworkMessageResultEntityTest extends KernelTestBase {
 
   use SmsFrameworkMessageResultTestTrait;
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'user',
     'sms',
@@ -35,9 +32,6 @@ final class SmsFrameworkMessageResultEntityTest extends KernelTestBase {
     'entity_test',
   ];
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('entity_test');
@@ -47,9 +41,6 @@ final class SmsFrameworkMessageResultEntityTest extends KernelTestBase {
     $this->installEntitySchema('sms_report');
   }
 
-  /**
-   * {@inheritdoc}
-   */
   protected function createMessageResult(): SmsMessageResultInterface {
     return SmsMessageResult::create();
   }

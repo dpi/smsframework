@@ -16,9 +16,6 @@ use Drupal\sms\Entity\SmsGatewayInterface;
  */
 final class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference',
   ];

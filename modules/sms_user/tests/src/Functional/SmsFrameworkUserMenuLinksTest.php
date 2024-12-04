@@ -15,19 +15,10 @@ use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
  */
 class SmsFrameworkUserMenuLinksTest extends SmsFrameworkBrowserTestBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = ['sms_user'];
 
-  /**
-   * {@inheritdoc}
-   */
   protected $defaultTheme = 'stark';
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $user = $this->drupalCreateUser([

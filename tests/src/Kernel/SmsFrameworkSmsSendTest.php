@@ -18,9 +18,6 @@ use Drupal\sms\Provider\SmsProviderInterface;
  */
 final class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference',
   ];
@@ -32,9 +29,6 @@ final class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
    */
   private SmsProviderInterface $defaultSmsProvider;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->defaultSmsProvider = $this->container->get('sms.provider');

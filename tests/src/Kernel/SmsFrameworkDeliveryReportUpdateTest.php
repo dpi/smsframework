@@ -24,9 +24,6 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
 
   use SmsFrameworkTestTrait;
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'sms',
     'sms_test_gateway',
@@ -42,9 +39,6 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
    */
   private SmsProviderInterface $defaultSmsProvider;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->httpClient = $this->container->get('http_client');

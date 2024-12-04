@@ -18,9 +18,6 @@ use Drupal\sms\Message\SmsMessageResultInterface;
  */
 final class MemoryOutgoingResult extends Memory {
 
-  /**
-   * {@inheritdoc}
-   */
   public function send(SmsMessageInterface $sms_message): SmsMessageResultInterface {
     $result = parent::send($sms_message);
 

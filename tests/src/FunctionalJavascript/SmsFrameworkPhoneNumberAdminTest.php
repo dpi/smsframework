@@ -17,14 +17,8 @@ final class SmsFrameworkPhoneNumberAdminTest extends WebDriverTestBase {
 
   use SmsFrameworkTestTrait;
 
-  /**
-   * {@inheritdoc}
-   */
   protected $defaultTheme = 'stark';
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = ['sms', 'block', 'entity_test'];
 
   /**
@@ -34,9 +28,6 @@ final class SmsFrameworkPhoneNumberAdminTest extends WebDriverTestBase {
    */
   protected EntityTypeManagerInterface $entityTypeManager;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->entityTypeManager = $this->container->get('entity_type.manager');

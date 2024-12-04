@@ -16,9 +16,6 @@ use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
  */
 class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'system',
     'sms',
@@ -44,9 +41,6 @@ class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
    */
   protected $gateway;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->installSchema('system', ['sequences']);

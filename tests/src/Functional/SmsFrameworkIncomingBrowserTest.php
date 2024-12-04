@@ -29,9 +29,6 @@ final class SmsFrameworkIncomingBrowserTest extends SmsFrameworkBrowserTestBase 
    */
   protected SmsGatewayInterface $incomingGateway;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->httpClient = $this->container->get('http_client');

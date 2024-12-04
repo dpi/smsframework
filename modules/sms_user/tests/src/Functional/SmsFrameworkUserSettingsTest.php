@@ -14,14 +14,8 @@ use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
  */
 class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = ['sms_user'];
 
-  /**
-   * {@inheritdoc}
-   */
   protected $defaultTheme = 'stark';
 
   /**
@@ -31,9 +25,6 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
    */
   protected array $days = [];
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $account = $this->drupalCreateUser([

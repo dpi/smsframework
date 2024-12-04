@@ -69,9 +69,6 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
     $this->configuration['widget'] = $form_state->getValue('widget');
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function send(SmsMessageInterface $sms_message): SmsMessageResultInterface {
     $gateway_id = $this->configuration['gateway_id'];
 
@@ -178,9 +175,6 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
     return $reports;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getCreditsBalance(): ?float {
     return 13.36;
   }

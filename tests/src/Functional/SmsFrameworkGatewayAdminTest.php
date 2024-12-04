@@ -17,9 +17,6 @@ use Drupal\sms\Plugin\SmsGateway\LogGateway;
  */
 final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = ['block'];
 
   /**
@@ -29,9 +26,6 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
    */
   protected ConfigEntityStorageInterface $smsGatewayStorage;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->smsGatewayStorage = \Drupal::entityTypeManager()->getStorage('sms_gateway');

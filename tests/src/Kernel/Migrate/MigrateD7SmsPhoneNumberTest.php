@@ -20,9 +20,6 @@ final class MigrateD7SmsPhoneNumberTest extends MigrateDrupal7TestBase {
 
   use MigratePhoneNumberTestTrait;
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'sms',
     'telephone',
@@ -30,9 +27,6 @@ final class MigrateD7SmsPhoneNumberTest extends MigrateDrupal7TestBase {
     'filter',
   ];
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->loadFixture(__DIR__ . '/../../../fixtures/migrate/drupal7.php');
@@ -83,9 +77,6 @@ final class MigrateD7SmsPhoneNumberTest extends MigrateDrupal7TestBase {
     return __DIR__ . '/../../../fixtures/migrate/sms_user_drupal7.php';
   }
 
-  /**
-   * {@inheritdoc}
-   */
   protected function confirmationMessageFixturePath(): string {
     return __DIR__ . '/../../../fixtures/migrate/sms_confirmation_message_d7.php';
   }

@@ -19,9 +19,6 @@ final class SmsFrameworkDeliveryReportUnitTest extends UnitTestCase {
 
   use SmsFrameworkDeliveryReportTestTrait;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function createDeliveryReport(): SmsDeliveryReportInterface {
     return new SmsDeliveryReport();
   }

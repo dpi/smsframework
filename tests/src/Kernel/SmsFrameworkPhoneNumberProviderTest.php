@@ -24,9 +24,6 @@ use Drupal\sms\Provider\PhoneNumberVerificationInterface;
  */
 final class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'sms', 'entity_test', 'user', 'field', 'telephone',
     'dynamic_entity_reference', 'sms_test_gateway',
@@ -67,9 +64,6 @@ final class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
    */
   private SmsGatewayInterface $gateway;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('entity_test');

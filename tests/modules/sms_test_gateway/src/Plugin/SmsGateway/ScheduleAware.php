@@ -26,9 +26,6 @@ final class ScheduleAware extends Memory {
     return [];
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function send(SmsMessageInterface $sms): SmsMessageResultInterface {
     if ($sms instanceof SmsMessageEntityInterface) {
       return parent::send($sms);

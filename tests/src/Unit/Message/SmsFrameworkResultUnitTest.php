@@ -19,9 +19,6 @@ final class SmsFrameworkResultUnitTest extends UnitTestCase {
 
   use SmsFrameworkMessageResultTestTrait;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function createMessageResult(): SmsMessageResultInterface {
     return new SmsMessageResult();
   }

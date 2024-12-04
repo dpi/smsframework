@@ -25,9 +25,6 @@ final class SmsFrameworkViewsTest extends ViewsKernelTestBase {
 
   use SmsFrameworkTestTrait;
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'user', 'sms', 'sms_test_gateway', 'sms_test_views', 'telephone',
     'dynamic_entity_reference', 'field',

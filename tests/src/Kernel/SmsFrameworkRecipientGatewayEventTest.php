@@ -15,9 +15,6 @@ use Drupal\sms\Provider\SmsProviderInterface;
  */
 final class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'sms', 'sms_test', 'sms_test_gateway', 'field', 'telephone',
     'dynamic_entity_reference',
@@ -30,9 +27,6 @@ final class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase
    */
   private SmsProviderInterface $smsProvider;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('sms');

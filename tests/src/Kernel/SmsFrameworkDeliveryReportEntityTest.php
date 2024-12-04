@@ -29,9 +29,6 @@ final class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
     testTimeDelivered as timeDelivered;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'user',
     'sms',
@@ -41,9 +38,6 @@ final class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
     'entity_test',
   ];
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('entity_test');
@@ -53,9 +47,6 @@ final class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
     $this->installEntitySchema('sms_report');
   }
 
-  /**
-   * {@inheritdoc}
-   */
   protected function createDeliveryReport(): BaseSmsDeliveryReportInterface {
     return SmsDeliveryReport::create();
   }

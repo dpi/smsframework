@@ -19,9 +19,6 @@ abstract class SmsFrameworkBrowserTestBase extends BrowserTestBase {
 
   use SmsFrameworkTestTrait;
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'sms',
     'sms_test_gateway',
@@ -29,9 +26,6 @@ abstract class SmsFrameworkBrowserTestBase extends BrowserTestBase {
     'dynamic_entity_reference',
   ];
 
-  /**
-   * {@inheritdoc}
-   */
   protected $defaultTheme = 'stark';
 
   /**
@@ -48,9 +42,6 @@ abstract class SmsFrameworkBrowserTestBase extends BrowserTestBase {
    */
   protected SmsProviderInterface $defaultSmsProvider;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->gatewayManager = $this->container->get('plugin.manager.sms_gateway');

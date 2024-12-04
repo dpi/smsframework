@@ -14,14 +14,8 @@ use Drupal\sms\Message\SmsMessageInterface;
  */
 final class SmsFrameworkPhoneNumberTest extends SmsFrameworkBrowserTestBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = ['entity_test'];
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);

@@ -18,14 +18,8 @@ use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
  */
 final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = ['sms_devel'];
 
-  /**
-   * {@inheritdoc}
-   */
   protected $defaultTheme = 'stark';
 
   /**
@@ -35,9 +29,6 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
    */
   protected SmsGatewayInterface $gateway;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
 

@@ -20,9 +20,6 @@ use Drupal\user\Entity\User;
  */
 class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'sms',
     'sms_user',
@@ -45,9 +42,6 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    */
   protected $smsProvider;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->activeHoursService = $this->container->get('sms_user.active_hours');

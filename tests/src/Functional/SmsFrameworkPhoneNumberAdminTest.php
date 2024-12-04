@@ -16,9 +16,6 @@ use Drupal\sms\Entity\PhoneNumberVerification;
  */
 final class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = ['block', 'entity_test'];
 
   /**
@@ -28,9 +25,6 @@ final class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase
    */
   protected EntityTypeManagerInterface $entityTypeManager;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->entityTypeManager = $this->container->get('entity_type.manager');

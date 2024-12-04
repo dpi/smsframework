@@ -22,9 +22,6 @@ use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
  */
 final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'sms',
     'sms_sendtophone',
@@ -34,9 +31,6 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
     'field_ui',
   ];
 
-  /**
-   * {@inheritdoc}
-   */
   protected $defaultTheme = 'stark';
 
   /**
@@ -53,9 +47,6 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
    */
   protected PhoneNumberSettingsInterface $phoneNumberSettings;
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
 

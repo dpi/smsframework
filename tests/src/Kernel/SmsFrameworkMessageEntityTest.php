@@ -32,18 +32,12 @@ final class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     testUid as originalUid;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = [
     'sms', 'sms_test_gateway', 'telephone', 'dynamic_entity_reference', 'user',
     'sms_test_time',
     'entity_test',
   ];
 
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('sms');
@@ -74,9 +68,6 @@ final class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     static::assertTrue(\in_array('message', $sms_message->validate()->getFieldNames()));
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function testUid(): void {
     // User must exist or setUid will throw an exception.
     User::create(['uid' => 22, 'name' => 'user'])
