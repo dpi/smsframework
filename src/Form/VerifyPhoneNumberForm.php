@@ -61,7 +61,6 @@ class VerifyPhoneNumberForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-
     $form['code'] = [
       '#title' => $this->t('Verification code'),
       '#description' => $this->t('Enter the code you received from a SMS message.'),

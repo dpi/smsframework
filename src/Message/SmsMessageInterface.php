@@ -163,7 +163,7 @@ interface SmsMessageInterface {
    * @return $this
    *   The called SMS message object.
    */
-  public function setResult(SmsMessageResultInterface $result = NULL);
+  public function setResult(?SmsMessageResultInterface $result = NULL);
 
   /**
    * Gets the name of the sender of this SMS message.

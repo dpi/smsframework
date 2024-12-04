@@ -32,7 +32,7 @@ class RouteSubscriber implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('config.factory')
+      $container->get('config.factory'),
     );
   }
 
@@ -58,7 +58,7 @@ class RouteSubscriber implements ContainerInjectionInterface {
         ],
         [
           '_permission' => 'sms verify phone number',
-        ]
+        ],
       ));
     }
 

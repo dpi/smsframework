@@ -103,7 +103,7 @@ final class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
     $this->assertSession()->pageTextContains('Message sent to 3 users.');
 
     // Get the resulting message that was sent and confirm.
-    $this->assertCount(3, $this->getTestMessages($this->gateway), 'Sent three messages.');
+    static::assertCount(3, $this->getTestMessages($this->gateway), 'Sent three messages.');
   }
 
 }

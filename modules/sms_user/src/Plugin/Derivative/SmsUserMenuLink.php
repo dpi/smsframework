@@ -32,7 +32,7 @@ class SmsUserMenuLink extends DeriverBase implements ContainerDeriverInterface {
    */
   public static function create(ContainerInterface $container, $base_plugin_id) {
     return new static(
-      $container->get('sms.phone_number.verification')
+      $container->get('sms.phone_number.verification'),
     );
   }
 

@@ -69,7 +69,7 @@ class PhoneNumberSettings extends EntityConfigBase {
     PhoneNumberSettingsForm::createNewField(
       $phone_number_settings->getPhoneNumberEntityTypeId(),
       $phone_number_settings->getPhoneNumberBundle(),
-      $phone_number_settings->getFieldName('phone_number')
+      $phone_number_settings->getFieldName('phone_number'),
     );
   }
 

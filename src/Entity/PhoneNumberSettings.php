@@ -195,7 +195,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    * {@inheritdoc}
    */
   public function getFieldName($map) {
-    return isset($this->fields[$map]) ? $this->fields[$map] : NULL;
+    return $this->fields[$map] ?? NULL;
   }
 
   /**
@@ -240,7 +240,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
       $field_config = FieldConfig::loadByName(
         $this->getPhoneNumberEntityTypeId(),
         $this->getPhoneNumberBundle(),
-        $field_name
+        $field_name,
       );
       if ($field_config) {
         $this->addDependency('config', $field_config->getConfigDependencyName());

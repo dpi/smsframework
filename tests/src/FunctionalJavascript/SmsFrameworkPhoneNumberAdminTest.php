@@ -49,7 +49,6 @@ final class SmsFrameworkPhoneNumberAdminTest extends WebDriverTestBase {
       'administer smsframework',
     ]);
     $this->drupalLogin($account);
-
   }
 
   /**

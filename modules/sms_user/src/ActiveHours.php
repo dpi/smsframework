@@ -103,14 +103,14 @@ class ActiveHours implements ActiveHoursInterface {
     foreach ($this->ranges as $range) {
       $dates[] = new ActiveHoursDates(
         new DrupalDateTime($range['start'], $timezone),
-        new DrupalDateTime($range['end'], $timezone)
+        new DrupalDateTime($range['end'], $timezone),
       );
     }
 
     // Sort so nearest date is closest.
     // Can't do this in build() since computed relative dates can be different
     // per timezone.
-    usort($dates, function ($a, $b) {
+    usort($dates, static function ($a, $b) {
       if ($a->getStartDate() == $b->getStartDate()) {
         return 0;
       }

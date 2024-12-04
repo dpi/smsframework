@@ -35,7 +35,7 @@ function sms_requirements($phase) {
       'value' => \Drupal::translation()->formatPlural(
         $count,
         'There are @count messages in the incoming queue.',
-        'There are @count messages in the incoming queue.'
+        'There are @count messages in the incoming queue.',
       ),
     ];
 
@@ -53,7 +53,7 @@ function sms_requirements($phase) {
       'value' => \Drupal::translation()->formatPlural(
         $count,
         'There are @count messages in the outgoing queue.',
-        'There are @count messages in the outgoing queue.'
+        'There are @count messages in the outgoing queue.',
       ),
     ];
   }

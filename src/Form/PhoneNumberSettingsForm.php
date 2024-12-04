@@ -335,7 +335,7 @@ class PhoneNumberSettingsForm extends EntityForm {
     if ($entity_form_display) {
       $entity_form_display->setComponent(
         $field_name,
-        $definitions['form_display'][$config_key]
+        $definitions['form_display'][$config_key],
       );
       $entity_form_display->save();
     }

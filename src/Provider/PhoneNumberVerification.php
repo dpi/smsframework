@@ -257,7 +257,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
           $purge = $config->getPurgeVerificationPhoneNumber();
           $field_name = $config->getFieldName('phone_number');
           if (!empty($purge) && isset($entity->{$field_name})) {
-            $entity->{$field_name}->filter(function ($item) use ($phone_number_verification) {
+            $entity->{$field_name}->filter(static function ($item) use ($phone_number_verification) {
               return $item->value != $phone_number_verification->getPhoneNumber();
             });
             $entity->save();

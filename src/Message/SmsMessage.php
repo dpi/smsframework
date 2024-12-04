@@ -277,7 +277,7 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function setResult(SmsMessageResultInterface $result = NULL) {
+  public function setResult(?SmsMessageResultInterface $result = NULL) {
     $this->result = $result;
     return $this;
   }

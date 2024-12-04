@@ -24,7 +24,7 @@ trait SmsFrameworkTestTrait {
    * @param \Drupal\sms\Entity\SmsGatewayInterface|null $sms_gateway
    *   The new site fallback SMS Gateway, or NULL to unset.
    */
-  protected function setFallbackGateway(SmsGatewayInterface $sms_gateway = NULL) {
+  protected function setFallbackGateway(?SmsGatewayInterface $sms_gateway = NULL) {
     $sms_gateway = $sms_gateway?->id();
     $this->config('sms.settings')
       ->set('fallback_gateway', $sms_gateway)
@@ -65,7 +65,7 @@ trait SmsFrameworkTestTrait {
   public function getTestMessages(SmsGatewayInterface $sms_gateway): array {
     $gateway_id = $sms_gateway->id();
     $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
-    return isset($sms_messages[$gateway_id]) ? $sms_messages[$gateway_id] : [];
+    return $sms_messages[$gateway_id] ?? [];
   }
 
   /**
@@ -89,7 +89,7 @@ trait SmsFrameworkTestTrait {
    * @param \Drupal\sms\Entity\SmsGatewayInterface|null $sms_gateway
    *   A gateway plugin, or NULL to reset all messages.
    */
-  public function resetTestMessages(SmsGatewayInterface $sms_gateway = NULL) {
+  public function resetTestMessages(?SmsGatewayInterface $sms_gateway = NULL) {
     $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
     if ($sms_gateway) {
       $sms_messages[$sms_gateway->id()] = [];
@@ -112,7 +112,7 @@ trait SmsFrameworkTestTrait {
   protected function getIncomingMessages(SmsGatewayInterface $sms_gateway): array {
     $gateway_id = $sms_gateway->id();
     $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.incoming', []);
-    return isset($sms_messages[$gateway_id]) ? $sms_messages[$gateway_id] : [];
+    return $sms_messages[$gateway_id] ?? [];
   }
 
   /**
@@ -136,7 +136,7 @@ trait SmsFrameworkTestTrait {
    * @param \Drupal\sms\Entity\SmsGatewayInterface|null $sms_gateway
    *   A gateway plugin, or NULL to reset all messages.
    */
-  protected function resetIncomingMessages(SmsGatewayInterface $sms_gateway = NULL) {
+  protected function resetIncomingMessages(?SmsGatewayInterface $sms_gateway = NULL) {
     $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.incoming', []);
     if ($sms_gateway) {
       $sms_messages[$sms_gateway->id()] = [];
@@ -159,7 +159,7 @@ trait SmsFrameworkTestTrait {
   protected function getTestMessageReports(SmsGatewayInterface $sms_gateway): array {
     $gateway_id = $sms_gateway->id();
     $sms_reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
-    return isset($sms_reports[$gateway_id]) ? $sms_reports[$gateway_id] : [];
+    return $sms_reports[$gateway_id] ?? [];
   }
 
   /**
@@ -281,11 +281,11 @@ trait SmsFrameworkTestTrait {
    */
   protected function createMessageResult(SmsMessageInterface $sms_message): SmsMessageResult {
     $reports = array_map(
-      function ($recipient) {
+      static function ($recipient) {
         return (new SmsDeliveryReport())
           ->setRecipient($recipient);
       },
-      $sms_message->getRecipients()
+      $sms_message->getRecipients(),
     );
 
     return (new SmsMessageResult())
@@ -317,7 +317,7 @@ trait SmsFrameworkTestTrait {
    *   An array of phone numbers.
    */
   protected function randomPhoneNumbers($quantity = NULL): array {
-    $quantity = isset($quantity) ? $quantity : rand(2, 20);
+    $quantity = $quantity ?? rand(2, 20);
     $numbers = [];
     for ($i = 0; $i < $quantity; $i++) {
       $numbers[] = '+' . rand(1000, 999999999);

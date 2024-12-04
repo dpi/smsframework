@@ -111,10 +111,10 @@ class SmsMessageProcessor implements EventSubscriberInterface {
 
     $message_recipients = $sms_message->getRecipients();
     $result_recipients = array_map(
-      function (SmsDeliveryReportInterface $report) {
+      static function (SmsDeliveryReportInterface $report) {
         return $report->getRecipient();
       },
-      $result->getReports()
+      $result->getReports(),
     );
 
     $difference_count = count(array_diff($message_recipients, $result_recipients));

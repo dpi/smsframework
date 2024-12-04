@@ -49,7 +49,8 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   Time.
    */
-  public function __construct(array $configuration,
+  public function __construct(
+    array $configuration,
     $plugin_id,
     array $plugin_definition,
     EntityTypeManagerInterface $entity_type_manager,

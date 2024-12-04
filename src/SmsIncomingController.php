@@ -36,7 +36,7 @@ class SmsIncomingController extends ControllerBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('http_kernel.controller.argument_resolver'),
-      $container->get('sms.provider')
+      $container->get('sms.provider'),
     );
   }
 

@@ -118,7 +118,7 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
     $this->drupalGet('admin/config/smsframework/sendtophone');
     $this->submitForm($edit, 'Save configuration');
     $saved = $this->config('sms_sendtophone.settings')->get('content_types', []);
-    $this->assertEquals($expected, $saved);
+    static::assertEquals($expected, $saved);
 
     // Create a new node with sendtophone enabled and verify that the button is
     // added.
@@ -150,8 +150,8 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
     $this->submitForm(['number' => $phone_number], 'Send');
 
     $sms_message = $this->getLastTestMessage($this->gateway);
-    $this->assertTrue(in_array($phone_number, $sms_message->getRecipients()));
-    $this->assertEquals($sms_message->getMessage(), $node->toUrl()->setAbsolute()->toString());
+    static::assertTrue(in_array($phone_number, $sms_message->getRecipients()));
+    static::assertEquals($sms_message->getMessage(), $node->toUrl()->setAbsolute()->toString());
   }
 
   /**
@@ -204,7 +204,7 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
     $this->submitForm([], 'Send');
 
     $sms_message = $this->getLastTestMessage($this->gateway);
-    $this->assertEquals($sms_message->getMessage(), $node_body, 'Message body "' . $node_body . '" successfully sent.');
+    static::assertEquals($sms_message->getMessage(), $node_body, 'Message body "' . $node_body . '" successfully sent.');
   }
 
   /**
@@ -274,8 +274,8 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
     $this->submitForm([], 'Send');
 
     $sms_message = $this->getLastTestMessage($this->gateway);
-    $this->assertTrue(in_array($phone_number, $sms_message->getRecipients()), 'Message sent to correct number');
-    $this->assertEquals($sms_message->getMessage(), $random_text, 'Field content sent to user');
+    static::assertTrue(in_array($phone_number, $sms_message->getRecipients()), 'Message sent to correct number');
+    static::assertEquals($sms_message->getMessage(), $random_text, 'Field content sent to user');
   }
 
 }

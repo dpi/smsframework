@@ -49,7 +49,8 @@ class LogGateway extends SmsGatewayPluginBase implements ContainerFactoryPluginI
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   Time.
    */
-  public function __construct(array $configuration,
+  public function __construct(
+    array $configuration,
     $plugin_id,
     array $plugin_definition,
     LoggerChannelFactoryInterface $logger_factory,
