@@ -260,7 +260,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
     return match ($direction) {
       Direction::INCOMING => (int) $this->retention_duration_incoming,
       Direction::OUTGOING => (int) $this->retention_duration_outgoing,
-      default => throw new \InvalidArgumentException(sprintf('%s is not a valid direction.', $direction)),
+      default => throw new \InvalidArgumentException(\sprintf('%s is not a valid direction.', $direction)),
     };
   }
 

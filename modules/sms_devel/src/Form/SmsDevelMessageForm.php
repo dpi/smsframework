@@ -74,7 +74,7 @@ class SmsDevelMessageForm extends FormBase {
     $results = $form_state->getTemporaryValue('results');
 
     if ($results) {
-      $form = array_merge($form, $this->verboseResults($results));
+      $form = \array_merge($form, $this->verboseResults($results));
     }
 
     $form['number'] = [
@@ -272,7 +272,7 @@ class SmsDevelMessageForm extends FormBase {
         '@message' => $status_message,
       ]));
     }
-    elseif ($report_count = count($result->getReports())) {
+    elseif ($report_count = \count($result->getReports())) {
       $this->messenger()->addMessage($this->t('Message was processed, @count delivery reports were generated.', [
         '@count' => $report_count,
       ]));
@@ -365,7 +365,7 @@ class SmsDevelMessageForm extends FormBase {
 
       $render['results'][][] = [
         '#wrapper_attributes' => [
-          'colspan' => count($render['results']['#header']),
+          'colspan' => \count($render['results']['#header']),
         ],
         'data' => $reports_cell,
       ];

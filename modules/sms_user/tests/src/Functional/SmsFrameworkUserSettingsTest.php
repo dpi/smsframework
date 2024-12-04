@@ -43,7 +43,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
 
     // Build list of days.
     $date = new \DateTime('next Sunday');
-    while (($day = strtolower($date->format('l'))) && !in_array($day, $this->days)) {
+    while (($day = \strtolower($date->format('l'))) && !\in_array($day, $this->days)) {
       $this->days[] = $day;
       $date->modify('+1 day');
     }
@@ -306,10 +306,10 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
     $this->assertSession()->responseContains('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings. <a href="' . Url::fromRoute('entity.phone_number_settings.add')->toString() . '">Add phone number settings</a>.', 'Warning message displayed for no phone number settings.');
 
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="all"]');
-    static::assertTrue(count($input) === 1, "The 'All unrecognised phone numbers' radio is disabled.");
+    static::assertTrue(\count($input) === 1, "The 'All unrecognised phone numbers' radio is disabled.");
 
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="incoming_pattern"]');
-    static::assertTrue(count($input) === 1, "The 'incoming_pattern' radio is disabled.");
+    static::assertTrue(\count($input) === 1, "The 'incoming_pattern' radio is disabled.");
   }
 
   /**
@@ -323,10 +323,10 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
     $this->assertSession()->responseNotContains('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings.', 'Warning message displayed for no phone number settings.');
 
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="all"]');
-    static::assertTrue(count($input) === 0, "The 'All unrecognised phone numbers' radio is not disabled.");
+    static::assertTrue(\count($input) === 0, "The 'All unrecognised phone numbers' radio is not disabled.");
 
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="incoming_pattern"]');
-    static::assertTrue(count($input) === 0, "The 'incoming_pattern' radio is not disabled.");
+    static::assertTrue(\count($input) === 0, "The 'incoming_pattern' radio is not disabled.");
   }
 
 }

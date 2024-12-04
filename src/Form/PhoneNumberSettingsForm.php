@@ -111,7 +111,7 @@ class PhoneNumberSettingsForm extends EntityForm {
     $field_options['boolean'][self::CREATE_NEW_FIELD] = $this->t('- Create a new boolean field -');
 
     if ($entity_bundle = $form_state->getValue('entity_bundle', $bundle_default_value ?: NULL)) {
-      [$entity_type_id, $bundle] = explode('|', $entity_bundle);
+      [$entity_type_id, $bundle] = \explode('|', $entity_bundle);
       if (!empty($entity_type_id) && !empty($bundle)) {
         $field_definitions = $this->entityFieldManager
           ->getFieldDefinitions($entity_type_id, $bundle);
@@ -176,7 +176,7 @@ class PhoneNumberSettingsForm extends EntityForm {
         $token = "[$token:*]";
       }
       $form['message']['tokens']['list'] = [
-        '#markup' => $this->t('Available tokens include: @token_types', ['@token_types' => implode(' ', $tokens)]),
+        '#markup' => $this->t('Available tokens include: @token_types', ['@token_types' => \implode(' ', $tokens)]),
       ];
     }
 
@@ -217,7 +217,7 @@ class PhoneNumberSettingsForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $config = &$this->entity;
 
-    [$entity_type_id, $bundle] = explode('|', $form_state->getValue('entity_bundle'));
+    [$entity_type_id, $bundle] = \explode('|', $form_state->getValue('entity_bundle'));
     $config
       ->setPhoneNumberEntityTypeId($entity_type_id)
       ->setPhoneNumberBundle($bundle);

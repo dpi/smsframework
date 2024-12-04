@@ -74,9 +74,9 @@ final class Incoming extends SmsGatewayPluginBase {
         ->setResult($result);
 
       foreach ($sms_properties as $property => $method) {
-        if (array_key_exists($property, $raw_message)) {
+        if (\array_key_exists($property, $raw_message)) {
           $value = $raw_message[$property];
-          call_user_func_array([$message, $method], [$value]);
+          \call_user_func_array([$message, $method], [$value]);
         }
       }
 

@@ -126,11 +126,11 @@ class SmsMessageResult implements SmsMessageResultInterface {
    * {@inheritdoc}
    */
   public function setCreditsBalance($balance) {
-    if (is_numeric($balance) || is_null($balance)) {
+    if (\is_numeric($balance) || \is_null($balance)) {
       $this->creditsBalance = $balance;
     }
     else {
-      throw new SmsException(sprintf('Credit balance set is a %s', gettype($balance)));
+      throw new SmsException(\sprintf('Credit balance set is a %s', \gettype($balance)));
     }
     return $this;
   }
@@ -146,11 +146,11 @@ class SmsMessageResult implements SmsMessageResultInterface {
    * {@inheritdoc}
    */
   public function setCreditsUsed($credits_used) {
-    if (is_numeric($credits_used) || is_null($credits_used)) {
+    if (\is_numeric($credits_used) || \is_null($credits_used)) {
       $this->creditsUsed = $credits_used;
     }
     else {
-      throw new SmsException(sprintf('Credit used is a %s', gettype($credits_used)));
+      throw new SmsException(\sprintf('Credit used is a %s', \gettype($credits_used)));
     }
     return $this;
   }

@@ -52,7 +52,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
     }
 
     $sms_message = SmsMessageEntity::convertFromSmsMessage($sms_message)
-      ->addRecipient(reset($phone_numbers))
+      ->addRecipient(\reset($phone_numbers))
       ->setRecipientEntity($entity)
       ->setDirection(Direction::OUTGOING);
 

@@ -38,7 +38,7 @@ final class SmsFrameworkPhoneNumberTest extends SmsFrameworkBrowserTestBase {
 
     $phone_numbers = ['+123123123', '+456456456', '+789789789'];
     for ($quantity = 1; $quantity < 3; $quantity++) {
-      $test_entity = $this->createEntityWithPhoneNumber($phone_number_settings, array_slice($phone_numbers, 0, $quantity));
+      $test_entity = $this->createEntityWithPhoneNumber($phone_number_settings, \array_slice($phone_numbers, 0, $quantity));
 
       static::assertEquals($quantity, $this->countVerificationCodes($test_entity), 'There is ' . $quantity . ' verification code.');
 

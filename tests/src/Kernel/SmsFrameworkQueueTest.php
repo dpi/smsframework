@@ -104,7 +104,7 @@ final class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
     static::assertCount(0, $this->getTestMessages($this->gateway), 'Message not received yet.');
 
     $this->cronService->run();
-    static::assertEquals($sms_message->getMessage(), sms_test_gateway_get_incoming()['message'], 'Message was received.');
+    static::assertEquals($sms_message->getMessage(), \sms_test_gateway_get_incoming()['message'], 'Message was received.');
   }
 
   /**
@@ -182,7 +182,7 @@ final class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
 
     $this->cronService->run();
     $sms_messages = SmsMessage::loadMultiple();
-    $sms_message_new = reset($sms_messages);
+    $sms_message_new = \reset($sms_messages);
 
     static::assertCount(1, $this->getTestMessages($this->gateway), 'One message was sent.');
     static::assertCount(1, $sms_messages, 'There are SMS entities in storage.');

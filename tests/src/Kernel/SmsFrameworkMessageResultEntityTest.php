@@ -60,8 +60,8 @@ final class SmsFrameworkMessageResultEntityTest extends KernelTestBase {
   public function testSaveAndRetrieveResult(): void {
     /** @var \Drupal\sms\Entity\SmsMessageResult $result */
     $result = $this->createMessageResult()
-      ->setCreditsUsed(rand(5, 10))
-      ->setCreditsBalance(rand(10, 20))
+      ->setCreditsUsed(\rand(5, 10))
+      ->setCreditsBalance(\rand(10, 20))
       ->setError(SmsMessageResultStatus::INVALID_SENDER)
       ->setErrorMessage('Invalid sender ID')
       ->setReports([SmsDeliveryReport::create()->setRecipient('1234567890')]);
@@ -91,8 +91,8 @@ final class SmsFrameworkMessageResultEntityTest extends KernelTestBase {
     $this->expectExceptionMessage('No parent SMS message specified for SMS message result');
     /** @var \Drupal\sms\Entity\SmsMessageResult $result */
     $result = $this->createMessageResult()
-      ->setCreditsUsed(rand(5, 10))
-      ->setCreditsBalance(rand(10, 20))
+      ->setCreditsUsed(\rand(5, 10))
+      ->setCreditsBalance(\rand(10, 20))
       ->setError(SmsMessageResultStatus::INVALID_SENDER)
       ->setErrorMessage('Invalid sender ID')
       ->setReports([SmsDeliveryReport::create()->setRecipient('1234567890')]);

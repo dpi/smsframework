@@ -104,7 +104,7 @@ class SmsBlastForm extends FormBase {
     /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $verification */
     foreach ($this->phoneNumberVerificationStorage->loadMultiple($ids) as $verification) {
       // Ensure entity exists and one message is sent to each entity.
-      if (($entity = $verification->getEntity()) && !in_array($entity->id(), $entity_ids)) {
+      if (($entity = $verification->getEntity()) && !\in_array($entity->id(), $entity_ids)) {
         $entity_ids[] = $entity->id();
 
         try {

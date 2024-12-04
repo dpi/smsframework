@@ -28,12 +28,12 @@ final class MemoryOutgoingResult extends Memory {
     if ($delete_reports > 0) {
       $reports = $result->getReports();
 
-      if (!count($reports)) {
+      if (!\count($reports)) {
         throw new \Exception('There are no reports to delete.');
       }
 
       // Slice off the first {$delete_reports}x reports.
-      $reports = array_slice($reports, $delete_reports);
+      $reports = \array_slice($reports, $delete_reports);
 
       $result->setReports($reports);
       return $result;

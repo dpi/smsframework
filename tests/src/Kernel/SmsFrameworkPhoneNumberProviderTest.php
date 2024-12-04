@@ -82,7 +82,7 @@ final class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
 
     $this->phoneField = FieldStorageConfig::create([
       'entity_type' => 'entity_test',
-      'field_name' => mb_strtolower($this->randomMachineName()),
+      'field_name' => \mb_strtolower($this->randomMachineName()),
       'type' => 'telephone',
     ]);
     $this->phoneField->save();
@@ -112,7 +112,7 @@ final class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
 
     // Test zero, one, multiple phone numbers.
     for ($i = 0; $i < 3; $i++) {
-      $phone_numbers = array_slice($phone_numbers_all, 0, $i);
+      $phone_numbers = \array_slice($phone_numbers_all, 0, $i);
       $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
 
       $return = $this->phoneNumberProvider->getPhoneNumbers($entity, NULL);
@@ -136,18 +136,18 @@ final class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
 
     // Test zero, one, multiple phone numbers.
     for ($i = 0; $i < 3; $i++) {
-      $phone_numbers = array_slice($phone_numbers_all, 0, $i);
+      $phone_numbers = \array_slice($phone_numbers_all, 0, $i);
       $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, $phone_numbers);
 
       // Ensures test verifications don't leak between entities. array_values()
       // resets array keys since they are not important, assertEquals() normally
       // asserts keys.
-      $phone_number_verified = array_values(array_slice($phone_numbers, 0, 1, TRUE));
-      $phone_number_unverified = array_values(array_slice($phone_numbers, 1, $i, TRUE));
+      $phone_number_verified = \array_values(\array_slice($phone_numbers, 0, 1, TRUE));
+      $phone_number_unverified = \array_values(\array_slice($phone_numbers, 1, $i, TRUE));
 
       // Verify first phone number.
       if (!empty($phone_number_verified)) {
-        $this->verifyPhoneNumber($entity, reset($phone_number_verified));
+        $this->verifyPhoneNumber($entity, \reset($phone_number_verified));
       }
 
       $return = $this->phoneNumberProvider->getPhoneNumbers($entity, NULL);

@@ -48,7 +48,7 @@ final class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
   public function testGatewayInstall(): void {
     static::assertEquals(
       [LogGateway::PLUGIN_ID],
-      array_keys(SmsGateway::loadMultiple()),
+      \array_keys(SmsGateway::loadMultiple()),
     );
   }
 

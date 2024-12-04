@@ -201,7 +201,7 @@ trait SmsFrameworkMessageTestTrait {
   public function testResults(): void {
     $error_message = $this->getRandomGenerator()->string();
     $recipients = ['2345678901', '1234567890'];
-    $reports = array_combine($recipients, array_map(static function ($recipient) {
+    $reports = \array_combine($recipients, \array_map(static function ($recipient) {
       return (new SmsDeliveryReport())
         ->setRecipient($recipient)
         ->setStatus(SmsMessageReportStatus::DELIVERED);

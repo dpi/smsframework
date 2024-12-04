@@ -139,7 +139,7 @@ final class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
       'recipient' => '1234567890',
     ]);
     static::assertCount(1, $saved);
-    $saved = reset($saved);
+    $saved = \reset($saved);
     static::assertEquals($report->getRecipient(), $saved->getRecipient());
     static::assertEquals($report->getMessageId(), $saved->getMessageId());
     static::assertEquals($report->getStatus(), $saved->getStatus());

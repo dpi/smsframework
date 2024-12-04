@@ -38,7 +38,7 @@ class SmsGatewayListBuilder extends ConfigEntityListBuilder {
    */
   public function render() {
     $render = parent::render();
-    $render['table']['#empty'] = t('No gateways found.');
+    $render['table']['#empty'] = \t('No gateways found.');
     return $render;
   }
 

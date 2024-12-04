@@ -33,8 +33,8 @@ final class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkBrowserTestBas
     $this->drupalLogin($account);
     $this->drupalGet(Url::fromRoute('sms.phone.verify'));
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains(t('Verify a phone number'));
-    $this->assertSession()->pageTextContains(t('Enter the code you received from a SMS message.'));
+    $this->assertSession()->pageTextContains(\t('Verify a phone number'));
+    $this->assertSession()->pageTextContains(\t('Enter the code you received from a SMS message.'));
   }
 
   /**
@@ -61,13 +61,13 @@ final class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkBrowserTestBas
     $edit['code'] = $this->randomMachineName();
     $this->drupalGet(Url::fromRoute('sms.phone.verify'));
     $this->submitForm($edit, 'Verify code');
-    $this->assertSession()->pageTextContains(t('Invalid verification code.'));
+    $this->assertSession()->pageTextContains(\t('Invalid verification code.'));
 
     // Valid code.
     $edit['code'] = $code;
     $this->drupalGet(Url::fromRoute('sms.phone.verify'));
     $this->submitForm($edit, 'Verify code');
-    $this->assertSession()->pageTextContains(t('Phone number is now verified.'));
+    $this->assertSession()->pageTextContains(\t('Phone number is now verified.'));
 
     // Reset verification code static cache.
     $this->resetAll();
@@ -92,10 +92,10 @@ final class SmsFrameworkPhoneNumberVerifyForm extends SmsFrameworkBrowserTestBas
     $edit['code'] = $this->randomMachineName();
     $this->drupalGet(Url::fromRoute('sms.phone.verify'));
     $this->submitForm($edit, 'Verify code');
-    $this->assertSession()->responseNotContains(t('There has been too many failed verification attempts. Try again later.'));
+    $this->assertSession()->responseNotContains(\t('There has been too many failed verification attempts. Try again later.'));
     $this->drupalGet(Url::fromRoute('sms.phone.verify'));
     $this->submitForm($edit, 'Verify code');
-    $this->assertSession()->pageTextContains(t('There has been too many failed verification attempts. Try again later.'));
+    $this->assertSession()->pageTextContains(\t('There has been too many failed verification attempts. Try again later.'));
   }
 
   /**

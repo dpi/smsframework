@@ -47,7 +47,7 @@ final class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
 
     $phone_field = FieldStorageConfig::create([
       'entity_type' => 'user',
-      'field_name' => mb_strtolower($this->randomMachineName()),
+      'field_name' => \mb_strtolower($this->randomMachineName()),
       'type' => 'telephone',
     ]);
     $phone_field->save();
@@ -85,9 +85,9 @@ final class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
     }
 
     // Verify three of the users randomly.
-    $numbers = range(0, count($entities) - 1);
-    shuffle($numbers);
-    foreach (array_slice($numbers, 0, 3) as $i) {
+    $numbers = \range(0, \count($entities) - 1);
+    \shuffle($numbers);
+    foreach (\array_slice($numbers, 0, 3) as $i) {
       $this->verifyPhoneNumber($entities[$i], $phone_numbers[0]);
     }
 
@@ -98,7 +98,7 @@ final class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
     $edit['message'] = $this->randomString();
 
     $this->drupalGet(Url::fromRoute('sms_blast.blast'));
-    $this->submitForm($edit, t('Send'));
+    $this->submitForm($edit, \t('Send'));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('Message sent to 3 users.');
 

@@ -86,7 +86,7 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
     static::assertEquals(SmsMessageReportStatus::QUEUED, $saved_reports[2]->getStatus());
 
     /** @var \Drupal\sms\Message\SmsDeliveryReportInterface $first_report */
-    $first_report = reset($saved_reports);
+    $first_report = \reset($saved_reports);
     static::assertEquals($request_time, $first_report->getStatusTime());
 
     $message_id = $first_report->getMessageId();

@@ -57,7 +57,7 @@ class SmsIncomingController extends ControllerBase {
       ->getArguments($request, $controller);
 
     /** @var \Drupal\sms\SmsProcessingResponse $response */
-    $response = call_user_func_array($controller, $arguments);
+    $response = \call_user_func_array($controller, $arguments);
 
     foreach ($response->getMessages() as $message) {
       $this->smsProvider->queue($message);

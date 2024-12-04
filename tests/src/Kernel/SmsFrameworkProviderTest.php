@@ -133,7 +133,7 @@ final class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
     $sms_messages = $this->smsProvider->incoming($sms_message);
 
-    static::assertEquals($message, sms_test_gateway_get_incoming()['message'], 'Message was received.');
+    static::assertEquals($message, \sms_test_gateway_get_incoming()['message'], 'Message was received.');
     static::assertCount(1, $sms_messages, 'Return value contains 1 item.');
     static::assertTrue($sms_messages[0] instanceof StandardSmsMessageInterface, 'Return value is a SMS message.');
     static::assertTrue($sms_messages[0]->getResult() instanceof SmsMessageResultInterface);
@@ -292,7 +292,7 @@ final class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
       ->loadByProperties(['direction' => Direction::INCOMING]);
     static::assertCount(1, $sms_messages, 'There is one SMS message in the incoming queue.');
 
-    $sms_message_loaded = reset($sms_messages);
+    $sms_message_loaded = \reset($sms_messages);
     static::assertEquals(Direction::INCOMING, $sms_message_loaded->getDirection());
   }
 
@@ -316,7 +316,7 @@ final class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
       ->loadByProperties(['direction' => Direction::OUTGOING]);
     static::assertCount(1, $sms_messages, 'There is one SMS message in the outgoing queue.');
 
-    $sms_message_loaded = reset($sms_messages);
+    $sms_message_loaded = \reset($sms_messages);
     static::assertEquals(Direction::OUTGOING, $sms_message_loaded->getDirection());
   }
 

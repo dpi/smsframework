@@ -70,7 +70,7 @@ class AdminOverviewForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->config('sms_sendtophone.settings')
-      ->set('content_types', array_filter($form_state->getValue('content_types')))
+      ->set('content_types', \array_filter($form_state->getValue('content_types')))
       ->save();
 
     $this->messenger()->addMessage($this->t('The configuration options have been saved.'));

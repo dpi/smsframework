@@ -50,7 +50,7 @@ final class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase
    */
   public function testPhoneNumberList(): void {
     $this->drupalGet('admin/config/smsframework/phone_number');
-    $this->assertSession()->responseContains(t('No phone number settings found.'));
+    $this->assertSession()->responseContains(\t('No phone number settings found.'));
     $this->assertSession()->linkByHrefExists('admin/config/smsframework/phone_number/add');
 
     // Ensure statistics are appearing on list.
@@ -90,7 +90,7 @@ final class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase
                       <td>' . $quantity[0] . '</td>
                       <td>' . $quantity[1] . '</td>
                       <td>' . ($quantity[0] + $quantity[2]) . '</td>
-                      <td>' . array_sum($quantity) . '</td>');
+                      <td>' . \array_sum($quantity) . '</td>');
   }
 
   /**
@@ -110,7 +110,7 @@ final class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase
 
     $this->assertSession()->addressEquals('admin/config/smsframework/phone_number');
     $t_args = ['%id' => 'entity_test.entity_test'];
-    $this->assertSession()->responseContains(t('Phone number settings %id created.', $t_args));
+    $this->assertSession()->responseContains(\t('Phone number settings %id created.', $t_args));
     $this->assertSession()->responseContains('<td>entity_test</td>');
     $this->assertSession()->linkByHrefExists('admin/config/smsframework/phone_number/entity_test.entity_test');
     $this->assertSession()->linkByHrefExists('admin/config/smsframework/phone_number/entity_test.entity_test/delete');
@@ -135,13 +135,13 @@ final class SmsFrameworkPhoneNumberAdminTest extends SmsFrameworkBrowserTestBase
 
     // Delete new phone number settings.
     $this->drupalGet('admin/config/smsframework/phone_number/entity_test.entity_test/delete');
-    $this->assertSession()->responseContains(t('Are you sure you want to delete SMS phone number settings %label?', [
+    $this->assertSession()->responseContains(\t('Are you sure you want to delete SMS phone number settings %label?', [
       '%label' => 'entity_test.entity_test',
     ]));
     $this->drupalGet('admin/config/smsframework/phone_number/entity_test.entity_test/delete');
     $this->submitForm([], 'Delete');
     $this->assertSession()->addressEquals('admin/config/smsframework/phone_number');
-    $this->assertSession()->responseContains(t('Phone number settings %label was deleted.', [
+    $this->assertSession()->responseContains(\t('Phone number settings %label was deleted.', [
       '%label' => 'entity_test.entity_test',
     ]));
     $this->assertSession()->responseContains('No phone number settings found.');

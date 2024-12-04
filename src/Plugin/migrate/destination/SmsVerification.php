@@ -69,7 +69,7 @@ class SmsVerification extends EntityContentBase implements ContainerFactoryPlugi
       $plugin_definition,
       $migration,
       $container->get('entity_type.manager')->getStorage($entity_type),
-      array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type)),
+      \array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type)),
       $container->get('entity_field.manager'),
       $container->get('plugin.manager.field.field_type'),
       $container->get('sms.phone_number.verification'),
@@ -85,7 +85,7 @@ class SmsVerification extends EntityContentBase implements ContainerFactoryPlugi
       // After successful import of the verification data, the phone number
       // should be updated on the corresponding user entity.
       /** @var \Drupal\sms\Entity\PhoneNumberVerification $verification */
-      $verification = $this->storage->load(reset($return));
+      $verification = $this->storage->load(\reset($return));
       $this->setVerifiedValue($verification, $row->getSourceProperty('delta'));
     }
     return $return;
@@ -96,7 +96,7 @@ class SmsVerification extends EntityContentBase implements ContainerFactoryPlugi
    */
   public function rollback(array $destination_identifier) {
     /** @var \Drupal\sms\Entity\PhoneNumberVerification $verification */
-    $verification = $this->storage->load(reset($destination_identifier));
+    $verification = $this->storage->load(\reset($destination_identifier));
     $this->unsetVerifiedValue($verification);
     // Remove the verified user phone number.
     parent::rollback($destination_identifier);

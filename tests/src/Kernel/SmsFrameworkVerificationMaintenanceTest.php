@@ -51,7 +51,7 @@ final class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBa
 
     $this->phoneField = FieldStorageConfig::create([
       'entity_type' => 'entity_test',
-      'field_name' => mb_strtolower($this->randomMachineName()),
+      'field_name' => \mb_strtolower($this->randomMachineName()),
       'type' => 'telephone',
     ]);
     $this->phoneField->save();

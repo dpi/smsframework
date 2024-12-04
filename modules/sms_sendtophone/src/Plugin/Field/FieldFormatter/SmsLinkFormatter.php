@@ -27,7 +27,7 @@ class SmsLinkFormatter extends FormatterBase {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
     foreach ($items as $delta => $item) {
-      $text = strip_tags($item->value);
+      $text = \strip_tags($item->value);
       $element[$delta] = [
         '#type' => 'markup',
         'text' => [

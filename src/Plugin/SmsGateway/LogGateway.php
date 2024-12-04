@@ -79,7 +79,7 @@ class LogGateway extends SmsGatewayPluginBase implements ContainerFactoryPluginI
    */
   public function send(SmsMessageInterface $sms) {
     $this->logger->notice('SMS message sent to %number with the text: @message', [
-      '%number' => implode(', ', $sms->getRecipients()),
+      '%number' => \implode(', ', $sms->getRecipients()),
       '@message' => $sms->getMessage(),
     ]);
 

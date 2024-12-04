@@ -110,7 +110,7 @@ class ActiveHours implements ActiveHoursInterface {
     // Sort so nearest date is closest.
     // Can't do this in build() since computed relative dates can be different
     // per timezone.
-    usort($dates, static function ($a, $b) {
+    \usort($dates, static function ($a, $b) {
       if ($a->getStartDate() == $b->getStartDate()) {
         return 0;
       }

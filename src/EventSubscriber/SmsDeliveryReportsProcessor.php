@@ -44,7 +44,7 @@ class SmsDeliveryReportsProcessor implements EventSubscriberInterface {
       if ($report->getMessageId()) {
         $existing = $this->reportStorage->loadByProperties(['message_id' => $report->getMessageId()]);
         if ($existing) {
-          $existing = reset($existing);
+          $existing = \reset($existing);
           $existing
             ->setStatus($report->getStatus())
             ->setStatusMessage($report->getStatusMessage())

@@ -138,7 +138,7 @@ final class SmsFrameworkViewsTest extends ViewsKernelTestBase {
       'message', 'created', 'gateway', 'sender_entity__target_id',
       'recipient_entity__target_id', 'automated', 'processed', 'queued',
     ];
-    static::assertEquals($cols, array_keys($view->field));
+    static::assertEquals($cols, \array_keys($view->field));
 
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
@@ -172,13 +172,13 @@ final class SmsFrameworkViewsTest extends ViewsKernelTestBase {
 
     $number1 = $message1->getRecipients()[0];
     $number2 = $message1->getRecipients()[1];
-    static::assertEquals('<a href="tel:' . urlencode($number1) . '">' . $number1 . '</a>, <a href="tel:' . urlencode($number2) . '">' . $number2 . '</a>', $render);
+    static::assertEquals('<a href="tel:' . \urlencode($number1) . '">' . $number1 . '</a>, <a href="tel:' . \urlencode($number2) . '">' . $number2 . '</a>', $render);
 
     $number1 = $message2->getRecipients()[0];
     $render = $renderer->executeInRenderContext(new RenderContext(), static function () use ($view) {
       return $view->field['recipient_phone_number']->advancedRender($view->result[1]);
     });
-    static::assertEquals('<a href="tel:' . urlencode($number1) . '">' . $number1 . '</a>', $render);
+    static::assertEquals('<a href="tel:' . \urlencode($number1) . '">' . $number1 . '</a>', $render);
 
     // message.
     $render = $renderer->executeInRenderContext(new RenderContext(), static function () use ($view) {

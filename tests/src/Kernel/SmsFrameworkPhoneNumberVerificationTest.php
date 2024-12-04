@@ -82,7 +82,7 @@ final class SmsFrameworkPhoneNumberVerificationTest extends SmsFrameworkKernelBa
 
     $this->phoneField = FieldStorageConfig::create([
       'entity_type' => 'entity_test',
-      'field_name' => mb_strtolower($this->randomMachineName()),
+      'field_name' => \mb_strtolower($this->randomMachineName()),
       'type' => 'telephone',
     ]);
     $this->phoneField->save();
@@ -265,7 +265,7 @@ final class SmsFrameworkPhoneNumberVerificationTest extends SmsFrameworkKernelBa
     $sent_messages = $this->getTestMessages($this->gateway);
     static::assertCount(1, $sent_messages);
 
-    $verification_message = reset($sent_messages);
+    $verification_message = \reset($sent_messages);
     static::assertTrue($verification_message->getOption('_is_verification_message'));
 
     $verification = $this->getLastVerification();

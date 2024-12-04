@@ -62,7 +62,7 @@ final class SmsFrameworkPhoneNumberAdminTest extends WebDriverTestBase {
     /** @var \Drupal\field\FieldStorageConfigInterface $field_telephone */
     $field_telephone = $field_storage->create([
       'entity_type' => 'entity_test',
-      'field_name' => mb_strtolower($this->randomMachineName()),
+      'field_name' => \mb_strtolower($this->randomMachineName()),
       'type' => 'telephone',
     ]);
     $field_telephone->save();

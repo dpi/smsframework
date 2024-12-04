@@ -75,11 +75,11 @@ class SendToPhoneForm extends FormBase {
     catch (PhoneNumberSettingsException $e) {
     }
 
-    if ($user->hasPermission('send to any number') || count($this->phoneNumbers)) {
+    if ($user->hasPermission('send to any number') || \count($this->phoneNumbers)) {
       $form = $this->getForm($form, $form_state, $type, $extra);
     }
     else {
-      if (!count($this->phoneNumbers)) {
+      if (!\count($this->phoneNumbers)) {
         // User has no phone number, or unconfirmed.
         $form['message'] = [
           '#type' => 'markup',
@@ -130,7 +130,7 @@ class SendToPhoneForm extends FormBase {
         break;
 
       case 'node':
-        if (is_numeric($extra)) {
+        if (\is_numeric($extra)) {
           $node = Node::load($extra);
           $form['message_display'] = [
             '#type' => 'textarea',
@@ -154,8 +154,8 @@ class SendToPhoneForm extends FormBase {
       '#title' => $this->t('Phone number'),
     ];
 
-    if (count($this->phoneNumbers)) {
-      $form['number']['#default_value'] = reset($this->phoneNumbers);
+    if (\count($this->phoneNumbers)) {
+      $form['number']['#default_value'] = \reset($this->phoneNumbers);
     }
 
     $form['submit'] = [

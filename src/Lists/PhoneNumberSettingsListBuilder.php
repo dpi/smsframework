@@ -127,7 +127,7 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
    */
   public function render() {
     $render = parent::render();
-    $render['table']['#empty'] = t('No phone number settings found.');
+    $render['table']['#empty'] = \t('No phone number settings found.');
     return $render;
   }
 

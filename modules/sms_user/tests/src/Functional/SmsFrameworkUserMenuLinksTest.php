@@ -42,7 +42,7 @@ class SmsFrameworkUserMenuLinksTest extends SmsFrameworkBrowserTestBase {
    */
   public function testDynamicMenuLinks(): void {
     $entityDisplayRepo = \Drupal::service('entity_display.repository');
-    assert($entityDisplayRepo instanceof EntityDisplayRepositoryInterface);
+    \assert($entityDisplayRepo instanceof EntityDisplayRepositoryInterface);
     $entityDisplayRepo->getFormDisplay('user', 'user', 'default')->save();
     $this->createPhoneNumberSettings('user', 'user');
     $this->drupalGet(Url::fromRoute('user.admin_index'));
