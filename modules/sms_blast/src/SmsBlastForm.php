@@ -41,7 +41,11 @@ class SmsBlastForm extends FormBase {
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, PhoneNumberProviderInterface $phone_number_provider, MessengerInterface $messenger) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    PhoneNumberProviderInterface $phone_number_provider,
+    MessengerInterface $messenger,
+  ) {
     $this->phoneNumberVerificationStorage = $entity_type_manager
       ->getStorage('sms_phone_number_verification');
     $this->phoneNumberProvider = $phone_number_provider;

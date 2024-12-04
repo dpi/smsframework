@@ -107,7 +107,13 @@ class SmsMessage implements SmsMessageInterface {
    * @param int|null $uid
    *   (optional) The user who created the SMS message.
    */
-  public function __construct(?string $sender_phone_number = NULL, array $recipients = [], string $message = '', array $options = [], ?int $uid = NULL) {
+  public function __construct(
+    ?string $sender_phone_number = NULL,
+    array $recipients = [],
+    string $message = '',
+    array $options = [],
+    ?int $uid = NULL,
+  ) {
     $this->setSenderNumber($sender_phone_number);
     $this->addRecipients($recipients);
     $this->setMessage($message);

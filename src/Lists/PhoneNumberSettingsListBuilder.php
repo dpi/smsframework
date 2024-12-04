@@ -52,7 +52,13 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   Time.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, EntityStorageInterface $phone_number_verification_storage, PhoneNumberVerificationInterface $phone_number_verification_provider, TimeInterface $time) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityStorageInterface $storage,
+    EntityStorageInterface $phone_number_verification_storage,
+    PhoneNumberVerificationInterface $phone_number_verification_provider,
+    TimeInterface $time,
+  ) {
     parent::__construct($entity_type, $storage);
     $this->phoneNumberVerificationStorage = $phone_number_verification_storage;
     $this->phoneNumberVerificationProvider = $phone_number_verification_provider;

@@ -23,7 +23,11 @@ class SmsGatewayPluginManager extends DefaultPluginManager implements SmsGateway
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   Module handler for calling module hooks.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
+  public function __construct(
+    \Traversable $namespaces,
+    CacheBackendInterface $cache_backend,
+    ModuleHandlerInterface $module_handler,
+  ) {
     parent::__construct('Plugin/SmsGateway', $namespaces, $module_handler, 'Drupal\sms\Plugin\SmsGatewayPluginInterface', 'Drupal\sms\Annotation\SmsGateway');
     $this->setCacheBackend($cache_backend, 'sms_gateways');
     $this->alterInfo('sms_gateway_info');

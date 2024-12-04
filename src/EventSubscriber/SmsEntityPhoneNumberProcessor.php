@@ -28,7 +28,9 @@ class SmsEntityPhoneNumberProcessor implements EventSubscriberInterface {
    * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification
    *   The phone number verification service.
    */
-  public function __construct(PhoneNumberVerificationInterface $phone_number_verification) {
+  public function __construct(
+    PhoneNumberVerificationInterface $phone_number_verification,
+  ) {
     $this->phoneNumberVerification = $phone_number_verification;
   }
 

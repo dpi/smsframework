@@ -53,7 +53,17 @@ class SmsVerification extends EntityContentBase implements ContainerFactoryPlugi
    * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $verification
    *   The phone number verification service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, EntityFieldManagerInterface $entity_field_manager, FieldTypePluginManagerInterface $field_type_manager, PhoneNumberVerificationInterface $verification) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    MigrationInterface $migration,
+    EntityStorageInterface $storage,
+    array $bundles,
+    EntityFieldManagerInterface $entity_field_manager,
+    FieldTypePluginManagerInterface $field_type_manager,
+    PhoneNumberVerificationInterface $verification,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage, $bundles, $entity_field_manager, $field_type_manager);
     $this->phoneNumberVerificationService = $verification;
   }

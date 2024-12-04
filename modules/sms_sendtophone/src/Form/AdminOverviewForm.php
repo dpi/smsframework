@@ -24,7 +24,10 @@ class AdminOverviewForm extends ConfigFormBase {
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, MessengerInterface $messenger) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    MessengerInterface $messenger,
+  ) {
     parent::__construct($config_factory);
     $this->setMessenger($messenger);
   }

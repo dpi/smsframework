@@ -13,7 +13,6 @@
 
   <!-- Temporary, disruptive -->
   <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint"><severity>0</severity></rule>
-  <rule ref="SlevomatCodingStandard.Classes.RequireMultiLineMethodSignature.RequiredMultiLineSignature"><severity>0</severity></rule>
   <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes.IncorrectStrictTypesFormat"><severity>0</severity></rule>
   <rule ref="SlevomatCodingStandard.Commenting.UselessInheritDocComment.UselessInheritDocComment"><severity>0</severity></rule>
   <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingAnyTypeHint"><severity>0</severity></rule>

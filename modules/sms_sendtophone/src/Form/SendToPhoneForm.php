@@ -44,7 +44,10 @@ class SendToPhoneForm extends FormBase {
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    */
-  public function __construct(SmsProviderInterface $sms_provider, MessengerInterface $messenger) {
+  public function __construct(
+    SmsProviderInterface $sms_provider,
+    MessengerInterface $messenger,
+  ) {
     $this->smsProvider = $sms_provider;
     $this->setMessenger($messenger);
   }
