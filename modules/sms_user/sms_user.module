@@ -5,7 +5,7 @@
  * Provides integration between the SMS Framework and Drupal users.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
