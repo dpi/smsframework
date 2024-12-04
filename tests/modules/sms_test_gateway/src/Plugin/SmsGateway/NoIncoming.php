@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 
-use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Plugin\SmsGatewayPluginBase;
 
 /**
  * Defines a gateway which does not implement incoming messages.

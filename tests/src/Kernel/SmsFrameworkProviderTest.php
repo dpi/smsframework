@@ -5,18 +5,18 @@ declare(strict_types = 1);
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\sms\Direction;
+use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
+use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\sms\Event\SmsEvents;
+use Drupal\sms\Exception\RecipientRouteException;
 use Drupal\sms\Exception\SmsDirectionException;
 use Drupal\sms\Exception\SmsException;
-use Drupal\sms\Exception\RecipientRouteException;
 use Drupal\sms\Message\SmsMessage as StandardSmsMessage;
 use Drupal\sms\Message\SmsMessageInterface as StandardSmsMessageInterface;
-use Drupal\sms\Entity\SmsMessage;
-use Drupal\sms\Entity\SmsMessageInterface;
-use Drupal\sms\Entity\SmsGateway;
-use Drupal\sms\Direction;
-use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Provider\SmsProviderInterface;
 

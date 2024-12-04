@@ -4,20 +4,20 @@ declare(strict_types = 1);
 
 namespace Drupal\sms\Provider;
 
-use Drupal\sms\Event\SmsDeliveryReportEvent;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Drupal\sms\Entity\SmsMessage;
+use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Entity\SmsMessageInterface as SmsMessageEntityInterface;
+use Drupal\sms\Event\SmsDeliveryReportEvent;
+use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Event\SmsMessageEvent;
+use Drupal\sms\Exception\SmsDirectionException;
+use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Plugin\SmsGateway\SmsIncomingEventProcessorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Drupal\sms\Exception\SmsException;
-use Drupal\sms\Exception\SmsDirectionException;
-use Drupal\sms\Direction;
-use Drupal\sms\Event\SmsEvents;
 
 /**
  * The SMS provider that provides default messaging functionality.

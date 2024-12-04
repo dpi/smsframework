@@ -5,8 +5,8 @@ declare(strict_types = 1);
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\Core\Url;
-use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Direction;
+use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsGatewayInterface;
 
 /**

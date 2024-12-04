@@ -4,10 +4,10 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageResultInterface;
-use Drupal\sms\Direction;
 use Drupal\sms\Plugin\SmsGateway\LogGateway;
 use Drupal\sms\Provider\SmsProviderInterface;
 

@@ -4,16 +4,16 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\sms_user\Kernel;
 
-use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
 use Drupal\Core\Test\AssertMailTrait;
-use Drupal\sms\Entity\SmsMessage;
-use Drupal\user\Entity\User;
-use Drupal\user\UserInterface;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\sms\Direction;
 use Drupal\sms\Entity\PhoneNumberSettings;
 use Drupal\sms\Entity\SmsGatewayInterface;
-use Drupal\sms\Direction;
+use Drupal\sms\Entity\SmsMessage;
+use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
+use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
 
 /**
  * Tests account registration.

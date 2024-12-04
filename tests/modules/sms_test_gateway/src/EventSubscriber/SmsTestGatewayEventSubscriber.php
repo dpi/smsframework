@@ -4,9 +4,9 @@ declare(strict_types = 1);
 
 namespace Drupal\sms_test_gateway\EventSubscriber;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Event\SmsMessageEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Test event subscriber.

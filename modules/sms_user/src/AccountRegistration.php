@@ -4,19 +4,19 @@ declare(strict_types = 1);
 
 namespace Drupal\sms_user;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Utility\Token;
-use Drupal\sms\Entity\PhoneNumberSettingsInterface;
-use Drupal\sms\Provider\SmsProviderInterface;
-use Drupal\sms\Provider\PhoneNumberVerificationInterface;
-use Drupal\sms\Message\SmsMessageInterface;
-use Drupal\sms\Direction;
-use Drupal\user\Entity\User;
 use Drupal\Component\Utility\Random;
-use Drupal\sms\Entity\SmsMessage;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityConstraintViolationListInterface;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Drupal\Core\Utility\Token;
+use Drupal\sms\Direction;
+use Drupal\sms\Entity\PhoneNumberSettingsInterface;
+use Drupal\sms\Entity\SmsMessage;
+use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Provider\PhoneNumberVerificationInterface;
+use Drupal\sms\Provider\SmsProviderInterface;
+use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Defines the account registration service.

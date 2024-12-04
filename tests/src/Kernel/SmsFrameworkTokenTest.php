@@ -4,10 +4,10 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\Token;
 use Drupal\sms\Message\SmsMessage;
-use Drupal\Component\Utility\Html;
 
 /**
  * Tests SMS Framework tokens.

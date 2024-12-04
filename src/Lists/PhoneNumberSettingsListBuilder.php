@@ -6,11 +6,11 @@ namespace Drupal\sms\Lists;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\sms\Provider\PhoneNumberVerificationInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\sms\Provider\PhoneNumberVerificationInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Builds a list of phone number settings.

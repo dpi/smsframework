@@ -4,13 +4,13 @@ declare(strict_types = 1);
 
 namespace Drupal\sms_blast;
 
-use Drupal\Core\Form\FormBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Form\FormBase;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Provider\PhoneNumberProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\sms\Message\SmsMessage;
 
 /**
  * Defines a form for sending mass messages.

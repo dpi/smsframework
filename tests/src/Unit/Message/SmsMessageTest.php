@@ -8,8 +8,8 @@ use Drupal\Component\Uuid\Php;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageInterface;
-use Drupal\Tests\UnitTestCase;
 use Drupal\Tests\sms\Functional\SmsFrameworkMessageTestTrait;
+use Drupal\Tests\UnitTestCase;
 
 /**
  * Unit Tests for SmsMessage.

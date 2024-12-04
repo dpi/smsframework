@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\sms\Kernel;
 
-use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Direction;
+use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Provider\SmsProviderInterface;
 
 /**

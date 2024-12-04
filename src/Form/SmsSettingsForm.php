@@ -4,13 +4,13 @@ declare(strict_types = 1);
 
 namespace Drupal\sms\Form;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
-use Drupal\sms\Entity\SmsGateway;
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\Core\Routing\RequestContext;
+use Drupal\Core\Routing\RouteBuilderInterface;
+use Drupal\sms\Entity\SmsGateway;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

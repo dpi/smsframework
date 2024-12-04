@@ -5,11 +5,11 @@ declare(strict_types = 1);
 namespace Drupal\Tests\sms_blast\Functional;
 
 use Drupal\Core\Url;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\sms\Entity\PhoneNumberSettings;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
 use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
-use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\sms\Entity\PhoneNumberSettings;
 
 /**
  * Integration tests for the sms_blast module.

@@ -5,10 +5,10 @@ declare(strict_types = 1);
 namespace Drupal\sms\EventSubscriber;
 
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\sms\Event\SmsDeliveryReportEvent;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Drupal\sms\Event\SmsDeliveryReportEvent;
 use Drupal\sms\Event\SmsEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Handles delivery reports as they come in and updates storage.

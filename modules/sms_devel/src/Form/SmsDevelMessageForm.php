@@ -5,18 +5,18 @@ declare(strict_types = 1);
 namespace Drupal\sms_devel\Form;
 
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Messenger\MessengerInterface;
-use Drupal\sms\Entity\SmsGateway;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\sms\Provider\SmsProviderInterface;
-use Drupal\sms\Entity\SmsMessage;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\sms\Direction;
+use Drupal\sms\Entity\SmsGateway;
+use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Exception\SmsException;
-use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Message\SmsMessageResult;
+use Drupal\sms\Message\SmsMessageResultInterface;
+use Drupal\sms\Provider\SmsProviderInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Simulate a message being sent or received.

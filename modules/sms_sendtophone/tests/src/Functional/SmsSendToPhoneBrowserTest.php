@@ -9,11 +9,11 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\node\Entity\NodeType;
+use Drupal\sms\Entity\PhoneNumberSettings;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
 use Drupal\sms_sendtophone\Plugin\Field\FieldFormatter\SmsLinkFormatter;
 use Drupal\sms_sendtophone\Plugin\Filter\FilterInlineSms;
 use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
-use Drupal\sms\Entity\PhoneNumberSettings;
 
 /**
  * Integration tests for the SMS SendToPhone Module.

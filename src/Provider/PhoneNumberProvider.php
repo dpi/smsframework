@@ -4,14 +4,14 @@ declare(strict_types = 1);
 
 namespace Drupal\sms\Provider;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsMessage as SmsMessageEntity;
-use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Event\SmsEntityPhoneNumber;
+use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Exception\NoPhoneNumberException;
 use Drupal\sms\Message\SmsMessageInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Phone number provider.

@@ -6,11 +6,11 @@ namespace Drupal\sms\Plugin\Field\FieldWidget;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
-use Drupal\telephone\Plugin\Field\FieldWidget\TelephoneDefaultWidget;
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
+use Drupal\telephone\Plugin\Field\FieldWidget\TelephoneDefaultWidget;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

@@ -4,17 +4,17 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\Core\Render\RenderContext;
+use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
-use Drupal\views\Views;
-use Drupal\views\Tests\ViewTestData;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
-use Drupal\sms\Entity\SmsMessage;
-use Drupal\Core\Render\RenderContext;
-use Drupal\sms\Direction;
+use Drupal\views\Tests\ViewTestData;
+use Drupal\views\Views;
 
 /**
  * Tests SMS Framework integration with Views.

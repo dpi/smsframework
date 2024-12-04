@@ -10,8 +10,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\sms\Exception\SmsStorageException;
-use Drupal\sms\Message\SmsMessageReportStatus;
 use Drupal\sms\Message\SmsDeliveryReportInterface as StdDeliveryReportInterface;
+use Drupal\sms\Message\SmsMessageReportStatus;
 
 /**
  * Defines the SMS message delivery report entity.

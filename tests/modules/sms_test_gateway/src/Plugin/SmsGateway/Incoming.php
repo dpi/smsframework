@@ -4,17 +4,17 @@ declare(strict_types = 1);
 
 namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 
-use Drupal\sms\Message\SmsDeliveryReport;
-use Drupal\sms\Message\SmsMessageResult;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Drupal\Component\Serialization\Json;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Message\SmsMessageResult;
 use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Drupal\sms\SmsProcessingResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Defines a gateway supporting incoming route.

@@ -7,10 +7,10 @@ namespace Drupal\sms\Entity;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Url;
-use Drupal\sms\Plugin\SmsGatewayPluginCollection;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
+use Drupal\Core\Url;
 use Drupal\sms\Direction;
+use Drupal\sms\Plugin\SmsGatewayPluginCollection;
 
 /**
  * Defines storage for an SMS Gateway instance.

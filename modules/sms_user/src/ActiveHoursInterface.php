@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace Drupal\sms_user;
 
-use Drupal\user\UserInterface;
 use Drupal\sms\Entity\SmsMessageInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Defines interface for the user active hours service.

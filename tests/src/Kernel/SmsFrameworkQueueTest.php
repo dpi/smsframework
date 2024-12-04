@@ -5,9 +5,9 @@ declare(strict_types = 1);
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\Core\CronInterface;
+use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Entity\SmsMessage;
-use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Plugin\QueueWorker\SmsProcessor;
 use Drupal\sms\Provider\SmsProviderInterface;

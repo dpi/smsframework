@@ -6,10 +6,10 @@ namespace Drupal\Tests\sms_devel\Functional;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Url;
-use Drupal\sms\Entity\SmsGatewayInterface;
-use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
-use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Direction;
+use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms\Entity\SmsMessage;
+use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
 
 /**
  * Tests the message form.

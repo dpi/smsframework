@@ -4,11 +4,11 @@ declare(strict_types = 1);
 
 namespace Drupal\sms\EventSubscriber;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Event\SmsEntityPhoneNumber;
+use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Drupal\sms\Provider\PhoneNumberVerificationInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Resolve phone numbers for an entity using phone verification system.

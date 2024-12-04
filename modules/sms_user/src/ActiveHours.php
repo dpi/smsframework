@@ -5,9 +5,9 @@ declare(strict_types = 1);
 namespace Drupal\sms_user;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\user\UserInterface;
-use Drupal\Core\Datetime\DrupalDateTime;
 
 /**
  * Defines the user active hours service.

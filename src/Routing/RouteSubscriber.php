@@ -4,12 +4,12 @@ declare(strict_types = 1);
 
 namespace Drupal\sms\Routing;
 
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Route;
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\sms\Entity\SmsGateway;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Subscriber for SMS Framework routes.

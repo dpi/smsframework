@@ -6,17 +6,17 @@ namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Random;
-use Drupal\sms\Message\SmsDeliveryReport;
-use Drupal\sms\Message\SmsMessageResultInterface;
-use Drupal\sms\Plugin\SmsGatewayPluginBase;
-use Drupal\sms\Plugin\SmsGateway\SmsIncomingEventProcessorInterface;
-use Drupal\sms\Event\SmsMessageEvent;
-use Drupal\sms\Message\SmsMessageInterface;
-use Drupal\sms\Message\SmsMessageResult;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\sms\Event\SmsMessageEvent;
+use Drupal\sms\Message\SmsDeliveryReport;
+use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Message\SmsMessageReportStatus;
+use Drupal\sms\Message\SmsMessageResult;
+use Drupal\sms\Message\SmsMessageResultInterface;
+use Drupal\sms\Plugin\SmsGateway\SmsIncomingEventProcessorInterface;
+use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Drupal\sms\Message\SmsMessageReportStatus;
 
 /**
  * Defines a gateway storing transmitted SMS in memory.

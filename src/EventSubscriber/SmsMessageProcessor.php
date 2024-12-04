@@ -4,23 +4,23 @@ declare(strict_types = 1);
 
 namespace Drupal\sms\EventSubscriber;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Direction;
+use Drupal\sms\Entity\SmsGateway;
+use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Event\RecipientGatewayEvent;
+use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Event\SmsMessageEvent;
 use Drupal\sms\Exception\RecipientRouteException;
 use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Exception\SmsPluginReportException;
-use Drupal\sms\Entity\SmsGateway;
-use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Message\SmsDeliveryReportInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * Handles messages before they are processed by queue(), send(), or incoming().

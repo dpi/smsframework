@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\sms_user\Functional;
 
-use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
 use Drupal\Core\Url;
+use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
 
 /**
  * Tests SMS User settings user interface.
