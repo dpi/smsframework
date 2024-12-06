@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
@@ -71,6 +72,7 @@ final class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     $this->setFallbackGateway($this->gateway);
 
     ViewTestData::createTestViews($this::class, ['sms_test_views']);
+    DateFormat::load('medium')?->setPattern('D, j M Y - H:i')->save();
   }
 
   /**
@@ -172,13 +174,13 @@ final class SmsFrameworkViewsTest extends ViewsKernelTestBase {
 
     $number1 = $message1->getRecipients()[0];
     $number2 = $message1->getRecipients()[1];
-    static::assertEquals('<a href="tel:' . urlencode($number1) . '">' . $number1 . '</a>, <a href="tel:' . urlencode($number2) . '">' . $number2 . '</a>', $render);
+    static::assertEquals('<a href="tel:' . urlencode($number1) . '">' . $number1 . '</a>, <a href="tel:' . urlencode($number2) . '">' . $number2 . '</a>', (string) $render);
 
     $number1 = $message2->getRecipients()[0];
     $render = $renderer->executeInRenderContext(new RenderContext(), static function () use ($view) {
       return $view->field['recipient_phone_number']->advancedRender($view->result[1]);
     });
-    static::assertEquals('<a href="tel:' . urlencode($number1) . '">' . $number1 . '</a>', $render);
+    static::assertEquals('<a href="tel:' . urlencode($number1) . '">' . $number1 . '</a>', (string) $render);
 
     // message.
     $render = $renderer->executeInRenderContext(new RenderContext(), static function () use ($view) {
@@ -195,12 +197,12 @@ final class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     $render = $renderer->executeInRenderContext(new RenderContext(), static function () use ($view) {
       return $view->field['created']->advancedRender($view->result[0]);
     });
-    static::assertEquals("Fri, 04/17/1998 - 23:08\n", $render);
+    static::assertStringContainsString('Fri, 17 Apr 1998 - 23:08', (string) $render);
 
     $render = $renderer->executeInRenderContext(new RenderContext(), static function () use ($view) {
       return $view->field['created']->advancedRender($view->result[1]);
     });
-    static::assertEquals("Wed, 10/30/1985 - 13:43\n", $render);
+    static::assertStringContainsString('Wed, 30 Oct 1985 - 13:43', (string) $render);
 
     // gateway.
     $render = $renderer->executeInRenderContext(new RenderContext(), static function () use ($view) {
@@ -255,7 +257,7 @@ final class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     $render = $renderer->executeInRenderContext(new RenderContext(), static function () use ($view) {
       return $view->field['processed']->advancedRender($view->result[1]);
     });
-    static::assertEquals("Wed, 10/30/1985 - 13:44\n", $render);
+    static::assertStringContainsString('Wed, 30 Oct 1985 - 13:44', (string) $render);
 
     // queued.
     $render = $renderer->executeInRenderContext(new RenderContext(), static function () use ($view) {

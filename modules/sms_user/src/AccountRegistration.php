@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\sms_user;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
 use Drupal\sms\Provider\SmsProviderInterface;
@@ -15,6 +16,7 @@ use Drupal\user\Entity\User;
 use Drupal\Component\Utility\Random;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\Core\Entity\EntityConstraintViolationListInterface;
+use Drupal\user\UserNameValidator;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Drupal\user\UserInterface;
 
@@ -25,28 +27,19 @@ class AccountRegistration implements AccountRegistrationInterface {
 
   /**
    * Phone number settings for user.user bundle.
-   *
-   * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface|null
    */
   protected ?PhoneNumberSettingsInterface $userPhoneNumberSettings;
 
   /**
    * Constructs a AccountRegistration object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The configuration factory.
-   * @param \Drupal\Core\Utility\Token $token
-   *   The token replacement system.
-   * @param \Drupal\sms\Provider\SmsProviderInterface $smsProvider
-   *   The SMS provider.
-   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phoneNumberVerificationProvider
-   *   The phone number verification provider.
    */
-  public function __construct(
+  final public function __construct(
     protected ConfigFactoryInterface $configFactory,
     protected Token $token,
     protected SmsProviderInterface $smsProvider,
     protected PhoneNumberVerificationInterface $phoneNumberVerificationProvider,
+    protected UserNameValidator $userNameValidator,
+    protected EntityTypeManagerInterface $entityTypeManager,
   ) {
   }
 
@@ -323,9 +316,18 @@ class AccountRegistration implements AccountRegistrationInterface {
   protected function generateUniqueUsername() {
     $random = new Random();
     do {
-      $username = $random->name(8, TRUE);
-    } while (user_validate_name($username) || user_load_by_name($username));
-    return $username;
+      $userName = $random->name(8, TRUE);
+    } while (
+      count($this->userNameValidator->validateName($userName)) > 0 ||
+      $this->userNameExists($userName)
+    );
+    return $userName;
+  }
+
+  private function userNameExists(string $userName): bool {
+    return $this->entityTypeManager
+      ->getStorage('user')
+      ->loadByProperties(['name' => $userName]) !== [];
   }
 
   /**

@@ -10,6 +10,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
+use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms_sendtophone\Plugin\Field\FieldFormatter\SmsLinkFormatter;
 use Drupal\sms_sendtophone\Plugin\Filter\FilterInlineSms;
 use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
@@ -39,19 +40,9 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  /**
-   * The phone field for testing.
-   *
-   * @var \Drupal\field\FieldStorageConfigInterface
-   */
-  protected FieldStorageConfigInterface $phoneField;
-
-  /**
-   * Phone number settings for user entity type.
-   *
-   * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
-   */
-  protected PhoneNumberSettingsInterface $phoneNumberSettings;
+  private FieldStorageConfigInterface $phoneField;
+  private PhoneNumberSettingsInterface $phoneNumberSettings;
+  private SmsGatewayInterface $gateway;
 
   /**
    * {@inheritdoc}
