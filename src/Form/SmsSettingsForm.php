@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\sms\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -23,6 +24,8 @@ class SmsSettingsForm extends ConfigFormBase {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The factory for configuration objects.
+   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   *   The typed config manager.
    * @param \Drupal\Core\Routing\RouteBuilderInterface $routeBuilder
    *   The route builder.
    * @param \Drupal\Core\Routing\RequestContext $requestContext
@@ -32,11 +35,12 @@ class SmsSettingsForm extends ConfigFormBase {
    */
   public function __construct(
     ConfigFactoryInterface $configFactory,
+    TypedConfigManagerInterface $typedConfigManager,
     protected RouteBuilderInterface $routeBuilder,
     protected RequestContext $requestContext,
     MessengerInterface $messenger,
   ) {
-    parent::__construct($configFactory);
+    parent::__construct($configFactory, $typedConfigManager);
     $this->setMessenger($messenger);
   }
 
@@ -46,6 +50,7 @@ class SmsSettingsForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
+      $container->get('config.typed'),
       $container->get('router.builder'),
       $container->get('router.request_context'),
       $container->get('messenger'),

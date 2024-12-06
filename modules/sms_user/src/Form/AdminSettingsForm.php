@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\sms_user\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -25,6 +26,8 @@ class AdminSettingsForm extends ConfigFormBase {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The factory for configuration objects.
+   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   *   The typed config manager.
    * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phoneNumberVerificationProvider
    *   The phone number verification provider.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
@@ -32,10 +35,11 @@ class AdminSettingsForm extends ConfigFormBase {
    */
   public function __construct(
     ConfigFactoryInterface $configFactory,
+    TypedConfigManagerInterface $typedConfigManager,
     protected PhoneNumberVerificationInterface $phoneNumberVerificationProvider,
     MessengerInterface $messenger,
   ) {
-    parent::__construct($configFactory);
+    parent::__construct($configFactory, $typedConfigManager);
     $this->setMessenger($messenger);
   }
 
@@ -45,6 +49,7 @@ class AdminSettingsForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
+      $container->get('config.typed'),
       $container->get('sms.phone_number.verification'),
       $container->get('messenger'),
     );

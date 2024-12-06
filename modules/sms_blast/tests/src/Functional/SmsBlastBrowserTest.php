@@ -9,6 +9,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\sms\Entity\PhoneNumberSettings;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
+use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
 
 /**
@@ -22,12 +23,8 @@ final class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
 
   protected $defaultTheme = 'stark';
 
-  /**
-   * Phone number settings of user entity type.
-   *
-   * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
-   */
-  protected PhoneNumberSettingsInterface $phoneNumberSettings;
+  private PhoneNumberSettingsInterface $phoneNumberSettings;
+  private SmsGatewayInterface $gateway;
 
   protected function setUp(): void {
     parent::setUp();
