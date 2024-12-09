@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\sms_sendtophone\Plugin\Filter;
 
+use Drupal\Component\Render\MarkupInterface;
+use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a filter to align elements.
@@ -26,9 +31,29 @@ use Drupal\filter\Plugin\FilterBase;
  *   }
  * )
  */
-class FilterInlineSms extends FilterBase {
+class FilterInlineSms extends FilterBase implements ContainerFactoryPluginInterface {
 
   public const PLUGIN_ID = 'filter_inline_sms';
+
+  final public function __construct(
+    $configuration,
+    $plugin_id,
+    $plugin_definition,
+    private readonly RendererInterface $renderer,
+    private readonly ExtensionPathResolver $extensionPathResolver,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get(RendererInterface::class),
+      $container->get(ExtensionPathResolver::class),
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -98,9 +123,7 @@ class FilterInlineSms extends FilterBase {
   /**
    * Themes the message using a text link.
    */
-  protected function theme($text, $type = 'icon') {
-    /** @var \Drupal\Core\Extension\ExtensionPathResolver $extensionPathResolver */
-    $extensionPathResolver = \Drupal::service('extension.path.resolver');
+  protected function theme(string $text, string $type = 'icon'): MarkupInterface {
     switch ($type) {
       case 'text':
         $markup = '(' . $this->settings['display_text'] . ')';
@@ -109,7 +132,7 @@ class FilterInlineSms extends FilterBase {
       case 'icon':
       default:
         if (!isset($this->settings["default_icon"]) || $this->settings["default_icon"] == 1) {
-          $icon_path = $extensionPathResolver->getPath('module', 'sms_sendtophone') . '/sms-send.gif';
+          $icon_path = $this->extensionPathResolver->getPath('module', 'sms_sendtophone') . '/sms-send.gif';
         }
         else {
           $icon_path = $this->settings["custom_icon_path"];
@@ -138,17 +161,7 @@ class FilterInlineSms extends FilterBase {
       '#title' => $markup,
       '#url' => Url::fromRoute('sms_sendtophone.page', ['type' => 'inline'], $options),
     ];
-    return $this->renderer()->renderInIsolation($link);
-  }
-
-  /**
-   * Encapsulates the renderer service for unit testing purposes.
-   *
-   * @return \Drupal\Core\Render\RendererInterface
-   *   Returns the renderer service.
-   */
-  protected function renderer() {
-    return \Drupal::service('renderer');
+    return $this->renderer->renderInIsolation($link);
   }
 
 }

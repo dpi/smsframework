@@ -6,6 +6,7 @@ namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsMessage;
+use Drupal\sms_test_gateway\EventSubscriber\SmsTestGatewayEventSubscriber;
 
 /**
  * Tests SMS Framework gateway plugins.
@@ -24,7 +25,7 @@ final class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
     $this->installEntitySchema('sms');
     $this->installEntitySchema('sms_result');
     $this->installEntitySchema('sms_report');
-    $this->smsProvider = $this->container->get('sms.provider');
+    $this->smsProvider = \Drupal::service('sms.provider');
   }
 
   /**
@@ -43,7 +44,7 @@ final class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
     $sms_message->setResult($this->createMessageResult($sms_message));
 
     $this->smsProvider->queue($sms_message);
-    static::assertCount(1, \Drupal::state()->get('sms_test_gateway.memory.incoming'));
+    static::assertCount(1, \Drupal::state()->get(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING));
   }
 
 }

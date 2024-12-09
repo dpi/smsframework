@@ -12,7 +12,7 @@ use Drupal\sms\Direction;
 /**
  * Implements hook_requirements().
  */
-function sms_requirements($phase) {
+function sms_requirements($phase): array {
   $requirements = [];
 
   if ($phase == 'runtime') {
@@ -64,7 +64,7 @@ function sms_requirements($phase) {
 /**
  * Install the "sms_result" and "sms_report" entity types.
  */
-function sms_update_8101() {
+function sms_update_8101(): void {
   $update_manager = \Drupal::entityDefinitionUpdateManager();
   $entity_type_manager = \Drupal::entityTypeManager();
 

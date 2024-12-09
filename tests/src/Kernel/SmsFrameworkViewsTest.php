@@ -63,7 +63,7 @@ final class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     $this->installEntitySchema('sms_result');
     $this->installEntitySchema('sms_report');
 
-    $this->smsProvider = $this->container->get('sms.provider');
+    $this->smsProvider = \Drupal::service('sms.provider');
 
     $this->gateway = $this->createMemoryGateway();
     $this->setFallbackGateway($this->gateway);
@@ -93,7 +93,7 @@ final class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     $user0->addRole($role->id());
     $user0->save();
 
-    $this->container->get('current_user')->setAccount($user0);
+    \Drupal::service('current_user')->setAccount($user0);
 
     // Create some users to associate with SMS messages.
     $user1 = User::create(['name' => $this->randomMachineName()]);

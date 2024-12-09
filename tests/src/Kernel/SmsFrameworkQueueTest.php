@@ -60,10 +60,10 @@ final class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
     $this->installEntitySchema('sms_report');
 
     $this->gateway = $this->createMemoryGateway();
-    $this->smsProvider = $this->container->get('sms.provider');
+    $this->smsProvider = \Drupal::service('sms.provider');
     $this->setFallbackGateway($this->gateway);
-    $this->smsQueueProcessor = $this->container->get('sms.queue');
-    $this->cronService = $this->container->get('cron');
+    $this->smsQueueProcessor = \Drupal::service('sms.queue');
+    $this->cronService = \Drupal::service('cron');
   }
 
   /**

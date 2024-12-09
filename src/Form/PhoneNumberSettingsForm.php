@@ -207,7 +207,7 @@ class PhoneNumberSettingsForm extends EntityForm {
   /**
    * Handles AJAX callback for bundle field on new phone number settings.
    */
-  public function updateFieldMapping($form, FormStateInterface $form_state) {
+  public function updateFieldMapping($form, FormStateInterface $form_state): array {
     return $form['field_mapping'];
   }
 

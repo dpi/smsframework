@@ -70,9 +70,9 @@ final class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
     $this->gateway = $this->createMemoryGateway();
     $this->incomingGateway = $this->createMemoryGateway(['plugin' => 'incoming']);
-    $this->smsStorage = $this->container->get('entity_type.manager')
+    $this->smsStorage = \Drupal::service('entity_type.manager')
       ->getStorage('sms');
-    $this->smsProvider = $this->container->get('sms.provider');
+    $this->smsProvider = \Drupal::service('sms.provider');
     $this->setFallbackGateway($this->gateway);
   }
 
@@ -419,7 +419,7 @@ final class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
     // Ensure SmsEvents::MESSAGE_PRE_PROCESS is not executed. See
     // '_skip_preprocess_event' option.
-    $this->container->get('cron')->run();
+    \Drupal::service('cron')->run();
 
     $expected[] = SmsEvents::MESSAGE_OUTGOING_PRE_PROCESS;
     $expected[] = SmsEvents::MESSAGE_OUTGOING_POST_PROCESS;
@@ -481,7 +481,7 @@ final class SmsFrameworkProviderTest extends SmsFrameworkKernelBase {
 
     // Ensure SmsEvents::MESSAGE_PRE_PROCESS is not executed. See
     // '_skip_preprocess_event' option.
-    $this->container->get('cron')->run();
+    \Drupal::service('cron')->run();
 
     $expected[] = SmsEvents::MESSAGE_INCOMING_PRE_PROCESS;
     $expected[] = 'Drupal\sms_test_gateway\Plugin\SmsGateway\Memory::incomingEvent';

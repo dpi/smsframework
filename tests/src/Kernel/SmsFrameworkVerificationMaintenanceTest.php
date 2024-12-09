@@ -79,7 +79,7 @@ final class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBa
     $this->getLastVerification()
       ->setStatus(FALSE)
       ->save();
-    $this->container->get('cron')->run();
+    \Drupal::service('cron')->run();
     static::assertTrue($this->getLastVerification() instanceof PhoneNumberVerificationInterface);
   }
 
@@ -91,7 +91,7 @@ final class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBa
       ->setStatus(FALSE)
       ->set('created', 0)
       ->save();
-    $this->container->get('cron')->run();
+    \Drupal::service('cron')->run();
     static::assertFalse($this->getLastVerification());
   }
 
@@ -103,7 +103,7 @@ final class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBa
       ->setStatus(FALSE)
       ->set('created', 0)
       ->save();
-    $this->container->get('cron')->run();
+    \Drupal::service('cron')->run();
     $this->testEntity = EntityTest::load($this->testEntity->id());
     static::assertNotEmpty($this->testEntity->{$this->phoneField->getName()});
   }
@@ -119,7 +119,7 @@ final class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBa
       ->setStatus(FALSE)
       ->set('created', 0)
       ->save();
-    $this->container->get('cron')->run();
+    \Drupal::service('cron')->run();
     $this->testEntity = EntityTest::load($this->testEntity->id());
     static::assertEmpty($this->testEntity->{$this->phoneField->getName()});
   }
@@ -132,7 +132,7 @@ final class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBa
       ->setStatus(TRUE)
       ->set('created', 0)
       ->save();
-    $this->container->get('cron')->run();
+    \Drupal::service('cron')->run();
     static::assertTrue($this->getLastVerification() instanceof PhoneNumberVerificationInterface);
   }
 

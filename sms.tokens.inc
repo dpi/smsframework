@@ -47,7 +47,7 @@ function sms_token_info(): array {
 /**
  * Implements hook_tokens().
  */
-function sms_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
+function sms_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata): array {
   $replacements = [];
 
   if ($type == 'sms') {

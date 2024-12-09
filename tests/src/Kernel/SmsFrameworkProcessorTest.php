@@ -63,9 +63,9 @@ final class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
 
     $this->gatewayMemory = $this->createMemoryGateway();
     $this->gatewayOutgoingResult = $this->createMemoryGateway(['plugin' => 'memory_outgoing_result']);
-    $this->smsStorage = $this->container->get('entity_type.manager')
+    $this->smsStorage = \Drupal::service('entity_type.manager')
       ->getStorage('sms');
-    $this->smsProvider = $this->container->get('sms.provider');
+    $this->smsProvider = \Drupal::service('sms.provider');
   }
 
   /**

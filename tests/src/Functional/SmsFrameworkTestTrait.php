@@ -12,6 +12,7 @@ use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
+use Drupal\sms_test_gateway\EventSubscriber\SmsTestGatewayEventSubscriber;
 
 /**
  * Shared SMS Framework helpers for kernel and web tests.
@@ -111,7 +112,7 @@ trait SmsFrameworkTestTrait {
    */
   protected function getIncomingMessages(SmsGatewayInterface $sms_gateway): array {
     $gateway_id = $sms_gateway->id();
-    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.incoming', []);
+    $sms_messages = \Drupal::state()->get(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING, []);
     return $sms_messages[$gateway_id] ?? [];
   }
 
@@ -126,7 +127,7 @@ trait SmsFrameworkTestTrait {
    */
   protected function getLastIncomingMessage(SmsGatewayInterface $sms_gateway) {
     $gateway_id = $sms_gateway->id();
-    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.incoming', []);
+    $sms_messages = \Drupal::state()->get(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING, []);
     return isset($sms_messages[$gateway_id]) ? \end($sms_messages[$gateway_id]) : FALSE;
   }
 
@@ -137,14 +138,14 @@ trait SmsFrameworkTestTrait {
    *   A gateway plugin, or NULL to reset all messages.
    */
   protected function resetIncomingMessages(?SmsGatewayInterface $sms_gateway = NULL) {
-    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.incoming', []);
+    $sms_messages = \Drupal::state()->get(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING, []);
     if ($sms_gateway) {
       $sms_messages[$sms_gateway->id()] = [];
     }
     else {
       $sms_messages = [];
     }
-    \Drupal::state()->set('sms_test_gateway.memory.incoming', $sms_messages);
+    \Drupal::state()->set(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING, $sms_messages);
   }
 
   /**

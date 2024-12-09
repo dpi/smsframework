@@ -15,6 +15,7 @@ use Drupal\sms\Message\SmsMessageResult;
 use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Plugin\SmsGateway\SmsIncomingEventProcessorInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginBase;
+use Drupal\sms_test_gateway\EventSubscriber\SmsTestGatewayEventSubscriber;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -96,7 +97,7 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
     // https://www.drupal.org/node/2712579
     // Set state so we test this method is executed, remove this after above is
     // addressed.
-    \Drupal::state()->set('sms_test_gateway.memory.incoming', TRUE);
+    \Drupal::state()->set(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING, TRUE);
 
     $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
     $execution_order[] = __METHOD__;

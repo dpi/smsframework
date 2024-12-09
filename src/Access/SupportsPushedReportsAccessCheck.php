@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\sms\Access;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Routing\Access\AccessInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -16,7 +17,7 @@ class SupportsPushedReportsAccessCheck implements AccessInterface {
   /**
    * Checks if the gateway supports pushed reports.
    */
-  public function access(Request $request) {
+  public function access(Request $request): AccessResultInterface {
     if ($request->attributes->has('sms_gateway')) {
       /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
       $sms_gateway = $request->attributes->get('sms_gateway');

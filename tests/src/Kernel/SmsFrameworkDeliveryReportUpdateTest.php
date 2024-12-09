@@ -41,8 +41,8 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
 
   protected function setUp(): void {
     parent::setUp();
-    $this->httpClient = $this->container->get('http_client');
-    $this->defaultSmsProvider = $this->container->get('sms.provider');
+    $this->httpClient = \Drupal::service('http_client');
+    $this->defaultSmsProvider = \Drupal::service('sms.provider');
     $this->installEntitySchema('sms');
     $this->installEntitySchema('sms_result');
     $this->installEntitySchema('sms_report');
@@ -54,13 +54,13 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
    */
   public function testDeliveryReportUpdate(): void {
     $user = User::create();
-    $request_time = $this->container->get('datetime.time')->getRequestTime();
+    $request_time = \Drupal::service('datetime.time')->getRequestTime();
 
     $test_gateway = $this->createMemoryGateway();
     $test_gateway
       ->setRetentionDuration(Direction::OUTGOING, 1000)
       ->save();
-    $this->container->get('router.builder')->rebuild();
+    \Drupal::service('router.builder')->rebuild();
     // Get the delivery reports url for simulating push delivery report.
     $url = $test_gateway->getPushReportUrl()->setAbsolute()->toString();
 
@@ -73,7 +73,7 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
       ->setDirection(Direction::OUTGOING);
 
     $this->defaultSmsProvider->queue($sms_message);
-    $this->container->get('cron')->run();
+    \Drupal::service('cron')->run();
     $saved_reports = SmsDeliveryReport::loadMultiple();
     static::assertCount(2, $saved_reports);
     static::assertEquals(SmsMessageReportStatus::QUEUED, $saved_reports[1]->getStatus());
@@ -89,7 +89,7 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
     // Simulate push delivery report.
     $request = $this->buildDeliveryReportRequest($message_id, $first_report->getRecipient(), 'pending', $status_time);
     $this->defaultSmsProvider->processDeliveryReport($request, $test_gateway);
-    $this->container->get('entity_type.manager')->getStorage('sms_report')->resetCache();
+    \Drupal::service('entity_type.manager')->getStorage('sms_report')->resetCache();
     $updated_report = SmsDeliveryReport::load($first_report->id());
     static::assertEquals('pending', $updated_report->getStatus());
     static::assertEquals($status_time, $updated_report->getStatusTime());
@@ -99,7 +99,7 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
     $status_time = $request_time + 500;
     $request = $this->buildDeliveryReportRequest($message_id, $first_report->getRecipient(), SmsMessageReportStatus::DELIVERED, $status_time);
     $this->defaultSmsProvider->processDeliveryReport($request, $test_gateway);
-    $this->container->get('entity_type.manager')->getStorage('sms_report')->resetCache();
+    \Drupal::service('entity_type.manager')->getStorage('sms_report')->resetCache();
     $updated_report = SmsDeliveryReport::load($first_report->id());
     static::assertEquals(SmsMessageReportStatus::DELIVERED, $updated_report->getStatus());
     static::assertEquals($status_time, $updated_report->getStatusTime());

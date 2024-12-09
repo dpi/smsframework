@@ -63,7 +63,7 @@ final class SmsFrameworkMessageResultEntityTest extends KernelTestBase {
       ->setResult($result);
     $sms_message->save();
 
-    $storage = $this->container->get('entity_type.manager')->getStorage('sms_result');
+    $storage = \Drupal::service('entity_type.manager')->getStorage('sms_result');
     $saved = $storage->load($result->id());
     /** @var \Drupal\sms\Entity\SmsMessageResult $saved */
     static::assertEquals($result->getCreditsBalance(), $saved->getCreditsBalance());

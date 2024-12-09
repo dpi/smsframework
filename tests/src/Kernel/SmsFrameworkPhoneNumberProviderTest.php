@@ -72,7 +72,7 @@ final class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $this->gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
     $this->setFallbackGateway($this->gateway);
 
-    $this->phoneNumberProvider = $this->container->get('sms.phone_number');
+    $this->phoneNumberProvider = \Drupal::service('sms.phone_number');
 
     $this->phoneField = FieldStorageConfig::create([
       'entity_type' => 'entity_test',

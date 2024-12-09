@@ -143,7 +143,7 @@ trait MigratePhoneNumberTestTrait {
    * Asserts that the specified user has a verified phone number.
    */
   protected function assertVerifiedPhoneNumber(UserInterface $user, $number) {
-    $phone_numbers = $this->container->get('sms.phone_number')->getPhoneNumbers($user, TRUE);
+    $phone_numbers = \Drupal::service('sms.phone_number')->getPhoneNumbers($user, TRUE);
     $phone_number = \reset($phone_numbers);
     static::assertEquals($number, $phone_number, "Phone number '$number' is verified.");
   }
@@ -152,7 +152,7 @@ trait MigratePhoneNumberTestTrait {
    * Asserts that the specified user has an unverified phone number.
    */
   protected function assertUnVerifiedPhoneNumber(UserInterface $user, $number) {
-    $phone_numbers = $this->container->get('sms.phone_number')->getPhoneNumbers($user, FALSE);
+    $phone_numbers = \Drupal::service('sms.phone_number')->getPhoneNumbers($user, FALSE);
     $phone_number = \reset($phone_numbers);
     static::assertEquals($number, $phone_number, "Phone number '$number' is unverified.");
   }
@@ -161,17 +161,17 @@ trait MigratePhoneNumberTestTrait {
    * Asserts that the specified user has no phone number verified or unverified.
    */
   protected function assertNoVerifiedPhoneNumber(UserInterface $user) {
-    $phone_numbers = $this->container->get('sms.phone_number')->getPhoneNumbers($user);
+    $phone_numbers = \Drupal::service('sms.phone_number')->getPhoneNumbers($user);
     static::assertEquals([], $phone_numbers, "No phone numbers for user {$user->id()}.");
   }
 
   /**
    * Asserts that the specified number has a pending verification code.
    */
-  protected function assertVerificationCode($number, $code) {
-    $verification = $this->container->get('sms.phone_number.verification')->getPhoneVerificationByPhoneNumber($number, FALSE);
+  protected function assertVerificationCode($number, $code): void {
+    $verification = \Drupal::service('sms.phone_number.verification')->getPhoneVerificationByPhoneNumber($number, FALSE);
     $verification = \reset($verification);
-    return static::assertEquals($code, $verification->getCode());
+    static::assertEquals($code, $verification->getCode());
   }
 
   /**

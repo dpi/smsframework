@@ -117,7 +117,7 @@ final class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
       ->setStatus(SmsMessageReportStatus::DELIVERED)
       ->setRecipient('1234567890')
       ->setStatusMessage('Message delivered')
-      ->setStatusTime($this->container->get('datetime.time')->getRequestTime());
+      ->setStatusTime(\Drupal::service('datetime.time')->getRequestTime());
 
     $sms_message = SmsMessage::create();
     $sms_message->save();
@@ -125,7 +125,7 @@ final class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
       ->setSmsMessage($sms_message)
       ->save();
 
-    $storage = $this->container->get('entity_type.manager')->getStorage('sms_report');
+    $storage = \Drupal::service('entity_type.manager')->getStorage('sms_report');
     $saved = $storage->loadByProperties([
       'recipient' => '1234567890',
     ]);
@@ -154,7 +154,7 @@ final class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
       ->setStatus(SmsMessageReportStatus::DELIVERED)
       ->setRecipient('1234567890')
       ->setStatusMessage('Message delivered')
-      ->setStatusTime($this->container->get('datetime.time')->getRequestTime());
+      ->setStatusTime(\Drupal::service('datetime.time')->getRequestTime());
     $result->save();
   }
 
@@ -165,7 +165,7 @@ final class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
     $sms_message = SmsMessage::create();
     $sms_message->save();
 
-    $time_queued = $this->container->get('datetime.time')->getRequestTime();
+    $time_queued = \Drupal::service('datetime.time')->getRequestTime();
     $time_delivered = $time_queued + 3600;
 
     /** @var \Drupal\sms\Entity\SmsDeliveryReport $report */
@@ -197,7 +197,7 @@ final class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
     $sms_message = SmsMessage::create();
     $sms_message->save();
 
-    $request_time = $this->container->get('datetime.time')->getRequestTime();
+    $request_time = \Drupal::service('datetime.time')->getRequestTime();
     $status_times = [
       'queued' => $request_time,
       'pending' => $request_time + 1800,

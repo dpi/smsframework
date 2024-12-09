@@ -28,7 +28,7 @@ final class SmsFrameworkPushedDeliveryReportTest extends SmsFrameworkKernelBase 
 
   protected function setUp(): void {
     parent::setUp();
-    $this->routeProvider = $this->container->get('router.route_provider');
+    $this->routeProvider = \Drupal::service('router.route_provider');
   }
 
   /**

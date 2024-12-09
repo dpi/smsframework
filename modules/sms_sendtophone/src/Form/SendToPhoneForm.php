@@ -115,8 +115,10 @@ class SendToPhoneForm extends FormBase {
 
   /**
    * Builds the form array.
+   *
+   * @phpstan-return array<string, mixed>
    */
-  protected function getForm(array $form, FormStateInterface $form_state, $type = NULL, $extra = NULL) {
+  protected function getForm(array $form, FormStateInterface $form_state, $type = NULL, $extra = NULL): array {
     switch ($type) {
       case 'cck':
       case 'field':

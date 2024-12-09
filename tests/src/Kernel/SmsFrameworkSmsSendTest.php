@@ -31,7 +31,7 @@ final class SmsFrameworkSmsSendTest extends SmsFrameworkKernelBase {
 
   protected function setUp(): void {
     parent::setUp();
-    $this->defaultSmsProvider = $this->container->get('sms.provider');
+    $this->defaultSmsProvider = \Drupal::service('sms.provider');
   }
 
   /**

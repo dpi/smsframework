@@ -30,7 +30,7 @@ final class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('sms');
-    $this->smsProvider = $this->container->get('sms.provider');
+    $this->smsProvider = \Drupal::service('sms.provider');
     $this->setFallbackGateway(NULL);
   }
 
