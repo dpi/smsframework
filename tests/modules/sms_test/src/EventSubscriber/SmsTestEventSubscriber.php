@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\sms_test\EventSubscriber;
 
+use Drupal\Core\State\StateInterface;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Event\RecipientGatewayEvent;
 use Drupal\sms\Event\SmsEvents;
@@ -15,6 +16,11 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class SmsTestEventSubscriber implements EventSubscriberInterface {
 
+  public function __construct(
+    private readonly StateInterface $state,
+  ) {
+  }
+
   /**
    * Adds a gateway with ID 'test_gateway_200', with weight '200'.
    *
@@ -22,7 +28,7 @@ final class SmsTestEventSubscriber implements EventSubscriberInterface {
    *   The RecipientGatewayEvent event.
    */
   public function testAddGateway200(RecipientGatewayEvent $event): void {
-    if (\Drupal::state()->get('sms_test_event_subscriber__test_gateway_200', FALSE)) {
+    if ($this->state->get('sms_test_event_subscriber__test_gateway_200', FALSE)) {
       $gateway = SmsGateway::load('test_gateway_200');
       $event->addGateway($gateway, 200);
     }
@@ -35,7 +41,7 @@ final class SmsTestEventSubscriber implements EventSubscriberInterface {
    *   The RecipientGatewayEvent event.
    */
   public function testAddGateway400(RecipientGatewayEvent $event): void {
-    if (\Drupal::state()->get('sms_test_event_subscriber__test_gateway_400', FALSE)) {
+    if ($this->state->get('sms_test_event_subscriber__test_gateway_400', FALSE)) {
       $gateway = SmsGateway::load('test_gateway_400');
       $event->addGateway($gateway, 400);
     }
@@ -50,15 +56,17 @@ final class SmsTestEventSubscriber implements EventSubscriberInterface {
    *   The event name.
    */
   public function testExecutionOrder(Event $event, $eventName): void {
-    $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
+    /** @var array $execution_order */
+    $execution_order = $this->state->get('sms_test_event_subscriber__execution_order', []);
     $execution_order[] = $eventName;
-    \Drupal::state()->set('sms_test_event_subscriber__execution_order', $execution_order);
+    $this->state->set('sms_test_event_subscriber__execution_order', $execution_order);
   }
 
   /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
+    $events = [];
     $events[SmsEvents::MESSAGE_GATEWAY][] = ['testAddGateway200'];
     $events[SmsEvents::MESSAGE_GATEWAY][] = ['testAddGateway400'];
 

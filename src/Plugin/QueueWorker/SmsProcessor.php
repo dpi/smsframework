@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\sms\Direction;
+use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -27,44 +28,23 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
   public const PLUGIN_ID = 'sms.messages';
 
   /**
-   * SMS message entity storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected EntityStorageInterface $smsMessageStorage;
-
-  /**
    * Constructs a new SmsProcessor object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param array $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\sms\Provider\SmsProviderInterface $smsProvider
-   *   The SMS provider.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   Time.
    */
-  public function __construct(
+  final public function __construct(
     array $configuration,
     $plugin_id,
-    array $plugin_definition,
-    EntityTypeManagerInterface $entity_type_manager,
+    mixed $plugin_definition,
+    protected EntityTypeManagerInterface $entityTypeManager,
     protected SmsProviderInterface $smsProvider,
     protected TimeInterface $time,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->smsMessageStorage = $entity_type_manager->getStorage('sms');
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  final public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return new static(
       $configuration,
       $plugin_id,
@@ -78,40 +58,58 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
   /**
    * {@inheritdoc}
    */
-  public function processItem($data) {
-    if (isset($data['id'])) {
-      $id = $data['id'];
-      /** @var \Drupal\sms\Entity\SmsMessageInterface $sms_message */
-      if ($sms_message = $this->smsMessageStorage->load($id)) {
-        switch ($sms_message->getDirection()) {
-          case Direction::INCOMING:
-            $this->smsProvider
-              ->incoming($sms_message);
-            break;
+  public function processItem($data): void {
+    /** @var array{id: positive-int} $data */
+    $id = $data['id'] ?? throw new \LogicException('Missing SMS message id.');
 
-          case Direction::OUTGOING:
-            $this->smsProvider
-              ->send($sms_message);
-            break;
-        }
-
-        $duration = NULL;
-        if ($gateway = $sms_message->getGateway()) {
-          $duration = $gateway->getRetentionDuration($sms_message->getDirection());
-        }
-
-        // Clean up SMS message now if retention is set to delete immediately.
-        if ($duration === 0) {
-          $sms_message->delete();
-        }
-        else {
-          $sms_message
-            ->setProcessedTime($this->time->getRequestTime())
-            ->setQueued(FALSE)
-            ->save();
-        }
-      }
+    /** @var \Drupal\sms\Entity\SmsMessageInterface|null $sms_message */
+    $sms_message = $this->smsStorage()->load($id);
+    if ($sms_message === NULL) {
+      return;
     }
+
+    switch ($sms_message->getDirection()) {
+      case Direction::INCOMING:
+        $this->smsProvider
+          ->incoming($sms_message);
+        break;
+
+      case Direction::OUTGOING:
+        $this->smsProvider
+          ->send($sms_message);
+        break;
+    }
+
+    $duration = $sms_message->getGateway()?->getRetentionDuration($sms_message->getDirection() ?? throw new \LogicException('SMS message missing direction')) ?? NULL;
+
+    // Clean up SMS message now if retention is set to delete immediately.
+    if ($duration === 0) {
+      $sms_message->delete();
+      return;
+    }
+
+    $sms_message
+      ->setProcessedTime($this->time->getRequestTime())
+      ->setQueued(FALSE)
+      ->save();
+  }
+
+  /**
+   * Create a queue item from a message.
+   *
+   * @phpstan-return array{id: positive-int}
+   */
+  public static function createItemFrom(SmsMessageInterface $sms): array {
+    if ($sms->isNew()) {
+      throw new \LogicException('SMS must be saved.');
+    }
+
+    // @phpstan-ignore-next-line
+    return ['id' => (int) $sms->id()];
+  }
+
+  private function smsStorage(): EntityStorageInterface {
+    return $this->entityTypeManager->getStorage('sms');
   }
 
 }

@@ -15,9 +15,9 @@ use Drupal\sms\Exception\SmsDirectionException;
 use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Plugin\SmsGateway\SmsIncomingEventProcessorInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * The SMS provider that provides default messaging functionality.
@@ -26,11 +26,8 @@ class DefaultSmsProvider implements SmsProviderInterface {
 
   /**
    * Creates a new instance of the default SMS provider.
-   *
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
-   *   The event dispatcher.
    */
-  public function __construct(
+  final public function __construct(
     protected EventDispatcherInterface $eventDispatcher,
   ) {
   }
@@ -60,12 +57,12 @@ class DefaultSmsProvider implements SmsProviderInterface {
           }
         }
 
-        if ($errors) {
+        if ($errors !== []) {
           throw new SmsException(\sprintf('Can not queue SMS message because there are %s validation error(s): %s', \count($errors), \implode(' ', $errors)));
         }
       }
 
-      if ($sms_message->getGateway()->getSkipQueue()) {
+      if ($sms_message->getGateway()?->getSkipQueue() === TRUE) {
         switch ($sms_message->getDirection()) {
           case Direction::INCOMING:
             $this->incoming($sms_message);

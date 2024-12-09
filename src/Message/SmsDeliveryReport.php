@@ -118,14 +118,14 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
     return $this;
   }
 
-  public function getStatusTime(): int {
+  public function getStatusTime(): ?int {
     return $this->statusTime;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setStatusTime(int $time) {
+  public function setStatusTime(?int $time) {
     $this->statusTime = $time;
     return $this;
   }

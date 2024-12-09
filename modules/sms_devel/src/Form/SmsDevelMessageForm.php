@@ -54,9 +54,10 @@ class SmsDevelMessageForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    /** @var \Drupal\sms\Message\SmsMessageResultInterface[] $results */
     $results = $form_state->getTemporaryValue('results');
 
-    if ($results) {
+    if ($results !== []) {
       $form = \array_merge($form, $this->verboseResults($results));
     }
 
@@ -142,7 +143,9 @@ class SmsDevelMessageForm extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state): void {
+    /** @var string $number */
     $number = $form_state->getValue('number');
+    /** @var string $message */
     $message = $form_state->getValue('message');
     $automated = !empty($form_state->getValue('automated'));
     $this->message = SmsMessage::create()
@@ -152,7 +155,7 @@ class SmsDevelMessageForm extends FormBase {
 
     $send_on = $form_state->getValue('send_on');
     if ($send_on instanceof DrupalDateTime) {
-      $this->message->setSendTime($send_on->format('U'));
+      $this->message->setSendTime($send_on->getTimestamp());
     }
 
     $triggering_element = $form_state->getTriggeringElement();
@@ -248,7 +251,8 @@ class SmsDevelMessageForm extends FormBase {
    *   An SMS result object.
    */
   protected function resultMessage(SmsMessageResultInterface $result): void {
-    if ($status_code = $result->getError()) {
+    $status_code = $result->getError();
+    if ($status_code !== NULL) {
       $status_message = $result->getErrorMessage();
       $this->messenger()->addError($this->t('A problem occurred while attempting to process message: (code: @code) @message', [
         '@code' => $status_code,

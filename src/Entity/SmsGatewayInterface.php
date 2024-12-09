@@ -100,7 +100,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    * @phpstan-param \Drupal\sms\Direction::* $direction
    *    The direction of the message.
    *
-   * @return int
+   * @return int<-1, max>
    *   How long messages should persist in seconds. -1 to never expire.
    */
   public function getRetentionDuration(int $direction): int;

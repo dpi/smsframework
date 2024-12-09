@@ -220,7 +220,7 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function setDirection($direction) {
+  public function setDirection(int $direction) {
     $this->direction = $direction;
     return $this;
   }

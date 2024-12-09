@@ -16,7 +16,7 @@ interface SmsDeliveryReportInterface extends PlainDeliveryReportInterface, Conte
   /**
    * Gets the parent SMS message entity.
    */
-  public function getSmsMessage(): SmsMessageInterface;
+  public function getSmsMessage(): ?SmsMessageInterface;
 
   /**
    * Sets the parent SMS message entity.

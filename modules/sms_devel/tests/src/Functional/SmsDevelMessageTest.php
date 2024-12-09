@@ -22,11 +22,6 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
 
   protected $defaultTheme = 'stark';
 
-  /**
-   * A memory gateway.
-   *
-   * @var \Drupal\sms\Entity\SmsGatewayInterface
-   */
   protected SmsGatewayInterface $gateway;
 
   protected function setUp(): void {
@@ -43,12 +38,13 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
    * Tests sending functionality skipping queue.
    */
   public function testSendSkipQueue(): void {
+    $edit = [];
     $edit['number'] = $this->randomPhoneNumbers(1)[0];
     $edit['message'] = $this->randomString();
     $edit['skip_queue'] = TRUE;
 
     $this->drupalGet(Url::fromRoute('sms_devel.message'));
-    $this->submitForm($edit, \t('Send'));
+    $this->submitForm($edit, 'Send');
     $this->assertSession()->responseContains('Message was processed, 1 delivery reports were generated.');
 
     $messages = $this->getTestMessages($this->gateway);
@@ -60,16 +56,17 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
    * Tests sending functionality entering queue.
    */
   public function testSendNoSkipQueue(): void {
+    $edit = [];
     $edit['number'] = $this->randomPhoneNumbers(1)[0];
     $edit['message'] = $this->randomString();
     $edit['skip_queue'] = FALSE;
 
     $this->drupalGet(Url::fromRoute('sms_devel.message'));
-    $this->submitForm($edit, \t('Send'));
+    $this->submitForm($edit, 'Send');
     $this->assertSession()->responseContains('Message added to the outgoing queue.');
 
     $messages = SmsMessage::loadMultiple();
-    $message = \reset($messages);
+    $message = $messages[\array_key_first($messages)];
     static::assertEquals($edit['message'], $message->getMessage(), 'Message is same');
     static::assertEquals(Direction::OUTGOING, $message->getDirection(), 'Message is outgoing');
   }
@@ -78,33 +75,36 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
    * Tests receiving functionality skipping queue.
    */
   public function testReceiveSkipQueue(): void {
+    $edit = [];
     $edit['number'] = $this->randomPhoneNumbers(1)[0];
     $edit['message'] = $this->randomString();
     $edit['gateway'] = $this->gateway->id();
     $edit['skip_queue'] = TRUE;
 
     $this->drupalGet(Url::fromRoute('sms_devel.message'));
-    $this->submitForm($edit, \t('Receive'));
+    $this->submitForm($edit, 'Receive');
     $this->assertSession()->responseContains('Message was processed, 1 delivery reports were generated.');
 
-    static::assertEquals($edit['message'], \sms_test_gateway_get_incoming()['message']);
+    $result = \sms_test_gateway_get_incoming();
+    static::assertEquals($edit['message'], $result['message']);
   }
 
   /**
    * Tests receiving functionality entering queue.
    */
   public function testReceiveNoSkipQueue(): void {
+    $edit = [];
     $edit['number'] = $this->randomPhoneNumbers(1)[0];
     $edit['message'] = $this->randomString();
     $edit['gateway'] = $this->gateway->id();
     $edit['skip_queue'] = FALSE;
 
     $this->drupalGet(Url::fromRoute('sms_devel.message'));
-    $this->submitForm($edit, \t('Receive'));
+    $this->submitForm($edit, 'Receive');
     $this->assertSession()->responseContains('Message added to the incoming queue.');
 
     $messages = SmsMessage::loadMultiple();
-    $message = \reset($messages);
+    $message = $messages[\array_key_first($messages)];
     static::assertEquals($edit['message'], $message->getMessage(), 'Message is same');
     static::assertEquals(Direction::INCOMING, $message->getDirection(), 'Message is incoming');
   }
@@ -113,10 +113,11 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
    * Tests receiving with no selected gateway.
    */
   public function testReceiveGatewayInvalid(): void {
+    $edit = [];
     $edit['gateway'] = '';
 
     $this->drupalGet(Url::fromRoute('sms_devel.message'));
-    $this->submitForm($edit, \t('Receive'));
+    $this->submitForm($edit, 'Receive');
     $this->assertSession()->responseContains('Gateway must be selected if receiving a message.');
   }
 
@@ -124,23 +125,24 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
    * Tests tagging message as automated.
    */
   public function testAutomated(): void {
+    $edit = [];
     $edit['number'] = $this->randomPhoneNumbers(1)[0];
     $edit['message'] = $this->randomString();
     $edit['skip_queue'] = FALSE;
     $edit['automated'] = FALSE;
 
     $this->drupalGet(Url::fromRoute('sms_devel.message'));
-    $this->submitForm($edit, \t('Send'));
+    $this->submitForm($edit, 'Send');
 
     $messages = SmsMessage::loadMultiple();
-    $message = \reset($messages);
-    static::assertFalse($message->isAutomated(), 'Message is not automated');
+    static::assertFalse($messages[\array_key_first($messages)]->isAutomated(), 'Message is not automated');
   }
 
   /**
    * Tests adding send date.
    */
   public function testDate(): void {
+    $edit = [];
     $edit['number'] = $this->randomPhoneNumbers(1)[0];
     $edit['message'] = $this->randomString();
     $edit['skip_queue'] = FALSE;
@@ -154,11 +156,10 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['send_on[date]'] = $date_user->format('Y-m-d');
     $edit['send_on[time]'] = $date_user->format('H:i:s');
     $this->drupalGet(Url::fromRoute('sms_devel.message'));
-    $this->submitForm($edit, \t('Send'));
+    $this->submitForm($edit, 'Send');
 
     $messages = SmsMessage::loadMultiple();
-    $message = \reset($messages);
-    static::assertEquals($date->format('U'), $message->getSendTime(), 'Message has send time.');
+    static::assertEquals($date->getTimestamp(), $messages[\array_key_first($messages)]->getSendTime(), 'Message has send time.');
   }
 
   /**
@@ -167,12 +168,13 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
   public function testNoFallbackGateway(): void {
     $this->setFallbackGateway(NULL);
 
+    $edit = [];
     $edit['number'] = $this->randomPhoneNumbers(1)[0];
     $edit['message'] = $this->randomString();
     $edit['skip_queue'] = TRUE;
 
     $this->drupalGet(Url::fromRoute('sms_devel.message'));
-    $this->submitForm($edit, \t('Send'));
+    $this->submitForm($edit, 'Send');
     $this->assertSession()->responseContains('Message could not be sent');
 
     $messages = $this->getTestMessages($this->gateway);
@@ -183,6 +185,7 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
    * Tests verbose message output.
    */
   public function testVerboseReports(): void {
+    $edit = [];
     $edit['gateway'] = $this->gateway->id();
     $edit['number'] = $this->randomPhoneNumbers(1)[0];
     $edit['message'] = $this->randomString();
@@ -190,7 +193,7 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['verbose'] = TRUE;
 
     $this->drupalGet(Url::fromRoute('sms_devel.message'));
-    $this->submitForm($edit, \t('Send'));
+    $this->submitForm($edit, 'Send');
     $this->assertSession()->responseContains('Message was processed, 1 delivery reports were generated.');
 
     $first_row = '#edit-results > tbody > tr:nth-child(1)';
@@ -227,23 +230,23 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
 
     // Message ID.
     $selector = $first_row_first_report . ' > td:nth-child(2)';
-    $this->assertSession()->elementTextContains('css', $selector, $report->getMessageId());
+    $this->assertSession()->elementTextContains('css', $selector, (string) $report->getMessageId());
 
     // Status.
     $selector = $first_row_first_report . ' > td:nth-child(3)';
-    $this->assertSession()->elementTextContains('css', $selector, $report->getStatus());
+    $this->assertSession()->elementTextContains('css', $selector, (string) $report->getStatus());
 
     // Status Message.
     $selector = $first_row_first_report . ' > td:nth-child(4)';
     $this->assertSession()->elementTextContains('css', $selector, $report->getStatusMessage());
 
     // Time Delivered.
-    $date = DrupalDateTime::createFromTimestamp($report->getTimeDelivered());
+    $date = new \DateTimeImmutable('@' . ($report->getTimeDelivered() ?? throw new \LogicException()));
     $selector = $first_row_first_report . ' > td:nth-child(5)';
     $this->assertSession()->elementTextContains('css', $selector, $date->format('c'));
 
     // Time Queued.
-    $date = DrupalDateTime::createFromTimestamp($report->getTimeQueued());
+    $date = new \DateTimeImmutable('@' . ($report->getTimeQueued() ?? throw new \LogicException()));
     $selector = $first_row_first_report . ' > td:nth-child(6)';
     $this->assertSession()->elementTextContains('css', $selector, $date->format('c'));
   }

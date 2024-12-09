@@ -32,13 +32,6 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
     'user',
   ];
 
-  /**
-   * The default SMS provider service.
-   *
-   * @var \Drupal\sms\Provider\SmsProviderInterface
-   */
-  private SmsProviderInterface $defaultSmsProvider;
-
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('sms');
@@ -51,7 +44,8 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
    * Tests that delivery reports are updated after initial sending.
    */
   public function testDeliveryReportUpdate(): void {
-    $user = User::create();
+    $user = User::create(['name' => $this->randomMachineName()]);
+    $user->save();
     $request_time = \Drupal::service('datetime.time')->getRequestTime();
 
     $test_gateway = $this->createMemoryGateway();
@@ -64,7 +58,7 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
       ->setSender($this->randomMachineName())
       ->addRecipients(['1234567890', '987654321'])
       ->setMessage($this->randomString())
-      ->setUid($user->id())
+      ->setUid((int) $user->id())
       ->setGateway($test_gateway)
       ->setDirection(Direction::OUTGOING);
 

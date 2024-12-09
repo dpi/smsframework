@@ -16,22 +16,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class SmsEntityPhoneNumberProcessor implements EventSubscriberInterface {
 
   /**
-   * The phone number verification service.
-   *
-   * @var \Drupal\sms\Provider\PhoneNumberVerificationInterface
-   */
-  protected $phoneNumberVerification;
-
-  /**
    * Constructs a new SmsEntityPhoneNumberProcessor object.
-   *
-   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification
-   *   The phone number verification service.
    */
-  public function __construct(
-    PhoneNumberVerificationInterface $phone_number_verification,
+  final public function __construct(
+    protected readonly PhoneNumberVerificationInterface $phoneNumberVerification,
   ) {
-    $this->phoneNumberVerification = $phone_number_verification;
   }
 
   /**
@@ -81,6 +70,7 @@ class SmsEntityPhoneNumberProcessor implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
+    $events = [];
     $events[SmsEvents::ENTITY_PHONE_NUMBERS][] = ['entityPhoneNumbers', 1024];
     return $events;
   }

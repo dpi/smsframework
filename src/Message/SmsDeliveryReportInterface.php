@@ -101,14 +101,18 @@ interface SmsDeliveryReportInterface {
 
   /**
    * Gets the gateway-provided timestamp for the current status.
+   *
+   * @phpstan-return positive-int|null
    */
-  public function getStatusTime(): int;
+  public function getStatusTime(): ?int;
 
   /**
    * Sets the gateway-provided timestamp for the current status.
    *
+   * @phpstan-param positive-int $time|null
+   *
    * @return $this
    */
-  public function setStatusTime(int $time);
+  public function setStatusTime(?int $time);
 
 }

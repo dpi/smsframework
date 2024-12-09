@@ -11,7 +11,7 @@ use Drupal\sms\Event\SmsEntityPhoneNumber;
 use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Exception\NoPhoneNumberException;
 use Drupal\sms\Message\SmsMessageInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Phone number provider.
@@ -20,11 +20,6 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
 
   /**
    * Constructs a new PhoneNumberProvider object.
-   *
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
-   *   The event dispatcher.
-   * @param \Drupal\sms\Provider\SmsProviderInterface $smsProvider
-   *   The SMS provider.
    */
   public function __construct(
     protected EventDispatcherInterface $eventDispatcher,

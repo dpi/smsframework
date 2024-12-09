@@ -17,18 +17,7 @@ use Drupal\sms\Plugin\QueueWorker\SmsProcessor;
  */
 class SmsQueueProcessor implements SmsQueueProcessorInterface {
 
-  /**
-   * SMS gateway config storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
   protected EntityStorageInterface $smsGatewayStorage;
-
-  /**
-   * SMS message entity storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
   protected EntityStorageInterface $smsMessageStorage;
 
   /**
@@ -40,15 +29,6 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
 
   /**
    * Creates a new instance of SmsQueueProcessor.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Queue\QueueFactory $queueQactory
-   *   The queue service.
-   * @param \Drupal\sms\Provider\SmsProviderInterface $smsProvider
-   *   The SMS provider.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   Time.
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
@@ -62,9 +42,9 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
   }
 
   public function processUnqueued(): void {
-    /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
     $ids = [];
     foreach ($this->smsGatewayStorage->loadMultiple() as $sms_gateway) {
+      /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
       $query = $this->smsMessageStorage
         ->getQuery()
         ->accessCheck(FALSE)
@@ -81,8 +61,8 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
 
     /** @var \Drupal\sms\Entity\SmsMessageInterface $sms_message */
     foreach ($this->smsMessageStorage->loadMultiple($ids) as $sms_message) {
-      $data = ['id' => $sms_message->id()];
-      if ($this->queue->createItem($data)) {
+      $data = SmsProcessor::createItemFrom($sms_message);
+      if ($this->queue->createItem($data) !== FALSE) {
         $sms_message
           ->setQueued(TRUE)
           ->save();
@@ -91,15 +71,13 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
   }
 
   public function garbageCollection(): void {
-    $directions = [
-      Direction::INCOMING,
-      Direction::OUTGOING,
-    ];
-
     $ids = [];
     /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
     foreach ($this->smsGatewayStorage->loadMultiple() as $sms_gateway) {
-      foreach ($directions as $direction) {
+      foreach ([
+        Direction::INCOMING,
+        Direction::OUTGOING,
+      ] as $direction) {
         $lifetime = $sms_gateway->getRetentionDuration($direction);
         if ($lifetime !== -1) {
           $ids += $this->smsMessageStorage
@@ -115,7 +93,7 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
       }
     }
 
-    if ($ids) {
+    if ($ids !== []) {
       $this->smsMessageStorage->delete($this->smsMessageStorage->loadMultiple($ids));
     }
   }

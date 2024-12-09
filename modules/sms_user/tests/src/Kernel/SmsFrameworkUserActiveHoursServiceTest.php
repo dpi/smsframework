@@ -216,7 +216,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    * is called and the SMS message is saved.
    */
   public function testDelaySmsMessage(): void {
-    $timestamp = (new DrupalDateTime('next tuesday 9:00'))->format('U');
+    $timestamp = (new DrupalDateTime('next tuesday 9:00'))->getTimestamp();
     $this->activeHoursStatus(TRUE);
     $this->setActiveHours([
       ['start' => 'next tuesday 9:00', 'end' => 'next tuesday 17:00'],
@@ -238,7 +238,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    * Tests delay was not applied to a SMS message if it is tagged as automated.
    */
   public function testDelaySmsMessageNotAutomated(): void {
-    $timestamp = (new DrupalDateTime('next tuesday 9:00'))->format('U');
+    $timestamp = (new DrupalDateTime('next tuesday 9:00'))->getTimestamp();
     $this->activeHoursStatus(TRUE);
     $this->setActiveHours([
       ['start' => 'next tuesday 9:00', 'end' => 'next tuesday 17:00'],

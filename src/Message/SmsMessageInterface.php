@@ -98,7 +98,7 @@ interface SmsMessageInterface {
    * @return $this
    *   Return SMS message for chaining.
    */
-  public function setDirection($direction);
+  public function setDirection(int $direction);
 
   /**
    * Gets the options for building or sending this SMS message.

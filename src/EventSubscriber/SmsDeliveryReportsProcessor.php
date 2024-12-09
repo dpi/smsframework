@@ -16,20 +16,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class SmsDeliveryReportsProcessor implements EventSubscriberInterface {
 
   /**
-   * The entity storage for SMS delivery reports.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected EntityStorageInterface $reportStorage;
-
-  /**
    * Creates a new SmsDeliveryReportsProcessor controller.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
-    $this->reportStorage = $entity_type_manager->getStorage('sms_report');
+  final public function __construct(
+    private EntityTypeManagerInterface $entityTypeManager,
+  ) {
   }
 
   /**
@@ -41,9 +32,10 @@ class SmsDeliveryReportsProcessor implements EventSubscriberInterface {
   public function updateDeliveryReports(SmsDeliveryReportEvent $event): void {
     foreach ($event->getReports() as $report) {
       // Only messages that have message IDs can be tracked and updated.
-      if ($report->getMessageId()) {
-        $existing = $this->reportStorage->loadByProperties(['message_id' => $report->getMessageId()]);
-        if ($existing) {
+      if ($report->getMessageId() !== NULL) {
+        /** @var \Drupal\sms\Entity\SmsDeliveryReport[] $existing */
+        $existing = $this->reportStorage()->loadByProperties(['message_id' => $report->getMessageId()]);
+        if ($existing !== []) {
           $existing = \reset($existing);
           $existing
             ->setStatus($report->getStatus())
@@ -60,8 +52,13 @@ class SmsDeliveryReportsProcessor implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     // Update delivery reports as they are received.
+    $events = [];
     $events[SmsEvents::DELIVERY_REPORT_POST_PROCESS][] = ['updateDeliveryReports', 1024];
     return $events;
+  }
+
+  private function reportStorage(): EntityStorageInterface {
+    return $this->entityTypeManager->getStorage('sms_report');
   }
 
 }

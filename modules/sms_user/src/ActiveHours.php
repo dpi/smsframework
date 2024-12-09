@@ -84,8 +84,11 @@ class ActiveHours implements ActiveHoursInterface {
   public function delaySmsMessage(SmsMessageInterface &$sms_message): void {
     $recipient = $sms_message->getRecipientEntity();
     if ($sms_message->isAutomated() && $recipient instanceof UserInterface) {
-      if (!$this->inHours($recipient) && ($range = $this->findNextTime($recipient))) {
-        $sms_message->setSendTime($range->getStartDate()->format('U'));
+      if (FALSE === $this->inHours($recipient)) {
+        $range = $this->findNextTime($recipient);
+        if ($range !== FALSE) {
+          $sms_message->setSendTime($range->getStartDate()->getTimestamp());
+        }
       }
     }
   }

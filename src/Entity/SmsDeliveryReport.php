@@ -49,7 +49,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
   /**
    * {@inheritdoc}
    */
-  public function setMessageId($message_id) {
+  public function setMessageId(?string $message_id) {
     return $this->set('message_id', $message_id);
   }
 
@@ -60,7 +60,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
   /**
    * {@inheritdoc}
    */
-  public function setRecipient($recipient) {
+  public function setRecipient(string $recipient) {
     return $this->set('recipient', $recipient);
   }
 
@@ -71,7 +71,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
   /**
    * {@inheritdoc}
    */
-  public function setStatus($status) {
+  public function setStatus(?string $status) {
     return $this->set('status', $status);
   }
 
@@ -82,18 +82,19 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
   /**
    * {@inheritdoc}
    */
-  public function setStatusMessage($message) {
+  public function setStatusMessage(string $message) {
     return $this->set('status_message', $message);
   }
 
-  public function getStatusTime(): int {
-    return $this->get('status_time')->value;
+  public function getStatusTime(): ?int {
+    $value = $this->get('status_time')->value;
+    return $value === NULL ? NULL : (int) $value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setStatusTime($time) {
+  public function setStatusTime(?int $time) {
     return $this->set('status_time', $time);
   }
 
@@ -125,8 +126,8 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
       ->setStatusTime($time);
   }
 
-  public function getSmsMessage(): SmsMessageInterface {
-    return $this->get('sms_message')->entity;
+  public function getSmsMessage(): ?SmsMessageInterface {
+    return $this->get('sms_message')->entity ?? NULL;
   }
 
   /**
@@ -220,7 +221,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
 
   public function preSave(EntityStorageInterface $storage): void {
     // SMS delivery report cannot be saved without a parent SMS message.
-    if (!$this->getSmsMessage()) {
+    if (NULL === $this->getSmsMessage()) {
       throw new SmsStorageException('No parent SMS message specified for SMS delivery report');
     }
     parent::preSave($storage);

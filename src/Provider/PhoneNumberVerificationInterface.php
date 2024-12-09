@@ -24,7 +24,7 @@ interface PhoneNumberVerificationInterface {
    * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|null
    *   A phone number settings entity, or NULL if it does not exist.
    */
-  public function getPhoneNumberSettings($entity_type_id, $bundle): ?PhoneNumberSettingsInterface;
+  public function getPhoneNumberSettings(string $entity_type_id, string $bundle): ?PhoneNumberSettingsInterface;
 
   /**
    * Gets phone number settings for the bundle of an entity.
@@ -65,13 +65,13 @@ interface PhoneNumberVerificationInterface {
    * @param bool|null $verified
    *   Whether the returned phone numbers must be verified, or NULL to get all
    *   regardless of status.
-   * @param string $entity_type
+   * @param string|null $entity_type
    *   An entity type ID to filter.
    *
    * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface[]
    *   An array of phone number verification entities, if any.
    */
-  public function getPhoneVerificationByPhoneNumber($phone_number, $verified = TRUE, $entity_type = NULL): array;
+  public function getPhoneVerificationByPhoneNumber(string $phone_number, ?bool $verified = TRUE, ?string $entity_type = NULL): array;
 
   /**
    * Gets a phone number verification for an entity and phone number pair.
@@ -81,7 +81,7 @@ interface PhoneNumberVerificationInterface {
    * @param string $phone_number
    *   A phone number.
    */
-  public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number): ?EntityPhoneNumberVerificationInterface;
+  public function getPhoneVerificationByEntity(EntityInterface $entity, string $phone_number): ?EntityPhoneNumberVerificationInterface;
 
   /**
    * Generates a phone number verification for an entity and phone number pair.
@@ -94,7 +94,7 @@ interface PhoneNumberVerificationInterface {
    * @param string $phone_number
    *   A phone number.
    */
-  public function newPhoneVerification(EntityInterface $entity, $phone_number): ?EntityPhoneNumberVerificationInterface;
+  public function newPhoneVerification(EntityInterface $entity, string $phone_number): ?EntityPhoneNumberVerificationInterface;
 
   /**
    * Detect modifications to phone numbers on an entity.

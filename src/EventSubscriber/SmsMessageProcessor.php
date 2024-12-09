@@ -18,9 +18,9 @@ use Drupal\sms\Exception\SmsPluginReportException;
 use Drupal\sms\Message\SmsDeliveryReportInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Handles messages before they are processed by queue(), send(), or incoming().
@@ -32,13 +32,8 @@ class SmsMessageProcessor implements EventSubscriberInterface {
 
   /**
    * Creates a new SmsMessageProcessor controller.
-   *
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
-   *   The event dispatcher.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The configuration factory.
    */
-  public function __construct(
+  final public function __construct(
     protected EventDispatcherInterface $eventDispatcher,
     protected ConfigFactoryInterface $configFactory,
   ) {
@@ -118,7 +113,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
     );
 
     $difference_count = \count(\array_diff($message_recipients, $result_recipients));
-    if ($difference_count) {
+    if ($difference_count > 0) {
       throw new SmsPluginReportException(\sprintf('Missing reports for %s recipient(s).', $difference_count));
     }
   }
@@ -135,7 +130,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
     foreach ($sms_messages as $sms_message) {
       if ($sms_message->getDirection() == Direction::OUTGOING) {
         $recipients = $sms_message->getRecipients();
-        if (!\count($recipients)) {
+        if (\count($recipients) === 0) {
           throw new RecipientRouteException(\sprintf('There are no recipients.'));
         }
       }
@@ -191,7 +186,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
         $new = $base instanceof EntityInterface ? $base->createDuplicate() : (clone $base);
         $result[] = $new
           ->addRecipients($recipients)
-          ->setGateway(SmsGateway::load($gateway_id));
+          ->setGateway(SmsGateway::load($gateway_id) ?? throw new \LogicException('Missing gateway.'));
       }
     }
 
@@ -275,6 +270,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
+    $events = [];
     $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['ensureIncomingSupport', 1024];
     // Ensure reports for incoming messages.
     $events[SmsEvents::MESSAGE_PRE_PROCESS][] = ['ensureReportsPreprocess', 1024];

@@ -265,7 +265,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
 
   public function getUid(): ?int {
     $sender = $this->getSenderEntity();
-    return ($sender instanceof UserInterface) ? $sender->id() : NULL;
+    return ($sender instanceof UserInterface) ? (int) $sender->id() : NULL;
   }
 
   /**
@@ -294,13 +294,16 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * @see \Drupal\sms\Entity\SmsMessageInterface
    */
   public function getDirection(): ?int {
-    return $this->get('direction')->value;
+    /** @var string|null $direction */
+    $direction = $this->get('direction')->value;
+    // @phpstan-ignore-next-line
+    return $direction === NULL ? NULL : (int) $direction;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setDirection($direction) {
+  public function setDirection(int $direction) {
     $this->set('direction', $direction);
     return $this;
   }
