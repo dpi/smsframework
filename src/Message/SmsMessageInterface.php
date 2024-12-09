@@ -185,11 +185,8 @@ interface SmsMessageInterface {
 
   /**
    * Get phone number of the sender.
-   *
-   * @return string
-   *   The phone number of the sender.
    */
-  public function getSenderNumber(): string;
+  public function getSenderNumber(): ?string;
 
   /**
    * Set the phone number of the sender.
@@ -200,7 +197,7 @@ interface SmsMessageInterface {
    * @return $this
    *   Return SMS message for chaining.
    */
-  public function setSenderNumber(string $number);
+  public function setSenderNumber(?string $number);
 
   /**
    * Gets the message to be sent.

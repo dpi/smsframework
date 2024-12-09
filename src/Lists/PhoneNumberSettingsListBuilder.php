@@ -31,9 +31,6 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
     parent::__construct($entity_type, $storage);
   }
 
-  /**
-   * {@inheritdoc}
-   */
   final public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type): static {
     return new static(
       $entity_type,

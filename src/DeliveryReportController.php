@@ -9,7 +9,6 @@ use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -28,9 +27,6 @@ class DeliveryReportController implements ContainerInjectionInterface {
   ) {
   }
 
-  /**
-   * {@inheritdoc}
-   */
   final public static function create(ContainerInterface $container): static {
     return new static(
       $container->get(SmsProviderInterface::class),

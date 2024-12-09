@@ -58,15 +58,15 @@ final class AccountRegistration implements AccountRegistrationInterface, LoggerA
     }
 
     $sender_number = $sms_message->getSenderNumber();
-    if (!empty($sender_number)) {
+    if (\strlen($sender_number) > 0) {
       // Any users with this phone number?
       $entities = $this->phoneNumberVerificationProvider
         ->getPhoneVerificationByPhoneNumber($sender_number, NULL, 'user');
-      if (!count($entities)) {
-        if (!empty($this->settings('unrecognized_sender.status'))) {
+      if ($entities === []) {
+        if (TRUE === $this->settings('unrecognized_sender.status')) {
           $this->allUnknownNumbers($sms_message);
         }
-        if (!empty($this->settings('incoming_pattern.status'))) {
+        if (TRUE === $this->settings('incoming_pattern.status')) {
           $this->incomingPatternMessage($sms_message);
         }
       }
@@ -357,11 +357,8 @@ final class AccountRegistration implements AccountRegistrationInterface, LoggerA
    *
    * @param string $name
    *   The configuration name.
-   *
-   * @return array|null
-   *   The values for the requested configuration.
    */
-  protected function settings(string $name): ?array {
+  protected function settings(string $name): mixed {
     return $this->configFactory
       ->get('sms_user.settings')
       ->get('account_registration.' . $name);

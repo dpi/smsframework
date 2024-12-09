@@ -109,13 +109,14 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
    * {@inheritdoc}
    */
   public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number): ?EntityPhoneNumberVerificationInterface {
+    /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $entities */
     $entities = $this->phoneNumberVerificationStorage
       ->loadByProperties([
         'entity__target_id' => $entity->id(),
         'entity__target_type' => $entity->getEntityTypeId(),
         'phone' => $phone_number,
       ]);
-    return \reset($entities);
+    return $entities !== [] ? $entities[\array_key_first($entities)] : NULL;
   }
 
   /**

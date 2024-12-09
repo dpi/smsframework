@@ -29,9 +29,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class Incoming extends SmsGatewayPluginBase {
 
-  /**
-   * {@inheritdoc}
-   */
   public function send(SmsMessageInterface $sms): SmsMessageResultInterface {
   }
 

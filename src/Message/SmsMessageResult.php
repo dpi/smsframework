@@ -50,9 +50,6 @@ class SmsMessageResult implements SmsMessageResultInterface {
    */
   protected ?float $creditsUsed = NULL;
 
-  /**
-   * {@inheritdoc}
-   */
   public function getError(): ?string {
     return $this->error;
   }
@@ -65,9 +62,6 @@ class SmsMessageResult implements SmsMessageResultInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getErrorMessage(): string {
     return $this->errorMessage;
   }
@@ -115,9 +109,6 @@ class SmsMessageResult implements SmsMessageResultInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getCreditsBalance(): ?float {
     return $this->creditsBalance;
   }
@@ -135,9 +126,6 @@ class SmsMessageResult implements SmsMessageResultInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getCreditsUsed(): ?float {
     return $this->creditsUsed;
   }

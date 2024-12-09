@@ -36,9 +36,6 @@ class AdminSettingsForm extends ConfigFormBase {
     $this->setMessenger($messenger);
   }
 
-  /**
-   * {@inheritdoc}
-   */
   final public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('config.factory'),

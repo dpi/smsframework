@@ -134,14 +134,14 @@ class SmsMessage implements SmsMessageInterface {
     return $this;
   }
 
-  public function getSenderNumber(): string {
+  public function getSenderNumber(): ?string {
     return $this->senderPhoneNumber;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setSenderNumber(string $number) {
+  public function setSenderNumber(?string $number) {
     $this->senderPhoneNumber = $number;
     return $this;
   }

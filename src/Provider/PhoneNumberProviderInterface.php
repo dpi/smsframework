@@ -6,7 +6,6 @@ namespace Drupal\sms\Provider;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Message\SmsMessageInterface;
-use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
  * Interface for phone number provider.
@@ -35,12 +34,9 @@ interface PhoneNumberProviderInterface {
    * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
    *   The SMS message to send to the entity.
    *
-   * @return \Drupal\sms\Message\SmsMessageResultInterface|false
-   *   The message result from the gateway.
-   *
    * @throws \Drupal\sms\Exception\NoPhoneNumberException
    *   Thrown if entity does not have a phone number.
    */
-  public function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message): SmsMessageResultInterface|false;
+  public function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message): void;
 
 }

@@ -317,14 +317,14 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     return $this;
   }
 
-  public function getSenderNumber(): string {
-    return $this->get('sender_phone_number')->value;
+  public function getSenderNumber(): ?string {
+    return $this->get('sender_phone_number')->value ?? NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setSenderNumber($number) {
+  public function setSenderNumber(?string $number) {
     $this->set('sender_phone_number', $number);
     return $this;
   }

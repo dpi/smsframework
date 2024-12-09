@@ -49,7 +49,7 @@ final class SmsTestGatewayEventSubscriber implements EventSubscriberInterface {
     /** @var array<string, array<\Drupal\sms\Message\SmsMessageInterface>> $incoming_messages */
     $incoming_messages = &\drupal_static(static::STATE_MEMORY_INCOMING, []);
     foreach ($event->getMessages() as $message) {
-      assert($message instanceof SmsMessageInterface);
+      \assert($message instanceof SmsMessageInterface);
       $incoming_messages[$message->getGateway()->id()][] = $message;
     }
     $this->state->set(static::STATE_MEMORY_INCOMING, $incoming_messages);

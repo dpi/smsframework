@@ -3,4 +3,4 @@ services:
     autoconfigure: true
     autowire: true
 
-   Drupal\sms_test\EventSubscriber\SmsTestEventSubscriber: ~
+  Drupal\sms_test\EventSubscriber\SmsTestEventSubscriber: ~

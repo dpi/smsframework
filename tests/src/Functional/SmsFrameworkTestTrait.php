@@ -29,7 +29,8 @@ trait SmsFrameworkTestTrait {
    */
   protected function setFallbackGateway(?SmsGatewayInterface $sms_gateway = NULL): void {
     $sms_gateway = $sms_gateway?->id();
-    $this->config('sms.settings')
+    \Drupal::configFactory()
+      ->getEditable('sms.settings')
       ->set('fallback_gateway', $sms_gateway)
       ->save();
   }

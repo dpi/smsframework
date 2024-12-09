@@ -18,9 +18,6 @@ use Drupal\sms\Plugin\SmsGatewayPluginBase;
  */
 final class NoIncoming extends SmsGatewayPluginBase {
 
-  /**
-   * {@inheritdoc}
-   */
   public function send(SmsMessageInterface $sms): SmsMessageResultInterface {
     throw new \LogicException('No-op');
   }
