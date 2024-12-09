@@ -26,28 +26,13 @@ class SmsGatewayForm extends EntityForm {
 
   /**
    * Gateway storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected EntityStorageInterface $gatewayStorage;
 
   /**
    * Constructs a new SmsGatewayForm.
-   *
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $routeBuilder
-   *   The route builder.
-   * @param \Drupal\Core\Routing\RequestContext $requestContext
-   *   The request context.
-   * @param \Drupal\Core\Access\AccessManagerInterface $accessManager
-   *   The access manager.
-   * @param \Drupal\sms\Plugin\SmsGatewayPluginManagerInterface $gatewayManager
-   *   The gateway manager service.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   Entity type manager.
    */
-  public function __construct(
+  final public function __construct(
     protected RouteBuilderInterface $routeBuilder,
     protected RequestContext $requestContext,
     protected AccessManagerInterface $accessManager,
@@ -59,10 +44,7 @@ class SmsGatewayForm extends EntityForm {
     $this->gatewayStorage = $entityTypeManager->getStorage('sms_gateway');
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
+  final public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('router.builder'),
       $container->get('router.request_context'),
@@ -318,6 +300,8 @@ class SmsGatewayForm extends EntityForm {
     if ($rebuild) {
       $this->routeBuilder->setRebuildNeeded();
     }
+
+    return $saved;
   }
 
   /**

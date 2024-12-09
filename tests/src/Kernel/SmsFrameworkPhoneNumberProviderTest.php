@@ -140,17 +140,17 @@ final class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
       $phone_number_unverified = \array_values(\array_slice($phone_numbers, 1, $i, TRUE));
 
       // Verify first phone number.
-      if (!empty($phone_number_verified)) {
+      if (\count($phone_number_verified) > 0) {
         $this->verifyPhoneNumber($entity, \reset($phone_number_verified));
       }
 
-      $return = $this->phoneNumberProvider->getPhoneNumbers($entity, NULL);
+      $return = $this->phoneNumberProvider->getPhoneNumbers($entity, verified: NULL);
       static::assertEquals($phone_numbers, $return);
 
-      $return = $this->phoneNumberProvider->getPhoneNumbers($entity, FALSE);
-      static::assertEquals($phone_number_unverified, $return, $entity->id());
+      $return = $this->phoneNumberProvider->getPhoneNumbers($entity, verified: FALSE);
+      static::assertEquals($phone_number_unverified, $return);
 
-      $return = $this->phoneNumberProvider->getPhoneNumbers($entity, TRUE);
+      $return = $this->phoneNumberProvider->getPhoneNumbers($entity, verified: TRUE);
       static::assertEquals($phone_number_verified, $return);
     }
   }

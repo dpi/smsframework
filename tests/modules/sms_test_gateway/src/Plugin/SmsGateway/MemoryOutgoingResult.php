@@ -21,7 +21,7 @@ final class MemoryOutgoingResult extends Memory {
   public function send(SmsMessageInterface $sms): SmsMessageResultInterface {
     $result = parent::send($sms);
 
-    $delete_reports = \Drupal::state()->get('sms_test_gateway.memory_outgoing_result.delete_reports');
+    $delete_reports = static::state()->get('sms_test_gateway.memory_outgoing_result.delete_reports');
     if ($delete_reports > 0) {
       $reports = $result->getReports();
 

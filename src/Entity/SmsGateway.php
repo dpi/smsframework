@@ -13,6 +13,7 @@ use Drupal\Core\Url;
 use Drupal\sms\Direction;
 use Drupal\sms\Plugin\SmsGatewayPluginCollection;
 use Drupal\sms\Plugin\SmsGatewayPluginInterface;
+use Drupal\sms\Plugin\SmsGatewayPluginManagerInterface;
 
 /**
  * Defines storage for an SMS Gateway instance.
@@ -97,10 +98,8 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
 
   /**
    * The plugin collection that holds the plugin for this entity.
-   *
-   * @var \Drupal\sms\Plugin\SmsGatewayPluginCollection
    */
-  protected $pluginCollection;
+  protected ?SmsGatewayPluginCollection $pluginCollection = NULL;
 
   /**
    * Whether messages sent to this gateway should be sent immediately.
@@ -157,9 +156,9 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
-    /** @var static $original */
+    /** @var static|null $original */
     $original = &$this->original;
-    $original_path = isset($original) ? $original->getPushReportPath() : '';
+    $original_path = $original?->getPushReportPath() ?? '';
     if ($original_path != $this->getPushReportPath()) {
       \Drupal::service('router.builder')->setRebuildNeeded();
     }
@@ -172,14 +171,11 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
    *   The action's plugin collection.
    */
   protected function getPluginCollection(): LazyPluginCollection {
-    if (!$this->pluginCollection) {
-      $this->pluginCollection = new SmsGatewayPluginCollection(
-        \Drupal::service('plugin.manager.sms_gateway'),
-        $this->plugin,
-        $this->settings,
-      );
-    }
-    return $this->pluginCollection;
+    return $this->pluginCollection ??= new SmsGatewayPluginCollection(
+      \Drupal::service(SmsGatewayPluginManagerInterface::class),
+      $this->plugin,
+      $this->settings,
+    );
   }
 
   /**

@@ -30,6 +30,7 @@ use Symfony\Component\HttpFoundation\Response;
 final class Incoming extends SmsGatewayPluginBase {
 
   public function send(SmsMessageInterface $sms): SmsMessageResultInterface {
+    throw new \LogicException('Not implemented');
   }
 
   /**

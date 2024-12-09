@@ -21,7 +21,7 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
   /**
    * Constructs a new PhoneNumberSettingsListBuilder.
    */
-  public function __construct(
+  final public function __construct(
     EntityTypeInterface $entity_type,
     EntityStorageInterface $storage,
     private readonly EntityStorageInterface $phoneNumberVerificationStorage,

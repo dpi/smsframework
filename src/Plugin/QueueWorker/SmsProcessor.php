@@ -104,7 +104,6 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
       throw new \LogicException('SMS must be saved.');
     }
 
-    // @phpstan-ignore-next-line
     return ['id' => (int) $sms->id()];
   }
 

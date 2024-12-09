@@ -19,17 +19,8 @@ class VerifyPhoneNumberForm extends FormBase {
 
   /**
    * Constructs a VerifyPhoneNumberForm object.
-   *
-   * @param \Drupal\Core\Flood\FloodInterface $flood
-   *   The flood control mechanism.
-   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phoneNumberVerification
-   *   The phone number verification service.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   Time.
    */
-  public function __construct(
+  final public function __construct(
     protected FloodInterface $flood,
     protected PhoneNumberVerificationInterface $phoneNumberVerification,
     MessengerInterface $messenger,
@@ -38,10 +29,7 @@ class VerifyPhoneNumberForm extends FormBase {
     $this->setMessenger($messenger);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
+  final public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('flood'),
       $container->get('sms.phone_number.verification'),

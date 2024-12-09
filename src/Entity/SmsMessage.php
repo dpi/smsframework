@@ -296,7 +296,6 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   public function getDirection(): ?int {
     /** @var string|null $direction */
     $direction = $this->get('direction')->value;
-    // @phpstan-ignore-next-line
     return $direction === NULL ? NULL : (int) $direction;
   }
 

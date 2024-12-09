@@ -39,6 +39,8 @@ services:
     tags:
       - { name: access_check, applies_to: _sms_gateway_supports_pushed_reports }
 
+  Drupal\sms\Routing\RouteSubscriber: ~
+
   # Plugins.
   plugin.manager.sms_gateway:
     class: Drupal\sms\Plugin\SmsGatewayPluginManager

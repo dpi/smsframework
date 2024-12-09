@@ -30,17 +30,8 @@ class PhoneNumberSettingsForm extends EntityForm {
 
   /**
    * Constructs a new PhoneNumberSettingsForm object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
-   *   The entity type bundle info.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
-   *   The entity field manager.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
    */
-  public function __construct(
+  final public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
     protected EntityFieldManagerInterface $entityFieldManager,
@@ -50,10 +41,7 @@ class PhoneNumberSettingsForm extends EntityForm {
     $this->setMessenger($messenger);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
+  final public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
@@ -215,7 +203,7 @@ class PhoneNumberSettingsForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function save(array $form, FormStateInterface $form_state) {
+  public function save(array $form, FormStateInterface $form_state): int {
     $config = &$this->entity;
 
     [$entity_type_id, $bundle] = \explode('|', $form_state->getValue('entity_bundle'));
@@ -267,6 +255,8 @@ class PhoneNumberSettingsForm extends EntityForm {
     }
 
     $form_state->setRedirectUrl(Url::fromRoute('sms.phone_number_settings.list'));
+
+    return $saved;
   }
 
   /**

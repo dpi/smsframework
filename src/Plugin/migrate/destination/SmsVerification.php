@@ -26,34 +26,13 @@ class SmsVerification extends EntityContentBase implements ContainerFactoryPlugi
 
   /**
    * The phone number verification service.
-   *
-   * @var \Drupal\sms\Provider\PhoneNumberVerificationInterface
    */
-  protected $phoneNumberVerificationService;
+  protected PhoneNumberVerificationInterface $phoneNumberVerificationService;
 
   /**
    * Builds a phone number verification entity destination.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
-   *   The migration.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The storage for this entity type.
-   * @param array $bundles
-   *   The list of bundles this entity type has.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
-   *   The field type plugin manager service.
-   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $verification
-   *   The phone number verification service.
    */
-  public function __construct(
+  final public function __construct(
     array $configuration,
     $plugin_id,
     $plugin_definition,
@@ -71,7 +50,7 @@ class SmsVerification extends EntityContentBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
+  final public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL): static {
     $entity_type = static::getEntityTypeId($plugin_id);
     return new static(
       $configuration,
@@ -117,13 +96,11 @@ class SmsVerification extends EntityContentBase implements ContainerFactoryPlugi
    *
    * @param \Drupal\sms\Entity\PhoneNumberVerificationInterface $verification
    *   The phone number verification for a given user entity.
-   * @param int $delta
+   * @param int|null $delta
    *   The specific item of the phone number field to set.
    */
-  protected function setVerifiedValue(EntityPhoneNumberVerificationInterface $verification, $delta): void {
-    if (!isset($delta)) {
-      $delta = 0;
-    }
+  protected function setVerifiedValue(EntityPhoneNumberVerificationInterface $verification, ?int $delta): void {
+    $delta ??= 0;
     $user_entity = $verification->getEntity();
     $phone_number_settings = $this->phoneNumberVerificationService
       ->getPhoneNumberSettingsForEntity($user_entity);
