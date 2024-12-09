@@ -15,6 +15,8 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\sms\Direction;
+use Drupal\sms\Entity\PhoneNumberSettingsInterface;
+use Drupal\sms\Entity\PhoneNumberVerificationInterface;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Drupal\sms\Message\SmsMessage;
 
@@ -65,15 +67,12 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPhoneNumberSettings($entity_type_id, $bundle) {
+  public function getPhoneNumberSettings($entity_type_id, $bundle): ?PhoneNumberSettingsInterface {
     return $this->phoneNumberSettings
       ->load($entity_type_id . '.' . $bundle);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPhoneNumberSettingsForEntity(EntityInterface $entity) {
+  public function getPhoneNumberSettingsForEntity(EntityInterface $entity): ?PhoneNumberSettingsInterface {
     if (!$phone_number_settings = $this->getPhoneNumberSettings($entity->getEntityTypeId(), $entity->bundle())) {
       throw new PhoneNumberSettingsException(\sprintf('Entity phone number config does not exist for bundle %s:%s', $entity->getEntityTypeId(), $entity->bundle()));
     }
@@ -83,7 +82,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPhoneVerificationByCode($code) {
+  public function getPhoneVerificationByCode($code): false|PhoneNumberVerificationInterface {
     $entities = $this->phoneNumberVerificationStorage
       ->loadByProperties([
         'code' => $code,
@@ -94,7 +93,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPhoneVerificationByPhoneNumber($phone_number, $verified = TRUE, $entity_type = NULL) {
+  public function getPhoneVerificationByPhoneNumber($phone_number, $verified = TRUE, $entity_type = NULL): array {
     $properties['phone'] = $phone_number;
     if (isset($entity_type)) {
       $properties['entity__target_type'] = $entity_type;
@@ -109,7 +108,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number) {
+  public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number): ?PhoneNumberVerificationInterface {
     $entities = $this->phoneNumberVerificationStorage
       ->loadByProperties([
         'entity__target_id' => $entity->id(),
@@ -122,7 +121,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
   /**
    * {@inheritdoc}
    */
-  public function newPhoneVerification(EntityInterface $entity, $phone_number) {
+  public function newPhoneVerification(EntityInterface $entity, $phone_number): ?PhoneNumberVerificationInterface {
     $config = $this->getPhoneNumberSettingsForEntity($entity);
     $message = $config->getVerificationMessage() ?: '';
 
@@ -161,10 +160,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
     return $phone_verification;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function updatePhoneVerificationByEntity(EntityInterface $entity) {
+  public function updatePhoneVerificationByEntity(EntityInterface $entity): void {
     try {
       $phone_number_settings = $this->getPhoneNumberSettingsForEntity($entity);
       $field_name = $phone_number_settings->getFieldName('phone_number');
@@ -207,10 +203,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function deletePhoneVerificationByEntity(EntityInterface $entity) {
+  public function deletePhoneVerificationByEntity(EntityInterface $entity): void {
     // Check the entity uses phone numbers. To save on a SQL call, and to
     // prevent having to install phone number verification for SMS Framework
     // tests which delete entities. Which would otherwise error on non-existent
@@ -228,10 +221,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function purgeExpiredVerifications() {
+  public function purgeExpiredVerifications(): void {
     $current_time = $this->time->getRequestTime();
 
     $verification_ids = [];

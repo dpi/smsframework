@@ -61,10 +61,7 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
     $this->queue = $queueQactory->get(SmsProcessor::PLUGIN_ID, FALSE);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function processUnqueued() {
+  public function processUnqueued(): void {
     /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
     $ids = [];
     foreach ($this->smsGatewayStorage->loadMultiple() as $sms_gateway) {
@@ -93,10 +90,7 @@ class SmsQueueProcessor implements SmsQueueProcessorInterface {
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function garbageCollection() {
+  public function garbageCollection(): void {
     $directions = [
       Direction::INCOMING,
       Direction::OUTGOING,

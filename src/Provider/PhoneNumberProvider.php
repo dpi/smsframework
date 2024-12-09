@@ -11,6 +11,7 @@ use Drupal\sms\Event\SmsEntityPhoneNumber;
 use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Exception\NoPhoneNumberException;
 use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Message\SmsMessageResultInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -35,7 +36,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPhoneNumbers(EntityInterface $entity, $verified = TRUE) {
+  public function getPhoneNumbers(EntityInterface $entity, $verified = TRUE): array {
     $event = new SmsEntityPhoneNumber($entity, $verified);
     /** @var \Drupal\sms\Event\SmsEntityPhoneNumber $event */
     $event = $this->eventDispatcher
@@ -43,10 +44,7 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
     return $event->getPhoneNumbers();
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message) {
+  public function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message): SmsMessageResultInterface|false {
     if (!$phone_numbers = $this->getPhoneNumbers($entity)) {
       throw new NoPhoneNumberException('Attempted to send an SMS to entity without a phone number.');
     }
