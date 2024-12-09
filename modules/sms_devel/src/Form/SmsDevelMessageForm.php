@@ -11,6 +11,7 @@ use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsMessage;
+use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Message\SmsMessageResult;
@@ -23,40 +24,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class SmsDevelMessageForm extends FormBase {
 
-  /**
-   * The SMS Provider.
-   *
-   * @var \Drupal\sms\Provider\SmsProviderInterface
-   */
-  protected $smsProvider;
+  protected SmsMessageInterface $message;
 
   /**
-   * The message.
-   *
-   * @var \Drupal\sms\Entity\SmsMessageInterface
+   * Creates an new SmsDevelMessageForm object.
    */
-  protected $message;
-
-  /**
-   * Creates an new SendForm object.
-   *
-   * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
-   *   The SMS service provider.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   */
-  public function __construct(
-    SmsProviderInterface $sms_provider,
+  final public function __construct(
+    private readonly SmsProviderInterface $smsProvider,
     MessengerInterface $messenger,
   ) {
-    $this->smsProvider = $sms_provider;
     $this->setMessenger($messenger);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
+  final public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('sms.provider'),
       $container->get('messenger'),
@@ -161,7 +141,7 @@ class SmsDevelMessageForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     $number = $form_state->getValue('number');
     $message = $form_state->getValue('message');
     $automated = !empty($form_state->getValue('automated'));
@@ -259,7 +239,7 @@ class SmsDevelMessageForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {}
+  public function submitForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * Output a status message for a result object.

@@ -129,7 +129,7 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function setSender($sender) {
+  public function setSender(?string $sender) {
     $this->senderName = $sender;
     return $this;
   }
@@ -141,7 +141,7 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function setSenderNumber($number) {
+  public function setSenderNumber(string $number) {
     $this->senderPhoneNumber = $number;
     return $this;
   }
@@ -153,7 +153,7 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function setMessage($message) {
+  public function setMessage(string $message) {
     $this->message = $message;
     return $this;
   }
@@ -168,7 +168,7 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function addRecipient($recipient) {
+  public function addRecipient(string $recipient) {
     if (!\in_array($recipient, $this->recipients, TRUE)) {
       $this->recipients[] = $recipient;
     }
@@ -281,7 +281,7 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function setUid($uid) {
+  public function setUid(?int $uid) {
     $this->uid = $uid;
     return $this;
   }

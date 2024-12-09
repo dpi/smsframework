@@ -339,7 +339,7 @@ class AdminSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     // Active hours.
     foreach ($form_state->getValue(['active_hours', 'days']) as $day => $row) {
       foreach ($row as $position => $hour) {
@@ -436,7 +436,7 @@ class AdminSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $config = $this->config('sms_user.settings');
 
     // Account Registration.

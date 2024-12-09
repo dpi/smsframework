@@ -60,7 +60,7 @@ class PhoneNumberSettingsDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->entity->delete();
 
     $this->messenger()->addMessage($this->t('Phone number settings %label was deleted.', [

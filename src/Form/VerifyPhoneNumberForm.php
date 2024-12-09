@@ -80,7 +80,7 @@ class VerifyPhoneNumberForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     $flood_window = $this->config('sms.settings')->get('flood.verify_window');
     $flood_limit = $this->config('sms.settings')->get('flood.verify_limit');
 
@@ -115,7 +115,7 @@ class VerifyPhoneNumberForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $code = $form_state->getValue('code');
     $phone_verification = $this->phoneNumberVerification
       ->getPhoneVerificationByCode($code);

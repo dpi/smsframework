@@ -223,7 +223,7 @@ class SmsGatewayForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */
     $sms_gateway = $this->getEntity();
 
@@ -263,7 +263,7 @@ class SmsGatewayForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     parent::submitForm($form, $form_state);
 
     /** @var \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway */

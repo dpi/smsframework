@@ -72,7 +72,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function addRecipient($recipient) {
+  public function addRecipient(string $recipient) {
     // Ensure duplicate recipients cannot be added.
     foreach ($this->recipient_phone_number as $item) {
       if ($item->value == $recipient) {
@@ -246,7 +246,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    *
    * @see ::getSender()
    */
-  public function setSender($sender) {
+  public function setSender(?string $sender) {
     $this->set('sender_name', $sender);
     return $this;
   }
@@ -258,7 +258,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function setMessage($message) {
+  public function setMessage(string $message) {
     $this->set('message', $message);
     return $this;
   }
@@ -275,7 +275,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function setUid($uid) {
+  public function setUid(?int $uid) {
     $this->setSenderEntity(User::load($uid));
     return $this;
   }
@@ -287,7 +287,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function setAutomated($automated) {
+  public function setAutomated(bool $automated) {
     $this->set('automated', $automated);
     return $this;
   }
@@ -310,7 +310,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   }
 
   public function getGateway(): ?SmsGatewayInterface {
-    return $this->get('gateway')->entity;
+    return $this->get('gateway')->entity ?? NULL;
   }
 
   /**

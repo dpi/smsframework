@@ -60,7 +60,7 @@ class SmsGatewayDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->entity->delete();
 
     $this->messenger()->addMessage($this->t('Gateway %label was deleted.', [

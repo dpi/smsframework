@@ -28,7 +28,7 @@ interface SmsMessageInterface {
    * @return $this
    *   The called SMS message object.
    */
-  public function addRecipient($recipient);
+  public function addRecipient(string $recipient);
 
   /**
    * Adds multiple recipients to the SMS message.
@@ -181,7 +181,7 @@ interface SmsMessageInterface {
    * @return $this
    *   The called SMS message object.
    */
-  public function setSender($sender);
+  public function setSender(?string $sender);
 
   /**
    * Get phone number of the sender.
@@ -200,7 +200,7 @@ interface SmsMessageInterface {
    * @return $this
    *   Return SMS message for chaining.
    */
-  public function setSenderNumber($number);
+  public function setSenderNumber(string $number);
 
   /**
    * Gets the message to be sent.
@@ -219,7 +219,7 @@ interface SmsMessageInterface {
    * @return $this
    *   The called SMS message object.
    */
-  public function setMessage($message);
+  public function setMessage(string $message);
 
   /**
    * Gets the UUID of the SMS object.
@@ -241,13 +241,13 @@ interface SmsMessageInterface {
   /**
    * Set the user who created the SMS message.
    *
-   * @param int|null $uid
+   * @param positive-int|null $uid
    *   The ID of a user entity.
    *
    * @return $this
    *   The called SMS message object.
    */
-  public function setUid($uid);
+  public function setUid(?int $uid);
 
   /**
    * Sets whether this SMS message was generated automatically.
@@ -259,7 +259,7 @@ interface SmsMessageInterface {
    * @return $this
    *   The called SMS message object.
    */
-  public function setAutomated($automated);
+  public function setAutomated(bool $automated);
 
   /**
    * Gets whether this SMS message was generated automatically.

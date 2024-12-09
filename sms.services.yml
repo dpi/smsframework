@@ -5,6 +5,7 @@ services:
       - { name: route_enhancer }
   sms.provider:
     alias: sms.provider.default
+  Drupal\sms\Provider\SmsProviderInterface: '@sms.provider'
   sms.provider.default:
     class: Drupal\sms\Provider\DefaultSmsProvider
     arguments: ['@event_dispatcher']
@@ -17,6 +18,7 @@ services:
   sms.phone_number.verification:
     class: Drupal\sms\Provider\PhoneNumberVerification
     arguments: ['@entity_type.manager', '@config.factory', '@token', '@sms.provider', '@datetime.time']
+  Drupal\sms\Provider\PhoneNumberVerificationInterface: '@sms.phone_number.verification'
   sms.queue:
     class: Drupal\sms\Provider\SmsQueueProcessor
     arguments: ['@entity_type.manager', '@queue', '@sms.provider', '@datetime.time']
