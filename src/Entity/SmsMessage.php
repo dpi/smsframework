@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\sms\Exception\SmsStorageException;
+use Drupal\sms\Message\SmsDeliveryReportInterface;
 use Drupal\sms\Message\SmsMessageInterface as StdSmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface as StdMessageResultInterface;
 use Drupal\user\Entity\User;
@@ -60,7 +61,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRecipients() {
+  public function getRecipients(): array {
     $recipients = [];
     foreach ($this->get('recipient_phone_number') as $recipient) {
       $recipients[] = $recipient->value;
@@ -115,14 +116,14 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function getOptions() {
+  public function getOptions(): array {
     return ($first = $this->get('options')->first()) ? $first->getValue() : [];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getOption($name) {
+  public function getOption($name): mixed {
     $options = $this->getOptions();
     return $options[$name] ?? NULL;
   }
@@ -147,10 +148,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getResult() {
+  public function getResult(): ?StdMessageResultInterface {
     // Check the temporary store first as that contains the most recent value.
     // Also, if the entity is new then return that value (can be null).
     if ($this->result || $this->isNew()) {
@@ -196,7 +194,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function getReport($recipient) {
+  public function getReport($recipient): ?SmsDeliveryReportInterface {
     // If a result has been set, check that first.
     if ($this->result) {
       return $this->result->getReport($recipient);
@@ -216,7 +214,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function getReports() {
+  public function getReports(): array {
     // If a result has been set, check that first.
     if ($this->result) {
       return $this->result->getReports();
@@ -229,10 +227,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     return [];
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getSender() {
+  public function getSender(): ?string {
     $sender_name = $this->get('sender_name');
     if (isset($sender_name->value)) {
       return $sender_name->value;
@@ -256,10 +251,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getMessage() {
+  public function getMessage(): string {
     return $this->get('message')->value;
   }
 
@@ -271,17 +263,11 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getUuid() {
+  public function getUuid(): string {
     return $this->get('uuid')->value;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getUid() {
+  public function getUid(): ?int {
     $sender = $this->getSenderEntity();
     return ($sender instanceof UserInterface) ? $sender->id() : NULL;
   }
@@ -294,10 +280,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function isAutomated() {
+  public function isAutomated(): bool {
     return (bool) $this->get('automated')->value;
   }
 
@@ -314,11 +297,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    *
    * @see \Drupal\sms\Entity\SmsMessageInterface
    */
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDirection() {
+  public function getDirection(): ?int {
     return $this->get('direction')->value;
   }
 
@@ -330,10 +309,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getGateway() {
+  public function getGateway(): ?SmsGatewayInterface {
     return $this->get('gateway')->entity;
   }
 
@@ -345,10 +321,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getSenderNumber() {
+  public function getSenderNumber(): string {
     return $this->get('sender_phone_number')->value;
   }
 
@@ -360,10 +333,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getSenderEntity() {
+  public function getSenderEntity(): ?EntityInterface {
     return $this->get('sender_entity')->entity;
   }
 
@@ -375,10 +345,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getRecipientEntity() {
+  public function getRecipientEntity(): ?EntityInterface {
     return $this->get('recipient_entity')->entity;
   }
 
@@ -390,10 +357,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function isQueued() {
+  public function isQueued(): bool {
     return (bool) $this->get('queued')->value;
   }
 
@@ -405,17 +369,11 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getCreatedTime() {
+  public function getCreatedTime(): int {
     return $this->get('created')->value;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getSendTime() {
+  public function getSendTime(): int {
     return $this->get('send_on')->value;
   }
 
@@ -427,10 +385,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getProcessedTime() {
+  public function getProcessedTime(): ?int {
     return $this->get('processed')->value;
   }
 
@@ -445,7 +400,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function chunkByRecipients($size) {
+  public function chunkByRecipients($size): array {
     $recipients_all = $this->getRecipients();
 
     // Save processing by returning early.
@@ -468,7 +423,9 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type): array {
+    $fields = [];
+
     // Identifiers.
     $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(\t('SMS message ID'))

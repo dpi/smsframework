@@ -85,15 +85,14 @@ interface SmsMessageInterface {
   /**
    * Get direction of the message.
    *
-   * @return int|null
-   *   See \Drupal\sms\Direction constants for potential values.
+   * @phpstan-return \Drupal\sms\Direction::*|null
    */
   public function getDirection(): ?int;
 
   /**
    * Set direction of the message.
    *
-   * @param int $direction
+   * @param \Drupal\sms\Direction::* $direction
    *   Any of \Drupal\sms\Direction constants.
    *
    * @return $this

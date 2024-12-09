@@ -27,7 +27,7 @@
   },
   "require-dev": {
       "mglaman/phpstan-drupal": "^1",
-      "previousnext/coding-standard": "^1.0",
+      "previousnext/coding-standard": "^1.1.1",
       "phpstan/phpstan": "^1.11",
       "phpstan/phpstan-deprecation-rules": "*",
       "phpstan/extension-installer": "^1.4"
