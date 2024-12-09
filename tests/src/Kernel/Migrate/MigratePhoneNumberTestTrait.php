@@ -186,23 +186,23 @@ trait MigratePhoneNumberTestTrait {
   }
 
   /**
-   * Provides the relative path to the fixture that sets up the database.
-   */
-  abstract protected function smsUserFixtureFilePath(): void;
-
-  /**
-   * Provides the relative path to the fixture that adds confirmation message.
-   */
-  abstract protected function confirmationMessageFixturePath(): void;
-
-  /**
    * Returns the list of D6 or D7 sms_user phone number migrations to test.
    */
-  abstract protected function getMigrationsToTest(): void;
+  abstract protected function getMigrationsToTest(): array;
 
   /**
    * Returns the list of migrations to rollback for the rollback test.
    */
-  abstract protected function getMigrationsToRollback(): void;
+  abstract protected function getMigrationsToRollback(): array;
+
+  /**
+   * Provides the relative path to the fixture that sets up the database.
+   */
+  abstract protected function smsUserFixtureFilePath(): string;
+
+  /**
+   * Provides the relative path to the fixture that adds confirmation message.
+   */
+  abstract protected function confirmationMessageFixturePath(): string;
 
 }
