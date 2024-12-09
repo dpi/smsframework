@@ -16,7 +16,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
-use Drupal\sms\Entity\PhoneNumberVerificationInterface;
+use Drupal\sms\Entity\PhoneNumberVerificationInterface as EntityPhoneNumberVerificationInterface;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Drupal\sms\Message\SmsMessage;
 
@@ -82,7 +82,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPhoneVerificationByCode($code): false|PhoneNumberVerificationInterface {
+  public function getPhoneVerificationByCode($code): false|EntityPhoneNumberVerificationInterface {
     $entities = $this->phoneNumberVerificationStorage
       ->loadByProperties([
         'code' => $code,
@@ -108,7 +108,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number): ?PhoneNumberVerificationInterface {
+  public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number): ?EntityPhoneNumberVerificationInterface {
     $entities = $this->phoneNumberVerificationStorage
       ->loadByProperties([
         'entity__target_id' => $entity->id(),
@@ -121,7 +121,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
   /**
    * {@inheritdoc}
    */
-  public function newPhoneVerification(EntityInterface $entity, $phone_number): ?PhoneNumberVerificationInterface {
+  public function newPhoneVerification(EntityInterface $entity, $phone_number): ?EntityPhoneNumberVerificationInterface {
     $config = $this->getPhoneNumberSettingsForEntity($entity);
     $message = $config->getVerificationMessage() ?: '';
 
