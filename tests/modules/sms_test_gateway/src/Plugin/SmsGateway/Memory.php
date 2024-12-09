@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\State\StateInterface;
 use Drupal\sms\Event\SmsMessageEvent;
 use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Message\SmsMessageInterface;
@@ -66,7 +68,7 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     $this->configuration['widget'] = $form_state->getValue('widget');
   }
 
@@ -74,34 +76,31 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
     $gateway_id = $this->configuration['gateway_id'];
 
     // Message.
-    $state = \Drupal::state()->get('sms_test_gateway.memory.send', []);
+    $state = static::state()->get('sms_test_gateway.memory.send', []);
     $state[$gateway_id][] = $sms_message;
-    \Drupal::state()->set('sms_test_gateway.memory.send', $state);
+    static::state()->set('sms_test_gateway.memory.send', $state);
 
     // Reports.
-    $reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
+    $reports = static::state()->get('sms_test_gateway.memory.report', []);
     $gateway_reports = $reports[$gateway_id] ?? [];
     $new_reports = $this->randomDeliveryReports($sms_message);
     $reports[$gateway_id] = \array_merge($gateway_reports, $new_reports);
-    \Drupal::state()->set('sms_test_gateway.memory.report', $reports);
+    static::state()->set('sms_test_gateway.memory.report', $reports);
 
     return (new SmsMessageResult())
       ->setReports($new_reports);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function incomingEvent(SmsMessageEvent $event) {
+  public function incomingEvent(SmsMessageEvent $event): void {
     // @todo Contents of this method are subject to proposals made in
     // https://www.drupal.org/node/2712579
     // Set state so we test this method is executed, remove this after above is
     // addressed.
-    \Drupal::state()->set(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING, TRUE);
+    static::state()->set(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING, TRUE);
 
-    $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
+    $execution_order = static::state()->get('sms_test_event_subscriber__execution_order', []);
     $execution_order[] = __METHOD__;
-    \Drupal::state()->set('sms_test_event_subscriber__execution_order', $execution_order);
+    static::state()->set('sms_test_event_subscriber__execution_order', $execution_order);
   }
 
   /**
@@ -109,7 +108,7 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
    */
   public function parseDeliveryReports(Request $request, Response $response): array {
     $gateway_id = $this->configuration['gateway_id'];
-    $memory_reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
+    $memory_reports = static::state()->get('sms_test_gateway.memory.report', []);
 
     $data = Json::decode($request->request->get('delivery_report'));
     $return = [];
@@ -135,7 +134,7 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
       $memory_reports[$gateway_id][$message_id] = $new_report;
     }
 
-    \Drupal::state()->set('sms_test_gateway.memory.report', $memory_reports);
+    static::state()->set('sms_test_gateway.memory.report', $memory_reports);
 
     // Set the response.
     $response->setContent('custom response content');
@@ -161,7 +160,7 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
    */
   protected function randomDeliveryReports(SmsMessageInterface $sms_message): array {
     $random = new Random();
-    $request_time = \Drupal::time()->getRequestTime();
+    $request_time = static::time()->getRequestTime();
     $reports = [];
     foreach ($sms_message->getRecipients() as $number) {
       $reports[] = (new SmsDeliveryReport())
@@ -178,6 +177,14 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
 
   public function getCreditsBalance(): ?float {
     return 13.36;
+  }
+
+  private static function state(): StateInterface {
+    return \Drupal::state();
+  }
+
+  private static function time(): TimeInterface {
+    return \Drupal::time();
   }
 
 }

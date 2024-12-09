@@ -61,8 +61,7 @@ class SmsMessage implements SmsMessageInterface {
    *
    * Since direction is not a part of the constructor, it needs to be nullable.
    *
-   * @var int|null
-   * @see \Drupal\sms\Direction
+   * @var \Drupal\sms\Direction::*|null
    */
   protected ?int $direction = NULL;
 
@@ -120,13 +119,10 @@ class SmsMessage implements SmsMessageInterface {
     $this->setMessage($message);
     $this->options = $options;
     $this->setUid($uid);
-    $this->uuid = $this->uuidGenerator()->generate();
+    $this->uuid = static::uuidGenerator()->generate();
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getSender() {
+  public function getSender(): ?string {
     return $this->senderName;
   }
 
@@ -138,10 +134,7 @@ class SmsMessage implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getSenderNumber() {
+  public function getSenderNumber(): string {
     return $this->senderPhoneNumber;
   }
 
@@ -153,10 +146,7 @@ class SmsMessage implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getMessage() {
+  public function getMessage(): string {
     return $this->message;
   }
 
@@ -171,7 +161,7 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRecipients() {
+  public function getRecipients(): array {
     return $this->recipients;
   }
 
@@ -211,10 +201,7 @@ class SmsMessage implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getGateway() {
+  public function getGateway(): ?SmsGatewayInterface {
     return $this->gateway;
   }
 
@@ -226,10 +213,7 @@ class SmsMessage implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getDirection() {
+  public function getDirection(): ?int {
     return $this->direction;
   }
 
@@ -244,14 +228,14 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function getOptions() {
+  public function getOptions(): array {
     return $this->options;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getOption($name) {
+  public function getOption($name): mixed {
     if (\array_key_exists($name, $this->options)) {
       return $this->options[$name];
     }
@@ -274,10 +258,7 @@ class SmsMessage implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getResult() {
+  public function getResult(): ?SmsMessageResultInterface {
     return $this->result;
   }
 
@@ -289,17 +270,11 @@ class SmsMessage implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getUuid() {
+  public function getUuid(): string {
     return $this->uuid;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getUid() {
+  public function getUid(): ?int {
     return $this->uid;
   }
 
@@ -319,27 +294,18 @@ class SmsMessage implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function isAutomated() {
+  public function isAutomated(): bool {
     return $this->automated;
   }
 
-  /**
-   * Gets the UUID generator.
-   *
-   * @return \Drupal\Component\Uuid\UuidInterface
-   *   The UUID generator.
-   */
-  protected function uuidGenerator(): UuidInterface {
-    return \Drupal::service('uuid');
+  protected static function uuidGenerator(): UuidInterface {
+    return \Drupal::service(UuidInterface::class);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function chunkByRecipients($size) {
+  public function chunkByRecipients($size): array {
     $recipients_all = $this->getRecipients();
 
     // Save processing by returning early.
@@ -361,14 +327,14 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function getReport($recipient) {
+  public function getReport($recipient): ?SmsDeliveryReportInterface {
     return $this->result?->getReport($recipient);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getReports() {
+  public function getReports(): array {
     return $this->result ? $this->result->getReports() : [];
   }
 

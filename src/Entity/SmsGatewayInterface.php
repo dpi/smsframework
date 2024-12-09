@@ -97,19 +97,18 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   /**
    * Get how many seconds to hold messages.
    *
-   * @param int $direction
-   *   The direction of the message. See SmsMessageInterface::DIRECTION_*
-   *   constants.
+   * @phpstan-param \Drupal\sms\Direction::* $direction
+   *    The direction of the message.
    *
    * @return int
    *   How long messages should persist in seconds. -1 to never expire.
    */
-  public function getRetentionDuration($direction): int;
+  public function getRetentionDuration(int $direction): int;
 
   /**
-   * Set how many seconds to hold messages..
+   * Set how many seconds to hold messages.
    *
-   * @param int $direction
+   * @param \Drupal\sms\Direction::* $direction
    *   The direction of the message. See SmsMessageInterface::DIRECTION_*
    *   constants.
    * @param int $retention_duration
@@ -118,7 +117,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    * @return $this
    *   Return this gateway for chaining.
    */
-  public function setRetentionDuration($direction, $retention_duration);
+  public function setRetentionDuration(int $direction, $retention_duration);
 
   /**
    * Get maximum number of recipients per outgoing message.

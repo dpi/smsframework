@@ -43,10 +43,7 @@ class AccountRegistration implements AccountRegistrationInterface {
   ) {
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function createAccount(SmsMessageInterface $sms_message) {
+  public function createAccount(SmsMessageInterface $sms_message): void {
     $this->userPhoneNumberSettings = $this->phoneNumberVerificationProvider
       ->getPhoneNumberSettings('user', 'user');
     if (!$this->userPhoneNumberSettings) {

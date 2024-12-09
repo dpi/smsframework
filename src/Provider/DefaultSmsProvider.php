@@ -38,7 +38,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function queue(SmsMessageInterface $sms_message) {
+  public function queue(SmsMessageInterface $sms_message): array {
     if (!$sms_message->getDirection()) {
       throw new SmsDirectionException('Missing direction for message.');
     }
@@ -89,7 +89,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms) {
+  public function send(SmsMessageInterface $sms): array {
     $sms->setDirection(Direction::OUTGOING);
 
     $dispatch = !$sms->getOption('_skip_preprocess_event');
@@ -119,14 +119,14 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function incoming(SmsMessageInterface $sms_message) {
+  public function incoming(SmsMessageInterface $sms_message): array {
     $sms_message->setDirection(Direction::INCOMING);
 
     // Do not iterate over messages individually like outgoing, changing gateway
     // in pre-process events do not apply to incoming.
-    $plugin = $sms_message->getGateway()->getPlugin();
+    $plugin = $sms_message->getGateway()?->getPlugin() ?? throw new \LogicException('Missing gateway plugin.');
 
-    $dispatch = !$sms_message->getOption('_skip_preprocess_event');
+    $dispatch = NULL === $sms_message->getOption('_skip_preprocess_event');
     $sms_messages = $dispatch ? $this->dispatchEvent(SmsEvents::MESSAGE_PRE_PROCESS, [$sms_message])->getMessages() : [$sms_message];
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_INCOMING_PRE_PROCESS, $sms_messages)->getMessages();
 
@@ -141,10 +141,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
     return $sms_messages;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function processDeliveryReport(Request $request, SmsGatewayInterface $sms_gateway) {
+  public function processDeliveryReport(Request $request, SmsGatewayInterface $sms_gateway): Response {
     $response = new Response();
     $reports = $sms_gateway->getPlugin()
       ->parseDeliveryReports($request, $response);

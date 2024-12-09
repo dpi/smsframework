@@ -11,6 +11,7 @@ use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageReportStatus;
 use Drupal\sms\Message\SmsMessageResult;
+use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -74,10 +75,7 @@ class LogGateway extends SmsGatewayPluginBase implements ContainerFactoryPluginI
     );
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function send(SmsMessageInterface $sms) {
+  public function send(SmsMessageInterface $sms): SmsMessageResultInterface {
     $this->logger->notice('SMS message sent to %number with the text: @message', [
       '%number' => \implode(', ', $sms->getRecipients()),
       '@message' => $sms->getMessage(),

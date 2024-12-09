@@ -7,6 +7,7 @@ namespace Drupal\sms\Provider;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Provides an interface for sending messages.
@@ -66,6 +67,6 @@ interface SmsProviderInterface {
    * @param \Drupal\sms\Entity\SmsGatewayInterface $gateway
    *   The gateway designated to process the delivery report.
    */
-  public function processDeliveryReport(Request $request, SmsGatewayInterface $gateway): void;
+  public function processDeliveryReport(Request $request, SmsGatewayInterface $gateway): Response;
 
 }

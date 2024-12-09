@@ -46,7 +46,7 @@ class ActiveHours implements ActiveHoursInterface {
   /**
    * {@inheritdoc}
    */
-  public function inHours(UserInterface $user, $now = 'now') {
+  public function inHours(UserInterface $user, $now = 'now'): bool {
     $this->build();
 
     // We're in hours if active hours feature is disabled.
@@ -68,7 +68,7 @@ class ActiveHours implements ActiveHoursInterface {
   /**
    * {@inheritdoc}
    */
-  public function findNextTime(UserInterface $user, $now = 'now') {
+  public function findNextTime(UserInterface $user, $now = 'now'): ActiveHoursDates|false {
     $timezone = $user->getTimeZone();
     $now = new DrupalDateTime($now, $timezone);
     foreach ($this->getRanges($timezone) as $date) {
@@ -81,10 +81,7 @@ class ActiveHours implements ActiveHoursInterface {
     return FALSE;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function delaySmsMessage(SmsMessageInterface &$sms_message) {
+  public function delaySmsMessage(SmsMessageInterface &$sms_message): void {
     $recipient = $sms_message->getRecipientEntity();
     if ($sms_message->isAutomated() && $recipient instanceof UserInterface) {
       if (!$this->inHours($recipient) && ($range = $this->findNextTime($recipient))) {
@@ -96,7 +93,7 @@ class ActiveHours implements ActiveHoursInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRanges($timezone) {
+  public function getRanges($timezone): array {
     $this->build();
 
     $dates = [];

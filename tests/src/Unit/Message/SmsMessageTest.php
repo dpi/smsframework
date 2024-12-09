@@ -38,7 +38,7 @@ final class SmsMessageTest extends UnitTestCase {
  */
 final class TestSmsMessage extends SmsMessage {
 
-  protected function uuidGenerator(): UuidInterface {
+  protected static function uuidGenerator(): UuidInterface {
     return new Php();
   }
 

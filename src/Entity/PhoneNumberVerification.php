@@ -40,17 +40,11 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
    */
   protected $bundle;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getCreatedTime() {
+  public function getCreatedTime(): int {
     return $this->get('created')->value;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getEntity() {
+  public function getEntity(): ?EntityInterface {
     return $this->get('entity')->entity;
   }
 
@@ -62,10 +56,7 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPhoneNumber() {
+  public function getPhoneNumber(): string {
     return $this->get('phone')->value;
   }
 
@@ -77,10 +68,7 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getCode() {
+  public function getCode(): string {
     return $this->get('code')->value;
   }
 
@@ -92,10 +80,7 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getStatus() {
+  public function getStatus(): bool {
     return (bool) $this->get('status')->value;
   }
 
@@ -110,7 +95,9 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type): array {
+    $fields = [];
+
     $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(\t('Phone verification ID'))
       ->setDescription(\t('The phone verification ID.'))
@@ -158,10 +145,7 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
     return $fields;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function preSave(EntityStorageInterface $storage) {
+  public function preSave(EntityStorageInterface $storage): void {
     parent::preSave($storage);
     // Update bundle field with bundle of entity.
     $entity = $this->getEntity();

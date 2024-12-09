@@ -116,10 +116,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
     return $this->entity_type . '.' . $this->bundle;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPhoneNumberEntityTypeId() {
+  public function getPhoneNumberEntityTypeId(): string {
     return $this->entity_type;
   }
 
@@ -131,10 +128,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPhoneNumberBundle() {
+  public function getPhoneNumberBundle(): string {
     return $this->bundle;
   }
 
@@ -146,10 +140,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getVerificationMessage() {
+  public function getVerificationMessage(): string {
     return $this->verification_message;
   }
 
@@ -161,10 +152,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getVerificationCodeLifetime() {
+  public function getVerificationCodeLifetime(): int {
     return $this->verification_code_lifetime;
   }
 
@@ -176,10 +164,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPurgeVerificationPhoneNumber() {
+  public function getPurgeVerificationPhoneNumber(): bool {
     return $this->purge_verification_phone_number;
   }
 
@@ -194,7 +179,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
   /**
    * {@inheritdoc}
    */
-  public function getFieldName($map) {
+  public function getFieldName($map): ?string {
     return $this->fields[$map] ?? NULL;
   }
 

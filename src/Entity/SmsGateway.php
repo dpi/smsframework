@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\Url;
 use Drupal\sms\Direction;
 use Drupal\sms\Plugin\SmsGatewayPluginCollection;
+use Drupal\sms\Plugin\SmsGatewayPluginInterface;
 
 /**
  * Defines storage for an SMS Gateway instance.
@@ -188,24 +189,15 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
     return ['settings' => $this->getPluginCollection()];
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPlugin() {
+  public function getPlugin(): SmsGatewayPluginInterface {
     return $this->getPluginCollection()->get($this->plugin);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPluginId() {
+  public function getPluginId(): string {
     return $this->plugin;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getSkipQueue() {
+  public function getSkipQueue(): bool {
     return !empty($this->skip_queue);
   }
 
@@ -217,10 +209,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPushIncomingPath() {
+  public function getPushIncomingPath(): ?string {
     return $this->incoming_push_path;
   }
 
@@ -232,17 +221,11 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPushReportUrl() {
+  public function getPushReportUrl(): Url {
     return Url::fromRoute('sms.delivery_report.receive.' . $this->id());
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPushReportPath() {
+  public function getPushReportPath(): ?string {
     return $this->reports_push_path;
   }
 
@@ -257,7 +240,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   /**
    * {@inheritdoc}
    */
-  public function getRetentionDuration($direction) {
+  public function getRetentionDuration($direction): int {
     return match ($direction) {
       Direction::INCOMING => (int) $this->retention_duration_incoming,
       Direction::OUTGOING => (int) $this->retention_duration_outgoing,
@@ -281,64 +264,43 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getMaxRecipientsOutgoing() {
+  public function getMaxRecipientsOutgoing(): int {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return isset($definition['outgoing_message_max_recipients']) ? (int) $definition['outgoing_message_max_recipients'] : 1;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function supportsIncoming() {
+  public function supportsIncoming(): bool {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return isset($definition['incoming']) ? (boolean) $definition['incoming'] : FALSE;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function autoCreateIncomingRoute() {
+  public function autoCreateIncomingRoute(): bool {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return isset($definition['incoming_route']) ? (boolean) $definition['incoming_route'] : FALSE;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function isScheduleAware() {
+  public function isScheduleAware(): bool {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return !empty($definition['schedule_aware']);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function supportsReportsPull() {
+  public function supportsReportsPull(): bool {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return isset($definition['reports_pull']) ? (boolean) $definition['reports_pull'] : FALSE;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function supportsReportsPush() {
+  public function supportsReportsPush(): bool {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return isset($definition['reports_push']) ? (boolean) $definition['reports_push'] : FALSE;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function supportsCreditBalanceQuery() {
+  public function supportsCreditBalanceQuery(): bool {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return isset($definition['credit_balance_available']) ? (boolean) $definition['credit_balance_available'] : FALSE;
