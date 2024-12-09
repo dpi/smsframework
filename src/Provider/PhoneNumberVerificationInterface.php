@@ -6,7 +6,7 @@ namespace Drupal\sms\Provider;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
-use Drupal\sms\Entity\PhoneNumberVerificationInterface;
+use Drupal\sms\Entity\PhoneNumberVerificationInterface as EntityPhoneNumberVerificationInterface;
 
 /**
  * Interface for phone number provider.
@@ -50,7 +50,7 @@ interface PhoneNumberVerificationInterface {
    *   A phone number verification entity, or FALSE if $code is not a valid
    *   verification code.
    */
-  public function getPhoneVerificationByCode($code): PhoneNumberVerificationInterface|false;
+  public function getPhoneVerificationByCode($code): EntityPhoneNumberVerificationInterface|false;
 
   /**
    * Gets phone number verifications for a phone number.
@@ -80,11 +80,8 @@ interface PhoneNumberVerificationInterface {
    *   An entity to get phone number verification.
    * @param string $phone_number
    *   A phone number.
-   *
-   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|null
-   *   The phone number verification for an entity and phone number pair.
    */
-  public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number): ?PhoneNumberVerificationInterface;
+  public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number): ?EntityPhoneNumberVerificationInterface;
 
   /**
    * Generates a phone number verification for an entity and phone number pair.
@@ -96,11 +93,8 @@ interface PhoneNumberVerificationInterface {
    *   An entity to get phone number verification.
    * @param string $phone_number
    *   A phone number.
-   *
-   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|null
-   *   A phone number verification.
    */
-  public function newPhoneVerification(EntityInterface $entity, $phone_number): ?PhoneNumberVerificationInterface;
+  public function newPhoneVerification(EntityInterface $entity, $phone_number): ?EntityPhoneNumberVerificationInterface;
 
   /**
    * Detect modifications to phone numbers on an entity.
