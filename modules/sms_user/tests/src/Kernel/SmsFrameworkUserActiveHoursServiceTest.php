@@ -9,6 +9,7 @@ use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
 use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
 
 /**
  * Tests active hours service.
@@ -258,7 +259,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Helper to set status of active hours.
    */
-  protected function activeHoursStatus($status) {
+  protected function activeHoursStatus($status): void {
     \Drupal::configFactory()
       ->getEditable('sms_user.settings')
       ->set('active_hours.status', $status)
@@ -268,7 +269,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Helper to set and replace existing active hours ranges.
    */
-  protected function setActiveHours($ranges) {
+  protected function setActiveHours($ranges): void {
     \Drupal::configFactory()
       ->getEditable('sms_user.settings')
       ->set('active_hours.ranges', $ranges)
@@ -284,7 +285,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    * @return \Drupal\user\UserInterface
    *   A saved user entity.
    */
-  protected function createUser(array $values = []) {
+  protected function createUser(array $values = []): UserInterface {
     $user = User::create([
       'uid' => 1,
       'name' => $this->randomMachineName(),

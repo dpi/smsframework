@@ -51,7 +51,7 @@ class SmsIncomingController extends ControllerBase {
    * @return mixed
    *   A response to return.
    */
-  public function processIncoming(Request $request, SmsGatewayInterface $sms_gateway) {
+  public function processIncoming(Request $request, SmsGatewayInterface $sms_gateway): mixed {
     $controller = [$sms_gateway->getPlugin(), 'processIncoming'];
     $arguments = $this->argumentResolver
       ->getArguments($request, $controller);

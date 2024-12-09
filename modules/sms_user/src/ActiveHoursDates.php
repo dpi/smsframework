@@ -33,7 +33,7 @@ class ActiveHoursDates {
    * @return \Drupal\Core\Datetime\DrupalDateTime
    *   The start date.
    */
-  public function getStartDate() {
+  public function getStartDate(): DrupalDateTime {
     return $this->start;
   }
 
@@ -43,7 +43,7 @@ class ActiveHoursDates {
    * @return \Drupal\Core\Datetime\DrupalDateTime
    *   The end date.
    */
-  public function getEndDate() {
+  public function getEndDate(): DrupalDateTime {
     return $this->end;
   }
 

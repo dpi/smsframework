@@ -123,7 +123,7 @@ class ActiveHours implements ActiveHoursInterface {
   /**
    * Store the active hours configuration state.
    */
-  protected function build() {
+  protected function build(): void {
     if (isset($this->status)) {
       return;
     }

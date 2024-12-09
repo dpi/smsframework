@@ -120,7 +120,7 @@ class SmsVerification extends EntityContentBase implements ContainerFactoryPlugi
    * @param int $delta
    *   The specific item of the phone number field to set.
    */
-  protected function setVerifiedValue(EntityPhoneNumberVerificationInterface $verification, $delta) {
+  protected function setVerifiedValue(EntityPhoneNumberVerificationInterface $verification, $delta): void {
     if (!isset($delta)) {
       $delta = 0;
     }
@@ -140,7 +140,7 @@ class SmsVerification extends EntityContentBase implements ContainerFactoryPlugi
    * @param \Drupal\sms\Entity\PhoneNumberVerificationInterface $verification
    *   The phone number verification for a given user entity.
    */
-  protected function unsetVerifiedValue(EntityPhoneNumberVerificationInterface $verification) {
+  protected function unsetVerifiedValue(EntityPhoneNumberVerificationInterface $verification): void {
     $user_entity = $verification->getEntity();
     $phone_number_settings = $this->phoneNumberVerificationService
       ->getPhoneNumberSettingsForEntity($user_entity);

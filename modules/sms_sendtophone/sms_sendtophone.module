@@ -18,14 +18,14 @@ use Drupal\user\Entity\User;
  *
  * @todo Need to optimize this later.
  */
-function sms_sendtophone_page_attachments(array &$attachments) {
+function sms_sendtophone_page_attachments(array &$attachments): void {
   $attachments['#attached']['library'][] = 'sms_sendtophone/default';
 }
 
 /**
  * Implements hook_node_links_alter().
  */
-function sms_sendtophone_node_links_alter(array &$links, NodeInterface $node, array &$context) {
+function sms_sendtophone_node_links_alter(array &$links, NodeInterface $node, array &$context): void {
   /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
   $phone_number_provider = \Drupal::service('sms.phone_number');
   /** @var \Drupal\user\UserInterface $user */
@@ -79,7 +79,7 @@ function sms_sendtophone_node_links_alter(array &$links, NodeInterface $node, ar
 /**
  * Implements hook_form_alter().
  */
-function sms_sendtophone_form_alter(&$form, FormStateInterface &$form_state, $form_id) {
+function sms_sendtophone_form_alter(&$form, FormStateInterface &$form_state, $form_id): void {
   if ($form_id == 'sms_sendtophone_inline_form' || $form_id == 'sms_sendtophone_node_form' || $form_id == 'sms_sendtophone_cck_form') {
     if (!\Drupal::currentUser()->hasPermission('send to any number')) {
       // Makes number field plain text.

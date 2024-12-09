@@ -11,7 +11,4 @@
   <rule ref="Drupal.Commenting.FunctionComment.Missing"><severity>0</severity></rule>
   <rule ref="Drupal.Commenting.DocComment.Empty"><severity>0</severity></rule>
   <rule ref="Drupal.Commenting.ClassComment.Missing"><severity>0</severity></rule>
-
-  <!-- Temporary, disruptive -->
-  <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint"><severity>0</severity></rule>
 </ruleset>

@@ -45,7 +45,7 @@ class RecipientGatewayEvent extends Event {
    * @return string
    *   The phone number for this event.
    */
-  public function getRecipient() {
+  public function getRecipient(): string {
     return $this->recipient;
   }
 
@@ -69,7 +69,7 @@ class RecipientGatewayEvent extends Event {
    * @return array
    *   An array of doubles gateway/priority doubles.
    */
-  public function getGateways() {
+  public function getGateways(): array {
     return $this->gateways;
   }
 
@@ -79,7 +79,7 @@ class RecipientGatewayEvent extends Event {
    * @return \Drupal\sms\Entity\SmsGatewayInterface[]
    *   An array of gateways ordered by priority from highest to lowest.
    */
-  public function getGatewaysSorted() {
+  public function getGatewaysSorted(): array {
     $sorted = $this->gateways;
     \uasort($sorted, static function ($a, $b) {
       [, $priority_a] = $a;

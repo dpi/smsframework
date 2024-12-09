@@ -42,7 +42,7 @@ class SmsEntityPhoneNumber extends Event {
    * @return \Drupal\Core\Entity\EntityInterface
    *   The entity to find phone numbers.
    */
-  public function getEntity() {
+  public function getEntity(): EntityInterface {
     return $this->entity;
   }
 
@@ -53,7 +53,7 @@ class SmsEntityPhoneNumber extends Event {
    *   Whether the returned phone numbers must be verified, or NULL to get all
    *   phone numbers regardless of status.
    */
-  public function getRequiresVerification() {
+  public function getRequiresVerification(): ?bool {
     return $this->verified;
   }
 
@@ -63,7 +63,7 @@ class SmsEntityPhoneNumber extends Event {
    * @return string[]
    *   The phone number on this event.
    */
-  public function getPhoneNumbers() {
+  public function getPhoneNumbers(): array {
     return $this->phoneNumbers;
   }
 

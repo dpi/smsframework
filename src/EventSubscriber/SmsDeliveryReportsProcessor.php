@@ -38,7 +38,7 @@ class SmsDeliveryReportsProcessor implements EventSubscriberInterface {
    * @param \Drupal\sms\Event\SmsDeliveryReportEvent $event
    *   The event containing updated delivery reports status.
    */
-  public function updateDeliveryReports(SmsDeliveryReportEvent $event) {
+  public function updateDeliveryReports(SmsDeliveryReportEvent $event): void {
     foreach ($event->getReports() as $report) {
       // Only messages that have message IDs can be tracked and updated.
       if ($report->getMessageId()) {

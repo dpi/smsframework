@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\sms\Provider;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\sms\Entity\PhoneNumberSettingsInterface;
+use Drupal\sms\Entity\PhoneNumberVerificationInterface;
 
 /**
  * Interface for phone number provider.
@@ -22,7 +24,7 @@ interface PhoneNumberVerificationInterface {
    * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|null
    *   A phone number settings entity, or NULL if it does not exist.
    */
-  public function getPhoneNumberSettings($entity_type_id, $bundle);
+  public function getPhoneNumberSettings($entity_type_id, $bundle): ?PhoneNumberSettingsInterface;
 
   /**
    * Gets phone number settings for the bundle of an entity.
@@ -36,7 +38,7 @@ interface PhoneNumberVerificationInterface {
    * @throws \Drupal\sms\Exception\PhoneNumberSettingsException
    *   Thrown if entity is not configured for phone numbers.
    */
-  public function getPhoneNumberSettingsForEntity(EntityInterface $entity);
+  public function getPhoneNumberSettingsForEntity(EntityInterface $entity): ?PhoneNumberSettingsInterface;
 
   /**
    * Checks if there is a phone number verification for a code.
@@ -48,7 +50,7 @@ interface PhoneNumberVerificationInterface {
    *   A phone number verification entity, or FALSE if $code is not a valid
    *   verification code.
    */
-  public function getPhoneVerificationByCode($code);
+  public function getPhoneVerificationByCode($code): PhoneNumberVerificationInterface|false;
 
   /**
    * Gets phone number verifications for a phone number.
@@ -69,7 +71,7 @@ interface PhoneNumberVerificationInterface {
    * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface[]
    *   An array of phone number verification entities, if any.
    */
-  public function getPhoneVerificationByPhoneNumber($phone_number, $verified = TRUE, $entity_type = NULL);
+  public function getPhoneVerificationByPhoneNumber($phone_number, $verified = TRUE, $entity_type = NULL): array;
 
   /**
    * Gets a phone number verification for an entity and phone number pair.
@@ -82,7 +84,7 @@ interface PhoneNumberVerificationInterface {
    * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|null
    *   The phone number verification for an entity and phone number pair.
    */
-  public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number);
+  public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number): ?PhoneNumberVerificationInterface;
 
   /**
    * Generates a phone number verification for an entity and phone number pair.
@@ -98,7 +100,7 @@ interface PhoneNumberVerificationInterface {
    * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|null
    *   A phone number verification.
    */
-  public function newPhoneVerification(EntityInterface $entity, $phone_number);
+  public function newPhoneVerification(EntityInterface $entity, $phone_number): ?PhoneNumberVerificationInterface;
 
   /**
    * Detect modifications to phone numbers on an entity.
@@ -110,7 +112,7 @@ interface PhoneNumberVerificationInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   Update phone number verifications for this entity.
    */
-  public function updatePhoneVerificationByEntity(EntityInterface $entity);
+  public function updatePhoneVerificationByEntity(EntityInterface $entity): void;
 
   /**
    * Deletes phone number verifications for an entity.
@@ -118,7 +120,7 @@ interface PhoneNumberVerificationInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   Delete phone number verifications for this entity.
    */
-  public function deletePhoneVerificationByEntity(EntityInterface $entity);
+  public function deletePhoneVerificationByEntity(EntityInterface $entity): void;
 
   /**
    * Cleans up expired phone number verifications.
@@ -126,6 +128,6 @@ interface PhoneNumberVerificationInterface {
    * Removes phone numbers from entities if setting is verification expires, and
    * setting is enabled.
    */
-  public function purgeExpiredVerifications();
+  public function purgeExpiredVerifications(): void;
 
 }

@@ -9,6 +9,7 @@ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\sms\Provider\PhoneNumberVerificationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -148,7 +149,7 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
    * @return \Drupal\Core\Entity\Query\QueryInterface
    *   A phone number entity query.
    */
-  protected function buildPhoneNumberVerificationQuery($entity_type_id, $bundle) {
+  protected function buildPhoneNumberVerificationQuery($entity_type_id, $bundle): QueryInterface {
     return $this->phoneNumberVerificationStorage
       ->getQuery()
       ->accessCheck(TRUE)

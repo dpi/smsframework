@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\sms\Entity;
 
+use Drupal\Component\Plugin\LazyPluginCollection;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -169,7 +170,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
    * @return \Drupal\Component\Plugin\LazyPluginCollection
    *   The action's plugin collection.
    */
-  protected function getPluginCollection() {
+  protected function getPluginCollection(): LazyPluginCollection {
     if (!$this->pluginCollection) {
       $this->pluginCollection = new SmsGatewayPluginCollection(
         \Drupal::service('plugin.manager.sms_gateway'),

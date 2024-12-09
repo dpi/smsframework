@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\sms\Message;
 
+use Drupal\Component\Uuid\UuidInterface;
 use Drupal\sms\Entity\SmsGatewayInterface;
 
 /**
@@ -331,7 +332,7 @@ class SmsMessage implements SmsMessageInterface {
    * @return \Drupal\Component\Uuid\UuidInterface
    *   The UUID generator.
    */
-  protected function uuidGenerator() {
+  protected function uuidGenerator(): UuidInterface {
     return \Drupal::service('uuid');
   }
 

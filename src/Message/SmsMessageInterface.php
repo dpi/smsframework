@@ -17,7 +17,7 @@ interface SmsMessageInterface {
    * @return array
    *   The list of recipients of this SMS message.
    */
-  public function getRecipients();
+  public function getRecipients(): array;
 
   /**
    * Adds a single recipient to the SMS message.
@@ -69,7 +69,7 @@ interface SmsMessageInterface {
    * @return \Drupal\sms\Entity\SmsGatewayInterface|null
    *   A gateway plugin instance, or NULL to let the provider decide.
    */
-  public function getGateway();
+  public function getGateway(): ?SmsGatewayInterface;
 
   /**
    * Set the gateway for this message.
@@ -88,7 +88,7 @@ interface SmsMessageInterface {
    * @return int|null
    *   See \Drupal\sms\Direction constants for potential values.
    */
-  public function getDirection();
+  public function getDirection(): ?int;
 
   /**
    * Set direction of the message.
@@ -107,7 +107,7 @@ interface SmsMessageInterface {
    * @return array
    *   The options for building or sending this SMS message.
    */
-  public function getOptions();
+  public function getOptions(): array;
 
   /**
    * Gets the option specified by the key $name.
@@ -118,7 +118,7 @@ interface SmsMessageInterface {
    * @return mixed
    *   Get the value of the option.
    */
-  public function getOption($name);
+  public function getOption($name): mixed;
 
   /**
    * Sets an option for this SMS message.
@@ -151,7 +151,7 @@ interface SmsMessageInterface {
    *   The result associated with this SMS message, or NULL if there is no
    *   result.
    */
-  public function getResult();
+  public function getResult(): ?SmsMessageResultInterface;
 
   /**
    * Set the result associated with this SMS message.
@@ -171,7 +171,7 @@ interface SmsMessageInterface {
    * @return string|null
    *   The name of the sender, or NULL if none is defined.
    */
-  public function getSender();
+  public function getSender(): ?string;
 
   /**
    * Set the name of the sender of this SMS message.
@@ -190,7 +190,7 @@ interface SmsMessageInterface {
    * @return string
    *   The phone number of the sender.
    */
-  public function getSenderNumber();
+  public function getSenderNumber(): string;
 
   /**
    * Set the phone number of the sender.
@@ -209,7 +209,7 @@ interface SmsMessageInterface {
    * @return string
    *   The message to be sent.
    */
-  public function getMessage();
+  public function getMessage(): string;
 
   /**
    * Set the message to be sent.
@@ -228,7 +228,7 @@ interface SmsMessageInterface {
    * @return string
    *   The UUID of the SMS object.
    */
-  public function getUuid();
+  public function getUuid(): string;
 
   /**
    * Gets the user who created the SMS message.
@@ -237,7 +237,7 @@ interface SmsMessageInterface {
    *   The ID of the user who created the message. Or NULL if no user entity is
    *   associated as the sender.
    */
-  public function getUid();
+  public function getUid(): ?int;
 
   /**
    * Set the user who created the SMS message.
@@ -268,7 +268,7 @@ interface SmsMessageInterface {
    * @return bool
    *   Whether this SMS message was generated automatically.
    */
-  public function isAutomated();
+  public function isAutomated(): bool;
 
   /**
    * Split this SMS message into new messages by chunks of recipients.
@@ -279,7 +279,7 @@ interface SmsMessageInterface {
    * @return static[]
    *   An array of SMS messages split by recipient chunks.
    */
-  public function chunkByRecipients($size);
+  public function chunkByRecipients($size): array;
 
   /**
    * Gets the delivery report for a particular recipient.
@@ -293,7 +293,7 @@ interface SmsMessageInterface {
    *
    * @see SmsMessageInterface::getReports()
    */
-  public function getReport($recipient);
+  public function getReport($recipient): ?SmsDeliveryReportInterface;
 
   /**
    * Gets the delivery reports for all recipients.
@@ -301,6 +301,6 @@ interface SmsMessageInterface {
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
    *   An array of delivery reports.
    */
-  public function getReports();
+  public function getReports(): array;
 
 }

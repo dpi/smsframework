@@ -21,7 +21,7 @@ final class SmsTestEventSubscriber implements EventSubscriberInterface {
    * @param \Drupal\sms\Event\RecipientGatewayEvent $event
    *   The RecipientGatewayEvent event.
    */
-  public function testAddGateway200(RecipientGatewayEvent $event) {
+  public function testAddGateway200(RecipientGatewayEvent $event): void {
     if (\Drupal::state()->get('sms_test_event_subscriber__test_gateway_200', FALSE)) {
       $gateway = SmsGateway::load('test_gateway_200');
       $event->addGateway($gateway, 200);
@@ -34,7 +34,7 @@ final class SmsTestEventSubscriber implements EventSubscriberInterface {
    * @param \Drupal\sms\Event\RecipientGatewayEvent $event
    *   The RecipientGatewayEvent event.
    */
-  public function testAddGateway400(RecipientGatewayEvent $event) {
+  public function testAddGateway400(RecipientGatewayEvent $event): void {
     if (\Drupal::state()->get('sms_test_event_subscriber__test_gateway_400', FALSE)) {
       $gateway = SmsGateway::load('test_gateway_400');
       $event->addGateway($gateway, 400);
@@ -49,7 +49,7 @@ final class SmsTestEventSubscriber implements EventSubscriberInterface {
    * @param string $eventName
    *   The event name.
    */
-  public function testExecutionOrder(Event $event, $eventName) {
+  public function testExecutionOrder(Event $event, $eventName): void {
     $execution_order = \Drupal::state()->get('sms_test_event_subscriber__execution_order', []);
     $execution_order[] = $eventName;
     \Drupal::state()->set('sms_test_event_subscriber__execution_order', $execution_order);

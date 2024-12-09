@@ -19,7 +19,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * @return \Drupal\Core\Entity\EntityInterface|null
    *   The entity who sent the SMS message, or NULL if it is missing.
    */
-  public function getSenderEntity();
+  public function getSenderEntity(): ?EntityInterface;
 
   /**
    * Set the entity who sent the SMS message.
@@ -38,7 +38,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * @return \Drupal\Core\Entity\EntityInterface|null
    *   The entity who will receive the SMS message, or NULL if it is missing.
    */
-  public function getRecipientEntity();
+  public function getRecipientEntity(): ?EntityInterface;
 
   /**
    * Set the entity who will receive the SMS message.
@@ -57,7 +57,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * @return bool
    *   Whether the SMS message is in the queue to be processed.
    */
-  public function isQueued();
+  public function isQueued(): bool;
 
   /**
    * Get whether the SMS message is in the queue to be processed.
@@ -76,7 +76,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * @return int
    *   Creation timestamp of the SMS message.
    */
-  public function getCreatedTime();
+  public function getCreatedTime(): int;
 
   /**
    * Get the time to send the SMS message.
@@ -84,7 +84,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * @return int
    *   The timestamp after which the SMS message should be sent.
    */
-  public function getSendTime();
+  public function getSendTime(): int;
 
   /**
    * Set the time to send the SMS message.
@@ -106,7 +106,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * @return int|null
    *   The timestamp when SMS message was processed, or NULL if not processed.
    */
-  public function getProcessedTime();
+  public function getProcessedTime(): ?int;
 
   /**
    * Set the time the SMS message was processed.

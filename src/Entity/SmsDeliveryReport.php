@@ -42,10 +42,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
 
   use EntityChangedTrait;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getMessageId() {
+  public function getMessageId(): ?string {
     return $this->get('message_id')->value;
   }
 
@@ -53,14 +50,10 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
    * {@inheritdoc}
    */
   public function setMessageId($message_id) {
-    $this->set('message_id', $message_id);
-    return $this;
+    return $this->set('message_id', $message_id);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getRecipient() {
+  public function getRecipient(): string {
     return $this->get('recipient')->value;
   }
 
@@ -68,14 +61,10 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
    * {@inheritdoc}
    */
   public function setRecipient($recipient) {
-    $this->set('recipient', $recipient);
-    return $this;
+    return $this->set('recipient', $recipient);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getStatus() {
+  public function getStatus(): ?string {
     return $this->get('status')->value;
   }
 
@@ -83,14 +72,10 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
    * {@inheritdoc}
    */
   public function setStatus($status) {
-    $this->set('status', $status);
-    return $this;
+    return $this->set('status', $status);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getStatusMessage() {
+  public function getStatusMessage(): string {
     return $this->get('status_message')->value;
   }
 
@@ -98,14 +83,10 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
    * {@inheritdoc}
    */
   public function setStatusMessage($message) {
-    $this->set('status_message', $message);
-    return $this;
+    return $this->set('status_message', $message);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getStatusTime() {
+  public function getStatusTime(): int {
     return $this->get('status_time')->value;
   }
 
@@ -113,14 +94,10 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
    * {@inheritdoc}
    */
   public function setStatusTime($time) {
-    $this->set('status_time', $time);
-    return $this;
+    return $this->set('status_time', $time);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getTimeQueued() {
+  public function getTimeQueued(): ?int {
     $queued = $this->getRevisionAtStatus(SmsMessageReportStatus::QUEUED);
     return $queued?->getStatusTime();
   }
@@ -129,16 +106,12 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
    * {@inheritdoc}
    */
   public function setTimeQueued($time) {
-    $this
+    return $this
       ->setStatus(SmsMessageReportStatus::QUEUED)
       ->setStatusTime($time);
-    return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getTimeDelivered() {
+  public function getTimeDelivered(): ?int {
     $delivered = $this->getRevisionAtStatus(SmsMessageReportStatus::DELIVERED);
     return $delivered?->getStatusTime();
   }
@@ -147,16 +120,12 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
    * {@inheritdoc}
    */
   public function setTimeDelivered($time) {
-    $this
+    return $this
       ->setStatus(SmsMessageReportStatus::DELIVERED)
       ->setStatusTime($time);
-    return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getSmsMessage() {
+  public function getSmsMessage(): SmsMessageInterface {
     return $this->get('sms_message')->entity;
   }
 
@@ -164,14 +133,13 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
    * {@inheritdoc}
    */
   public function setSmsMessage(SmsMessageInterface $sms_message) {
-    $this->set('sms_message', $sms_message);
-    return $this;
+    return $this->set('sms_message', $sms_message);
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type): array {
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['message_id'] = BaseFieldDefinition::create('string')
@@ -234,7 +202,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
    * @return \Drupal\sms\Entity\SmsDeliveryReportInterface|null
    *   The delivery report object with that status or null if there is none.
    */
-  public function getRevisionAtStatus($status) {
+  public function getRevisionAtStatus($status): ?SmsDeliveryReportInterface {
     $storage = $this->entityTypeManager()->getStorage($this->entityTypeId);
     $revision_ids = $storage->getQuery()
       ->accessCheck(FALSE)
@@ -250,10 +218,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
     return NULL;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function preSave(EntityStorageInterface $storage) {
+  public function preSave(EntityStorageInterface $storage): void {
     // SMS delivery report cannot be saved without a parent SMS message.
     if (!$this->getSmsMessage()) {
       throw new SmsStorageException('No parent SMS message specified for SMS delivery report');
@@ -261,10 +226,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
     parent::preSave($storage);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function save() {
+  public function save(): int {
     // Ensure a new revision is saved.
     $this->setNewRevision(TRUE);
     return parent::save();
@@ -279,7 +241,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
    * @return \Drupal\sms\Entity\SmsDeliveryReportInterface
    *   An SMS delivery report entity that can be saved.
    */
-  public static function convertFromDeliveryReport(StdDeliveryReportInterface $sms_report) {
+  public static function convertFromDeliveryReport(StdDeliveryReportInterface $sms_report): SmsDeliveryReportInterface {
     if ($sms_report instanceof SmsDeliveryReportInterface) {
       return $sms_report;
     }

@@ -31,7 +31,7 @@ class SmsEventSubscriber implements EventSubscriberInterface {
    * @param \Drupal\sms\Event\SmsMessageEvent $event
    *   The event.
    */
-  public function createAccount(SmsMessageEvent $event) {
+  public function createAccount(SmsMessageEvent $event): void {
     foreach ($event->getMessages() as $sms_message) {
       $this->accountRegistration->createAccount($sms_message);
     }

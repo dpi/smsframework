@@ -10,6 +10,7 @@ use Drupal\sms\Provider\SmsProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Provides delivery reports acknowledgement and passes to the correct gateway.
@@ -54,7 +55,7 @@ class DeliveryReportController implements ContainerInjectionInterface {
    * @return \Symfony\Component\HttpFoundation\Response
    *   A response object to return.
    */
-  public function processDeliveryReport(Request $request, SmsGatewayInterface $sms_gateway) {
+  public function processDeliveryReport(Request $request, SmsGatewayInterface $sms_gateway): Response {
     return $this->smsProvider->processDeliveryReport($request, $sms_gateway);
   }
 

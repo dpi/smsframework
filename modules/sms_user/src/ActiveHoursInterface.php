@@ -23,7 +23,7 @@ interface ActiveHoursInterface {
    * @return bool
    *   Whether the current time for a user is within active hours.
    */
-  public function inHours(UserInterface $user, $now = 'now');
+  public function inHours(UserInterface $user, $now = 'now'): bool;
 
   /**
    * Determine the next valid active hours date range for a user.
@@ -37,7 +37,7 @@ interface ActiveHoursInterface {
    * @return \Drupal\sms_user\ActiveHoursDates|false
    *   A date pair, or FALSE if no next date could be determined.
    */
-  public function findNextTime(UserInterface $user, $now = 'now');
+  public function findNextTime(UserInterface $user, $now = 'now'): ActiveHoursDates|false;
 
   /**
    * Delay a SMS message if active hours require it to be delayed.
@@ -45,7 +45,7 @@ interface ActiveHoursInterface {
    * @param \Drupal\sms\Entity\SmsMessageInterface $sms_message
    *   An SMS message entity.
    */
-  public function delaySmsMessage(SmsMessageInterface &$sms_message);
+  public function delaySmsMessage(SmsMessageInterface &$sms_message): void;
 
   /**
    * Get ranges converted to local timezone and sorted chronologically.
@@ -56,6 +56,6 @@ interface ActiveHoursInterface {
    * @return \Drupal\sms_user\ActiveHoursDates[]
    *   A array of date pairs sorted chronologically by start dates.
    */
-  public function getRanges($timezone);
+  public function getRanges($timezone): array;
 
 }

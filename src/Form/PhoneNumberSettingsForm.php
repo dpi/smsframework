@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Url;
+use Drupal\field\FieldConfigInterface;
 use Drupal\sms\Plugin\Field\FieldWidget\SmsTelephoneWidget;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -281,7 +282,7 @@ class PhoneNumberSettingsForm extends EntityForm {
    * @return \Drupal\field\FieldConfigInterface
    *   A field config entity.
    */
-  public static function createNewField($entity_type_id, $bundle, $config_key) {
+  public static function createNewField($entity_type_id, $bundle, $config_key): FieldConfigInterface {
     $entity_type_manager = \Drupal::entityTypeManager();
 
     // Definitions for field_storage_config.

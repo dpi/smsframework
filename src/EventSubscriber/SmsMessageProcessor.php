@@ -50,7 +50,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    * @param \Drupal\sms\Event\SmsMessageEvent $event
    *   An SMS message process event.
    */
-  public function ensureIncomingSupport(SmsMessageEvent $event) {
+  public function ensureIncomingSupport(SmsMessageEvent $event): void {
     $sms_messages = $event->getMessages();
     foreach ($sms_messages as $sms_message) {
       if ($sms_message->getDirection() == Direction::INCOMING) {
@@ -71,7 +71,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    * @param \Drupal\sms\Event\SmsMessageEvent $event
    *   An SMS message process event.
    */
-  public function ensureReportsPreprocess(SmsMessageEvent $event) {
+  public function ensureReportsPreprocess(SmsMessageEvent $event): void {
     $sms_messages = $event->getMessages();
     foreach ($sms_messages as $sms_message) {
       // Event can be for any direction. Capture incoming only for preprocess.
@@ -87,7 +87,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    * @param \Drupal\sms\Event\SmsMessageEvent $event
    *   An SMS message process event.
    */
-  public function ensureReportsPostprocess(SmsMessageEvent $event) {
+  public function ensureReportsPostprocess(SmsMessageEvent $event): void {
     $sms_messages = $event->getMessages();
     foreach ($sms_messages as $sms_message) {
       $this->ensureReports($sms_message);
@@ -103,7 +103,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    * @throws \Drupal\sms\Exception\SmsPluginReportException
    *   Thrown if result or reports are invalid.
    */
-  protected function ensureReports(SmsMessageInterface $sms_message) {
+  protected function ensureReports(SmsMessageInterface $sms_message): void {
     $result = $sms_message->getResult();
     if (!$result instanceof SmsMessageResultInterface) {
       throw new SmsPluginReportException('Missing result for message.');
@@ -129,7 +129,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    * @param \Drupal\sms\Event\SmsMessageEvent $event
    *   The SMS message preprocess event.
    */
-  public function ensureRecipients(SmsMessageEvent $event) {
+  public function ensureRecipients(SmsMessageEvent $event): void {
     $sms_messages = $event->getMessages();
 
     foreach ($sms_messages as $sms_message) {
@@ -155,7 +155,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    *   Guarantees a gateway is set on the message, otherwise this exception is
    *   thrown.
    */
-  public function ensureGateways(SmsMessageEvent $event) {
+  public function ensureGateways(SmsMessageEvent $event): void {
     $sms_messages = $event->getMessages();
     $result = [];
 
@@ -207,7 +207,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    * @return \Drupal\sms\Entity\SmsGatewayInterface|null
    *   A gateway for the phone number, or NULL if there is no gateway.
    */
-  protected function getGatewayForPhoneNumber($recipient) {
+  protected function getGatewayForPhoneNumber($recipient): ?SmsGatewayInterface {
     $event = new RecipientGatewayEvent($recipient);
     /** @var \Drupal\sms\Event\RecipientGatewayEvent $event */
     $event = $this->eventDispatcher
@@ -235,7 +235,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    * @param \Drupal\sms\Event\SmsMessageEvent $event
    *   The SMS message preprocess event.
    */
-  public function deliveryReportUrl(SmsMessageEvent $event) {
+  public function deliveryReportUrl(SmsMessageEvent $event): void {
     foreach ($event->getMessages() as &$sms_message) {
       if (!$sms_message->getOption('delivery_report_url')) {
         $url = $sms_message->getGateway()->getPushReportUrl();
@@ -255,7 +255,7 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    * @param \Drupal\sms\Event\SmsMessageEvent $event
    *   The SMS message preprocess event.
    */
-  public function chunkMaxRecipients(SmsMessageEvent $event) {
+  public function chunkMaxRecipients(SmsMessageEvent $event): void {
     $result = [];
 
     foreach ($event->getMessages() as $sms_message) {

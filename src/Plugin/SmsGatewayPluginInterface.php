@@ -9,6 +9,7 @@ use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Message\SmsMessageResultInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,7 +27,7 @@ interface SmsGatewayPluginInterface extends ConfigurableInterface, DependentPlug
    * @return \Drupal\sms\Message\SmsMessageResultInterface
    *   The result of the sms messaging operation.
    */
-  public function send(SmsMessageInterface $sms);
+  public function send(SmsMessageInterface $sms): SmsMessageResultInterface;
 
   /**
    * Returns the credit balance available on this gateway.
@@ -37,7 +38,7 @@ interface SmsGatewayPluginInterface extends ConfigurableInterface, DependentPlug
    * @return float|null
    *   The credit balance of the gateway, or NULL if unknown.
    */
-  public function getCreditsBalance();
+  public function getCreditsBalance(): ?float;
 
   /**
    * Parses incoming delivery reports and returns the created delivery reports.
@@ -54,7 +55,7 @@ interface SmsGatewayPluginInterface extends ConfigurableInterface, DependentPlug
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
    *   An array of delivery reports created from the request.
    */
-  public function parseDeliveryReports(Request $request, Response $response);
+  public function parseDeliveryReports(Request $request, Response $response): array;
 
   /**
    * Gets delivery reports from the gateway.
@@ -66,6 +67,6 @@ interface SmsGatewayPluginInterface extends ConfigurableInterface, DependentPlug
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
    *   An array of the delivery reports which have been pulled.
    */
-  public function getDeliveryReports(?array $message_ids = NULL);
+  public function getDeliveryReports(?array $message_ids = NULL): array;
 
 }

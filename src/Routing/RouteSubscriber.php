@@ -42,7 +42,7 @@ class RouteSubscriber implements ContainerInjectionInterface {
    * @return \Symfony\Component\Routing\RouteCollection
    *   A route collection.
    */
-  public function routes() {
+  public function routes(): RouteCollection {
     $sms_settings = $this->configFactory->get('sms.settings');
     $collection = new RouteCollection();
 

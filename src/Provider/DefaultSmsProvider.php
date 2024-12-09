@@ -170,7 +170,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * @return \Drupal\sms\Event\SmsMessageEvent
    *   The dispatched event.
    */
-  protected function dispatchEvent($event_name, array $sms_messages) {
+  protected function dispatchEvent($event_name, array $sms_messages): SmsMessageEvent {
     $event = new SmsMessageEvent($sms_messages);
     return $this->eventDispatcher
       ->dispatch($event, $event_name);

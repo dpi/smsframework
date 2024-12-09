@@ -39,7 +39,7 @@ class SmsMessageEvent extends Event {
    * @return \Drupal\sms\Message\SmsMessageInterface[]
    *   The messages on this event.
    */
-  public function getMessages() {
+  public function getMessages(): array {
     return $this->messages;
   }
 

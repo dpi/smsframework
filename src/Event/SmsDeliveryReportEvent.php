@@ -34,7 +34,7 @@ class SmsDeliveryReportEvent extends Event {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response for this event.
    */
-  public function getResponse() {
+  public function getResponse(): Response {
     return $this->response;
   }
 
@@ -58,7 +58,7 @@ class SmsDeliveryReportEvent extends Event {
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
    *   The delivery reports on this event.
    */
-  public function getReports() {
+  public function getReports(): array {
     return $this->reports;
   }
 

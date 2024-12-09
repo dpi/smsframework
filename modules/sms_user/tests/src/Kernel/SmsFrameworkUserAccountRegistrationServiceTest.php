@@ -515,7 +515,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    * @param string $message
    *   The message to send inwards.
    */
-  protected function sendIncomingMessage($sender_number, $message) {
+  protected function sendIncomingMessage($sender_number, $message): void {
     /** @var \Drupal\sms\Entity\SmsMessage $incoming */
     $incoming = SmsMessage::create()
       ->setSenderNumber($sender_number)
@@ -561,7 +561,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    * @return bool
    *   Whether message was found in any memory messages.
    */
-  public function inTestMessages(SmsGatewayInterface $sms_gateway, $message) {
+  public function inTestMessages(SmsGatewayInterface $sms_gateway, $message): bool {
     foreach ($this->getTestMessages($sms_gateway) as $sms_message) {
       if ($sms_message->getMessage() == $message) {
         return TRUE;

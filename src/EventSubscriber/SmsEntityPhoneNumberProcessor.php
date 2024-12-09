@@ -40,7 +40,7 @@ class SmsEntityPhoneNumberProcessor implements EventSubscriberInterface {
    * @param \Drupal\sms\Event\SmsEntityPhoneNumber $event
    *   The entity phone number event.
    */
-  public function entityPhoneNumbers(SmsEntityPhoneNumber $event) {
+  public function entityPhoneNumbers(SmsEntityPhoneNumber $event): void {
     $entity = $event->getEntity();
 
     try {

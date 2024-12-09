@@ -476,7 +476,7 @@ class AdminSettingsForm extends ConfigFormBase {
    * @return array
    *   A render array.
    */
-  protected function buildTokenElement() {
+  protected function buildTokenElement(): array {
     $tokens = ['sms-message', 'user'];
 
     /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */

@@ -76,7 +76,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
    *   An incoming SMS message.
    */
-  protected function allUnknownNumbers(SmsMessageInterface $sms_message) {
+  protected function allUnknownNumbers(SmsMessageInterface $sms_message): void {
     $user = User::create(['name' => $this->generateUniqueUsername()]);
     $user->activate();
 
@@ -124,7 +124,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
    *   An incoming SMS message.
    */
-  protected function incomingPatternMessage(SmsMessageInterface $sms_message) {
+  protected function incomingPatternMessage(SmsMessageInterface $sms_message): void {
     if (!empty($this->settings('incoming_pattern.incoming_messages.0'))) {
       $incoming_form = $this->settings('incoming_pattern.incoming_messages.0');
       $incoming_form = \str_replace("\r\n", "\n", $incoming_form);
@@ -208,7 +208,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @param string $message
    *   Message to send as a reply.
    */
-  protected function sendReply($sender_number, UserInterface $user, $message) {
+  protected function sendReply($sender_number, UserInterface $user, $message): void {
     $sms_message = SmsMessage::create();
     $sms_message
       ->addRecipient($sender_number)
@@ -242,7 +242,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @return string
    *   A regular expression.
    */
-  protected function compileFormRegex($form_string, $delimiter) {
+  protected function compileFormRegex($form_string, $delimiter): string {
     $placeholders = ['username' => '.+', 'email' => '\S+', 'password' => '.+'];
 
     // Placeholders enclosed in square brackets and escaped for use in regular
@@ -299,7 +299,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @return string
    *   Violation errors joined together.
    */
-  protected function buildError(ConstraintViolationListInterface $violations) {
+  protected function buildError(ConstraintViolationListInterface $violations): string {
     $error = '';
     foreach ($violations as $violation) {
       $error .= (string) $violation->getMessage() . " ";
@@ -313,7 +313,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @return string
    *   A unique user name.
    */
-  protected function generateUniqueUsername() {
+  protected function generateUniqueUsername(): string {
     $random = new Random();
     do {
       $userName = $random->name(8, TRUE);
@@ -341,7 +341,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @return \Drupal\Core\Entity\EntityConstraintViolationListInterface
    *   A filtered violation list.
    */
-  protected function removeAcceptableViolations(EntityConstraintViolationListInterface $violations, $incoming_form = NULL) {
+  protected function removeAcceptableViolations(EntityConstraintViolationListInterface $violations, $incoming_form = NULL): EntityConstraintViolationListInterface {
     // 'mail' will not fail validation if current user has 'administer users'.
     $needs_email = isset($incoming_form) && (\strpos($incoming_form, '[email]') !== FALSE);
     if (!$needs_email) {
@@ -365,7 +365,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @return array|null
    *   The values for the requested configuration.
    */
-  protected function settings($name) {
+  protected function settings($name): ?array {
     return $this->configFactory
       ->get('sms_user.settings')
       ->get('account_registration.' . $name);

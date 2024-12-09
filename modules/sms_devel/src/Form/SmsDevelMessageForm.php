@@ -193,7 +193,7 @@ class SmsDevelMessageForm extends FormBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function submitReceive(array &$form, FormStateInterface $form_state) {
+  public function submitReceive(array &$form, FormStateInterface $form_state): void {
     $this->message->setDirection(Direction::INCOMING);
     $result = new SmsMessageResult();
 
@@ -227,7 +227,7 @@ class SmsDevelMessageForm extends FormBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function submitSend(array &$form, FormStateInterface $form_state) {
+  public function submitSend(array &$form, FormStateInterface $form_state): void {
     $this->message->setDirection(Direction::OUTGOING);
 
     try {
@@ -267,7 +267,7 @@ class SmsDevelMessageForm extends FormBase {
    * @param \Drupal\sms\Message\SmsMessageResultInterface $result
    *   An SMS result object.
    */
-  protected function resultMessage(SmsMessageResultInterface $result) {
+  protected function resultMessage(SmsMessageResultInterface $result): void {
     if ($status_code = $result->getError()) {
       $status_message = $result->getErrorMessage();
       $this->messenger()->addError($this->t('A problem occurred while attempting to process message: (code: @code) @message', [
@@ -294,7 +294,7 @@ class SmsDevelMessageForm extends FormBase {
    * @return array
    *   A render array.
    */
-  protected function verboseResults(array $results) {
+  protected function verboseResults(array $results): array {
     $render = [];
 
     // Renders plain text, or 'Undefined' message if falsey.

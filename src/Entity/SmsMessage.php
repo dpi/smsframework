@@ -581,7 +581,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * @return static
    *   An unsaved SMS Message entity.
    */
-  public static function convertFromSmsMessage(StdSmsMessageInterface $sms_message) {
+  public static function convertFromSmsMessage(StdSmsMessageInterface $sms_message): static {
     if ($sms_message instanceof static) {
       return $sms_message;
     }
