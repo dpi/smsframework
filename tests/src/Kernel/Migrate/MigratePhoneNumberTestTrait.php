@@ -10,7 +10,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\sms\Entity\PhoneNumberSettings;
 use Drupal\sms\Entity\PhoneNumberVerification;
-use Drupal\sms\Plugin\Migrate\process\PhoneNumberSettings as PhoneNumberSettingsPlugin;
+use Drupal\sms\Plugin\migrate\process\PhoneNumberSettings as PhoneNumberSettingsPlugin;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 

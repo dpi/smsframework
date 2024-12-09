@@ -92,20 +92,16 @@ class DefaultSmsProvider implements SmsProviderInterface {
   public function send(SmsMessageInterface $sms): array {
     $sms->setDirection(Direction::OUTGOING);
 
-    $dispatch = !$sms->getOption('_skip_preprocess_event');
+    $dispatch = $sms->getOption('_skip_preprocess_event') === NULL;
     $sms_messages = $dispatch ? $this->dispatchEvent(SmsEvents::MESSAGE_PRE_PROCESS, [$sms])->getMessages() : [$sms];
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_OUTGOING_PRE_PROCESS, $sms_messages)->getMessages();
 
     // Iterate over messages individually since pre-process can modify the
     // gateway used.
     foreach ($sms_messages as $sms_message) {
-      $plugin = $sms_message->getGateway()->getPlugin();
+      $plugin = $sms_message->getGateway()?->getPlugin() ?? throw new \LogicException('Unable to get gateway plugin');
 
       $result = $plugin->send($sms_message);
-      if ($result === NULL) {
-        // @codingStandardsIgnoreLine
-        @trigger_error('Gateway plugins returning NULL is deprecated in smsframework:2.1.0 and will be removed in smsframework:3.0.0. The contract for \Drupal\sms\Plugin\SmsGatewayPluginInterface::send does not permit returning NULL. See https://www.drupal.org/node/3262679', E_USER_DEPRECATED);
-      }
 
       $sms_message->setResult($result);
 
@@ -141,9 +137,9 @@ class DefaultSmsProvider implements SmsProviderInterface {
     return $sms_messages;
   }
 
-  public function processDeliveryReport(Request $request, SmsGatewayInterface $sms_gateway): Response {
+  public function processDeliveryReport(Request $request, SmsGatewayInterface $gateway): Response {
     $response = new Response();
-    $reports = $sms_gateway->getPlugin()
+    $reports = $gateway->getPlugin()
       ->parseDeliveryReports($request, $response);
 
     $event = new SmsDeliveryReportEvent();

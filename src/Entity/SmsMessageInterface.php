@@ -68,7 +68,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * @return $this
    *   Return SMS message for chaining.
    */
-  public function setQueued($is_queued);
+  public function setQueued(bool $is_queued);
 
   /**
    * Get the creation timestamp of the SMS message.
@@ -95,7 +95,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * @return $this
    *   Return SMS message for chaining.
    */
-  public function setSendTime($send_time);
+  public function setSendTime(int $send_time);
 
   /**
    * The time the SMS message was processed.
@@ -117,6 +117,6 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * @return $this
    *   Return SMS message for chaining.
    */
-  public function setProcessedTime($processed);
+  public function setProcessedTime(int $processed);
 
 }

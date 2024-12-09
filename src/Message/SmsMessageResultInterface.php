@@ -28,7 +28,7 @@ interface SmsMessageResultInterface {
    *
    * @return $this
    */
-  public function setError($error);
+  public function setError(?string $error);
 
   /**
    * Gets the error message.
@@ -46,7 +46,7 @@ interface SmsMessageResultInterface {
    *
    * @return $this
    */
-  public function setErrorMessage($message);
+  public function setErrorMessage(string $message);
 
   /**
    * Gets the delivery report for a particular recipient.
@@ -60,7 +60,7 @@ interface SmsMessageResultInterface {
    *
    * @see SmsMessageResultInterface::getReports()
    */
-  public function getReport($recipient): ?SmsDeliveryReportInterface;
+  public function getReport(string $recipient): ?SmsDeliveryReportInterface;
 
   /**
    * Gets the delivery reports for all recipients.

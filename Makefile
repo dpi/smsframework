@@ -17,6 +17,5 @@ fix: phpcbf
 clean:
 	rm -rf vendor
 	rm -rf app
-	rm -rf modules
 	rm -rf core
 	rm -rf web

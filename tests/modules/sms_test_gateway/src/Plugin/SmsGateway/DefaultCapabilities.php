@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 
 use Drupal\sms\Message\SmsMessageInterface;
+use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginBase;
 
 /**
@@ -23,7 +24,8 @@ final class DefaultCapabilities extends SmsGatewayPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms) {
+  public function send(SmsMessageInterface $sms): SmsMessageResultInterface {
+    throw new \LogicException('No-op');
   }
 
 }

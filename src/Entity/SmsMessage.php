@@ -42,6 +42,8 @@ use Drupal\user\UserInterface;
  *     "views_data" = "Drupal\sms\Views\SmsMessageViewsData",
  *   },
  * )
+ *
+ * @property \Drupal\Core\Field\FieldItemList<\Drupal\telephone\Plugin\Field\FieldType\TelephoneItem> $recipient_phone_number
  */
 class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
 
@@ -51,12 +53,6 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * @var \Drupal\sms\Message\SmsMessageResultInterface|null
    */
   protected ?StdMessageResultInterface $result = NULL;
-
-  /**
-   * Following are implementors of plain SmsMessage interface.
-   *
-   * @see \Drupal\sms\Entity\SmsMessageInterface
-   */
 
   /**
    * {@inheritdoc}
@@ -334,7 +330,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   }
 
   public function getSenderEntity(): ?EntityInterface {
-    return $this->get('sender_entity')->entity;
+    return $this->get('sender_entity')->entity ?? NULL;
   }
 
   /**
@@ -364,37 +360,37 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function setQueued($is_queued) {
+  public function setQueued(bool $is_queued) {
     $this->set('queued', $is_queued);
     return $this;
   }
 
   public function getCreatedTime(): int {
-    return $this->get('created')->value;
+    return (int) $this->get('created')->value;
   }
 
   public function getSendTime(): int {
-    return $this->get('send_on')->value;
+    return (int) $this->get('send_on')->value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setSendTime($send_time) {
+  public function setSendTime(int $send_time) {
     $this->set('send_on', $send_time);
     return $this;
   }
 
   public function getProcessedTime(): ?int {
-    return $this->get('processed')->value;
+    $value = $this->get('processed')->value;
+    return ($value === NULL) ? NULL : (int) $value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setProcessedTime($processed) {
-    $this->set('processed', $processed);
-    return $this;
+  public function setProcessedTime(int $processed) {
+    return $this->set('processed', $processed);
   }
 
   /**

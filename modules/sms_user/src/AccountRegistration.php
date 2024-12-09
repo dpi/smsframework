@@ -39,13 +39,13 @@ final class AccountRegistration implements AccountRegistrationInterface, LoggerA
    * Constructs a AccountRegistration object.
    */
   final public function __construct(
-    private ConfigFactoryInterface $configFactory,
-    private Token $token,
-    private SmsProviderInterface $smsProvider,
-    private PhoneNumberVerificationInterface $phoneNumberVerificationProvider,
-    private UserNameValidator $userNameValidator,
-    private EntityTypeManagerInterface $entityTypeManager,
-    private PasswordGeneratorInterface $passwordGenerator,
+    private readonly ConfigFactoryInterface $configFactory,
+    private readonly Token $token,
+    private readonly SmsProviderInterface $smsProvider,
+    private readonly PhoneNumberVerificationInterface $phoneNumberVerificationProvider,
+    private readonly UserNameValidator $userNameValidator,
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly PasswordGeneratorInterface $passwordGenerator,
   ) {
   }
 
@@ -62,7 +62,7 @@ final class AccountRegistration implements AccountRegistrationInterface, LoggerA
       // Any users with this phone number?
       $entities = $this->phoneNumberVerificationProvider
         ->getPhoneVerificationByPhoneNumber($sender_number, NULL, 'user');
-      if (!\count($entities)) {
+      if (!count($entities)) {
         if (!empty($this->settings('unrecognized_sender.status'))) {
           $this->allUnknownNumbers($sms_message);
         }
@@ -361,7 +361,7 @@ final class AccountRegistration implements AccountRegistrationInterface, LoggerA
    * @return array|null
    *   The values for the requested configuration.
    */
-  protected function settings($name): ?array {
+  protected function settings(string $name): ?array {
     return $this->configFactory
       ->get('sms_user.settings')
       ->get('account_registration.' . $name);

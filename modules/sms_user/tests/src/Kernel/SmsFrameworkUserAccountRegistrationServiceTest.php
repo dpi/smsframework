@@ -123,8 +123,8 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    */
   public function testUnrecognisedOffNoCreateUser(): void {
     $this->config('sms_user.settings')
-      ->set('account_registration.unrecognized_sender.status', 0)
-      ->set('account_registration.unrecognized_sender.reply.status', 1)
+      ->set('account_registration.unrecognized_sender.status', FALSE)
+      ->set('account_registration.unrecognized_sender.reply.status', TRUE)
       ->save();
 
     $this->sendIncomingMessage('+123', $this->randomString());
@@ -133,7 +133,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
-   * Test user is created if a unrecognised phone number is used as sender.
+   * Test user is created if an unrecognised phone number is used as sender.
    */
   public function testUnrecognisedCreateUser(): void {
     $this->config('sms_user.settings')
@@ -145,7 +145,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     $this->sendIncomingMessage($sender_number, $this->randomString());
 
     $user = $this->getLastUser();
-    static::assertTrue($user instanceof UserInterface, 'One user created.');
+    static::assertInstanceOf(UserInterface::class, $user);
     static::assertEquals($sender_number, $user->{$this->phoneField->getName()}->value, 'Phone number associated');
   }
 
@@ -540,7 +540,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
-   * Count number of registered users.
+   * Get the last user created.
    *
    * @return \Drupal\user\UserInterface|null
    *   Get last created user, or NULL if no users in database.

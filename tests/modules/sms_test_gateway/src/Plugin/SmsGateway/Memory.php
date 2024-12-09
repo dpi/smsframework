@@ -72,18 +72,18 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
     $this->configuration['widget'] = $form_state->getValue('widget');
   }
 
-  public function send(SmsMessageInterface $sms_message): SmsMessageResultInterface {
+  public function send(SmsMessageInterface $sms): SmsMessageResultInterface {
     $gateway_id = $this->configuration['gateway_id'];
 
     // Message.
     $state = static::state()->get('sms_test_gateway.memory.send', []);
-    $state[$gateway_id][] = $sms_message;
+    $state[$gateway_id][] = $sms;
     static::state()->set('sms_test_gateway.memory.send', $state);
 
     // Reports.
     $reports = static::state()->get('sms_test_gateway.memory.report', []);
     $gateway_reports = $reports[$gateway_id] ?? [];
-    $new_reports = $this->randomDeliveryReports($sms_message);
+    $new_reports = $this->randomDeliveryReports($sms);
     $reports[$gateway_id] = \array_merge($gateway_reports, $new_reports);
     static::state()->set('sms_test_gateway.memory.report', $reports);
 
@@ -98,6 +98,7 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
     // addressed.
     static::state()->set(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING, TRUE);
 
+    /** @var array $execution_order */
     $execution_order = static::state()->get('sms_test_event_subscriber__execution_order', []);
     $execution_order[] = __METHOD__;
     static::state()->set('sms_test_event_subscriber__execution_order', $execution_order);
@@ -179,11 +180,11 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
     return 13.36;
   }
 
-  private static function state(): StateInterface {
+  protected static function state(): StateInterface {
     return \Drupal::state();
   }
 
-  private static function time(): TimeInterface {
+  protected static function time(): TimeInterface {
     return \Drupal::time();
   }
 

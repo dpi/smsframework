@@ -11,6 +11,7 @@ use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
+use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Drupal\sms\SmsProcessingResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,7 +32,7 @@ final class Incoming extends SmsGatewayPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms) {
+  public function send(SmsMessageInterface $sms): SmsMessageResultInterface {
   }
 
   /**

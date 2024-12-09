@@ -1,4 +1,8 @@
 services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+
   sms_test_time.time:
     class: Drupal\sms_test_time\SmsTestTime
     arguments: ['@sms_test_time.time.inner']
