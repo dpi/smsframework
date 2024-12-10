@@ -15,6 +15,8 @@ use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
 use Drupal\sms_test_gateway\EventSubscriber\SmsTestGatewayEventSubscriber;
+use Drupal\sms_test_gateway\Plugin\SmsGateway\Memory;
+use function PHPUnit\Framework\assertCount;
 
 /**
  * Shared SMS Framework helpers for kernel and web tests.
@@ -68,7 +70,8 @@ trait SmsFrameworkTestTrait {
    */
   public function getTestMessages(SmsGatewayInterface $sms_gateway): array {
     $gateway_id = $sms_gateway->id();
-    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
+    /** @var array<string, array<\Drupal\sms\Message\SmsMessageInterface>> $sms_messages */
+    $sms_messages = \Drupal::state()->get(Memory::STATE_MESSAGES, []);
     return $sms_messages[$gateway_id] ?? [];
   }
 
@@ -83,7 +86,8 @@ trait SmsFrameworkTestTrait {
    */
   public function getLastTestMessage(SmsGatewayInterface $sms_gateway): SmsMessageInterface|false {
     $gateway_id = $sms_gateway->id();
-    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
+    /** @var array<string, array<\Drupal\sms\Message\SmsMessageInterface>> $sms_messages */
+    $sms_messages = \Drupal::state()->get(Memory::STATE_MESSAGES, []);
     return isset($sms_messages[$gateway_id]) ? \end($sms_messages[$gateway_id]) : FALSE;
   }
 
@@ -94,14 +98,15 @@ trait SmsFrameworkTestTrait {
    *   A gateway plugin, or NULL to reset all messages.
    */
   public function resetTestMessages(?SmsGatewayInterface $sms_gateway = NULL): void {
-    $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
+    /** @var array<string, array<\Drupal\sms\Message\SmsMessageInterface>> $sms_messages */
+    $sms_messages = \Drupal::state()->get(Memory::STATE_MESSAGES, []);
     if ($sms_gateway) {
       $sms_messages[$sms_gateway->id()] = [];
     }
     else {
       $sms_messages = [];
     }
-    \Drupal::state()->set('sms_test_gateway.memory.send', $sms_messages);
+    \Drupal::state()->set(Memory::STATE_MESSAGES, $sms_messages);
   }
 
   /**
@@ -115,6 +120,7 @@ trait SmsFrameworkTestTrait {
    */
   protected function getIncomingMessages(SmsGatewayInterface $sms_gateway): array {
     $gateway_id = $sms_gateway->id();
+    /** @var array<string, array<\Drupal\sms\Message\SmsMessageInterface>> $sms_messages */
     $sms_messages = \Drupal::state()->get(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING, []);
     return $sms_messages[$gateway_id] ?? [];
   }
@@ -130,6 +136,7 @@ trait SmsFrameworkTestTrait {
    */
   protected function getLastIncomingMessage(SmsGatewayInterface $sms_gateway): SmsMessageInterface|false {
     $gateway_id = $sms_gateway->id();
+    /** @var array<string, array<\Drupal\sms\Message\SmsMessageInterface>> $sms_messages */
     $sms_messages = \Drupal::state()->get(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING, []);
     return isset($sms_messages[$gateway_id]) ? \end($sms_messages[$gateway_id]) : FALSE;
   }
@@ -141,12 +148,11 @@ trait SmsFrameworkTestTrait {
    *   A gateway plugin, or NULL to reset all messages.
    */
   protected function resetIncomingMessages(?SmsGatewayInterface $sms_gateway = NULL): void {
-    $sms_messages = \Drupal::state()->get(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING, []);
-    if ($sms_gateway) {
+    $sms_messages = [];
+    if ($sms_gateway !== NULL) {
+      /** @var array<string, array<\Drupal\sms\Message\SmsMessageInterface>> $sms_messages */
+      $sms_messages = \Drupal::state()->get(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING, []);
       $sms_messages[$sms_gateway->id()] = [];
-    }
-    else {
-      $sms_messages = [];
     }
     \Drupal::state()->set(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING, $sms_messages);
   }
@@ -162,7 +168,8 @@ trait SmsFrameworkTestTrait {
    */
   protected function getTestMessageReports(SmsGatewayInterface $sms_gateway): array {
     $gateway_id = $sms_gateway->id();
-    $sms_reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
+    /** @var array<string, array<string, \Drupal\sms\Message\SmsDeliveryReportInterface>> $sms_reports */
+    $sms_reports = \Drupal::state()->get(Memory::STATE_REPORTS, []);
     return $sms_reports[$gateway_id] ?? [];
   }
 
@@ -177,7 +184,8 @@ trait SmsFrameworkTestTrait {
    */
   protected function getLastTestMessageReport(SmsGatewayInterface $sms_gateway): SmsDeliveryReportInterface|false {
     $gateway_id = $sms_gateway->id();
-    $sms_reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
+    /** @var array<string, array<string, \Drupal\sms\Message\SmsDeliveryReportInterface>> $sms_reports */
+    $sms_reports = \Drupal::state()->get(Memory::STATE_REPORTS, []);
     return isset($sms_reports[$gateway_id]) ? \end($sms_reports[$gateway_id]) : FALSE;
   }
 
@@ -194,7 +202,8 @@ trait SmsFrameworkTestTrait {
    */
   protected function getTestMessageReport($message_id, SmsGatewayInterface $sms_gateway): SmsDeliveryReportInterface {
     $gateway_id = $sms_gateway->id();
-    $reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
+    /** @var array<string, array<string, \Drupal\sms\Message\SmsDeliveryReportInterface>> $reports */
+    $reports = \Drupal::state()->get(Memory::STATE_REPORTS, []);
     return $reports[$gateway_id][$message_id];
   }
 
@@ -202,7 +211,7 @@ trait SmsFrameworkTestTrait {
    * Resets the SMS reports stored in memory by 'Memory' gateway.
    */
   protected function resetTestMessageReports(): void {
-    \Drupal::state()->set('sms_test_gateway.memory.report', []);
+    \Drupal::state()->set(Memory::STATE_REPORTS, []);
   }
 
   /**
@@ -242,6 +251,7 @@ trait SmsFrameworkTestTrait {
    *   A phone number.
    */
   protected function verifyPhoneNumber(EntityInterface $entity, $phone_number): void {
+    /** @var \Drupal\sms\Entity\PhoneNumberVerification[] $verifications */
     $verifications = \Drupal::entityTypeManager()
       ->getStorage('sms_phone_number_verification')
       ->loadByProperties([
@@ -249,9 +259,9 @@ trait SmsFrameworkTestTrait {
         'entity__target_id' => $entity->id(),
         'phone' => $phone_number,
       ]);
-    $verification = \reset($verifications);
-    $verification->setStatus(TRUE)
-      ->save();
+    assertCount(1, $verifications);
+    $verification = $verifications[\array_key_first($verifications)];
+    $verification->setStatus(TRUE)->save();
   }
 
   /**
@@ -269,6 +279,7 @@ trait SmsFrameworkTestTrait {
       ->range(0, 1)
       ->accessCheck(FALSE)
       ->execute();
+    /** @var array<int, \Drupal\sms\Entity\PhoneNumberVerificationInterface> $verifications */
     $verifications = $verification_storage->loadMultiple($verification_ids);
 
     return \reset($verifications);

@@ -70,6 +70,8 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
   /**
    * Sets the number of seconds before phone number verifications expire.
    *
+   * @phpstan-param positive-int $lifetime
+   *
    * @return $this
    *   Return phone number settings for chaining.
    */

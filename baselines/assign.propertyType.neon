@@ -1,4 +1,4 @@
-# total 21 errors
+# total 18 errors
 
 parameters:
     ignoreErrors:
@@ -31,16 +31,6 @@ parameters:
             message: '#^Property Drupal\\Tests\\sms_user\\Kernel\\SmsFrameworkUserTest\:\:\$smsProvider \(Drupal\\sms\\Provider\\SmsProviderInterface\) does not accept object\.$#'
             count: 1
             path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserTest.php
-
-        -
-            message: '#^Property Drupal\\sms\\Entity\\SmsGateway\:\:\$incoming_push_path \(string\) does not accept string\|null\.$#'
-            count: 1
-            path: ../src/Entity/SmsGateway.php
-
-        -
-            message: '#^Property Drupal\\sms\\Entity\\SmsGateway\:\:\$reports_push_path \(string\) does not accept string\|null\.$#'
-            count: 1
-            path: ../src/Entity/SmsGateway.php
 
         -
             message: '#^Property Drupal\\sms\\Entity\\SmsMessageResult\:\:\$reports \(array\<Drupal\\sms\\Entity\\SmsDeliveryReportInterface\>\) does not accept array\<Drupal\\sms\\Message\\SmsDeliveryReportInterface\>\.$#'
@@ -86,11 +76,6 @@ parameters:
             message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkQueueTest\:\:\$smsQueueProcessor \(Drupal\\sms\\Provider\\SmsQueueProcessorInterface\) does not accept mixed\.$#'
             count: 1
             path: ../tests/src/Kernel/SmsFrameworkQueueTest.php
-
-        -
-            message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkRecipientGatewayEventTest\:\:\$smsProvider \(Drupal\\sms\\Provider\\SmsProviderInterface\) does not accept mixed\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkRecipientGatewayEventTest.php
 
         -
             message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkSmsSendTest\:\:\$defaultSmsProvider \(Drupal\\sms\\Provider\\SmsProviderInterface\) does not accept mixed\.$#'

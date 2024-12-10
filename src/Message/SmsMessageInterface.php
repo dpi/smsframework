@@ -229,7 +229,7 @@ interface SmsMessageInterface {
   /**
    * Gets the user who created the SMS message.
    *
-   * @return int|null
+   * @return positive-int|null
    *   The ID of the user who created the message. Or NULL if no user entity is
    *   associated as the sender.
    */
@@ -294,7 +294,7 @@ interface SmsMessageInterface {
   /**
    * Gets the delivery reports for all recipients.
    *
-   * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
+   * @return list<\Drupal\sms\Message\SmsDeliveryReportInterface>
    *   An array of delivery reports.
    */
   public function getReports(): array;

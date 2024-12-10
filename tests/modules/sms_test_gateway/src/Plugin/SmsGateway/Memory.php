@@ -37,6 +37,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorInterface {
 
+  public const STATE_MESSAGES = 'sms_test_gateway.memory.send';
+  public const STATE_REPORTS = 'sms_test_gateway.memory.report';
+
   /**
    * {@inheritdoc}
    */
@@ -76,16 +79,18 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
     $gateway_id = $this->configuration['gateway_id'];
 
     // Message.
-    $state = static::state()->get('sms_test_gateway.memory.send', []);
+    /** @var array<string, array<\Drupal\sms\Message\SmsMessageInterface>> $state */
+    $state = static::state()->get(static::STATE_MESSAGES, []);
     $state[$gateway_id][] = $sms;
-    static::state()->set('sms_test_gateway.memory.send', $state);
+    static::state()->set(static::STATE_MESSAGES, $state);
 
     // Reports.
-    $reports = static::state()->get('sms_test_gateway.memory.report', []);
+    /** @var array<string, array<string, \Drupal\sms\Message\SmsDeliveryReportInterface>> $reports */
+    $reports = static::state()->get(Memory::STATE_REPORTS, []);
     $gateway_reports = $reports[$gateway_id] ?? [];
     $new_reports = $this->randomDeliveryReports($sms);
     $reports[$gateway_id] = \array_merge($gateway_reports, $new_reports);
-    static::state()->set('sms_test_gateway.memory.report', $reports);
+    static::state()->set(Memory::STATE_REPORTS, $reports);
 
     return (new SmsMessageResult())
       ->setReports($new_reports);
@@ -109,7 +114,8 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
    */
   public function parseDeliveryReports(Request $request, Response $response): array {
     $gateway_id = $this->configuration['gateway_id'];
-    $memory_reports = static::state()->get('sms_test_gateway.memory.report', []);
+    /** @var array<string, array<string, \Drupal\sms\Message\SmsDeliveryReportInterface>> $memory_reports */
+    $memory_reports = static::state()->get(Memory::STATE_REPORTS, []);
 
     $data = Json::decode($request->request->get('delivery_report'));
     $return = [];
@@ -135,7 +141,7 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
       $memory_reports[$gateway_id][$message_id] = $new_report;
     }
 
-    static::state()->set('sms_test_gateway.memory.report', $memory_reports);
+    static::state()->set(Memory::STATE_REPORTS, $memory_reports);
 
     // Set the response.
     $response->setContent('custom response content');

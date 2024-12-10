@@ -61,7 +61,8 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
   }
 
   public function getPhoneNumber(): string {
-    return $this->get('phone')->value;
+    // @phpstan-ignore-next-line
+    return (string) $this->get('phone')->value;
   }
 
   /**
@@ -73,7 +74,8 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
   }
 
   public function getCode(): string {
-    return $this->get('code')->value;
+    // @phpstan-ignore-next-line
+    return (string) $this->get('code')->value;
   }
 
   /**

@@ -111,6 +111,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function getOptions(): array {
+    // @phpstan-ignore-next-line
     return ($first = $this->get('options')->first()) ? $first->getValue() : [];
   }
 
@@ -145,13 +146,14 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   public function getResult(): ?StdMessageResultInterface {
     // Check the temporary store first as that contains the most recent value.
     // Also, if the entity is new then return that value (can be null).
-    if ($this->result || $this->isNew()) {
+    if ($this->result !== NULL || $this->isNew()) {
       return $this->result;
     }
+    /** @var array<int, \Drupal\sms\Entity\SmsMessageResultInterface> $results */
     $results = $this->entityTypeManager()
       ->getStorage('sms_result')
       ->loadByProperties(['sms_message' => $this->id()]);
-    return $results ? \reset($results) : NULL;
+    return \count($results) > 0 ? $results[\array_key_first($results)] : NULL;
   }
 
   /**
@@ -174,10 +176,10 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   public function setResult(?StdMessageResultInterface $result = NULL) {
     // Throw an exception if there is already a result for this SMS message.
     $previous_result = $this->getResult();
-    if ($previous_result) {
+    if ($previous_result !== NULL) {
       throw new SmsStorageException('Saved SMS message results cannot be changed or updated.');
     }
-    elseif ($result) {
+    elseif ($result !== NULL) {
       // Temporarily store the result so it can be retrieved without having to
       // save the message entity.
       $this->result = $result;
@@ -190,17 +192,18 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    */
   public function getReport($recipient): ?SmsDeliveryReportInterface {
     // If a result has been set, check that first.
-    if ($this->result) {
+    if ($this->result !== NULL) {
       return $this->result->getReport($recipient);
     }
     elseif (!$this->isNew()) {
+      /** @var array<int, \Drupal\sms\Entity\SmsDeliveryReportInterface> $reports */
       $reports = $this->entityTypeManager()
         ->getStorage('sms_report')
         ->loadByProperties([
           'sms_message' => $this->id(),
           'recipient' => $recipient,
         ]);
-      return $reports ? \reset($reports) : NULL;
+      return \count($reports) > 0 ? $reports[\array_key_first($reports)] : NULL;
     }
     return NULL;
   }
@@ -210,25 +213,28 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    */
   public function getReports(): array {
     // If a result has been set, check that first.
-    if ($this->result) {
+    if ($this->result !== NULL) {
       return $this->result->getReports();
     }
     elseif (!$this->isNew()) {
-      return \array_values($this->entityTypeManager()
+      /** @var array<int, \Drupal\sms\Entity\SmsDeliveryReportInterface> $reports */
+      $reports = $this->entityTypeManager()
         ->getStorage('sms_report')
-        ->loadByProperties(['sms_message' => $this->id()]));
+        ->loadByProperties(['sms_message' => $this->id()]);
+      return \array_values($reports);
     }
     return [];
   }
 
   public function getSender(): ?string {
-    $sender_name = $this->get('sender_name');
-    if (isset($sender_name->value)) {
-      return $sender_name->value;
+    /** @var string|null $sender_name */
+    $sender_name = $this->sender_name->value ?? NULL;
+    if ($sender_name !== NULL) {
+      return $sender_name;
     }
-    else {
-      return ($sender_entity = $this->getSenderEntity()) ? $sender_entity->label() : NULL;
-    }
+
+    $label = $this->getSenderEntity()?->label();
+    return $label !== NULL ? (string) $label : NULL;
   }
 
   /**
@@ -246,6 +252,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   }
 
   public function getMessage(): string {
+    // @phpstan-ignore-next-line
     return $this->get('message')->value;
   }
 
@@ -258,11 +265,13 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   }
 
   public function getUuid(): string {
+    // @phpstan-ignore-next-line
     return $this->get('uuid')->value;
   }
 
   public function getUid(): ?int {
     $sender = $this->getSenderEntity();
+    // @phpstan-ignore-next-line
     return ($sender instanceof UserInterface) ? (int) $sender->id() : NULL;
   }
 
@@ -270,7 +279,11 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
    * {@inheritdoc}
    */
   public function setUid(?int $uid) {
-    $this->setSenderEntity(User::load($uid));
+    $user = User::load($uid);
+    if ($user !== NULL) {
+      $this->setSenderEntity($user);
+    }
+
     return $this;
   }
 
@@ -294,6 +307,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   public function getDirection(): ?int {
     /** @var string|null $direction */
     $direction = $this->get('direction')->value;
+    // @phpstan-ignore-next-line
     return $direction === NULL ? NULL : (int) $direction;
   }
 
@@ -306,6 +320,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   }
 
   public function getGateway(): ?SmsGatewayInterface {
+    // @phpstan-ignore-next-line
     return $this->get('gateway')->entity ?? NULL;
   }
 
@@ -318,6 +333,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   }
 
   public function getSenderNumber(): ?string {
+    // @phpstan-ignore-next-line
     return $this->get('sender_phone_number')->value ?? NULL;
   }
 
@@ -366,10 +382,12 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   }
 
   public function getCreatedTime(): int {
+    // @phpstan-ignore-next-line
     return (int) $this->get('created')->value;
   }
 
   public function getSendTime(): int {
+    // @phpstan-ignore-next-line
     return (int) $this->get('send_on')->value;
   }
 
@@ -383,6 +401,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
 
   public function getProcessedTime(): ?int {
     $value = $this->get('processed')->value;
+    // @phpstan-ignore-next-line
     return ($value === NULL) ? NULL : (int) $value;
   }
 
@@ -558,7 +577,8 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
       $new->setGateway($gateway);
     }
 
-    if ($uid = $sms_message->getUid()) {
+    $uid = $sms_message->getUid();
+    if ($uid !== NULL) {
       $new->setUid($uid);
     }
 
@@ -572,7 +592,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+  public static function postDelete(EntityStorageInterface $storage, array $entities): void {
     parent::postDelete($storage, $entities);
     $results = [];
     $reports = [];
@@ -596,10 +616,10 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+  public function postSave(EntityStorageInterface $storage, $update = TRUE): void {
     parent::postSave($storage, $update);
     // Save the result and reports in the static cache.
-    if ($this->result) {
+    if ($this->result !== NULL) {
       $result_entity = SmsMessageResult::convertFromMessageResult($this->result);
       $result_entity
         ->setSmsMessage($this)

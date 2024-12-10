@@ -111,7 +111,8 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
    * @return \Symfony\Component\HttpFoundation\Request
    *   A request object containing JSON-encoded delivery reports.
    */
-  protected function buildDeliveryReportRequest($message_id, $recipient, $status, $status_time): Request {
+  protected function buildDeliveryReportRequest(string $message_id, string $recipient, string $status, int $status_time): Request {
+    $reports = [];
     $reports[] = [
       'message_id' => $message_id,
       'recipient' => $recipient,
@@ -125,6 +126,7 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
   }
 
   private static function smsProvider(): SmsProviderInterface {
+    /** @var \Drupal\sms\Provider\SmsProviderInterface */
     return \Drupal::service(SmsProviderInterface::class);
   }
 

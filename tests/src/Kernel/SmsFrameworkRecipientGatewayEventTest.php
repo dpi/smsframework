@@ -20,17 +20,9 @@ final class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase
     'dynamic_entity_reference',
   ];
 
-  /**
-   * The default SMS provider.
-   *
-   * @var \Drupal\sms\Provider\SmsProviderInterface
-   */
-  private SmsProviderInterface $smsProvider;
-
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('sms');
-    $this->smsProvider = \Drupal::service('sms.provider');
     $this->setFallbackGateway(NULL);
   }
 
@@ -57,7 +49,9 @@ final class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase
       ->setMessage($this->randomString())
       ->addRecipients($this->randomPhoneNumbers());
 
-    $sms_messages = $this->smsProvider->queue($sms_message);
+    /** @var \Drupal\sms\Provider\SmsProviderInterface $smsProvider */
+    $smsProvider = \Drupal::service(SmsProviderInterface::class);
+    $sms_messages = $smsProvider->queue($sms_message);
     static::assertCount(1, $sms_messages, 'One message dispatched.');
     static::assertEquals('test_gateway_400', $sms_messages[0]->getGateway()->id());
 

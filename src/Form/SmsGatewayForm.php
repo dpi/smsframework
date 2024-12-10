@@ -309,7 +309,7 @@ class SmsGatewayForm extends EntityForm {
    *
    * Callback for `id` form element in SmsGatewayForm->buildForm.
    */
-  public function exists($entity_id, array $element, FormStateInterface $form_state) {
+  public function exists(string $entity_id, array $element, FormStateInterface $form_state): bool {
     return (bool) $this->gatewayStorage->getQuery()
       ->accessCheck(FALSE)
       ->condition('id', $entity_id)

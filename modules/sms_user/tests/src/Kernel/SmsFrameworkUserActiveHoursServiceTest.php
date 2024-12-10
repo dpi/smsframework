@@ -7,6 +7,7 @@ namespace Drupal\Tests\sms_user\Kernel;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsMessage;
+use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
@@ -230,6 +231,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
       ->setRecipientEntity($user)
       ->setAutomated(TRUE);
     $return = $this->smsProvider->queue($sms_message);
+    self::assertInstanceOf(SmsMessageInterface::class, $return[0]);
 
     static::assertEquals($timestamp, $return[0]->getSendTime());
   }

@@ -72,14 +72,15 @@ class FilterInlineSms extends FilterBase implements ContainerFactoryPluginInterf
   /**
    * {@inheritdoc}
    */
-  public function tips($long = FALSE) {
-    return $this->t('Text between [sms][/sms] tags will be highlighted and appended with a "send to phone" button.');
+  public function tips($long = FALSE): string {
+    return (string) $this->t('Text between [sms][/sms] tags will be highlighted and appended with a "send to phone" button.');
   }
 
   /**
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
+    $elements = [];
     $elements['display'] = [
       '#type' => 'radios',
       '#title' => \t('Show link as'),

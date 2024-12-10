@@ -1,4 +1,4 @@
-# total 20 errors
+# total 19 errors
 
 parameters:
     ignoreErrors:
@@ -56,11 +56,6 @@ parameters:
             message: '#^Method Drupal\\sms\\Form\\PhoneNumberSettingsForm\:\:updateFieldMapping\(\) has parameter \$form with no type specified\.$#'
             count: 1
             path: ../src/Form/PhoneNumberSettingsForm.php
-
-        -
-            message: '#^Method Drupal\\sms\\Form\\SmsGatewayForm\:\:exists\(\) has parameter \$entity_id with no type specified\.$#'
-            count: 1
-            path: ../src/Form/SmsGatewayForm.php
 
         -
             message: '#^Method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD6SmsPhoneNumberTest\:\:assertUnVerifiedPhoneNumber\(\) has parameter \$number with no type specified\.$#'

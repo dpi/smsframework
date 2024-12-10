@@ -1,4 +1,4 @@
-# total 3 errors
+# total 2 errors
 
 parameters:
     ignoreErrors:
@@ -11,8 +11,3 @@ parameters:
             message: '#^Only booleans are allowed in an elseif condition, mixed given\.$#'
             count: 1
             path: ../modules/sms_user/src/Form/AdminSettingsForm.php
-
-        -
-            message: '#^Only booleans are allowed in an elseif condition, Drupal\\sms\\Message\\SmsMessageResultInterface\|null given\.$#'
-            count: 1
-            path: ../src/Entity/SmsMessage.php

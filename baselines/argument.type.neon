@@ -1,4 +1,4 @@
-# total 107 errors
+# total 91 errors
 
 parameters:
     ignoreErrors:
@@ -113,29 +113,9 @@ parameters:
             path: ../src/DeliveryReportController.php
 
         -
-            message: '#^Parameter \#1 \$field of method Drupal\\Core\\Entity\\Query\\QueryInterface\:\:condition\(\) expects Drupal\\Core\\Entity\\Query\\ConditionInterface\|string, string\|false given\.$#'
-            count: 1
-            path: ../src/Entity/SmsDeliveryReport.php
-
-        -
-            message: '#^Parameter \#1 \$field of method Drupal\\Core\\Entity\\Query\\QueryInterface\:\:sort\(\) expects string, string\|false given\.$#'
-            count: 1
-            path: ../src/Entity/SmsDeliveryReport.php
-
-        -
             message: '#^Parameter \#1 \$manager of class Drupal\\sms\\Plugin\\SmsGatewayPluginCollection constructor expects Drupal\\Component\\Plugin\\PluginManagerInterface, mixed given\.$#'
             count: 1
             path: ../src/Entity/SmsGateway.php
-
-        -
-            message: '#^Parameter \#1 \$entity of method Drupal\\sms\\Entity\\SmsMessage\:\:setSenderEntity\(\) expects Drupal\\Core\\Entity\\EntityInterface, Drupal\\user\\Entity\\User\|null given\.$#'
-            count: 1
-            path: ../src/Entity/SmsMessage.php
-
-        -
-            message: '#^Parameter \#1 \$uid of method Drupal\\sms\\Entity\\SmsMessage\:\:setUid\(\) expects int\<1, max\>\|null, int\<min, \-1\>\|int\<1, max\> given\.$#'
-            count: 1
-            path: ../src/Entity/SmsMessage.php
 
         -
             message: '#^Parameter \#1 \$map of method Drupal\\sms\\Entity\\PhoneNumberSettingsInterface\:\:setFieldName\(\) expects string, mixed given\.$#'
@@ -388,11 +368,6 @@ parameters:
             path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
 
         -
-            message: '#^Parameter \#1 \.\.\.\$arrays of function array_merge expects array, mixed given\.$#'
-            count: 1
-            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
-
-        -
             message: '#^Parameter \#2 \$offset of function array_slice expects int, mixed given\.$#'
             count: 1
             path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/MemoryOutgoingResult.php
@@ -438,26 +413,6 @@ parameters:
             path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
 
         -
-            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
-            count: 3
-            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
-
-        -
-            message: '#^Parameter \#1 \$status of method Drupal\\sms\\Entity\\SmsDeliveryReport\:\:setStatus\(\) expects ''content_invalid''\|''delivered''\|''error''\|''expired''\|''invalid_recipient''\|''queued''\|''rejected''\|null, ''delivered''\|''pending''\|''queued'' given\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
-
-        -
-            message: '#^Parameter \#1 \$status of method Drupal\\sms\\Message\\SmsDeliveryReportInterface\:\:setStatus\(\) expects ''content_invalid''\|''delivered''\|''error''\|''expired''\|''invalid_recipient''\|''queued''\|''rejected''\|null, string given\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
-
-        -
-            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
-            count: 3
-            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
-
-        -
             message: '#^Parameter \#1 \$message_id of method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkDeliveryReportUpdateTest\:\:buildDeliveryReportRequest\(\) expects string, string\|null given\.$#'
             count: 2
             path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
@@ -478,19 +433,9 @@ parameters:
             path: ../tests/src/Kernel/SmsFrameworkGatewayEntityTest.php
 
         -
-            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
-            count: 3
-            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
-
-        -
             message: '#^Parameter \#1 \$uid of method Drupal\\sms\\Message\\SmsMessage\:\:setUid\(\) expects int\<1, max\>\|null, int given\.$#'
             count: 1
             path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
-
-        -
-            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
-            count: 3
-            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
 
         -
             message: '#^Parameter \#1 \$rid of method Drupal\\user\\Entity\\User\:\:addRole\(\) expects string, int\|string\|null given\.$#'
@@ -503,11 +448,6 @@ parameters:
             path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
 
         -
-            message: '#^Parameter \#1 \$status of method Drupal\\sms\\Message\\SmsDeliveryReportInterface\:\:setStatus\(\) expects ''content_invalid''\|''delivered''\|''error''\|''expired''\|''invalid_recipient''\|''queued''\|''rejected''\|null, string given\.$#'
-            count: 1
-            path: ../tests/src/Unit/Message/SmsFrameworkDeliveryReportUnitTest.php
-
-        -
             message: '#^Parameter \#1 \$error of method Drupal\\sms\\Message\\SmsMessageResultInterface\:\:setError\(\) expects ''account_error''\|''authentication''\|''error''\|''flooded''\|''invalid_sender''\|''no_credit''\|''parameters''\|null, string given\.$#'
             count: 1
             path: ../tests/src/Kernel/SmsFrameworkMessageResultEntityTest.php
@@ -516,23 +456,3 @@ parameters:
             message: '#^Parameter \#1 \$error of method Drupal\\sms\\Message\\SmsMessageResultInterface\:\:setError\(\) expects ''account_error''\|''authentication''\|''error''\|''flooded''\|''invalid_sender''\|''no_credit''\|''parameters''\|null, string given\.$#'
             count: 1
             path: ../tests/src/Unit/Message/SmsFrameworkResultUnitTest.php
-
-        -
-            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
-            count: 3
-            path: ../tests/src/FunctionalJavascript/SmsFrameworkPhoneNumberAdminTest.php
-
-        -
-            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
-            count: 3
-            path: ../tests/src/Functional/SmsFrameworkBrowserTestBase.php
-
-        -
-            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
-            count: 3
-            path: ../tests/src/Kernel/SmsFrameworkKernelBase.php
-
-        -
-            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
-            count: 3
-            path: ../tests/src/Unit/Event/RecipientGatewayEventTest.php

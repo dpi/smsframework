@@ -80,8 +80,10 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
 
   /**
    * Number of seconds before phone number verifications expire.
+   *
+   * @var positive-int
    */
-  protected int $verification_code_lifetime = 0;
+  protected int $verification_code_lifetime = 1;
 
   /**
    * Whether to remove phone numbers from entities when verifications expire.
@@ -147,7 +149,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
   }
 
   public function getVerificationCodeLifetime(): int {
-    return $this->verification_code_lifetime ?? 0;
+    return $this->verification_code_lifetime ?? 1;
   }
 
   /**

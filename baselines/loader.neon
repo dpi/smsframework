@@ -10,7 +10,6 @@ includes:
     - booleanNot.alwaysTrue.neon
     - booleanNot.exprNotBoolean.neon
     - booleanOr.alwaysTrue.neon
-    - booleanOr.leftNotBoolean.neon
     - booleanOr.rightNotBoolean.neon
     - cast.int.neon
     - cast.string.neon
@@ -35,7 +34,6 @@ includes:
     - missingType.generics.neon
     - missingType.iterableValue.neon
     - missingType.parameter.neon
-    - missingType.return.neon
     - notIdentical.alwaysTrue.neon
     - nullCoalesce.offset.neon
     - offsetAccess.nonOffsetAccessible.neon
@@ -46,11 +44,8 @@ includes:
     - property.onlyWritten.neon
     - property.phpDocType.neon
     - property.unused.neon
-    - return.type.neon
-    - return.unusedType.neon
     - staticMethod.alreadyNarrowedType.neon
     - staticMethod.dynamicCall.neon
-    - ternary.alwaysTrue.neon
     - ternary.condNotBoolean.neon
     - ternary.shortNotAllowed.neon
     - varTag.variableNotFound.neon

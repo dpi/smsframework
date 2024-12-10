@@ -8,6 +8,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\RevisionableStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\sms\Exception\SmsStorageException;
 use Drupal\sms\Message\SmsDeliveryReportInterface as StdDeliveryReportInterface;
@@ -43,6 +44,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
   use EntityChangedTrait;
 
   public function getMessageId(): ?string {
+    // @phpstan-ignore-next-line
     return $this->get('message_id')->value;
   }
 
@@ -54,6 +56,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
   }
 
   public function getRecipient(): string {
+    // @phpstan-ignore-next-line
     return $this->get('recipient')->value;
   }
 
@@ -65,6 +68,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
   }
 
   public function getStatus(): ?string {
+    // @phpstan-ignore-next-line
     return $this->get('status')->value;
   }
 
@@ -76,7 +80,8 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
   }
 
   public function getStatusMessage(): string {
-    return $this->get('status_message')->value;
+    // @phpstan-ignore-next-line
+    return (string) $this->get('status_message')->value;
   }
 
   /**
@@ -88,6 +93,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
 
   public function getStatusTime(): ?int {
     $value = $this->get('status_time')->value;
+    // @phpstan-ignore-next-line
     return $value === NULL ? NULL : (int) $value;
   }
 
@@ -127,6 +133,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
   }
 
   public function getSmsMessage(): ?SmsMessageInterface {
+    // @phpstan-ignore-next-line
     return $this->get('sms_message')->entity ?? NULL;
   }
 
@@ -194,27 +201,25 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
     return $fields;
   }
 
-  /**
-   * Gets a revision with the specified delivery report status.
-   *
-   * @param string $status
-   *   Delivery report status from \Drupal\sms\Message\SmsMessageReportStatus.
-   *
-   * @return \Drupal\sms\Entity\SmsDeliveryReportInterface|null
-   *   The delivery report object with that status or null if there is none.
-   */
-  public function getRevisionAtStatus($status): ?SmsDeliveryReportInterface {
+  public function getRevisionAtStatus(string $status): ?SmsDeliveryReportInterface {
     $storage = $this->entityTypeManager()->getStorage($this->entityTypeId);
+    \assert($storage instanceof RevisionableStorageInterface);
+    /** @var string $idKey */
+    $idKey = $this->getEntityType()->getKey('id');
+    /** @var string $revKey */
+    $revKey = $this->getEntityType()->getKey('revision');
+    /** @var array<int, int> $revision_ids */
     $revision_ids = $storage->getQuery()
       ->accessCheck(FALSE)
       ->allRevisions()
-      ->condition($this->getEntityType()->getKey('id'), $this->id())
+      ->condition($idKey, $this->id())
       ->condition('status', $status)
-      ->sort($this->getEntityType()->getKey('revision'), 'DESC')
+      ->sort($revKey, 'DESC')
       ->range(0, 1)
       ->execute();
-    if ($revision_ids) {
-      return $storage->loadRevision(\key($revision_ids));
+    if (\count($revision_ids) > 0) {
+      /** @var \Drupal\sms\Entity\SmsDeliveryReportInterface|null */
+      return $storage->loadRevision(\array_key_first($revision_ids));
     }
     return NULL;
   }

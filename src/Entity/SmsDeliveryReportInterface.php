@@ -25,4 +25,14 @@ interface SmsDeliveryReportInterface extends PlainDeliveryReportInterface, Conte
    */
   public function setSmsMessage(SmsMessageInterface $sms_message);
 
+  /**
+   * Gets a revision with the specified delivery report status.
+   *
+   * @phpstan-param \Drupal\sms\Message\SmsMessageReportStatus::* $status
+   *
+   * @return \Drupal\sms\Entity\SmsDeliveryReportInterface|null
+   *   The delivery report object with that status or null if there is none.
+   */
+  public function getRevisionAtStatus(string $status): ?SmsDeliveryReportInterface;
+
 }

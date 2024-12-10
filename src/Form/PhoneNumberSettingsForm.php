@@ -211,9 +211,12 @@ class PhoneNumberSettingsForm extends EntityForm {
       ->setPhoneNumberEntityTypeId($entity_type_id)
       ->setPhoneNumberBundle($bundle);
 
+    /** @var int<60, max> $lifetime */
+    $lifetime = (int) $form_state->getValue('code_lifetime');
+
     $config
       ->setVerificationMessage($form_state->getValue('verification_message'))
-      ->setVerificationCodeLifetime((int) $form_state->getValue('code_lifetime'))
+      ->setVerificationCodeLifetime($lifetime)
       ->setPurgeVerificationPhoneNumber((bool) $form_state->getValue('phone_number_purge'));
 
     foreach ($form_state->getValue('field_mapping') as $config_key => $field_name) {

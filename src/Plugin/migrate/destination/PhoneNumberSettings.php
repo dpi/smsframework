@@ -38,7 +38,7 @@ class PhoneNumberSettings extends EntityConfigBase {
   /**
    * {@inheritdoc}
    */
-  public function rollback(array $destination_identifier) {
+  public function rollback(array $destination_identifier): void {
     /** @var \Drupal\sms\Entity\PhoneNumberSettingsInterface $phone_number_settings */
     $phone_number_settings = $this->storage->load(\reset($destination_identifier));
 

@@ -82,7 +82,7 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * The UID of the creator of the SMS message.
    *
-   * @var int|null
+   * @var positive-int|null
    */
   protected ?int $uid = NULL;
 

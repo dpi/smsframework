@@ -83,7 +83,7 @@ class SmsVerification extends EntityContentBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  public function rollback(array $destination_identifier) {
+  public function rollback(array $destination_identifier): void {
     /** @var \Drupal\sms\Entity\PhoneNumberVerification $verification */
     $verification = $this->storage->load(\reset($destination_identifier));
     $this->unsetVerifiedValue($verification);

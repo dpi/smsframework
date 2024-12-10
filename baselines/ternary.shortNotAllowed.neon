@@ -1,4 +1,4 @@
-# total 4 errors
+# total 2 errors
 
 parameters:
     ignoreErrors:
@@ -6,16 +6,6 @@ parameters:
             message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
             count: 3
             path: ../src/Form/PhoneNumberSettingsForm.php
-
-        -
-            message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
-            count: 1
-            path: ../src/Form/VerifyPhoneNumberForm.php
-
-        -
-            message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
-            count: 1
-            path: ../src/Lists/PhoneNumberSettingsListBuilder.php
 
         -
             message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'

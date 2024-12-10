@@ -1,4 +1,4 @@
-# total 60 errors
+# total 34 errors
 
 parameters:
     ignoreErrors:
@@ -118,49 +118,9 @@ parameters:
             path: ../modules/sms_user/tests/src/Functional/SmsFrameworkUserSettingsTest.php
 
         -
-            message: '#^Cannot access offset ''credit_balance…'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
-            count: 1
-            path: ../src/Entity/SmsGateway.php
-
-        -
-            message: '#^Cannot access offset ''incoming'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
-            count: 1
-            path: ../src/Entity/SmsGateway.php
-
-        -
-            message: '#^Cannot access offset ''incoming_route'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
-            count: 1
-            path: ../src/Entity/SmsGateway.php
-
-        -
-            message: '#^Cannot access offset ''outgoing_message…'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
-            count: 1
-            path: ../src/Entity/SmsGateway.php
-
-        -
-            message: '#^Cannot access offset ''reports_pull'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
-            count: 1
-            path: ../src/Entity/SmsGateway.php
-
-        -
-            message: '#^Cannot access offset ''reports_push'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
-            count: 1
-            path: ../src/Entity/SmsGateway.php
-
-        -
-            message: '#^Cannot access offset ''schedule_aware'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
-            count: 1
-            path: ../src/Entity/SmsGateway.php
-
-        -
             message: '#^Cannot access offset ''label'' on mixed\.$#'
             count: 1
             path: ../src/Form/SmsGatewayForm.php
-
-        -
-            message: '#^Cannot access offset ''label'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
-            count: 1
-            path: ../src/Lists/SmsGatewayListBuilder.php
 
         -
             message: '#^Cannot access offset ''id'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
@@ -181,11 +141,6 @@ parameters:
             message: '#^Cannot access offset ''recipients'' on mixed\.$#'
             count: 1
             path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Incoming.php
-
-        -
-            message: '#^Cannot access an offset on mixed\.$#'
-            count: 1
-            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
 
         -
             message: '#^Cannot access offset ''message_id'' on mixed\.$#'
@@ -216,88 +171,3 @@ parameters:
             message: '#^Cannot access offset ''status_time'' on mixed\.$#'
             count: 3
             path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
-
-        -
-            message: '#^Cannot access offset mixed on mixed\.$#'
-            count: 5
-            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
-
-        -
-            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
-            count: 9
-            path: ../tests/src/FunctionalJavascript/SmsFrameworkPhoneNumberAdminTest.php
-
-        -
-            message: '#^Cannot access offset string on mixed\.$#'
-            count: 1
-            path: ../tests/src/FunctionalJavascript/SmsFrameworkPhoneNumberAdminTest.php
-
-        -
-            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
-            count: 9
-            path: ../tests/src/Functional/SmsFrameworkBrowserTestBase.php
-
-        -
-            message: '#^Cannot access offset string on mixed\.$#'
-            count: 1
-            path: ../tests/src/Functional/SmsFrameworkBrowserTestBase.php
-
-        -
-            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
-            count: 9
-            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
-
-        -
-            message: '#^Cannot access offset string on mixed\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
-
-        -
-            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
-            count: 9
-            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
-
-        -
-            message: '#^Cannot access offset string on mixed\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
-
-        -
-            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
-            count: 9
-            path: ../tests/src/Kernel/SmsFrameworkKernelBase.php
-
-        -
-            message: '#^Cannot access offset string on mixed\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkKernelBase.php
-
-        -
-            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
-            count: 9
-            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
-
-        -
-            message: '#^Cannot access offset string on mixed\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
-
-        -
-            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
-            count: 9
-            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
-
-        -
-            message: '#^Cannot access offset string on mixed\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
-
-        -
-            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
-            count: 9
-            path: ../tests/src/Unit/Event/RecipientGatewayEventTest.php
-
-        -
-            message: '#^Cannot access offset string on mixed\.$#'
-            count: 1
-            path: ../tests/src/Unit/Event/RecipientGatewayEventTest.php

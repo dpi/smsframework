@@ -1,12 +1,7 @@
-# total 3 errors
+# total 2 errors
 
 parameters:
     ignoreErrors:
-        -
-            message: '#^Casting to int something that''s already int\.$#'
-            count: 2
-            path: ../src/Entity/SmsGateway.php
-
         -
             message: '#^Casting to int something that''s already int\.$#'
             count: 2

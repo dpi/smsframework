@@ -13,30 +13,26 @@ use Symfony\Contracts\EventDispatcher\Event;
  * {@link \Drupal\sms\Event\SmsEvents} to see where this event is used.
  *
  * @see \Drupal\sms\Event\SmsEvents
+ *
+ * @template-covariant T of \Drupal\sms\Message\SmsMessageInterface=\Drupal\sms\Message\SmsMessageInterface
  */
 final class SmsMessageEvent extends Event {
 
   /**
-   * The SMS messages.
-   *
-   * @var \Drupal\sms\Message\SmsMessageInterface[]
-   */
-  protected array $messages;
-
-  /**
    * Constructs the object.
    *
-   * @param \Drupal\sms\Message\SmsMessageInterface[] $messages
+   * @param T[] $messages
    *   The SMS message.
    */
-  public function __construct(array $messages) {
-    $this->setMessages($messages);
+  public function __construct(
+    protected array $messages,
+  ) {
   }
 
   /**
    * Get all messages on this event.
    *
-   * @return \Drupal\sms\Message\SmsMessageInterface[]
+   * @return T[]
    *   The messages on this event.
    */
   public function getMessages(): array {
@@ -53,6 +49,7 @@ final class SmsMessageEvent extends Event {
    *   Returns this event for chaining.
    */
   public function setMessages(array $messages) {
+    /** @var T[] $messages */
     $this->messages = $messages;
     return $this;
   }

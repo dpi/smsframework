@@ -1,12 +1,7 @@
-# total 9 errors
+# total 7 errors
 
 parameters:
     ignoreErrors:
-        -
-            message: '#^Call to an undefined method Drupal\\Core\\Entity\\EntityStorageInterface\:\:loadRevision\(\)\.$#'
-            count: 1
-            path: ../src/Entity/SmsDeliveryReport.php
-
         -
             message: '#^Call to an undefined method Drupal\\Core\\Entity\\EntityInterface\:\:getMessageId\(\)\.$#'
             count: 1
@@ -30,11 +25,6 @@ parameters:
         -
             message: '#^Call to an undefined method Drupal\\Core\\Entity\\EntityInterface\:\:getStatusTime\(\)\.$#'
             count: 1
-            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
-
-        -
-            message: '#^Call to an undefined method Drupal\\sms\\Message\\SmsDeliveryReportInterface\:\:setSmsMessage\(\)\.$#'
-            count: 4
             path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
 
         -

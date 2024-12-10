@@ -1,4 +1,4 @@
-# total 22 errors
+# total 19 errors
 
 parameters:
     ignoreErrors:
@@ -16,21 +16,6 @@ parameters:
             message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
             count: 1
             path: ../modules/sms_user/src/Form/AdminSettingsForm.php
-
-        -
-            message: '#^Only booleans are allowed in an if condition, array\<int, string\> given\.$#'
-            count: 1
-            path: ../src/Entity/SmsDeliveryReport.php
-
-        -
-            message: '#^Only booleans are allowed in an if condition, Drupal\\sms\\Message\\SmsMessageResultInterface\|null given\.$#'
-            count: 4
-            path: ../src/Entity/SmsMessage.php
-
-        -
-            message: '#^Only booleans are allowed in an if condition, int\|null given\.$#'
-            count: 1
-            path: ../src/Entity/SmsMessage.php
 
         -
             message: '#^Only booleans are allowed in an if condition, Drupal\\Core\\Entity\\Display\\EntityFormDisplayInterface given\.$#'
@@ -74,40 +59,40 @@ parameters:
 
         -
             message: '#^Only booleans are allowed in an if condition, Drupal\\sms\\Entity\\SmsGatewayInterface\|null given\.$#'
-            count: 2
+            count: 1
             path: ../tests/src/FunctionalJavascript/SmsFrameworkPhoneNumberAdminTest.php
 
         -
             message: '#^Only booleans are allowed in an if condition, Drupal\\sms\\Entity\\SmsGatewayInterface\|null given\.$#'
-            count: 2
+            count: 1
             path: ../tests/src/Functional/SmsFrameworkBrowserTestBase.php
 
         -
             message: '#^Only booleans are allowed in an if condition, Drupal\\sms\\Entity\\SmsGatewayInterface\|null given\.$#'
-            count: 2
+            count: 1
             path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
 
         -
             message: '#^Only booleans are allowed in an if condition, Drupal\\sms\\Entity\\SmsGatewayInterface\|null given\.$#'
-            count: 2
+            count: 1
             path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
 
         -
             message: '#^Only booleans are allowed in an if condition, Drupal\\sms\\Entity\\SmsGatewayInterface\|null given\.$#'
-            count: 2
+            count: 1
             path: ../tests/src/Kernel/SmsFrameworkKernelBase.php
 
         -
             message: '#^Only booleans are allowed in an if condition, Drupal\\sms\\Entity\\SmsGatewayInterface\|null given\.$#'
-            count: 2
+            count: 1
             path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
 
         -
             message: '#^Only booleans are allowed in an if condition, Drupal\\sms\\Entity\\SmsGatewayInterface\|null given\.$#'
-            count: 2
+            count: 1
             path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
 
         -
             message: '#^Only booleans are allowed in an if condition, Drupal\\sms\\Entity\\SmsGatewayInterface\|null given\.$#'
-            count: 2
+            count: 1
             path: ../tests/src/Unit/Event/RecipientGatewayEventTest.php

@@ -73,6 +73,7 @@ final class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
     $sms_message = $this->createSmsMessage();
 
     $result = $this->smsProvider->queue($sms_message);
+    self::assertInstanceOf(SmsMessageInterface::class, $result[0]);
     $id = $result[0]->id();
 
     // Call processUnqueued manually so cron does not send the message with

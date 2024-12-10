@@ -111,7 +111,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    * @param \Drupal\sms\Direction::* $direction
    *   The direction of the message. See SmsMessageInterface::DIRECTION_*
    *   constants.
-   * @param int $retention_duration
+   * @param int<-1, max> $retention_duration
    *   How many seconds to hold messages, or use -1 to never expire.
    *
    * @return $this

@@ -44,7 +44,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_QUEUE_PRE_PROCESS, $sms_messages)->getMessages();
     unset($sms_message);
 
-    foreach ($sms_messages as $gateway_id => &$sms_message) {
+    foreach ($sms_messages as &$sms_message) {
       // Tag so SmsEvents::MESSAGE_PRE_PROCESS is not dispatched again.
       $sms_message->setOption('_skip_preprocess_event', TRUE);
 
@@ -155,7 +155,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    *
    * @param \Drupal\sms\Event\SmsEvents::MESSAGE_* $event_name
    *   The event to trigger.
-   * @param \Drupal\sms\Message\SmsMessageInterface[] $sms_messages
+   * @param array<\Drupal\sms\Message\SmsMessageInterface> $sms_messages
    *   The messages to dispatch.
    *
    * @return \Drupal\sms\Event\SmsMessageEvent

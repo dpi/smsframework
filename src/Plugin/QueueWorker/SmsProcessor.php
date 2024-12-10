@@ -104,7 +104,9 @@ class SmsProcessor extends QueueWorkerBase implements ContainerFactoryPluginInte
       throw new \LogicException('SMS must be saved.');
     }
 
-    return ['id' => (int) $sms->id()];
+    /** @var positive-int $id */
+    $id = (int) $sms->id();
+    return ['id' => $id];
   }
 
   private function smsStorage(): EntityStorageInterface {

@@ -67,7 +67,7 @@ class PhoneNumberSettingsListBuilder extends ConfigEntityListBuilder {
 
     $phone_number_settings = $this->phoneNumberVerificationProvider
       ->getPhoneNumberSettings($entity_type_id, $bundle);
-    $lifetime = $phone_number_settings->getVerificationCodeLifetime() ?: 0;
+    $lifetime = $phone_number_settings->getVerificationCodeLifetime();
 
     $row['count_expired'] = $this->buildPhoneNumberVerificationQuery($entity_type_id, $bundle)
       ->condition('status', 0)

@@ -1,4 +1,4 @@
-# total 78 errors
+# total 69 errors
 
 parameters:
     ignoreErrors:
@@ -213,16 +213,6 @@ parameters:
             path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
 
         -
-            message: '#^Cannot call method getStatusTime\(\) on Drupal\\sms\\Entity\\SmsDeliveryReportInterface\|null\.$#'
-            count: 6
-            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
-
-        -
-            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
-
-        -
             message: '#^Cannot call method getStatus\(\) on Drupal\\sms\\Entity\\SmsDeliveryReport\|null\.$#'
             count: 2
             path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
@@ -235,11 +225,6 @@ parameters:
         -
             message: '#^Cannot call method getTimeDelivered\(\) on Drupal\\sms\\Entity\\SmsDeliveryReport\|null\.$#'
             count: 2
-            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
-
-        -
-            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
-            count: 1
             path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
 
         -
@@ -290,11 +275,6 @@ parameters:
         -
             message: '#^Cannot call method id\(\) on Drupal\\Core\\Entity\\EntityInterface\|null\.$#'
             count: 3
-            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
-
-        -
-            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
-            count: 1
             path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
 
         -
@@ -358,11 +338,6 @@ parameters:
             path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
 
         -
-            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
-
-        -
             message: '#^Cannot call method getErrorMessage\(\) on Drupal\\sms\\Message\\SmsMessageResultInterface\|null\.$#'
             count: 2
             path: ../tests/src/Unit/Message/SmsMessageTest.php
@@ -371,23 +346,3 @@ parameters:
             message: '#^Cannot call method getStatus\(\) on Drupal\\sms\\Message\\SmsDeliveryReportInterface\|null\.$#'
             count: 2
             path: ../tests/src/Unit/Message/SmsMessageTest.php
-
-        -
-            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
-            count: 1
-            path: ../tests/src/FunctionalJavascript/SmsFrameworkPhoneNumberAdminTest.php
-
-        -
-            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
-            count: 1
-            path: ../tests/src/Functional/SmsFrameworkBrowserTestBase.php
-
-        -
-            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkKernelBase.php
-
-        -
-            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
-            count: 1
-            path: ../tests/src/Unit/Event/RecipientGatewayEventTest.php

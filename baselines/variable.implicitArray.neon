@@ -1,12 +1,7 @@
-# total 14 errors
+# total 12 errors
 
 parameters:
     ignoreErrors:
-        -
-            message: '#^Implicit array creation is not allowed \- variable \$elements does not exist\.$#'
-            count: 1
-            path: ../modules/sms_sendtophone/src/Plugin/Filter/FilterInlineSms.php
-
         -
             message: '#^Implicit array creation is not allowed \- variable \$data does not exist\.$#'
             count: 1
@@ -61,11 +56,6 @@ parameters:
             message: '#^Implicit array creation is not allowed \- variable \$edit does not exist\.$#'
             count: 3
             path: ../tests/src/Functional/SmsFrameworkSettingsTest.php
-
-        -
-            message: '#^Implicit array creation is not allowed \- variable \$reports does not exist\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
 
         -
             message: '#^Implicit array creation is not allowed \- variable \$data does not exist\.$#'

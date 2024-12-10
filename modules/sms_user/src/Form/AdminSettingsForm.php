@@ -445,7 +445,7 @@ class AdminSettingsForm extends ConfigFormBase {
       ->set('account_registration.incoming_pattern.reply.message_failure', $account_registration['incoming_pattern_options']['reply']['message_failure'])
       ->set('account_registration.incoming_pattern.send_activation_email', $account_registration['incoming_pattern_options']['send_activation_email'])
       // Active Hours.
-      ->set('active_hours.status', (boolean) $form_state->getValue(['active_hours', 'status']))
+      ->set('active_hours.status', (bool) $form_state->getValue(['active_hours', 'status']))
       // Days make sense for this form, however storage uses generic 'range'
       // term. Remove keys so it is a raw sequence.
       ->set('active_hours.ranges', \array_values($form_state->getValue(['active_hours', 'days'])))

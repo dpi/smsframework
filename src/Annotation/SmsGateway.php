@@ -12,6 +12,7 @@ use Drupal\Component\Annotation\Plugin;
  * Defines SmsGateway Annotation object.
  *
  * @Annotation
+ * @phpstan-type SmsGatewayDefinition array{id: string, label: \Drupal\Core\StringTranslation\TranslatableMarkup, outgoing_message_max_recipients?: int<-1, max>, incoming?: bool, incoming_route?: bool, schedule_aware?: bool, reports_pull?: bool, reports_push?: bool, credit_balance_available?: bool}
  */
 class SmsGateway extends Plugin {
 

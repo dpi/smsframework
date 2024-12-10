@@ -44,6 +44,7 @@ class SmsMessageResult extends ContentEntityBase implements SmsMessageResultInte
   protected array $reports = [];
 
   public function getError(): ?string {
+    // @phpstan-ignore-next-line
     return $this->get('error')->value ?? NULL;
   }
 
@@ -55,6 +56,7 @@ class SmsMessageResult extends ContentEntityBase implements SmsMessageResultInte
   }
 
   public function getErrorMessage(): string {
+    // @phpstan-ignore-next-line
     return $this->get('error_message')->value ?? '';
   }
 
@@ -198,10 +200,10 @@ class SmsMessageResult extends ContentEntityBase implements SmsMessageResultInte
    * @param \Drupal\sms\Message\SmsMessageResultInterface $sms_result
    *   A plain SMS message result.
    *
-   * @return static
+   * @return \Drupal\sms\Entity\SmsMessageResultInterface
    *   An SMS message result entity that can be saved.
    */
-  public static function convertFromMessageResult(StdMessageResultInterface $sms_result): static {
+  final public static function convertFromMessageResult(StdMessageResultInterface $sms_result): SmsMessageResultInterface {
     if ($sms_result instanceof SmsMessageResultInterface) {
       return $sms_result;
     }

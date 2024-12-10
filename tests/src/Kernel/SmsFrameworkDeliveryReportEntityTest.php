@@ -9,7 +9,6 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\sms\Entity\SmsDeliveryReport;
 use Drupal\sms\Entity\SmsDeliveryReportInterface;
 use Drupal\sms\Entity\SmsMessage;
-use Drupal\sms\Message\SmsDeliveryReportInterface as BaseSmsDeliveryReportInterface;
 use Drupal\sms\Message\SmsMessageReportStatus;
 use Drupal\Tests\sms\Trait\SmsFrameworkDeliveryReportTestTrait;
 use Drupal\Tests\sms\Trait\SmsFrameworkTestTrait;
@@ -47,7 +46,7 @@ final class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
     $this->installEntitySchema('sms_report');
   }
 
-  protected function createDeliveryReport(): BaseSmsDeliveryReportInterface {
+  protected function createDeliveryReport(): SmsDeliveryReportInterface {
     return SmsDeliveryReport::create();
   }
 
@@ -74,7 +73,6 @@ final class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
     $return = $report
       ->setTimeQueued($time);
 
-    static::assertTrue($return instanceof SmsDeliveryReportInterface);
     static::assertEquals($time, $report->getTimeQueued());
   }
 
@@ -101,7 +99,6 @@ final class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
     $return = $report
       ->setTimeDelivered($time);
 
-    static::assertTrue($return instanceof SmsDeliveryReportInterface);
     static::assertEquals($time, $report->getTimeDelivered());
   }
 
@@ -199,11 +196,11 @@ final class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
 
     $request_time = \Drupal::service('datetime.time')->getRequestTime();
     $status_times = [
-      'queued' => $request_time,
-      'pending' => $request_time + 1800,
-      'delivered' => $request_time + 3600,
+      SmsMessageReportStatus::QUEUED => $request_time,
+      SmsMessageReportStatus::EXPIRED => $request_time + 1800,
+      SmsMessageReportStatus::DELIVERED => $request_time + 3600,
     ];
-    /** @var \Drupal\sms\Entity\SmsDeliveryReport $report */
+
     $report = $this->createDeliveryReport()
       ->setSmsMessage($sms_message);
 
@@ -215,9 +212,9 @@ final class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
         ->save();
     }
 
-    static::assertEquals($status_times['queued'], $report->getRevisionAtStatus('queued')->getStatusTime());
-    static::assertEquals($status_times['pending'], $report->getRevisionAtStatus('pending')->getStatusTime());
-    static::assertEquals($status_times['delivered'], $report->getRevisionAtStatus('delivered')->getStatusTime());
+    static::assertEquals($status_times[SmsMessageReportStatus::QUEUED], $report->getRevisionAtStatus(SmsMessageReportStatus::QUEUED)?->getStatusTime());
+    static::assertEquals($status_times[SmsMessageReportStatus::EXPIRED], $report->getRevisionAtStatus(SmsMessageReportStatus::EXPIRED)?->getStatusTime());
+    static::assertEquals($status_times[SmsMessageReportStatus::DELIVERED], $report->getRevisionAtStatus(SmsMessageReportStatus::DELIVERED)?->getStatusTime());
 
     // Create another revision with different status time.
     $report
@@ -226,9 +223,9 @@ final class SmsFrameworkDeliveryReportEntityTest extends KernelTestBase {
       ->save();
 
     // Verify that the latest revision is always returned.
-    static::assertEquals(1234567890, $report->getRevisionAtStatus('queued')->getStatusTime());
-    static::assertEquals($status_times['pending'], $report->getRevisionAtStatus('pending')->getStatusTime());
-    static::assertEquals($status_times['delivered'], $report->getRevisionAtStatus('delivered')->getStatusTime());
+    static::assertEquals(1234567890, $report->getRevisionAtStatus(SmsMessageReportStatus::QUEUED)?->getStatusTime());
+    static::assertEquals($status_times[SmsMessageReportStatus::EXPIRED], $report->getRevisionAtStatus(SmsMessageReportStatus::EXPIRED)?->getStatusTime());
+    static::assertEquals($status_times[SmsMessageReportStatus::DELIVERED], $report->getRevisionAtStatus(SmsMessageReportStatus::DELIVERED)?->getStatusTime());
   }
 
 }

@@ -15,12 +15,12 @@ use Symfony\Component\HttpFoundation\Response;
 interface SmsProviderInterface {
 
   /**
-   * Queue a SMS message for sending or receiving.
+   * Queue an SMS message for sending or receiving.
    *
    * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
    *   A SMS message.
    *
-   * @return \Drupal\sms\Entity\SmsMessageInterface[]
+   * @return \Drupal\sms\Message\SmsMessageInterface[]
    *   The queued messages. A single message may be transformed into many.
    *
    * @throws \Drupal\sms\Exception\SmsDirectionException

@@ -1,4 +1,4 @@
-# total 13 errors
+# total 10 errors
 
 parameters:
     ignoreErrors:
@@ -28,24 +28,9 @@ parameters:
             path: ../tests/src/Kernel/SmsFrameworkPhoneNumberVerificationTest.php
 
         -
-            message: '#^Instanceof between Drupal\\sms\\Entity\\SmsMessageInterface and Drupal\\sms\\Entity\\SmsMessageInterface will always evaluate to true\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkProviderTest.php
-
-        -
             message: '#^Instanceof between Drupal\\sms\\Message\\SmsMessageInterface and Drupal\\sms\\Message\\SmsMessageInterface will always evaluate to true\.$#'
             count: 2
             path: ../tests/src/Kernel/SmsFrameworkProviderTest.php
-
-        -
-            message: '#^Instanceof between Drupal\\sms\\Message\\SmsDeliveryReportInterface and Drupal\\sms\\Message\\SmsDeliveryReportInterface will always evaluate to true\.$#'
-            count: 7
-            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
-
-        -
-            message: '#^Instanceof between Drupal\\sms\\Message\\SmsDeliveryReportInterface and Drupal\\sms\\Message\\SmsDeliveryReportInterface will always evaluate to true\.$#'
-            count: 7
-            path: ../tests/src/Unit/Message/SmsFrameworkDeliveryReportUnitTest.php
 
         -
             message: '#^Instanceof between Drupal\\sms\\Message\\SmsDeliveryReportInterface and Drupal\\sms\\Message\\SmsDeliveryReportInterface will always evaluate to true\.$#'

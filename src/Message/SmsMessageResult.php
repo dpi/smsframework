@@ -14,7 +14,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
   /**
    * The error of the message, or NULL if unknown.
    *
-   * @var string|null
+   * @var \Drupal\sms\Message\SmsMessageResultStatus::*|null
    */
   protected ?string $error = NULL;
 
