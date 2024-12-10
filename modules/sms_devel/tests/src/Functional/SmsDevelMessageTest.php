@@ -27,7 +27,9 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $user = $this->drupalCreateUser(['sms_devel form']);
+    $user = $this->drupalCreateUser(['sms_devel form'], values: [
+      'timezone' => 'Asia/Singapore',
+    ]);
     $this->drupalLogin($user);
 
     $this->gateway = $this->createMemoryGateway();
@@ -183,6 +185,8 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
 
   /**
    * Tests verbose message output.
+   *
+   * @covers \Drupal\sms_devel\Form\SmsDevelMessageForm::verboseResults
    */
   public function testVerboseReports(): void {
     $edit = [];
@@ -241,12 +245,14 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $this->assertSession()->elementTextContains('css', $selector, $report->getStatusMessage());
 
     // Time Delivered.
-    $date = new \DateTimeImmutable('@' . ($report->getTimeDelivered() ?? throw new \LogicException()));
+    $date = (new \DateTimeImmutable('@' . ($report->getTimeDelivered() ?? throw new \LogicException())))
+      ->setTimezone(new \DateTimeZone('Asia/Singapore'));
     $selector = $first_row_first_report . ' > td:nth-child(5)';
     $this->assertSession()->elementTextContains('css', $selector, $date->format('c'));
 
     // Time Queued.
-    $date = new \DateTimeImmutable('@' . ($report->getTimeQueued() ?? throw new \LogicException()));
+    $date = (new \DateTimeImmutable('@' . ($report->getTimeQueued() ?? throw new \LogicException())))
+      ->setTimezone(new \DateTimeZone('Asia/Singapore'));
     $selector = $first_row_first_report . ' > td:nth-child(6)';
     $this->assertSession()->elementTextContains('css', $selector, $date->format('c'));
   }
