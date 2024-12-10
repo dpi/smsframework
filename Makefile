@@ -19,3 +19,4 @@ clean:
 	rm -rf app
 	rm -rf core
 	rm -rf web
+	rm composer.lock
