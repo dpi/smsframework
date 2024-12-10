@@ -29,24 +29,23 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
    * Constructs a new PhoneNumberVerification object.
    */
   public function __construct(
-    private EntityTypeManagerInterface $entityTypeManager,
-    private ConfigFactoryInterface $configFactory,
-    private Token $token,
-    private SmsProviderInterface $smsProvider,
-    private TimeInterface $time,
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly ConfigFactoryInterface $configFactory,
+    private readonly Token $token,
+    private readonly SmsProviderInterface $smsProvider,
+    private readonly TimeInterface $time,
   ) {
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPhoneNumberSettings($entity_type_id, $bundle): ?PhoneNumberSettingsInterface {
+  public function getPhoneNumberSettings(string $entity_type_id, string $bundle): ?PhoneNumberSettingsInterface {
+    /** @var \Drupal\sms\Entity\PhoneNumberSettingsInterface */
     return $this->phoneNumberSettings()
       ->load($entity_type_id . '.' . $bundle);
   }
 
-  public function getPhoneNumberSettingsForEntity(EntityInterface $entity): ?PhoneNumberSettingsInterface {
-    if (!$phone_number_settings = $this->getPhoneNumberSettings($entity->getEntityTypeId(), $entity->bundle())) {
+  public function getPhoneNumberSettingsForEntity(EntityInterface $entity): PhoneNumberSettingsInterface {
+    $phone_number_settings = $this->getPhoneNumberSettings($entity->getEntityTypeId(), $entity->bundle());
+    if ($phone_number_settings === NULL) {
       throw new PhoneNumberSettingsException(\sprintf('Entity phone number config does not exist for bundle %s:%s', $entity->getEntityTypeId(), $entity->bundle()));
     }
     return $phone_number_settings;
@@ -123,6 +122,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
       ->setMessage($message)
       ->setDirection(Direction::OUTGOING);
 
+    $data = [];
     $data['sms-message'] = $sms_message;
     $data['sms_verification_code'] = $phone_verification->getCode();
 

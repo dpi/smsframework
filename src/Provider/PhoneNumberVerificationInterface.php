@@ -16,11 +16,6 @@ interface PhoneNumberVerificationInterface {
   /**
    * Gets read only phone number settings config object for a bundle.
    *
-   * @param string $entity_type_id
-   *   The entity type ID of the bundle.
-   * @param string $bundle
-   *   An entity bundle.
-   *
    * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|null
    *   A phone number settings entity, or NULL if it does not exist.
    */
@@ -29,16 +24,10 @@ interface PhoneNumberVerificationInterface {
   /**
    * Gets phone number settings for the bundle of an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity to get settings.
-   *
-   * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|null
-   *   A phone number settings entity, or NULL if it does not exist.
-   *
    * @throws \Drupal\sms\Exception\PhoneNumberSettingsException
    *   Thrown if entity is not configured for phone numbers.
    */
-  public function getPhoneNumberSettingsForEntity(EntityInterface $entity): ?PhoneNumberSettingsInterface;
+  public function getPhoneNumberSettingsForEntity(EntityInterface $entity): PhoneNumberSettingsInterface;
 
   /**
    * Checks if there is a phone number verification for a code.

@@ -50,8 +50,6 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
 
   /**
    * Temporarily stores the message result until save().
-   *
-   * @var \Drupal\sms\Message\SmsMessageResultInterface|null
    */
   protected ?StdMessageResultInterface $result = NULL;
 

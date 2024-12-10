@@ -75,7 +75,7 @@ class SmsMessageResult extends ContentEntityBase implements SmsMessageResultInte
   }
 
   public function getReports(): array {
-    if ($this->reports === []) {
+    if ($this->reports !== []) {
       return $this->reports;
     }
 
@@ -101,7 +101,9 @@ class SmsMessageResult extends ContentEntityBase implements SmsMessageResultInte
   }
 
   public function getCreditsBalance(): ?float {
-    return $this->get('credits_balance')->value ?? NULL;
+    /** @var string|null $value */
+    $value = $this->get('credits_balance')->value;
+    return $value !== NULL ? (float) $value : NULL;
   }
 
   /**
@@ -114,7 +116,9 @@ class SmsMessageResult extends ContentEntityBase implements SmsMessageResultInte
   }
 
   public function getCreditsUsed(): ?float {
-    return $this->get('credits_used')->value ?? NULL;
+    /** @var string|null $value */
+    $value = $this->get('credits_used')->value;
+    return $value !== NULL ? (float) $value : NULL;
   }
 
   /**

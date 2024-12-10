@@ -159,7 +159,7 @@ final class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
    * Tests getting a phone number, where no verification exists.
    *
    * Normally a phone number verification is maintained as field values change,
-   * via updatePhoneVerificationByEntity. However field values may exist before
+   * via updatePhoneVerificationByEntity. However, field values may exist before
    * a phone number settings map exist, or values may be entered in manually,
    * such as with migrate with hooks turned off.
    *
@@ -169,7 +169,7 @@ final class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $phoneNumberSettings = $this->phoneNumberSettings;
     $this->phoneNumberSettings->delete();
 
-    // Explicitly don't use createEntityWithPhoneNumber because we dont have
+    // Explicitly don't use createEntityWithPhoneNumber because we don't have
     // phone number settings yet.
     $entity = EntityTest::create([
       $this->phoneField->getName() => '+123123123',
@@ -220,7 +220,7 @@ final class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
   }
 
   /**
-   * Ensure default behaviour is to send one phone number per entity.
+   * Ensure default behavior is to send one phone number per entity.
    *
    * @covers ::sendMessage
    */

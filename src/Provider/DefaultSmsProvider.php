@@ -28,7 +28,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * Creates a new instance of the default SMS provider.
    */
   final public function __construct(
-    protected EventDispatcherInterface $eventDispatcher,
+    private readonly EventDispatcherInterface $eventDispatcher,
   ) {
   }
 
@@ -153,7 +153,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * Dispatch an SmsMessageEvent event for messages.
    *
-   * @param string $event_name
+   * @param \Drupal\sms\Event\SmsEvents::MESSAGE_* $event_name
    *   The event to trigger.
    * @param \Drupal\sms\Message\SmsMessageInterface[] $sms_messages
    *   The messages to dispatch.
@@ -161,7 +161,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * @return \Drupal\sms\Event\SmsMessageEvent
    *   The dispatched event.
    */
-  protected function dispatchEvent($event_name, array $sms_messages): SmsMessageEvent {
+  private function dispatchEvent(string $event_name, array $sms_messages): SmsMessageEvent {
     $event = new SmsMessageEvent($sms_messages);
     return $this->eventDispatcher
       ->dispatch($event, $event_name);

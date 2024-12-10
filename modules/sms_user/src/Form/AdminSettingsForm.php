@@ -184,13 +184,13 @@ class AdminSettingsForm extends ConfigFormBase {
       ]), 'warning');
     }
 
-    // The parent 'radios' form element for our account registration behaviour.
+    // The parent 'radios' form element for our account registration behavior.
     $form['account_registration']['behaviour'] = [
       '#type' => 'radios',
       '#title' => $this->t('Account registration via SMS'),
       '#options' => [
         'none' => $this->t('Disabled'),
-        'all' => $this->t('All unrecognised phone numbers'),
+        'all' => $this->t('All unrecognized phone numbers'),
         'incoming_pattern' => $this->t('Incoming message based on pattern'),
       ],
       '#required' => TRUE,
@@ -203,7 +203,7 @@ class AdminSettingsForm extends ConfigFormBase {
       '#return_value' => 'none',
     ];
 
-    // Modify the radio button for the 'All unrecognised phone numbers' option.
+    // Modify the radio button for the 'All unrecognized phone numbers' option.
     $form['account_registration']['behaviour']['all'] = [
       '#description' => $this->t('Automatically create a Drupal account for all phone numbers not associated with an existing account.'),
       '#return_value' => 'all',
@@ -263,7 +263,7 @@ class AdminSettingsForm extends ConfigFormBase {
     ];
 
     // Dynamically show form elements if the 'incoming_pattern' radio button is
-    // selected. This container holds a textarea and two checkboxs. The second
+    // selected. This container holds a textarea and two checkboxes. The second
     // checkbox, if checked, will be accompanied by two message textareas.
     $form['account_registration']['behaviour']['incoming_pattern_options'] = [
       '#type' => 'container',

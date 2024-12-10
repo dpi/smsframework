@@ -149,9 +149,9 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
   }
 
   /**
-   * Test account registrations for unrecognised numbers saves to config.
+   * Test account registrations for unrecognized numbers saves to config.
    */
-  public function testAccountRegistrationUnrecognised(): void {
+  public function testAccountRegistrationUnrecognized(): void {
     $this->createPhoneNumberSettings('user', 'user');
 
     $reply_message = $this->randomString();
@@ -223,7 +223,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
     ];
     $this->drupalGet(Url::fromRoute('sms_user.options'));
     $this->submitForm($edit, 'Save configuration');
-    $this->assertSession()->responseContains('Reply message must have a value if reply is enabled.', 'Validation failed for message on all unrecognised numbers when reply status is enabled.');
+    $this->assertSession()->responseContains('Reply message must have a value if reply is enabled.', 'Validation failed for message on all unrecognized numbers when reply status is enabled.');
 
     $edit = [
       'account_registration[behaviour]' => 'incoming_pattern',
@@ -276,7 +276,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
     $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->responseContains('Activation email cannot be sent if [password] placeholder is present.');
 
-    // Placeholder seperation.
+    // Placeholder separation.
     // Tests separator so regex doesn't have problems.
     $edit = [
       'account_registration[behaviour]' => 'incoming_pattern',
@@ -297,7 +297,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
     $this->assertSession()->responseContains('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings. <a href="' . Url::fromRoute('entity.phone_number_settings.add')->toString() . '">Add phone number settings</a>.', 'Warning message displayed for no phone number settings.');
 
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="all"]');
-    static::assertCount(1, $input, "The 'All unrecognised phone numbers' radio is disabled.");
+    static::assertCount(1, $input, "The 'All unrecognized phone numbers' radio is disabled.");
 
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="incoming_pattern"]');
     static::assertCount(1, $input, "The 'incoming_pattern' radio is disabled.");
@@ -314,7 +314,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
     $this->assertSession()->responseNotContains('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings.', 'Warning message displayed for no phone number settings.');
 
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="all"]');
-    static::assertCount(0, $input, "The 'All unrecognised phone numbers' radio is not disabled.");
+    static::assertCount(0, $input, "The 'All unrecognized phone numbers' radio is not disabled.");
 
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="incoming_pattern"]');
     static::assertCount(0, $input, "The 'incoming_pattern' radio is not disabled.");

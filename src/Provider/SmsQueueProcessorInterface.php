@@ -11,8 +11,6 @@ interface SmsQueueProcessorInterface {
 
   /**
    * Check for messages not in the Drupal queue and add them.
-   *
-   * @todo rename?
    */
   public function processUnqueued(): void;
 

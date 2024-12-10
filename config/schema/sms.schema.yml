@@ -52,7 +52,7 @@ sms.gateway.*:
       label: 'The internal path where pushed delivery reports can be received.'
     retention_duration_incoming:
       type: integer
-      label: 'How many seconds to hold messages after are recieved. Use -1 to never expire.'
+      label: 'How many seconds to hold messages after are received. Use -1 to never expire.'
     retention_duration_outgoing:
       type: integer
       label: 'How many seconds to hold messages after they are sent. Use -1 to never expire.'

@@ -77,7 +77,7 @@ class PhoneNumberSettingsForm extends EntityForm {
 
     $bundle_default_value = !$config->isNew() ? $config->getPhoneNumberEntityTypeId() . '|' . $config->getPhoneNumberBundle() : NULL;
 
-    // Field cannot be called 'bundle' or odd behaviour will happen on re-saves.
+    // Field cannot be called 'bundle' or odd behavior will happen on re-saves.
     $form['entity_bundle'] = [
       '#type' => 'select',
       '#title' => $this->t('Bundle'),

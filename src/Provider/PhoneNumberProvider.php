@@ -22,8 +22,8 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
    * Constructs a new PhoneNumberProvider object.
    */
   public function __construct(
-    protected EventDispatcherInterface $eventDispatcher,
-    protected SmsProviderInterface $smsProvider,
+    private readonly EventDispatcherInterface $eventDispatcher,
+    private readonly SmsProviderInterface $smsProvider,
   ) {
   }
 

@@ -31,7 +31,7 @@ interface ActiveHoursInterface {
    * @param \Drupal\user\UserInterface $user
    *   A user entity.
    * @param string $now
-   *   A time or strtotime() relative string localised to the users timezone.
+   *   A time or strtotime() relative string localized to the users' timezone.
    *   Defaults to current time for the user.
    *
    * @return \Drupal\sms_user\ActiveHoursDates|false

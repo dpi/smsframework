@@ -103,7 +103,7 @@ final class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBas
   }
 
   /**
-   * Test behaviour of widget with phone number purge setting.
+   * Test behavior of widget with phone number purge setting.
    */
   public function testPhoneNumberPurgedFieldValueOnExpiration(): void {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
@@ -125,7 +125,7 @@ final class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBas
   }
 
   /**
-   * Test behaviour of widget with phone number purge setting.
+   * Test behavior of widget with phone number purge setting.
    */
   public function testPhoneNumberNotPurgedFieldValueOnExpiration(): void {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
