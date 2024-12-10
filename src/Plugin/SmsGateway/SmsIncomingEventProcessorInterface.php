@@ -13,10 +13,7 @@ interface SmsIncomingEventProcessorInterface {
 
   /**
    * Process a SMS message from this gateway.
-   *
-   * @param \Drupal\sms\Event\SmsMessageEvent $event
-   *   The event.
    */
-  public function incomingEvent(SmsMessageEvent $event);
+  public function incomingEvent(SmsMessageEvent $event): void;
 
 }

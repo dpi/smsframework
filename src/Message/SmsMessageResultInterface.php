@@ -12,11 +12,10 @@ interface SmsMessageResultInterface {
   /**
    * Gets the error of the message.
    *
-   * @return string|null
-   *   A error code from \Drupal\sms\Message\SmsMessageResultError, or NULL if
-   *   there was no error.
+   * @return \Drupal\sms\Message\SmsMessageResultStatus::*|null
+   *   An error code, or NULL if there was no error.
    */
-  public function getError();
+  public function getError(): ?string;
 
   /**
    * Sets the error of the message.
@@ -24,14 +23,12 @@ interface SmsMessageResultInterface {
    * Usually a setting an error on a result indicates something went wrong with
    * the entire transaction.
    *
-   * @param string|null $error
-   *   A error code from \Drupal\sms\Message\SmsMessageResultError, or NULL if
-   *   unknown.
+   * @param \Drupal\sms\Message\SmsMessageResultStatus::*|null $error
+   *   An error code, or NULL if unknown.
    *
    * @return $this
-   *   Returns this result object for chaining.
    */
-  public function setError($error);
+  public function setError(?string $error);
 
   /**
    * Gets the error message.
@@ -39,7 +36,7 @@ interface SmsMessageResultInterface {
    * @return string
    *   The error message as provided by the gateway API.
    */
-  public function getErrorMessage();
+  public function getErrorMessage(): string;
 
   /**
    * Sets the error message.
@@ -48,9 +45,8 @@ interface SmsMessageResultInterface {
    *   The error message as provided by the gateway API.
    *
    * @return $this
-   *   Returns this report object for chaining.
    */
-  public function setErrorMessage($message);
+  public function setErrorMessage(string $message);
 
   /**
    * Gets the delivery report for a particular recipient.
@@ -64,15 +60,14 @@ interface SmsMessageResultInterface {
    *
    * @see SmsMessageResultInterface::getReports()
    */
-  public function getReport($recipient);
+  public function getReport(string $recipient): ?SmsDeliveryReportInterface;
 
   /**
    * Gets the delivery reports for all recipients.
    *
-   * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
-   *   An array of delivery reports.
+   * @phpstan-return \Drupal\sms\Message\SmsDeliveryReportInterface[]
    */
-  public function getReports();
+  public function getReports(): array;
 
   /**
    * Sets the delivery reports for all recipients.
@@ -81,7 +76,6 @@ interface SmsMessageResultInterface {
    *   An array of delivery reports.
    *
    * @return $this
-   *   Returns this result object for chaining.
    */
   public function setReports(array $reports);
 
@@ -92,7 +86,6 @@ interface SmsMessageResultInterface {
    *   A delivery report.
    *
    * @return $this
-   *   Returns this result object for chaining.
    */
   public function addReport(SmsDeliveryReportInterface $report);
 
@@ -102,7 +95,7 @@ interface SmsMessageResultInterface {
    * @return float|null
    *   The credit balance after the message is processed, or NULL if unknown.
    */
-  public function getCreditsBalance();
+  public function getCreditsBalance(): ?float;
 
   /**
    * Sets the credit balance after this transaction.
@@ -111,12 +104,11 @@ interface SmsMessageResultInterface {
    *   The credit balance after the message is processed, or NULL if unknown.
    *
    * @return $this
-   *   Returns this result object for chaining.
    *
    * @throws \Drupal\sms\Exception\SmsException
    *   Thrown if balance set is an invalid variable type.
    */
-  public function setCreditsBalance($balance);
+  public function setCreditsBalance(?float $balance);
 
   /**
    * Gets the credits consumed for this transaction.
@@ -124,7 +116,7 @@ interface SmsMessageResultInterface {
    * @return float|null
    *   The credits consumed for this transaction, or NULL if unknown.
    */
-  public function getCreditsUsed();
+  public function getCreditsUsed(): ?float;
 
   /**
    * Sets the credits consumed for this transaction.
@@ -133,11 +125,10 @@ interface SmsMessageResultInterface {
    *   The credits consumed for this transaction, or NULL if unknown.
    *
    * @return $this
-   *   Returns this result object for chaining.
    *
    * @throws \Drupal\sms\Exception\SmsException
    *   Thrown if credits set is an invalid variable type.
    */
-  public function setCreditsUsed($credits_used);
+  public function setCreditsUsed(?float $credits_used);
 
 }

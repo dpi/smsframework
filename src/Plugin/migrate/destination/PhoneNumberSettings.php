@@ -65,7 +65,7 @@ class PhoneNumberSettings extends EntityConfigBase {
    *
    * @see \Drupal\sms\Form\PhoneNumberSettingsForm::createNewField()
    */
-  protected function createPhoneNumberField(PhoneNumberSettingsInterface $phone_number_settings) {
+  protected function createPhoneNumberField(PhoneNumberSettingsInterface $phone_number_settings): void {
     PhoneNumberSettingsForm::createNewField(
       $phone_number_settings->getPhoneNumberEntityTypeId(),
       $phone_number_settings->getPhoneNumberBundle(),

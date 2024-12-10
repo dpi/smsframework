@@ -5,46 +5,26 @@ declare(strict_types=1);
 namespace Drupal\sms\Routing;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Routing\RouteSubscriberBase;
 use Drupal\sms\Entity\SmsGateway;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Subscriber for SMS Framework routes.
  */
-class RouteSubscriber implements ContainerInjectionInterface {
+class RouteSubscriber extends RouteSubscriberBase {
 
   /**
    * Constructs a new SMS Framework RouteSubscriber.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The config factory.
    */
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
   ) {
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-    );
-  }
-
-  /**
-   * Returns a set of route objects.
-   *
-   * @return \Symfony\Component\Routing\RouteCollection
-   *   A route collection.
-   */
-  public function routes() {
+  protected function alterRoutes(RouteCollection $collection): void {
     $sms_settings = $this->configFactory->get('sms.settings');
-    $collection = new RouteCollection();
 
     // Phone number verification.
     $path_verify = $sms_settings->get('page.verify');
@@ -78,6 +58,7 @@ class RouteSubscriber implements ContainerInjectionInterface {
       if ($gateway->autoCreateIncomingRoute()) {
         $path = $gateway->getPushIncomingPath();
         if (isset($path) && \mb_strlen($path) >= 2 && \mb_substr($path, 0, 1) == '/') {
+          $parameters = [];
           $parameters['sms_gateway']['type'] = 'entity:sms_gateway';
           $route = (new Route($path))
             ->setDefault('sms_gateway', $id)
@@ -89,8 +70,6 @@ class RouteSubscriber implements ContainerInjectionInterface {
         }
       }
     }
-
-    return $collection;
   }
 
 }

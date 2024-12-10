@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
+use Drupal\Tests\sms\Trait\SmsFrameworkTestTrait;
 
 /**
  * Base class for SMS Framework unit tests.

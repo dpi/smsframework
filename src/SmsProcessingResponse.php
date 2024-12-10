@@ -29,7 +29,7 @@ class SmsProcessingResponse {
    * @return \Drupal\sms\Message\SmsMessageInterface[]
    *   An array of messages to process.
    */
-  public function getMessages() {
+  public function getMessages(): array {
     return $this->messages;
   }
 
@@ -53,7 +53,7 @@ class SmsProcessingResponse {
    * @return mixed
    *   The response to pass to the request controller.
    */
-  public function getResponse() {
+  public function getResponse(): mixed {
     return $this->response;
   }
 

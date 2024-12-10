@@ -18,25 +18,17 @@ class SmsIncomingController extends ControllerBase {
 
   /**
    * Creates an incoming route controller.
-   *
-   * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argumentResolver
-   *   The argument resolver.
-   * @param \Drupal\sms\Provider\SmsProviderInterface $smsProvider
-   *   The SMS service provider.
    */
-  public function __construct(
+  final public function __construct(
     protected ArgumentResolverInterface $argumentResolver,
     protected SmsProviderInterface $smsProvider,
   ) {
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
+  final public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('http_kernel.controller.argument_resolver'),
-      $container->get('sms.provider'),
+      $container->get(SmsProviderInterface::class),
     );
   }
 
@@ -51,7 +43,7 @@ class SmsIncomingController extends ControllerBase {
    * @return mixed
    *   A response to return.
    */
-  public function processIncoming(Request $request, SmsGatewayInterface $sms_gateway) {
+  public function processIncoming(Request $request, SmsGatewayInterface $sms_gateway): mixed {
     $controller = [$sms_gateway->getPlugin(), 'processIncoming'];
     $arguments = $this->argumentResolver
       ->getArguments($request, $controller);

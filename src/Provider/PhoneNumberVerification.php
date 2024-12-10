@@ -15,6 +15,8 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\sms\Direction;
+use Drupal\sms\Entity\PhoneNumberSettingsInterface;
+use Drupal\sms\Entity\PhoneNumberVerificationInterface as EntityPhoneNumberVerificationInterface;
 use Drupal\sms\Exception\PhoneNumberSettingsException;
 use Drupal\sms\Message\SmsMessage;
 
@@ -24,57 +26,26 @@ use Drupal\sms\Message\SmsMessage;
 class PhoneNumberVerification implements PhoneNumberVerificationInterface {
 
   /**
-   * Storage for phone number settings.
-   *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
-   */
-  protected ConfigEntityStorageInterface $phoneNumberSettings;
-
-  /**
-   * Storage for Phone Number Verification entities.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected EntityStorageInterface $phoneNumberVerificationStorage;
-
-  /**
-   * Constructs a new PhoneNumberProvider object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The config factory.
-   * @param \Drupal\Core\Utility\Token $token
-   *   The token replacement system.
-   * @param \Drupal\sms\Provider\SmsProviderInterface $smsProvider
-   *   The SMS provider.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   Time.
+   * Constructs a new PhoneNumberVerification object.
    */
   public function __construct(
-    EntityTypeManagerInterface $entityTypeManager,
-    protected ConfigFactoryInterface $configFactory,
-    protected Token $token,
-    protected SmsProviderInterface $smsProvider,
-    protected TimeInterface $time,
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly ConfigFactoryInterface $configFactory,
+    private readonly Token $token,
+    private readonly SmsProviderInterface $smsProvider,
+    private readonly TimeInterface $time,
   ) {
-    $this->phoneNumberSettings = $entityTypeManager->getStorage('phone_number_settings');
-    $this->phoneNumberVerificationStorage = $entityTypeManager->getStorage('sms_phone_number_verification');
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPhoneNumberSettings($entity_type_id, $bundle) {
-    return $this->phoneNumberSettings
+  public function getPhoneNumberSettings(string $entity_type_id, string $bundle): ?PhoneNumberSettingsInterface {
+    /** @var \Drupal\sms\Entity\PhoneNumberSettingsInterface */
+    return $this->phoneNumberSettings()
       ->load($entity_type_id . '.' . $bundle);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPhoneNumberSettingsForEntity(EntityInterface $entity) {
-    if (!$phone_number_settings = $this->getPhoneNumberSettings($entity->getEntityTypeId(), $entity->bundle())) {
+  public function getPhoneNumberSettingsForEntity(EntityInterface $entity): PhoneNumberSettingsInterface {
+    $phone_number_settings = $this->getPhoneNumberSettings($entity->getEntityTypeId(), $entity->bundle());
+    if ($phone_number_settings === NULL) {
       throw new PhoneNumberSettingsException(\sprintf('Entity phone number config does not exist for bundle %s:%s', $entity->getEntityTypeId(), $entity->bundle()));
     }
     return $phone_number_settings;
@@ -83,8 +54,9 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPhoneVerificationByCode($code) {
-    $entities = $this->phoneNumberVerificationStorage
+  public function getPhoneVerificationByCode($code): false|EntityPhoneNumberVerificationInterface {
+    /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface[] $entities */
+    $entities = $this->phoneNumberVerificationStorage()
       ->loadByProperties([
         'code' => $code,
       ]);
@@ -94,35 +66,39 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPhoneVerificationByPhoneNumber($phone_number, $verified = TRUE, $entity_type = NULL) {
+  public function getPhoneVerificationByPhoneNumber(string $phone_number, ?bool $verified = TRUE, $entity_type = NULL): array {
+    $properties = [];
     $properties['phone'] = $phone_number;
-    if (isset($entity_type)) {
+    if ($entity_type !== NULL) {
       $properties['entity__target_type'] = $entity_type;
     }
-    if (isset($verified)) {
+    if ($verified !== NULL) {
       $properties['status'] = (int) $verified;
     }
-    return $this->phoneNumberVerificationStorage
+
+    /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface[] */
+    return $this->phoneNumberVerificationStorage()
       ->loadByProperties($properties);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number) {
-    $entities = $this->phoneNumberVerificationStorage
+  public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number): ?EntityPhoneNumberVerificationInterface {
+    /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface[] $entities */
+    $entities = $this->phoneNumberVerificationStorage()
       ->loadByProperties([
         'entity__target_id' => $entity->id(),
         'entity__target_type' => $entity->getEntityTypeId(),
         'phone' => $phone_number,
       ]);
-    return \reset($entities);
+    return $entities !== [] ? $entities[\array_key_first($entities)] : NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function newPhoneVerification(EntityInterface $entity, $phone_number) {
+  public function newPhoneVerification(EntityInterface $entity, $phone_number): ?EntityPhoneNumberVerificationInterface {
     $config = $this->getPhoneNumberSettingsForEntity($entity);
     $message = $config->getVerificationMessage() ?: '';
 
@@ -131,7 +107,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
     $code = \strtoupper($random->name(6));
 
     /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $phone_verification */
-    $phone_verification = $this->phoneNumberVerificationStorage->create();
+    $phone_verification = $this->phoneNumberVerificationStorage()->create();
     $phone_verification
       ->setCode($code)
       ->setStatus(FALSE)
@@ -139,32 +115,28 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
       ->setEntity($entity)
       ->save();
 
-    if ($phone_verification) {
-      $sms_message = new SmsMessage();
-      $sms_message
-        ->addRecipient($phone_number)
-        ->setOption('_is_verification_message', TRUE)
-        ->setMessage($message)
-        ->setDirection(Direction::OUTGOING);
+    $sms_message = new SmsMessage();
+    $sms_message
+      ->addRecipient($phone_number)
+      ->setOption('_is_verification_message', TRUE)
+      ->setMessage($message)
+      ->setDirection(Direction::OUTGOING);
 
-      $data['sms-message'] = $sms_message;
-      $data['sms_verification_code'] = $phone_verification->getCode();
+    $data = [];
+    $data['sms-message'] = $sms_message;
+    $data['sms_verification_code'] = $phone_verification->getCode();
 
-      $sms_message
-        ->setMessage($this->token->replace($message, $data))
-        ->setAutomated(FALSE);
+    $sms_message
+      ->setMessage($this->token->replace($message, $data))
+      ->setAutomated(FALSE);
 
-      $this->smsProvider
-        ->queue($sms_message);
-    }
+    $this->smsProvider
+      ->queue($sms_message);
 
     return $phone_verification;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function updatePhoneVerificationByEntity(EntityInterface $entity) {
+  public function updatePhoneVerificationByEntity(EntityInterface $entity): void {
     try {
       $phone_number_settings = $this->getPhoneNumberSettingsForEntity($entity);
       $field_name = $phone_number_settings->getFieldName('phone_number');
@@ -207,31 +179,25 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function deletePhoneVerificationByEntity(EntityInterface $entity) {
+  public function deletePhoneVerificationByEntity(EntityInterface $entity): void {
     // Check the entity uses phone numbers. To save on a SQL call, and to
     // prevent having to install phone number verification for SMS Framework
     // tests which delete entities. Which would otherwise error on non-existent
     // tables.
     try {
       $this->getPhoneNumberSettingsForEntity($entity);
-      $verification_entities = $this->phoneNumberVerificationStorage
+      $verification_entities = $this->phoneNumberVerificationStorage()
         ->loadByProperties([
           'entity__target_id' => $entity->id(),
           'entity__target_type' => $entity->getEntityTypeId(),
         ]);
-      $this->phoneNumberVerificationStorage->delete($verification_entities);
+      $this->phoneNumberVerificationStorage()->delete($verification_entities);
     }
     catch (PhoneNumberSettingsException $e) {
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function purgeExpiredVerifications() {
+  public function purgeExpiredVerifications(): void {
     $current_time = $this->time->getRequestTime();
 
     $verification_ids = [];
@@ -239,7 +205,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
       $config = $this->configFactory->get($config_id);
       $lifetime = $config->get('verification_code_lifetime');
       if (!empty($lifetime)) {
-        $verification_ids += $this->phoneNumberVerificationStorage->getQuery()
+        $verification_ids += $this->phoneNumberVerificationStorage()->getQuery()
           ->accessCheck(FALSE)
           ->condition('entity__target_type', $config->get('entity_type'))
           ->condition('bundle', $config->get('bundle'))
@@ -250,7 +216,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
     }
 
     /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $phone_number_verification */
-    foreach ($this->phoneNumberVerificationStorage->loadMultiple($verification_ids) as $phone_number_verification) {
+    foreach ($this->phoneNumberVerificationStorage()->loadMultiple($verification_ids) as $phone_number_verification) {
       if ($entity = $phone_number_verification->getEntity()) {
         try {
           $config = $this->getPhoneNumberSettingsForEntity($entity);
@@ -267,8 +233,17 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
           // Failed to save entity.
         }
       }
-      $this->phoneNumberVerificationStorage->delete([$phone_number_verification]);
+      $this->phoneNumberVerificationStorage()->delete([$phone_number_verification]);
     }
+  }
+
+  private function phoneNumberSettings(): ConfigEntityStorageInterface {
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface */
+    return $this->entityTypeManager->getStorage('phone_number_settings');
+  }
+
+  private function phoneNumberVerificationStorage(): EntityStorageInterface {
+    return $this->entityTypeManager->getStorage('sms_phone_number_verification');
   }
 
 }

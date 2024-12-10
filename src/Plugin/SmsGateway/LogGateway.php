@@ -11,6 +11,7 @@ use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageReportStatus;
 use Drupal\sms\Message\SmsMessageResult;
+use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginBase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -30,29 +31,16 @@ class LogGateway extends SmsGatewayPluginBase implements ContainerFactoryPluginI
 
   /**
    * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
    */
   protected LoggerInterface $logger;
 
   /**
    * Constructs a LogGateway object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param array $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
-   *   The logger factory.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   Time.
    */
-  public function __construct(
+  final public function __construct(
     array $configuration,
     $plugin_id,
-    array $plugin_definition,
+    $plugin_definition,
     LoggerChannelFactoryInterface $logger_factory,
     protected TimeInterface $time,
   ) {
@@ -64,7 +52,7 @@ class LogGateway extends SmsGatewayPluginBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  final public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return new static(
       $configuration,
       $plugin_id,
@@ -74,10 +62,7 @@ class LogGateway extends SmsGatewayPluginBase implements ContainerFactoryPluginI
     );
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function send(SmsMessageInterface $sms) {
+  public function send(SmsMessageInterface $sms): SmsMessageResultInterface {
     $this->logger->notice('SMS message sent to %number with the text: @message', [
       '%number' => \implode(', ', $sms->getRecipients()),
       '@message' => $sms->getMessage(),

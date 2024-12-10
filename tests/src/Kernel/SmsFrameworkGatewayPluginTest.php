@@ -6,6 +6,7 @@ namespace Drupal\Tests\sms\Kernel;
 
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsMessage;
+use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\sms_test_gateway\EventSubscriber\SmsTestGatewayEventSubscriber;
 
 /**
@@ -16,7 +17,11 @@ use Drupal\sms_test_gateway\EventSubscriber\SmsTestGatewayEventSubscriber;
 final class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
 
   protected static $modules = [
-    'sms', 'sms_test', 'sms_test_gateway', 'field', 'telephone',
+    'sms',
+    'sms_test',
+    'sms_test_gateway',
+    'field',
+    'telephone',
     'dynamic_entity_reference',
   ];
 
@@ -25,7 +30,6 @@ final class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
     $this->installEntitySchema('sms');
     $this->installEntitySchema('sms_result');
     $this->installEntitySchema('sms_report');
-    $this->smsProvider = \Drupal::service('sms.provider');
   }
 
   /**
@@ -43,8 +47,13 @@ final class SmsFrameworkGatewayPluginTest extends SmsFrameworkKernelBase {
       ->setGateway($gateway);
     $sms_message->setResult($this->createMessageResult($sms_message));
 
-    $this->smsProvider->queue($sms_message);
-    static::assertCount(1, \Drupal::state()->get(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING));
+    /** @var \Drupal\sms\Provider\SmsProviderInterface $smsProvider */
+    $smsProvider = \Drupal::service(SmsProviderInterface::class);
+    $smsProvider->queue($sms_message);
+
+    /** @var array $state */
+    $state = \Drupal::state()->get(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING);
+    static::assertCount(1, $state);
   }
 
 }

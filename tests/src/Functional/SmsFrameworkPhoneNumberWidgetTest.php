@@ -56,7 +56,7 @@ final class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBas
     $this->assertSession()->responseContains(\t('A verification code has been sent to this phone number. Go to the <a href="@url">verification form</a> and enter the code. The code will expire if it is not verified in', $t_args));
 
     $input = $this->xpath('//input[@name="' . $form_field_phone_number . '" and @disabled="disabled"]');
-    static::assertTrue(\count($input) === 1, 'The phone number text field is disabled.');
+    static::assertCount(1, $input, 'The phone number text field is disabled.');
 
     // Verify the code.
     $phone_verification = $this->getLastVerification();
@@ -69,7 +69,7 @@ final class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBas
     $this->assertSession()->responseContains(\t('This phone number is verified. <strong>Warning:</strong> Modifying this phone number will remove verification.'));
 
     $input = $this->xpath('//input[@name="' . $form_field_phone_number . '" and @disabled="disabled"]');
-    static::assertTrue(\count($input) === 0, 'The phone number text field is enabled.');
+    static::assertCount(0, $input, 'The phone number text field is enabled.');
   }
 
   /**
@@ -103,7 +103,7 @@ final class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBas
   }
 
   /**
-   * Test behaviour of widget with phone number purge setting.
+   * Test behavior of widget with phone number purge setting.
    */
   public function testPhoneNumberPurgedFieldValueOnExpiration(): void {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');
@@ -125,7 +125,7 @@ final class SmsFrameworkPhoneNumberWidgetTest extends SmsFrameworkBrowserTestBas
   }
 
   /**
-   * Test behaviour of widget with phone number purge setting.
+   * Test behavior of widget with phone number purge setting.
    */
   public function testPhoneNumberNotPurgedFieldValueOnExpiration(): void {
     $phone_number_settings = $this->createPhoneNumberSettings('entity_test', 'entity_test');

@@ -7,6 +7,7 @@ namespace Drupal\sms_user\Form;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -23,35 +24,25 @@ class AdminSettingsForm extends ConfigFormBase {
 
   /**
    * Constructs a new AdminSettingsForm.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phoneNumberVerificationProvider
-   *   The phone number verification provider.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
    */
-  public function __construct(
+  final public function __construct(
     ConfigFactoryInterface $configFactory,
     TypedConfigManagerInterface $typedConfigManager,
-    protected PhoneNumberVerificationInterface $phoneNumberVerificationProvider,
+    private PhoneNumberVerificationInterface $phoneNumberVerificationProvider,
     MessengerInterface $messenger,
+    private ModuleHandlerInterface $moduleHandler,
   ) {
     parent::__construct($configFactory, $typedConfigManager);
     $this->setMessenger($messenger);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
+  final public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('config.factory'),
       $container->get('config.typed'),
       $container->get('sms.phone_number.verification'),
       $container->get('messenger'),
+      $container->get(ModuleHandlerInterface::class),
     );
   }
 
@@ -193,13 +184,13 @@ class AdminSettingsForm extends ConfigFormBase {
       ]), 'warning');
     }
 
-    // The parent 'radios' form element for our account registration behaviour.
+    // The parent 'radios' form element for our account registration behavior.
     $form['account_registration']['behaviour'] = [
       '#type' => 'radios',
       '#title' => $this->t('Account registration via SMS'),
       '#options' => [
         'none' => $this->t('Disabled'),
-        'all' => $this->t('All unrecognised phone numbers'),
+        'all' => $this->t('All unrecognized phone numbers'),
         'incoming_pattern' => $this->t('Incoming message based on pattern'),
       ],
       '#required' => TRUE,
@@ -212,7 +203,7 @@ class AdminSettingsForm extends ConfigFormBase {
       '#return_value' => 'none',
     ];
 
-    // Modify the radio button for the 'All unrecognised phone numbers' option.
+    // Modify the radio button for the 'All unrecognized phone numbers' option.
     $form['account_registration']['behaviour']['all'] = [
       '#description' => $this->t('Automatically create a Drupal account for all phone numbers not associated with an existing account.'),
       '#return_value' => 'all',
@@ -272,7 +263,7 @@ class AdminSettingsForm extends ConfigFormBase {
     ];
 
     // Dynamically show form elements if the 'incoming_pattern' radio button is
-    // selected. This container holds a textarea and two checkboxs. The second
+    // selected. This container holds a textarea and two checkboxes. The second
     // checkbox, if checked, will be accompanied by two message textareas.
     $form['account_registration']['behaviour']['incoming_pattern_options'] = [
       '#type' => 'container',
@@ -339,7 +330,7 @@ class AdminSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     // Active hours.
     foreach ($form_state->getValue(['active_hours', 'days']) as $day => $row) {
       foreach ($row as $position => $hour) {
@@ -436,7 +427,7 @@ class AdminSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $config = $this->config('sms_user.settings');
 
     // Account Registration.
@@ -476,12 +467,10 @@ class AdminSettingsForm extends ConfigFormBase {
    * @return array
    *   A render array.
    */
-  protected function buildTokenElement() {
+  protected function buildTokenElement(): array {
     $tokens = ['sms-message', 'user'];
 
-    /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
-    $module_handler = \Drupal::service('module_handler');
-    if ($module_handler->moduleExists('token')) {
+    if ($this->moduleHandler->moduleExists('token')) {
       return [
         '#theme' => 'token_tree_link',
         '#token_types' => $tokens,

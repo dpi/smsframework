@@ -121,10 +121,10 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Ensure incoming SMS does not create messages or users.
    */
-  public function testUnrecognisedOffNoCreateUser(): void {
+  public function testUnrecognizedOffNoCreateUser(): void {
     $this->config('sms_user.settings')
-      ->set('account_registration.unrecognized_sender.status', 0)
-      ->set('account_registration.unrecognized_sender.reply.status', 1)
+      ->set('account_registration.unrecognized_sender.status', FALSE)
+      ->set('account_registration.unrecognized_sender.reply.status', TRUE)
       ->save();
 
     $this->sendIncomingMessage('+123', $this->randomString());
@@ -133,9 +133,9 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
-   * Test user is created if a unrecognised phone number is used as sender.
+   * Test user is created if an unrecognized phone number is used as sender.
    */
-  public function testUnrecognisedCreateUser(): void {
+  public function testUnrecognizedCreateUser(): void {
     $this->config('sms_user.settings')
       ->set('account_registration.unrecognized_sender.status', 1)
       ->set('account_registration.unrecognized_sender.reply.status', 1)
@@ -145,14 +145,14 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
     $this->sendIncomingMessage($sender_number, $this->randomString());
 
     $user = $this->getLastUser();
-    static::assertTrue($user instanceof UserInterface, 'One user created.');
+    static::assertInstanceOf(UserInterface::class, $user);
     static::assertEquals($sender_number, $user->{$this->phoneField->getName()}->value, 'Phone number associated');
   }
 
   /**
    * Test a user is not created if the sender phone number is already used.
    */
-  public function testUnrecognisedCreateUserPhoneNumberRecognised(): void {
+  public function testUnrecognizedCreateUserPhoneNumberRecognized(): void {
     $this->config('sms_user.settings')
       ->set('account_registration.unrecognized_sender.status', 1)
       ->set('account_registration.unrecognized_sender.reply.status', 1)
@@ -171,7 +171,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Ensure no reply sent if turned off.
    */
-  public function testUnrecognisedNoReply(): void {
+  public function testUnrecognizedNoReply(): void {
     $reply_message = $this->randomString();
     $this->config('sms_user.settings')
       ->set('account_registration.unrecognized_sender.status', TRUE)
@@ -187,7 +187,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Ensure reply sent if turned on.
    */
-  public function testUnrecognisedGotReply(): void {
+  public function testUnrecognizedGotReply(): void {
     $reply_message = $this->randomString();
     $this->config('sms_user.settings')
       ->set('account_registration.unrecognized_sender.status', TRUE)
@@ -203,7 +203,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   /**
    * Test if a user is created despite no email address.
    */
-  public function testUnrecognisedNoEmail(): void {
+  public function testUnrecognizedNoEmail(): void {
     $this->config('sms_user.settings')
       ->set('account_registration.unrecognized_sender.status', 1)
       ->save();
@@ -515,7 +515,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    * @param string $message
    *   The message to send inwards.
    */
-  protected function sendIncomingMessage($sender_number, $message) {
+  protected function sendIncomingMessage($sender_number, $message): void {
     /** @var \Drupal\sms\Entity\SmsMessage $incoming */
     $incoming = SmsMessage::create()
       ->setSenderNumber($sender_number)
@@ -540,7 +540,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
   }
 
   /**
-   * Count number of registered users.
+   * Get the last user created.
    *
    * @return \Drupal\user\UserInterface|null
    *   Get last created user, or NULL if no users in database.
@@ -561,7 +561,7 @@ class SmsFrameworkUserAccountRegistrationServiceTest extends SmsFrameworkKernelB
    * @return bool
    *   Whether message was found in any memory messages.
    */
-  public function inTestMessages(SmsGatewayInterface $sms_gateway, $message) {
+  public function inTestMessages(SmsGatewayInterface $sms_gateway, $message): bool {
     foreach ($this->getTestMessages($sms_gateway) as $sms_message) {
       if ($sms_message->getMessage() == $message) {
         return TRUE;

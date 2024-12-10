@@ -4,48 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\sms_sendtophone\Form;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\node\Entity\NodeType;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines admin overview form.
  */
 class AdminOverviewForm extends ConfigFormBase {
-
-  /**
-   * Constructs a new AdminOverviewForm.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   */
-  public function __construct(
-    ConfigFactoryInterface $config_factory,
-    TypedConfigManagerInterface $typedConfigManager,
-    MessengerInterface $messenger,
-  ) {
-    parent::__construct($config_factory, $typedConfigManager);
-    $this->setMessenger($messenger);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('config.typed'),
-      $container->get('messenger'),
-    );
-  }
 
   /**
    * {@inheritdoc}
@@ -76,7 +42,7 @@ class AdminOverviewForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->config('sms_sendtophone.settings')
       ->set('content_types', \array_filter($form_state->getValue('content_types')))
       ->save();

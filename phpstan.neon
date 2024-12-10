@@ -5,5 +5,5 @@ parameters:
     - ./tests
     - ./modules
   reportUnmatchedIgnoredErrors: true
-  ignoreErrors:
-    - identifier: missingType.iterableValue
+#  ignoreErrors:
+#    - identifier: missingType.iterableValue

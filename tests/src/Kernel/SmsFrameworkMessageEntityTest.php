@@ -13,8 +13,8 @@ use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Entity\SmsMessageResult;
 use Drupal\sms\Message\SmsMessage as StandardSmsMessage;
 use Drupal\sms\Message\SmsMessageResultInterface;
-use Drupal\Tests\sms\Functional\SmsFrameworkMessageTestTrait;
-use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
+use Drupal\Tests\sms\Trait\SmsFrameworkMessageTestTrait;
+use Drupal\Tests\sms\Trait\SmsFrameworkTestTrait;
 use Drupal\user\Entity\User;
 
 /**
@@ -103,7 +103,7 @@ final class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   public function testDirectionEntityValidation(): void {
     // Check for validation violation for missing direction.
     $sms_message1 = $this->createSmsMessage();
-    static::assertTrue(\in_array('direction', $sms_message1->validate()->getFieldNames()));
+    static::assertTrue(\in_array('direction', $sms_message1->validate()->getFieldNames(), TRUE));
   }
 
   /**
@@ -115,7 +115,7 @@ final class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
   public function testGateway(): void {
     // Check for validation violation for missing gateway.
     $sms_message1 = $this->createSmsMessage();
-    static::assertTrue(\in_array('gateway', $sms_message1->validate()->getFieldNames()));
+    static::assertTrue(\in_array('gateway', $sms_message1->validate()->getFieldNames(), TRUE));
 
     $gateway = $this->createMemoryGateway();
     $sms_message2 = $this->createSmsMessage();
@@ -217,7 +217,7 @@ final class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $sms_message1 = $this->createSmsMessage();
     static::assertEquals(NULL, $sms_message1->getProcessedTime());
 
-    $time = (new DrupalDateTime('+7 days'))->format('U');
+    $time = (new DrupalDateTime('+7 days'))->getTimestamp();
     $sms_message2 = $this->createSmsMessage();
     $sms_message2->setProcessedTime($time);
     static::assertEquals($time, $sms_message2->getProcessedTime());
@@ -249,6 +249,7 @@ final class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $original = new StandardSmsMessage('', [], '', [], NULL);
     $original
       ->setAutomated(TRUE)
+      ->setDirection(Direction::OUTGOING)
       ->setSender($this->randomMachineName())
       ->setSenderNumber($sender_number[0])
       ->addRecipients(['123123123', '456456456'])
@@ -262,6 +263,7 @@ final class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $sms_message = SmsMessage::convertFromSmsMessage($original);
 
     static::assertEquals($original->isAutomated(), $sms_message->isAutomated());
+    static::assertEquals($original->getDirection(), $sms_message->getDirection());
     static::assertEquals($original->getSender(), $sms_message->getSender());
     static::assertEquals($original->getSenderNumber(), $sms_message->getSenderNumber());
     static::assertEquals($original->getRecipients(), $sms_message->getRecipients());

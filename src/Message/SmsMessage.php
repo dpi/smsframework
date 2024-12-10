@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\sms\Message;
 
+use Drupal\Component\Uuid\UuidInterface;
 use Drupal\sms\Entity\SmsGatewayInterface;
 
 /**
@@ -60,8 +61,7 @@ class SmsMessage implements SmsMessageInterface {
    *
    * Since direction is not a part of the constructor, it needs to be nullable.
    *
-   * @var int|null
-   * @see \Drupal\sms\Direction
+   * @var \Drupal\sms\Direction::*|null
    */
   protected ?int $direction = NULL;
 
@@ -119,50 +119,41 @@ class SmsMessage implements SmsMessageInterface {
     $this->setMessage($message);
     $this->options = $options;
     $this->setUid($uid);
-    $this->uuid = $this->uuidGenerator()->generate();
+    $this->uuid = static::uuidGenerator()->generate();
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getSender() {
+  public function getSender(): ?string {
     return $this->senderName;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setSender($sender) {
+  public function setSender(?string $sender) {
     $this->senderName = $sender;
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getSenderNumber() {
+  public function getSenderNumber(): ?string {
     return $this->senderPhoneNumber;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setSenderNumber($number) {
+  public function setSenderNumber(?string $number) {
     $this->senderPhoneNumber = $number;
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getMessage() {
+  public function getMessage(): string {
     return $this->message;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setMessage($message) {
+  public function setMessage(string $message) {
     $this->message = $message;
     return $this;
   }
@@ -170,14 +161,14 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRecipients() {
+  public function getRecipients(): array {
     return $this->recipients;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function addRecipient($recipient) {
+  public function addRecipient(string $recipient) {
     if (!\in_array($recipient, $this->recipients, TRUE)) {
       $this->recipients[] = $recipient;
     }
@@ -210,10 +201,7 @@ class SmsMessage implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getGateway() {
+  public function getGateway(): ?SmsGatewayInterface {
     return $this->gateway;
   }
 
@@ -225,17 +213,14 @@ class SmsMessage implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getDirection() {
+  public function getDirection(): ?int {
     return $this->direction;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setDirection($direction) {
+  public function setDirection(int $direction) {
     $this->direction = $direction;
     return $this;
   }
@@ -243,14 +228,14 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function getOptions() {
+  public function getOptions(): array {
     return $this->options;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getOption($name) {
+  public function getOption($name): mixed {
     if (\array_key_exists($name, $this->options)) {
       return $this->options[$name];
     }
@@ -273,10 +258,7 @@ class SmsMessage implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getResult() {
+  public function getResult(): ?SmsMessageResultInterface {
     return $this->result;
   }
 
@@ -288,24 +270,18 @@ class SmsMessage implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getUuid() {
+  public function getUuid(): string {
     return $this->uuid;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getUid() {
+  public function getUid(): ?int {
     return $this->uid;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setUid($uid) {
+  public function setUid(?int $uid) {
     $this->uid = $uid;
     return $this;
   }
@@ -318,27 +294,18 @@ class SmsMessage implements SmsMessageInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function isAutomated() {
+  public function isAutomated(): bool {
     return $this->automated;
   }
 
-  /**
-   * Gets the UUID generator.
-   *
-   * @return \Drupal\Component\Uuid\UuidInterface
-   *   The UUID generator.
-   */
-  protected function uuidGenerator() {
-    return \Drupal::service('uuid');
+  protected static function uuidGenerator(): UuidInterface {
+    return \Drupal::service(UuidInterface::class);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function chunkByRecipients($size) {
+  public function chunkByRecipients($size): array {
     $recipients_all = $this->getRecipients();
 
     // Save processing by returning early.
@@ -360,14 +327,14 @@ class SmsMessage implements SmsMessageInterface {
   /**
    * {@inheritdoc}
    */
-  public function getReport($recipient) {
+  public function getReport($recipient): ?SmsDeliveryReportInterface {
     return $this->result?->getReport($recipient);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getReports() {
+  public function getReports(): array {
     return $this->result ? $this->result->getReports() : [];
   }
 

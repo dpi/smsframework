@@ -11,7 +11,7 @@ use Drupal\sms\Event\SmsEntityPhoneNumber;
 use Drupal\sms\Event\SmsEvents;
 use Drupal\sms\Exception\NoPhoneNumberException;
 use Drupal\sms\Message\SmsMessageInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Phone number provider.
@@ -20,22 +20,17 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
 
   /**
    * Constructs a new PhoneNumberProvider object.
-   *
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
-   *   The event dispatcher.
-   * @param \Drupal\sms\Provider\SmsProviderInterface $smsProvider
-   *   The SMS provider.
    */
   public function __construct(
-    protected EventDispatcherInterface $eventDispatcher,
-    protected SmsProviderInterface $smsProvider,
+    private readonly EventDispatcherInterface $eventDispatcher,
+    private readonly SmsProviderInterface $smsProvider,
   ) {
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getPhoneNumbers(EntityInterface $entity, $verified = TRUE) {
+  public function getPhoneNumbers(EntityInterface $entity, $verified = TRUE): array {
     $event = new SmsEntityPhoneNumber($entity, $verified);
     /** @var \Drupal\sms\Event\SmsEntityPhoneNumber $event */
     $event = $this->eventDispatcher
@@ -43,16 +38,14 @@ class PhoneNumberProvider implements PhoneNumberProviderInterface {
     return $event->getPhoneNumbers();
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message) {
-    if (!$phone_numbers = $this->getPhoneNumbers($entity)) {
+  public function sendMessage(EntityInterface $entity, SmsMessageInterface $sms_message): void {
+    $phoneNumbers = $this->getPhoneNumbers($entity);
+    if ($phoneNumbers === []) {
       throw new NoPhoneNumberException('Attempted to send an SMS to entity without a phone number.');
     }
 
     $sms_message = SmsMessageEntity::convertFromSmsMessage($sms_message)
-      ->addRecipient(\reset($phone_numbers))
+      ->addRecipient(\reset($phoneNumbers))
       ->setRecipientEntity($entity)
       ->setDirection(Direction::OUTGOING);
 

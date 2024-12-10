@@ -14,7 +14,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @see \Drupal\sms\Event\SmsEvents
  */
-class SmsMessageEvent extends Event {
+final class SmsMessageEvent extends Event {
 
   /**
    * The SMS messages.
@@ -39,7 +39,7 @@ class SmsMessageEvent extends Event {
    * @return \Drupal\sms\Message\SmsMessageInterface[]
    *   The messages on this event.
    */
-  public function getMessages() {
+  public function getMessages(): array {
     return $this->messages;
   }
 

@@ -26,8 +26,9 @@
     "drupal/dynamic_entity_reference": "^3 || ^4"
   },
   "require-dev": {
+      "drupal/core-dev": "^11",
       "mglaman/phpstan-drupal": "^1",
-      "previousnext/coding-standard": "^1.0",
+      "previousnext/coding-standard": "^1.1.1",
       "phpstan/phpstan": "^1.11",
       "phpstan/phpstan-deprecation-rules": "*",
       "phpstan/extension-installer": "^1.4"
@@ -41,10 +42,9 @@
   "config": {
     "allow-plugins": {
       "phpstan/extension-installer": true,
-      "dealerdirect/phpcodesniffer-composer-installer": true
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "php-http/discovery": true,
+      "tbachert/spi": true
     }
-  },
-    "conflict": {
-        "drupal/coder": "<8.3.26"
-    }
+  }
 }

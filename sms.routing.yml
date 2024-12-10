@@ -1,6 +1,3 @@
-route_callbacks:
-  - '\Drupal\sms\Routing\RouteSubscriber::routes'
-
 sms.admin:
   path: '/admin/config/smsframework'
   defaults:

@@ -17,6 +17,6 @@ interface AccountRegistrationInterface {
    * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
    *   An incoming SMS message.
    */
-  public function createAccount(SmsMessageInterface $sms_message);
+  public function createAccount(SmsMessageInterface $sms_message): void;
 
 }

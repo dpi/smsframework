@@ -1,5 +1,6 @@
 services:
-  sms_test.event_subscriber:
-    class: Drupal\sms_test\EventSubscriber\SmsTestEventSubscriber
-    tags:
-      - { name: event_subscriber }
+  _defaults:
+    autoconfigure: true
+    autowire: true
+
+  Drupal\sms_test\EventSubscriber\SmsTestEventSubscriber: ~

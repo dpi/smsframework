@@ -17,22 +17,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SmsUserMenuLink extends DeriverBase implements ContainerDeriverInterface {
 
   /**
-   * Constructs a \Drupal\sms_user\Plugin\Derivative\SmsUserMenuLink instance.
-   *
-   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phoneNumberVerification
-   *   The phone number verification service.
+   * Constructs a SmsUserMenuLink instance.
    */
-  public function __construct(
-    protected PhoneNumberVerificationInterface $phoneNumberVerification,
+  final public function __construct(
+    private PhoneNumberVerificationInterface $phoneNumberVerification,
   ) {
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, $base_plugin_id) {
+  final public static function create(ContainerInterface $container, $base_plugin_id): static {
     return new static(
-      $container->get('sms.phone_number.verification'),
+      $container->get(PhoneNumberVerificationInterface::class),
     );
   }
 
@@ -42,7 +39,7 @@ class SmsUserMenuLink extends DeriverBase implements ContainerDeriverInterface {
   public function getDerivativeDefinitions($base_plugin_definition) {
     $links = [];
 
-    if ($this->phoneNumberVerification->getPhoneNumberSettings('user', 'user')) {
+    if ($this->phoneNumberVerification->getPhoneNumberSettings('user', 'user') !== NULL) {
       $links['sms_user_phone_number_settings'] = [
         'title' => \t('User phone number'),
         'description' => \t('Set up phone number fields and settings for users.'),

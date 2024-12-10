@@ -9,6 +9,7 @@ use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\Tests\sms\Kernel\SmsFrameworkKernelBase;
 use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
 
 /**
  * Tests active hours service.
@@ -211,11 +212,11 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Tests delay was applied to a SMS message.
    *
-   * Checks invokation of sms_user_entity_presave(). This happens when queue()
+   * Checks invocation of sms_user_entity_presave(). This happens when queue()
    * is called and the SMS message is saved.
    */
   public function testDelaySmsMessage(): void {
-    $timestamp = (new DrupalDateTime('next tuesday 9:00'))->format('U');
+    $timestamp = (new DrupalDateTime('next tuesday 9:00'))->getTimestamp();
     $this->activeHoursStatus(TRUE);
     $this->setActiveHours([
       ['start' => 'next tuesday 9:00', 'end' => 'next tuesday 17:00'],
@@ -237,7 +238,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    * Tests delay was not applied to a SMS message if it is tagged as automated.
    */
   public function testDelaySmsMessageNotAutomated(): void {
-    $timestamp = (new DrupalDateTime('next tuesday 9:00'))->format('U');
+    $timestamp = (new DrupalDateTime('next tuesday 9:00'))->getTimestamp();
     $this->activeHoursStatus(TRUE);
     $this->setActiveHours([
       ['start' => 'next tuesday 9:00', 'end' => 'next tuesday 17:00'],
@@ -258,7 +259,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Helper to set status of active hours.
    */
-  protected function activeHoursStatus($status) {
+  protected function activeHoursStatus($status): void {
     \Drupal::configFactory()
       ->getEditable('sms_user.settings')
       ->set('active_hours.status', $status)
@@ -268,7 +269,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Helper to set and replace existing active hours ranges.
    */
-  protected function setActiveHours($ranges) {
+  protected function setActiveHours($ranges): void {
     \Drupal::configFactory()
       ->getEditable('sms_user.settings')
       ->set('active_hours.ranges', $ranges)
@@ -284,7 +285,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
    * @return \Drupal\user\UserInterface
    *   A saved user entity.
    */
-  protected function createUser(array $values = []) {
+  protected function createUser(array $values = []): UserInterface {
     $user = User::create([
       'uid' => 1,
       'name' => $this->randomMachineName(),

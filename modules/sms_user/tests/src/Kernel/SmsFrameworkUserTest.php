@@ -78,7 +78,7 @@ class SmsFrameworkUserTest extends SmsFrameworkKernelBase {
     static::assertEquals($message, \sms_test_gateway_get_incoming()['message']);
     // Make sure the phone number settings does not exist, in case it makes its
     // way into this test in the future.
-    static::assertNull(PhoneNumberSettings::load('user.user'), 'No phone numbser settings for user.user.');
+    static::assertNull(PhoneNumberSettings::load('user.user'));
   }
 
 }

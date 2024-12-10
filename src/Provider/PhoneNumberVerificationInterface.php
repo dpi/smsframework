@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\sms\Provider;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\sms\Entity\PhoneNumberSettingsInterface;
+use Drupal\sms\Entity\PhoneNumberVerificationInterface as EntityPhoneNumberVerificationInterface;
 
 /**
  * Interface for phone number provider.
@@ -14,29 +16,18 @@ interface PhoneNumberVerificationInterface {
   /**
    * Gets read only phone number settings config object for a bundle.
    *
-   * @param string $entity_type_id
-   *   The entity type ID of the bundle.
-   * @param string $bundle
-   *   An entity bundle.
-   *
    * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|null
    *   A phone number settings entity, or NULL if it does not exist.
    */
-  public function getPhoneNumberSettings($entity_type_id, $bundle);
+  public function getPhoneNumberSettings(string $entity_type_id, string $bundle): ?PhoneNumberSettingsInterface;
 
   /**
    * Gets phone number settings for the bundle of an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity to get settings.
-   *
-   * @return \Drupal\sms\Entity\PhoneNumberSettingsInterface|null
-   *   A phone number settings entity, or NULL if it does not exist.
-   *
    * @throws \Drupal\sms\Exception\PhoneNumberSettingsException
    *   Thrown if entity is not configured for phone numbers.
    */
-  public function getPhoneNumberSettingsForEntity(EntityInterface $entity);
+  public function getPhoneNumberSettingsForEntity(EntityInterface $entity): PhoneNumberSettingsInterface;
 
   /**
    * Checks if there is a phone number verification for a code.
@@ -48,7 +39,7 @@ interface PhoneNumberVerificationInterface {
    *   A phone number verification entity, or FALSE if $code is not a valid
    *   verification code.
    */
-  public function getPhoneVerificationByCode($code);
+  public function getPhoneVerificationByCode($code): EntityPhoneNumberVerificationInterface|false;
 
   /**
    * Gets phone number verifications for a phone number.
@@ -63,13 +54,13 @@ interface PhoneNumberVerificationInterface {
    * @param bool|null $verified
    *   Whether the returned phone numbers must be verified, or NULL to get all
    *   regardless of status.
-   * @param string $entity_type
+   * @param string|null $entity_type
    *   An entity type ID to filter.
    *
    * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface[]
    *   An array of phone number verification entities, if any.
    */
-  public function getPhoneVerificationByPhoneNumber($phone_number, $verified = TRUE, $entity_type = NULL);
+  public function getPhoneVerificationByPhoneNumber(string $phone_number, ?bool $verified = TRUE, ?string $entity_type = NULL): array;
 
   /**
    * Gets a phone number verification for an entity and phone number pair.
@@ -78,11 +69,8 @@ interface PhoneNumberVerificationInterface {
    *   An entity to get phone number verification.
    * @param string $phone_number
    *   A phone number.
-   *
-   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|null
-   *   The phone number verification for an entity and phone number pair.
    */
-  public function getPhoneVerificationByEntity(EntityInterface $entity, $phone_number);
+  public function getPhoneVerificationByEntity(EntityInterface $entity, string $phone_number): ?EntityPhoneNumberVerificationInterface;
 
   /**
    * Generates a phone number verification for an entity and phone number pair.
@@ -94,11 +82,8 @@ interface PhoneNumberVerificationInterface {
    *   An entity to get phone number verification.
    * @param string $phone_number
    *   A phone number.
-   *
-   * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|null
-   *   A phone number verification.
    */
-  public function newPhoneVerification(EntityInterface $entity, $phone_number);
+  public function newPhoneVerification(EntityInterface $entity, string $phone_number): ?EntityPhoneNumberVerificationInterface;
 
   /**
    * Detect modifications to phone numbers on an entity.
@@ -110,7 +95,7 @@ interface PhoneNumberVerificationInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   Update phone number verifications for this entity.
    */
-  public function updatePhoneVerificationByEntity(EntityInterface $entity);
+  public function updatePhoneVerificationByEntity(EntityInterface $entity): void;
 
   /**
    * Deletes phone number verifications for an entity.
@@ -118,7 +103,7 @@ interface PhoneNumberVerificationInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   Delete phone number verifications for this entity.
    */
-  public function deletePhoneVerificationByEntity(EntityInterface $entity);
+  public function deletePhoneVerificationByEntity(EntityInterface $entity): void;
 
   /**
    * Cleans up expired phone number verifications.
@@ -126,6 +111,6 @@ interface PhoneNumberVerificationInterface {
    * Removes phone numbers from entities if setting is verification expires, and
    * setting is enabled.
    */
-  public function purgeExpiredVerifications();
+  public function purgeExpiredVerifications(): void;
 
 }

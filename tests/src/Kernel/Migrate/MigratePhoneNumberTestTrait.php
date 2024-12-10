@@ -10,7 +10,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\sms\Entity\PhoneNumberSettings;
 use Drupal\sms\Entity\PhoneNumberVerification;
-use Drupal\sms\Plugin\Migrate\process\PhoneNumberSettings as PhoneNumberSettingsPlugin;
+use Drupal\sms\Plugin\migrate\process\PhoneNumberSettings as PhoneNumberSettingsPlugin;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 
@@ -142,7 +142,7 @@ trait MigratePhoneNumberTestTrait {
   /**
    * Asserts that the specified user has a verified phone number.
    */
-  protected function assertVerifiedPhoneNumber(UserInterface $user, $number) {
+  protected function assertVerifiedPhoneNumber(UserInterface $user, $number): void {
     $phone_numbers = \Drupal::service('sms.phone_number')->getPhoneNumbers($user, TRUE);
     $phone_number = \reset($phone_numbers);
     static::assertEquals($number, $phone_number, "Phone number '$number' is verified.");
@@ -151,7 +151,7 @@ trait MigratePhoneNumberTestTrait {
   /**
    * Asserts that the specified user has an unverified phone number.
    */
-  protected function assertUnVerifiedPhoneNumber(UserInterface $user, $number) {
+  protected function assertUnVerifiedPhoneNumber(UserInterface $user, $number): void {
     $phone_numbers = \Drupal::service('sms.phone_number')->getPhoneNumbers($user, FALSE);
     $phone_number = \reset($phone_numbers);
     static::assertEquals($number, $phone_number, "Phone number '$number' is unverified.");
@@ -160,7 +160,7 @@ trait MigratePhoneNumberTestTrait {
   /**
    * Asserts that the specified user has no phone number verified or unverified.
    */
-  protected function assertNoVerifiedPhoneNumber(UserInterface $user) {
+  protected function assertNoVerifiedPhoneNumber(UserInterface $user): void {
     $phone_numbers = \Drupal::service('sms.phone_number')->getPhoneNumbers($user);
     static::assertEquals([], $phone_numbers, "No phone numbers for user {$user->id()}.");
   }
@@ -177,7 +177,7 @@ trait MigratePhoneNumberTestTrait {
   /**
    * Rolls back a specified migration.
    */
-  protected function rollBackMigrations(array $ids) {
+  protected function rollBackMigrations(array $ids): void {
     foreach ($ids as $id) {
       $this->migration = $this->getMigration($id);
       $this->prepareMigration($this->migration);
@@ -186,23 +186,23 @@ trait MigratePhoneNumberTestTrait {
   }
 
   /**
-   * Provides the relative path to the fixture that sets up the database.
-   */
-  abstract protected function smsUserFixtureFilePath();
-
-  /**
-   * Provides the relative path to the fixture that adds confirmation message.
-   */
-  abstract protected function confirmationMessageFixturePath();
-
-  /**
    * Returns the list of D6 or D7 sms_user phone number migrations to test.
    */
-  abstract protected function getMigrationsToTest();
+  abstract protected function getMigrationsToTest(): array;
 
   /**
    * Returns the list of migrations to rollback for the rollback test.
    */
-  abstract protected function getMigrationsToRollback();
+  abstract protected function getMigrationsToRollback(): array;
+
+  /**
+   * Provides the relative path to the fixture that sets up the database.
+   */
+  abstract protected function smsUserFixtureFilePath(): string;
+
+  /**
+   * Provides the relative path to the fixture that adds confirmation message.
+   */
+  abstract protected function confirmationMessageFixturePath(): string;
 
 }

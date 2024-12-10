@@ -9,7 +9,7 @@ use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Provides delivery reports acknowledgement and passes to the correct gateway.
@@ -17,29 +17,19 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class DeliveryReportController implements ContainerInjectionInterface {
 
   /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected RequestStack $requestStack;
-
-  /**
-   * Creates an new delivery report controller.
+   * Creates a new delivery report controller.
    *
    * @param \Drupal\sms\Provider\SmsProviderInterface $smsProvider
    *   The SMS service provider.
    */
-  public function __construct(
-    protected SmsProviderInterface $smsProvider,
+  final public function __construct(
+    private SmsProviderInterface $smsProvider,
   ) {
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
+  final public static function create(ContainerInterface $container): static {
     return new static(
-      $container->get('sms.provider'),
+      $container->get(SmsProviderInterface::class),
     );
   }
 
@@ -49,12 +39,9 @@ class DeliveryReportController implements ContainerInjectionInterface {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request.
    * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
-   *   The gateway which is handling the the delivery report.
-   *
-   * @return \Symfony\Component\HttpFoundation\Response
-   *   A response object to return.
+   *   The gateway which is handling the delivery report.
    */
-  public function processDeliveryReport(Request $request, SmsGatewayInterface $sms_gateway) {
+  public function processDeliveryReport(Request $request, SmsGatewayInterface $sms_gateway): Response {
     return $this->smsProvider->processDeliveryReport($request, $sms_gateway);
   }
 

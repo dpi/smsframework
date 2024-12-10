@@ -17,18 +17,12 @@ class SmsGatewayDeleteForm extends EntityConfirmFormBase {
 
   /**
    * Constructs a new SmsGatewayDeleteForm.
-   *
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
    */
-  public function __construct(MessengerInterface $messenger) {
+  final public function __construct(MessengerInterface $messenger) {
     $this->setMessenger($messenger);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
+  final public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('messenger'),
     );
@@ -60,7 +54,7 @@ class SmsGatewayDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->entity->delete();
 
     $this->messenger()->addMessage($this->t('Gateway %label was deleted.', [

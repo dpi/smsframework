@@ -12,12 +12,10 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @see \Drupal\sms\Event\SmsEvents
  */
-class SmsDeliveryReportEvent extends Event {
+final class SmsDeliveryReportEvent extends Event {
 
   /**
    * The response to receiving a pushed delivery report.
-   *
-   * @var \Symfony\Component\HttpFoundation\Response
    */
   protected Response $response;
 
@@ -30,11 +28,8 @@ class SmsDeliveryReportEvent extends Event {
 
   /**
    * Get the response for this event.
-   *
-   * @return \Symfony\Component\HttpFoundation\Response
-   *   The response for this event.
    */
-  public function getResponse() {
+  public function getResponse(): Response {
     return $this->response;
   }
 
@@ -58,7 +53,7 @@ class SmsDeliveryReportEvent extends Event {
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface[]
    *   The delivery reports on this event.
    */
-  public function getReports() {
+  public function getReports(): array {
     return $this->reports;
   }
 

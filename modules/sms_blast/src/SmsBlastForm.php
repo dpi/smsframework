@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\sms_blast;
 
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -17,45 +18,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class SmsBlastForm extends FormBase {
 
-  /**
-   * Storage for Phone Number Verification entities.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $phoneNumberVerificationStorage;
-
-  /**
-   * Phone number provider.
-   *
-   * @var \Drupal\sms\Provider\PhoneNumberProviderInterface
-   */
-  protected $phoneNumberProvider;
-
-  /**
-   * Constructs a new SmsBlastForm object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider
-   *   The phone number provider.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   */
-  public function __construct(
-    EntityTypeManagerInterface $entity_type_manager,
-    PhoneNumberProviderInterface $phone_number_provider,
+  final public function __construct(
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly PhoneNumberProviderInterface $phoneNumberProvider,
     MessengerInterface $messenger,
   ) {
-    $this->phoneNumberVerificationStorage = $entity_type_manager
-      ->getStorage('sms_phone_number_verification');
-    $this->phoneNumberProvider = $phone_number_provider;
     $this->setMessenger($messenger);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('sms.phone_number'),
@@ -92,11 +63,13 @@ class SmsBlastForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    $sms_message = new SmsMessage();
-    $sms_message->setMessage($form_state->getValue('message'));
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
+    /** @var string $message */
+    $message = $form_state->getValue('message');
+    $sms_message = (new SmsMessage())
+      ->setMessage($message);
 
-    $ids = $this->phoneNumberVerificationStorage->getQuery()
+    $ids = $this->phoneNumberVerificationStorage()->getQuery()
       ->accessCheck(FALSE)
       ->condition('status', 1)
       ->condition('entity__target_type', 'user')
@@ -106,9 +79,10 @@ class SmsBlastForm extends FormBase {
     $failure = 0;
     $entity_ids = [];
     /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $verification */
-    foreach ($this->phoneNumberVerificationStorage->loadMultiple($ids) as $verification) {
-      // Ensure entity exists and one message is sent to each entity.
-      if (($entity = $verification->getEntity()) && !\in_array($entity->id(), $entity_ids)) {
+    foreach ($this->phoneNumberVerificationStorage()->loadMultiple($ids) as $verification) {
+      // Ensure entity exists and only one message is sent to each entity.
+      $entity = $verification->getEntity();
+      if ($entity !== NULL && !\in_array($entity->id(), $entity_ids, TRUE)) {
         $entity_ids[] = $entity->id();
 
         try {
@@ -116,7 +90,7 @@ class SmsBlastForm extends FormBase {
             ->sendMessage($entity, $sms_message);
           $success++;
         }
-        catch (\Exception $e) {
+        catch (\Exception) {
           $failure++;
         }
       }
@@ -128,6 +102,10 @@ class SmsBlastForm extends FormBase {
     if ($failure > 0) {
       $this->messenger()->addError($this->formatPlural($failure, 'Message could not be sent to @count user.', 'Message could not be sent to @count users.'));
     }
+  }
+
+  private function phoneNumberVerificationStorage(): EntityStorageInterface {
+    return $this->entityTypeManager->getStorage('sms_phone_number_verification');
   }
 
 }

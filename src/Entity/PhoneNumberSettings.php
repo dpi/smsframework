@@ -60,38 +60,28 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    *
    * ID is a concatenation of entity type ID and bundle
    * "{entity_type_id}.{bundle}" suitable as config ID "sms.phone.*.*".
-   *
-   * @var string
    */
-  protected $id;
+  protected string $id;
 
   /**
    * Entity type ID of phone number settings.
-   *
-   * @var string
    */
-  protected $entity_type;
+  protected string $entity_type;
 
   /**
    * Bundle of phone number settings.
-   *
-   * @var string
    */
-  protected $bundle;
+  protected string $bundle;
 
   /**
    * Message template to send for phone number verification.
-   *
-   * @var string
    */
-  protected $verification_message = '';
+  protected string $verification_message = '';
 
   /**
    * Number of seconds before phone number verifications expire.
-   *
-   * @var int
    */
-  protected $verification_code_lifetime = 0;
+  protected int $verification_code_lifetime = 0;
 
   /**
    * Whether to remove phone numbers from entities when verifications expire.
@@ -113,95 +103,81 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    * {@inheritdoc}
    */
   public function id() {
+    if (!isset($this->entity_type) || !isset($this->bundle)) {
+      return NULL;
+    }
+
     return $this->entity_type . '.' . $this->bundle;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPhoneNumberEntityTypeId() {
+  public function getPhoneNumberEntityTypeId(): string {
     return $this->entity_type;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setPhoneNumberEntityTypeId($entity_type_id) {
+  public function setPhoneNumberEntityTypeId(string $entity_type_id) {
     $this->entity_type = $entity_type_id;
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPhoneNumberBundle() {
+  public function getPhoneNumberBundle(): string {
     return $this->bundle;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setPhoneNumberBundle($bundle) {
+  public function setPhoneNumberBundle(string $bundle) {
     $this->bundle = $bundle;
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getVerificationMessage() {
+  public function getVerificationMessage(): string {
     return $this->verification_message;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setVerificationMessage($message) {
+  public function setVerificationMessage(string $message) {
     $this->verification_message = $message;
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getVerificationCodeLifetime() {
-    return $this->verification_code_lifetime;
+  public function getVerificationCodeLifetime(): int {
+    return $this->verification_code_lifetime ?? 0;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setVerificationCodeLifetime($lifetime) {
+  public function setVerificationCodeLifetime(int $lifetime) {
     $this->verification_code_lifetime = $lifetime;
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPurgeVerificationPhoneNumber() {
+  public function getPurgeVerificationPhoneNumber(): bool {
     return $this->purge_verification_phone_number;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setPurgeVerificationPhoneNumber($purge) {
+  public function setPurgeVerificationPhoneNumber(bool $purge) {
     $this->purge_verification_phone_number = $purge;
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getFieldName($map) {
+  public function getFieldName(string $map): ?string {
     return $this->fields[$map] ?? NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setFieldName($map, $field_name) {
+  public function setFieldName(string $map, ?string $field_name) {
     $this->fields[$map] = $field_name;
     return $this;
   }
@@ -209,7 +185,7 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
   /**
    * {@inheritdoc}
    */
-  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+  public static function postDelete(EntityStorageInterface $storage, array $entities): void {
     parent::postDelete($storage, $entities);
 
     // Delete associated phone number verifications.
@@ -242,12 +218,12 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
         $this->getPhoneNumberBundle(),
         $field_name,
       );
-      if ($field_config) {
+      if ($field_config !== NULL) {
         $this->addDependency('config', $field_config->getConfigDependencyName());
       }
     }
 
-    return $this->dependencies;
+    return $this;
   }
 
 }

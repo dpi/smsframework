@@ -17,8 +17,15 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
    *
    * @return int
    *   Creation timestamp of the phone number verification.
+   *
+   * @deprecated Use getCreatedDate instead.
    */
-  public function getCreatedTime();
+  public function getCreatedTime(): int;
+
+  /**
+   * Gets the phone number verification creation timestamp.
+   */
+  public function getCreatedDate(): \DateTimeImmutable;
 
   /**
    * Gets the entity for the phone number verification.
@@ -26,7 +33,7 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
    * @return \Drupal\Core\Entity\EntityInterface|null
    *   The entity for the phone number verification, or NULL if it is missing.
    */
-  public function getEntity();
+  public function getEntity(): ?EntityInterface;
 
   /**
    * Sets the entity for the phone number verification.
@@ -45,7 +52,7 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
    * @return string
    *   The phone number for the phone number verification.
    */
-  public function getPhoneNumber();
+  public function getPhoneNumber(): string;
 
   /**
    * Sets the phone number for the phone number verification.
@@ -56,7 +63,7 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
    * @return $this
    *   Return phone number verification for chaining.
    */
-  public function setPhoneNumber($phone_number);
+  public function setPhoneNumber(string $phone_number);
 
   /**
    * Gets the code for the phone number verification.
@@ -64,7 +71,7 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
    * @return string
    *   The code for the phone number verification.
    */
-  public function getCode();
+  public function getCode(): string;
 
   /**
    * Sets the code for the phone number verification.
@@ -75,7 +82,7 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
    * @return $this
    *   Return phone number verification for chaining.
    */
-  public function setCode($code);
+  public function setCode(string $code);
 
   /**
    * Gets the status for the phone number verification.
@@ -85,7 +92,7 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
    * @return bool
    *   Whether the phone number is verified.
    */
-  public function getStatus();
+  public function getStatus(): bool;
 
   /**
    * Sets the status for the phone number verification.
@@ -96,6 +103,6 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
    * @return $this
    *   Return phone number verification for chaining.
    */
-  public function setStatus($status);
+  public function setStatus(bool $status);
 
 }

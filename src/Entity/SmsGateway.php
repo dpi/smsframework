@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\sms\Entity;
 
+use Drupal\Component\Plugin\LazyPluginCollection;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -11,6 +12,8 @@ use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\Url;
 use Drupal\sms\Direction;
 use Drupal\sms\Plugin\SmsGatewayPluginCollection;
+use Drupal\sms\Plugin\SmsGatewayPluginInterface;
+use Drupal\sms\Plugin\SmsGatewayPluginManagerInterface;
 
 /**
  * Defines storage for an SMS Gateway instance.
@@ -95,10 +98,8 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
 
   /**
    * The plugin collection that holds the plugin for this entity.
-   *
-   * @var \Drupal\sms\Plugin\SmsGatewayPluginCollection
    */
-  protected $pluginCollection;
+  protected ?SmsGatewayPluginCollection $pluginCollection = NULL;
 
   /**
    * Whether messages sent to this gateway should be sent immediately.
@@ -155,9 +156,9 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
-    /** @var static $original */
+    /** @var static|null $original */
     $original = &$this->original;
-    $original_path = isset($original) ? $original->getPushReportPath() : '';
+    $original_path = $original?->getPushReportPath() ?? '';
     if ($original_path != $this->getPushReportPath()) {
       \Drupal::service('router.builder')->setRebuildNeeded();
     }
@@ -169,15 +170,12 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
    * @return \Drupal\Component\Plugin\LazyPluginCollection
    *   The action's plugin collection.
    */
-  protected function getPluginCollection() {
-    if (!$this->pluginCollection) {
-      $this->pluginCollection = new SmsGatewayPluginCollection(
-        \Drupal::service('plugin.manager.sms_gateway'),
-        $this->plugin,
-        $this->settings,
-      );
-    }
-    return $this->pluginCollection;
+  protected function getPluginCollection(): LazyPluginCollection {
+    return $this->pluginCollection ??= new SmsGatewayPluginCollection(
+      \Drupal::service(SmsGatewayPluginManagerInterface::class),
+      $this->plugin,
+      $this->settings,
+    );
   }
 
   /**
@@ -187,68 +185,50 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
     return ['settings' => $this->getPluginCollection()];
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPlugin() {
+  public function getPlugin(): SmsGatewayPluginInterface {
     return $this->getPluginCollection()->get($this->plugin);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPluginId() {
+  public function getPluginId(): string {
     return $this->plugin;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getSkipQueue() {
+  public function getSkipQueue(): bool {
     return !empty($this->skip_queue);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setSkipQueue($skip_queue) {
-    $this->skip_queue = (boolean) $skip_queue;
+  public function setSkipQueue(bool $skip_queue) {
+    $this->skip_queue = $skip_queue;
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPushIncomingPath() {
+  public function getPushIncomingPath(): ?string {
     return $this->incoming_push_path;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setPushIncomingPath($path) {
+  public function setPushIncomingPath(?string $path) {
     $this->incoming_push_path = $path;
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPushReportUrl() {
+  public function getPushReportUrl(): Url {
     return Url::fromRoute('sms.delivery_report.receive.' . $this->id());
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPushReportPath() {
+  public function getPushReportPath(): ?string {
     return $this->reports_push_path;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setPushReportPath($path) {
+  public function setPushReportPath(?string $path) {
     $this->reports_push_path = $path;
     return $this;
   }
@@ -256,7 +236,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   /**
    * {@inheritdoc}
    */
-  public function getRetentionDuration($direction) {
+  public function getRetentionDuration($direction): int {
     return match ($direction) {
       Direction::INCOMING => (int) $this->retention_duration_incoming,
       Direction::OUTGOING => (int) $this->retention_duration_outgoing,
@@ -267,7 +247,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   /**
    * {@inheritdoc}
    */
-  public function setRetentionDuration($direction, $retention_duration) {
+  public function setRetentionDuration($direction, int $retention_duration) {
     switch ($direction) {
       case Direction::INCOMING:
         $this->retention_duration_incoming = $retention_duration;
@@ -280,64 +260,43 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getMaxRecipientsOutgoing() {
+  public function getMaxRecipientsOutgoing(): int {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return isset($definition['outgoing_message_max_recipients']) ? (int) $definition['outgoing_message_max_recipients'] : 1;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function supportsIncoming() {
+  public function supportsIncoming(): bool {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return isset($definition['incoming']) ? (boolean) $definition['incoming'] : FALSE;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function autoCreateIncomingRoute() {
+  public function autoCreateIncomingRoute(): bool {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return isset($definition['incoming_route']) ? (boolean) $definition['incoming_route'] : FALSE;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function isScheduleAware() {
+  public function isScheduleAware(): bool {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return !empty($definition['schedule_aware']);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function supportsReportsPull() {
+  public function supportsReportsPull(): bool {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return isset($definition['reports_pull']) ? (boolean) $definition['reports_pull'] : FALSE;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function supportsReportsPush() {
+  public function supportsReportsPush(): bool {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return isset($definition['reports_push']) ? (boolean) $definition['reports_push'] : FALSE;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function supportsCreditBalanceQuery() {
+  public function supportsCreditBalanceQuery(): bool {
     $definition = $this->getPlugin()
       ->getPluginDefinition();
     return isset($definition['credit_balance_available']) ? (boolean) $definition['credit_balance_available'] : FALSE;

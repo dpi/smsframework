@@ -44,7 +44,7 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
   /**
    * {@inheritdoc}
    */
-  public function setConfiguration(array $configuration) {
+  public function setConfiguration(array $configuration): void {
     $this->configuration = NestedArray::mergeDeep($this->defaultConfiguration(), $configuration);
   }
 
@@ -65,13 +65,13 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
   /**
    * {@inheritdoc}
    */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state): void {
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
   }
 
   /**
@@ -81,24 +81,21 @@ abstract class SmsGatewayPluginBase extends PluginBase implements SmsGatewayPlug
     return [];
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getCreditsBalance() {
+  public function getCreditsBalance(): ?float {
     return NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function parseDeliveryReports(Request $request, Response $response) {
+  public function parseDeliveryReports(Request $request, Response $response): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getDeliveryReports(?array $message_ids = NULL) {
+  public function getDeliveryReports(?array $message_ids = NULL): array {
     return [];
   }
 

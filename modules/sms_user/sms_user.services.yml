@@ -9,7 +9,11 @@ services:
 
   sms_user.account_registration:
     class: Drupal\sms_user\AccountRegistration
-    arguments: ['@config.factory', '@token', '@sms.provider', '@sms.phone_number.verification']
   Drupal\sms_user\AccountRegistrationInterface: '@sms_user.account_registration'
 
   Drupal\sms_user\EventSubscriber\SmsEventSubscriber: ~
+
+  logger.channel.sms_user:
+    parent: logger.channel_base
+    arguments:
+      $channel: 'sms_user'

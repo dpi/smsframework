@@ -16,22 +16,16 @@ class SmsEventSubscriber implements EventSubscriberInterface {
 
   /**
    * Constructs a new SmsEvents instance.
-   *
-   * @param \Drupal\sms_user\AccountRegistrationInterface $accountRegistration
-   *   The account registration service.
    */
-  public function __construct(
-    protected AccountRegistrationInterface $accountRegistration,
+  final public function __construct(
+    private readonly AccountRegistrationInterface $accountRegistration,
   ) {
   }
 
   /**
    * Process an incoming SMS to see if a new account should be created.
-   *
-   * @param \Drupal\sms\Event\SmsMessageEvent $event
-   *   The event.
    */
-  public function createAccount(SmsMessageEvent $event) {
+  public function createAccount(SmsMessageEvent $event): void {
     foreach ($event->getMessages() as $sms_message) {
       $this->accountRegistration->createAccount($sms_message);
     }
@@ -41,6 +35,7 @@ class SmsEventSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
+    $events = [];
     $events[SmsEvents::MESSAGE_INCOMING_POST_PROCESS][] = ['createAccount'];
     return $events;
   }

@@ -8,6 +8,7 @@ use Drupal\Component\Utility\Random;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityConstraintViolationListInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Password\PasswordGeneratorInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
@@ -18,12 +19,16 @@ use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Drupal\user\UserNameValidator;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Defines the account registration service.
  */
-class AccountRegistration implements AccountRegistrationInterface {
+final class AccountRegistration implements AccountRegistrationInterface, LoggerAwareInterface {
+
+  use LoggerAwareTrait;
 
   /**
    * Phone number settings for user.user bundle.
@@ -34,19 +39,17 @@ class AccountRegistration implements AccountRegistrationInterface {
    * Constructs a AccountRegistration object.
    */
   final public function __construct(
-    protected ConfigFactoryInterface $configFactory,
-    protected Token $token,
-    protected SmsProviderInterface $smsProvider,
-    protected PhoneNumberVerificationInterface $phoneNumberVerificationProvider,
-    protected UserNameValidator $userNameValidator,
-    protected EntityTypeManagerInterface $entityTypeManager,
+    private readonly ConfigFactoryInterface $configFactory,
+    private readonly Token $token,
+    private readonly SmsProviderInterface $smsProvider,
+    private readonly PhoneNumberVerificationInterface $phoneNumberVerificationProvider,
+    private readonly UserNameValidator $userNameValidator,
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly PasswordGeneratorInterface $passwordGenerator,
   ) {
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function createAccount(SmsMessageInterface $sms_message) {
+  public function createAccount(SmsMessageInterface $sms_message): void {
     $this->userPhoneNumberSettings = $this->phoneNumberVerificationProvider
       ->getPhoneNumberSettings('user', 'user');
     if (!$this->userPhoneNumberSettings) {
@@ -55,15 +58,15 @@ class AccountRegistration implements AccountRegistrationInterface {
     }
 
     $sender_number = $sms_message->getSenderNumber();
-    if (!empty($sender_number)) {
+    if (\strlen($sender_number) > 0) {
       // Any users with this phone number?
       $entities = $this->phoneNumberVerificationProvider
         ->getPhoneVerificationByPhoneNumber($sender_number, NULL, 'user');
-      if (!\count($entities)) {
-        if (!empty($this->settings('unrecognized_sender.status'))) {
+      if ($entities === []) {
+        if (TRUE === $this->settings('unrecognized_sender.status')) {
           $this->allUnknownNumbers($sms_message);
         }
-        if (!empty($this->settings('incoming_pattern.status'))) {
+        if (TRUE === $this->settings('incoming_pattern.status')) {
           $this->incomingPatternMessage($sms_message);
         }
       }
@@ -76,7 +79,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
    *   An incoming SMS message.
    */
-  protected function allUnknownNumbers(SmsMessageInterface $sms_message) {
+  protected function allUnknownNumbers(SmsMessageInterface $sms_message): void {
     $user = User::create(['name' => $this->generateUniqueUsername()]);
     $user->activate();
 
@@ -88,9 +91,7 @@ class AccountRegistration implements AccountRegistrationInterface {
     $user->{$phone_field_name}[] = $sender_number;
 
     // Password.
-    /** @var \Drupal\Core\Password\PasswordGeneratorInterface $passwordGenerator */
-    $passwordGenerator = \Drupal::service('password_generator');
-    $password = $passwordGenerator->generate();
+    $password = $this->passwordGenerator->generate();
     $user->setPassword($password);
 
     $validate = $this->removeAcceptableViolations($user->validate());
@@ -101,8 +102,7 @@ class AccountRegistration implements AccountRegistrationInterface {
       // @see https://www.drupal.org/node/2709911
       $t_args['%name'] = $user->label();
       $t_args['%uid'] = $user->id();
-      \Drupal::logger('sms_user.account_registration.unrecognized_sender')
-        ->info('Creating new account for %sender_phone_number. Username: %name. User ID: %uid', $t_args);
+      $this->logger?->info('Creating new account for %sender_phone_number. Username: %name. User ID: %uid', $t_args);
 
       // Optionally send a reply.
       if (!empty($this->settings('unrecognized_sender.reply.status'))) {
@@ -113,8 +113,7 @@ class AccountRegistration implements AccountRegistrationInterface {
     }
     else {
       $t_args['@error'] = $this->buildError($validate);
-      \Drupal::logger('sms_user.account_registration.unrecognized_sender')
-        ->error('Could not create new account for %sender_phone_number because there was a problem with validation: @error', $t_args);
+      $this->logger?->error('Could not create new account for %sender_phone_number because there was a problem with validation: @error', $t_args);
     }
   }
 
@@ -124,75 +123,73 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
    *   An incoming SMS message.
    */
-  protected function incomingPatternMessage(SmsMessageInterface $sms_message) {
-    if (!empty($this->settings('incoming_pattern.incoming_messages.0'))) {
-      $incoming_form = $this->settings('incoming_pattern.incoming_messages.0');
-      $incoming_form = \str_replace("\r\n", "\n", $incoming_form);
-      $compiled = $this->compileFormRegex($incoming_form, '/');
-      $matches = [];
-      if (\preg_match_all('/^' . $compiled . '$/', $sms_message->getMessage(), $matches)) {
-        $contains_email = \strpos($incoming_form, '[email]') !== FALSE;
-        $contains_username = \strpos($incoming_form, '[username]') !== FALSE;
-        $contains_password = \strpos($incoming_form, '[password]') !== FALSE;
+  protected function incomingPatternMessage(SmsMessageInterface $sms_message): void {
+    if (empty($this->settings('incoming_pattern.incoming_messages.0'))) {
+      return;
+    }
 
-        $username = (!empty($matches['username'][0]) && $contains_username) ? $matches['username'][0] : $this->generateUniqueUsername();
-        $user = User::create(['name' => $username]);
-        $user->activate();
+    $incoming_form = $this->settings('incoming_pattern.incoming_messages.0');
+    $incoming_form = \str_replace("\r\n", "\n", $incoming_form);
+    $compiled = $this->compileFormRegex($incoming_form, '/');
+    $matches = [];
+    if (\preg_match_all('/^' . $compiled . '$/', $sms_message->getMessage(), $matches)) {
+      $contains_email = \strpos($incoming_form, '[email]') !== FALSE;
+      $contains_username = \strpos($incoming_form, '[username]') !== FALSE;
+      $contains_password = \strpos($incoming_form, '[password]') !== FALSE;
 
-        // Sender phone number.
-        $sender_number = $sms_message->getSenderNumber();
-        $t_args['%sender_phone_number'] = $sender_number;
+      $username = (!empty($matches['username'][0]) && $contains_username) ? $matches['username'][0] : $this->generateUniqueUsername();
+      $user = User::create(['name' => $username]);
+      $user->activate();
 
-        // Sender phone number.
-        $phone_field_name = $this->userPhoneNumberSettings
-          ->getFieldName('phone_number');
-        $user->{$phone_field_name}[] = $sender_number;
+      // Sender phone number.
+      $sender_number = $sms_message->getSenderNumber();
+      $t_args['%sender_phone_number'] = $sender_number;
 
-        if (!empty($matches['email'][0]) && $contains_email) {
-          $user->setEmail($matches['email'][0]);
+      // Sender phone number.
+      $phone_field_name = $this->userPhoneNumberSettings
+        ->getFieldName('phone_number');
+      $user->{$phone_field_name}[] = $sender_number;
+
+      if (!empty($matches['email'][0]) && $contains_email) {
+        $user->setEmail($matches['email'][0]);
+      }
+
+      $password = (!empty($matches['password'][0]) && $contains_password) ? $matches['password'][0] : $this->passwordGenerator->generate();
+      $user->setPassword($password);
+
+      $validate = $this->removeAcceptableViolations($user->validate(), $incoming_form);
+      if ($validate->count() == 0) {
+        $user->save();
+
+        // @todo autoconfirm the number?
+        // @see https://www.drupal.org/node/2709911
+        $message = $this->settings('incoming_pattern.reply.message');
+        $message = \str_replace('[user:password]', $password, $message);
+
+        $this->logger?->info('Creating new account for %sender_phone_number. Username: %name. User ID: %uid', $t_args + [
+          '%uid' => $user->id(),
+          '%name' => $user->label(),
+        ]);
+
+        // Send an activation email if no password placeholder is found.
+        if (!$contains_password && !empty($this->settings('incoming_pattern.send_activation_email'))) {
+          \_user_mail_notify('register_no_approval_required', $user);
         }
+      }
+      else {
+        $message = $this->settings('incoming_pattern.reply.message_failure');
 
-        /** @var \Drupal\Core\Password\PasswordGeneratorInterface $passwordGenerator */
-        $passwordGenerator = \Drupal::service('password_generator');
-        $password = (!empty($matches['password'][0]) && $contains_password) ? $matches['password'][0] : $passwordGenerator->generate();
-        $user->setPassword($password);
+        $error = $this->buildError($validate);
+        $message = \str_replace('[error]', $error, $message);
 
-        $validate = $this->removeAcceptableViolations($user->validate(), $incoming_form);
-        if ($validate->count() == 0) {
-          $user->save();
+        $this->logger?->warning('Could not create new account for %sender_phone_number because there was a problem with validation: @error', $t_args + [
+          '@error' => $error,
+        ]);
+      }
 
-          // @todo autoconfirm the number?
-          // @see https://www.drupal.org/node/2709911
-          $message = $this->settings('incoming_pattern.reply.message');
-          $message = \str_replace('[user:password]', $password, $message);
-
-          \Drupal::logger('sms_user.account_registration.incoming_pattern')
-            ->info('Creating new account for %sender_phone_number. Username: %name. User ID: %uid', $t_args + [
-              '%uid' => $user->id(),
-              '%name' => $user->label(),
-            ]);
-
-          // Send an activation email if no password placeholder is found.
-          if (!$contains_password && !empty($this->settings('incoming_pattern.send_activation_email'))) {
-            \_user_mail_notify('register_no_approval_required', $user);
-          }
-        }
-        else {
-          $message = $this->settings('incoming_pattern.reply.message_failure');
-
-          $error = $this->buildError($validate);
-          $message = \str_replace('[error]', $error, $message);
-
-          \Drupal::logger('sms_user.account_registration.incoming_pattern')
-            ->warning('Could not create new account for %sender_phone_number because there was a problem with validation: @error', $t_args + [
-              '@error' => $error,
-            ]);
-        }
-
-        // Optionally send a reply.
-        if (!empty($this->settings('incoming_pattern.reply.status'))) {
-          $this->sendReply($sender_number, $user, $message);
-        }
+      // Optionally send a reply.
+      if (!empty($this->settings('incoming_pattern.reply.status'))) {
+        $this->sendReply($sender_number, $user, $message);
       }
     }
   }
@@ -208,7 +205,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @param string $message
    *   Message to send as a reply.
    */
-  protected function sendReply($sender_number, UserInterface $user, $message) {
+  protected function sendReply($sender_number, UserInterface $user, $message): void {
     $sms_message = SmsMessage::create();
     $sms_message
       ->addRecipient($sender_number)
@@ -226,8 +223,7 @@ class AccountRegistration implements AccountRegistrationInterface {
     catch (\Exception $e) {
       $t_args['%recipient'] = $sender_number;
       $t_args['%error'] = $e->getMessage();
-      \Drupal::logger('sms_user.account_registration.incoming_pattern')
-        ->warning('Reply message could not be sent to recipient %recipient: %error', $t_args);
+      $this->logger?->warning('Reply message could not be sent to recipient %recipient: %error', $t_args);
     }
   }
 
@@ -242,7 +238,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @return string
    *   A regular expression.
    */
-  protected function compileFormRegex($form_string, $delimiter) {
+  protected function compileFormRegex($form_string, $delimiter): string {
     $placeholders = ['username' => '.+', 'email' => '\S+', 'password' => '.+'];
 
     // Placeholders enclosed in square brackets and escaped for use in regular
@@ -299,7 +295,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @return string
    *   Violation errors joined together.
    */
-  protected function buildError(ConstraintViolationListInterface $violations) {
+  protected function buildError(ConstraintViolationListInterface $violations): string {
     $error = '';
     foreach ($violations as $violation) {
       $error .= (string) $violation->getMessage() . " ";
@@ -313,7 +309,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @return string
    *   A unique user name.
    */
-  protected function generateUniqueUsername() {
+  protected function generateUniqueUsername(): string {
     $random = new Random();
     do {
       $userName = $random->name(8, TRUE);
@@ -341,7 +337,7 @@ class AccountRegistration implements AccountRegistrationInterface {
    * @return \Drupal\Core\Entity\EntityConstraintViolationListInterface
    *   A filtered violation list.
    */
-  protected function removeAcceptableViolations(EntityConstraintViolationListInterface $violations, $incoming_form = NULL) {
+  protected function removeAcceptableViolations(EntityConstraintViolationListInterface $violations, $incoming_form = NULL): EntityConstraintViolationListInterface {
     // 'mail' will not fail validation if current user has 'administer users'.
     $needs_email = isset($incoming_form) && (\strpos($incoming_form, '[email]') !== FALSE);
     if (!$needs_email) {
@@ -361,11 +357,8 @@ class AccountRegistration implements AccountRegistrationInterface {
    *
    * @param string $name
    *   The configuration name.
-   *
-   * @return array|null
-   *   The values for the requested configuration.
    */
-  protected function settings($name) {
+  protected function settings(string $name): mixed {
     return $this->configFactory
       ->get('sms_user.settings')
       ->get('account_registration.' . $name);

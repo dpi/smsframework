@@ -19,17 +19,8 @@ class VerifyPhoneNumberForm extends FormBase {
 
   /**
    * Constructs a VerifyPhoneNumberForm object.
-   *
-   * @param \Drupal\Core\Flood\FloodInterface $flood
-   *   The flood control mechanism.
-   * @param \Drupal\sms\Provider\PhoneNumberVerificationInterface $phoneNumberVerification
-   *   The phone number verification service.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   Time.
    */
-  public function __construct(
+  final public function __construct(
     protected FloodInterface $flood,
     protected PhoneNumberVerificationInterface $phoneNumberVerification,
     MessengerInterface $messenger,
@@ -38,10 +29,7 @@ class VerifyPhoneNumberForm extends FormBase {
     $this->setMessenger($messenger);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
+  final public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('flood'),
       $container->get('sms.phone_number.verification'),
@@ -80,7 +68,7 @@ class VerifyPhoneNumberForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     $flood_window = $this->config('sms.settings')->get('flood.verify_window');
     $flood_limit = $this->config('sms.settings')->get('flood.verify_limit');
 
@@ -89,7 +77,7 @@ class VerifyPhoneNumberForm extends FormBase {
       return;
     }
 
-    $current_time = $this->time->getRequestTime();
+    $current_time = new \DateTimeImmutable('@' . $this->time->getRequestTime());
     $code = $form_state->getValue('code');
     $phone_verification = $this->phoneNumberVerification
       ->getPhoneVerificationByCode($code);
@@ -100,7 +88,7 @@ class VerifyPhoneNumberForm extends FormBase {
         ->getPhoneNumberSettingsForEntity($entity);
       $lifetime = $phone_number_settings->getVerificationCodeLifetime() ?: 0;
 
-      if ($current_time > $phone_verification->getCreatedTime() + $lifetime) {
+      if ($current_time > $phone_verification->getCreatedDate()->modify('+' . $lifetime . ' seconds')) {
         $form_state->setError($form['code'], $this->t('Verification code is expired.'));
       }
     }
@@ -115,7 +103,7 @@ class VerifyPhoneNumberForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $code = $form_state->getValue('code');
     $phone_verification = $this->phoneNumberVerification
       ->getPhoneVerificationByCode($code);

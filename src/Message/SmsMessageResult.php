@@ -50,10 +50,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
    */
   protected ?float $creditsUsed = NULL;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getError() {
+  public function getError(): ?string {
     return $this->error;
   }
 
@@ -65,10 +62,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getErrorMessage() {
+  public function getErrorMessage(): string {
     return $this->errorMessage;
   }
 
@@ -83,7 +77,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
   /**
    * {@inheritdoc}
    */
-  public function getReport($recipient) {
+  public function getReport($recipient): ?SmsDeliveryReportInterface {
     foreach ($this->reports as $report) {
       if ($report->getRecipient() == $recipient) {
         return $report;
@@ -95,7 +89,7 @@ class SmsMessageResult implements SmsMessageResultInterface {
   /**
    * {@inheritdoc}
    */
-  public function getReports() {
+  public function getReports(): array {
     return $this->reports;
   }
 
@@ -115,17 +109,14 @@ class SmsMessageResult implements SmsMessageResultInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getCreditsBalance() {
+  public function getCreditsBalance(): ?float {
     return $this->creditsBalance;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setCreditsBalance($balance) {
+  public function setCreditsBalance(?float $balance) {
     if (\is_numeric($balance) || \is_null($balance)) {
       $this->creditsBalance = $balance;
     }
@@ -135,17 +126,14 @@ class SmsMessageResult implements SmsMessageResultInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getCreditsUsed() {
+  public function getCreditsUsed(): ?float {
     return $this->creditsUsed;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setCreditsUsed($credits_used) {
+  public function setCreditsUsed(?float $credits_used) {
     if (\is_numeric($credits_used) || \is_null($credits_used)) {
       $this->creditsUsed = $credits_used;
     }

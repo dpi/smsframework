@@ -8,7 +8,6 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Exception\SmsStorageException;
 use Drupal\sms\Message\SmsDeliveryReportInterface as PlainDeliveryReportInterface;
 use Drupal\sms\Message\SmsMessageResultInterface as StdMessageResultInterface;
@@ -44,40 +43,29 @@ class SmsMessageResult extends ContentEntityBase implements SmsMessageResultInte
    */
   protected array $reports = [];
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getError() {
-    return $this->get('error')->value;
+  public function getError(): ?string {
+    return $this->get('error')->value ?? NULL;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setError($error) {
-    $this->set('error', $error);
-    return $this;
+    return $this->set('error', $error);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getErrorMessage() {
-    return $this->get('error_message')->value;
+  public function getErrorMessage(): string {
+    return $this->get('error_message')->value ?? '';
   }
 
   /**
    * {@inheritdoc}
    */
   public function setErrorMessage($message) {
-    $this->set('error_message', $message);
-    return $this;
+    return $this->set('error_message', $message);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getReport($recipient) {
+  public function getReport($recipient): ?PlainDeliveryReportInterface {
     foreach ($this->getReports() as $report) {
       if ($report->getRecipient() === $recipient) {
         return $report;
@@ -86,17 +74,12 @@ class SmsMessageResult extends ContentEntityBase implements SmsMessageResultInte
     return NULL;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getReports() {
-    if ($this->reports) {
+  public function getReports(): array {
+    if ($this->reports !== []) {
       return $this->reports;
     }
-    if ($this->getSmsMessage()) {
-      return $this->getSmsMessage()->getReports();
-    }
-    return [];
+
+    return $this->getSmsMessage()?->getReports() ?? [];
   }
 
   /**
@@ -104,6 +87,7 @@ class SmsMessageResult extends ContentEntityBase implements SmsMessageResultInte
    */
   public function setReports(array $reports) {
     $this->reports = $reports;
+
     return $this;
   }
 
@@ -112,54 +96,43 @@ class SmsMessageResult extends ContentEntityBase implements SmsMessageResultInte
    */
   public function addReport(PlainDeliveryReportInterface $report) {
     $this->reports[] = $report;
+
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getCreditsBalance() {
-    return $this->get('credits_balance')->value;
+  public function getCreditsBalance(): ?float {
+    /** @var string|null $value */
+    $value = $this->get('credits_balance')->value;
+    return $value !== NULL ? (float) $value : NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setCreditsBalance($balance) {
-    if (\is_numeric($balance) || \is_null($balance)) {
-      $this->set('credits_balance', $balance);
-    }
-    else {
-      throw new SmsException(\sprintf('Credit balance set is a %s', \gettype($balance)));
-    }
+  public function setCreditsBalance(?float $balance) {
+    $this->set('credits_balance', $balance);
+
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getCreditsUsed() {
-    return $this->get('credits_used')->value;
+  public function getCreditsUsed(): ?float {
+    /** @var string|null $value */
+    $value = $this->get('credits_used')->value;
+    return $value !== NULL ? (float) $value : NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setCreditsUsed($credits_used) {
-    if (\is_numeric($credits_used) || \is_null($credits_used)) {
-      $this->set('credits_used', $credits_used);
-    }
-    else {
-      throw new SmsException(\sprintf('Credit used is a %s', \gettype($credits_used)));
-    }
+  public function setCreditsUsed(?float $credits_used) {
+    $this->set('credits_used', $credits_used);
+
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getSmsMessage() {
-    return $this->get('sms_message')->entity;
+  public function getSmsMessage(): ?SmsMessageInterface {
+    /** @var \Drupal\sms\Entity\SmsMessageInterface|null */
+    return $this->get('sms_message')->entity ?? NULL;
   }
 
   /**
@@ -173,7 +146,7 @@ class SmsMessageResult extends ContentEntityBase implements SmsMessageResultInte
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type): array {
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['error'] = BaseFieldDefinition::create('string')
@@ -211,12 +184,9 @@ class SmsMessageResult extends ContentEntityBase implements SmsMessageResultInte
     return $fields;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function preSave(EntityStorageInterface $storage) {
+  public function preSave(EntityStorageInterface $storage): void {
     // SMS message result cannot be saved without a parent SMS message.
-    if (!$this->getSmsMessage()) {
+    if (NULL === $this->getSmsMessage()) {
       throw new SmsStorageException('No parent SMS message specified for SMS message result');
     }
     parent::preSave($storage);

@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Url;
+use Drupal\field\FieldConfigInterface;
 use Drupal\sms\Plugin\Field\FieldWidget\SmsTelephoneWidget;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -29,17 +30,8 @@ class PhoneNumberSettingsForm extends EntityForm {
 
   /**
    * Constructs a new PhoneNumberSettingsForm object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
-   *   The entity type bundle info.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
-   *   The entity field manager.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
    */
-  public function __construct(
+  final public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
     protected EntityFieldManagerInterface $entityFieldManager,
@@ -49,10 +41,7 @@ class PhoneNumberSettingsForm extends EntityForm {
     $this->setMessenger($messenger);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
+  final public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
@@ -88,7 +77,7 @@ class PhoneNumberSettingsForm extends EntityForm {
 
     $bundle_default_value = !$config->isNew() ? $config->getPhoneNumberEntityTypeId() . '|' . $config->getPhoneNumberBundle() : NULL;
 
-    // Field cannot be called 'bundle' or odd behaviour will happen on re-saves.
+    // Field cannot be called 'bundle' or odd behavior will happen on re-saves.
     $form['entity_bundle'] = [
       '#type' => 'select',
       '#title' => $this->t('Bundle'),
@@ -214,7 +203,7 @@ class PhoneNumberSettingsForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function save(array $form, FormStateInterface $form_state) {
+  public function save(array $form, FormStateInterface $form_state): int {
     $config = &$this->entity;
 
     [$entity_type_id, $bundle] = \explode('|', $form_state->getValue('entity_bundle'));
@@ -224,7 +213,7 @@ class PhoneNumberSettingsForm extends EntityForm {
 
     $config
       ->setVerificationMessage($form_state->getValue('verification_message'))
-      ->setVerificationCodeLifetime($form_state->getValue('code_lifetime'))
+      ->setVerificationCodeLifetime((int) $form_state->getValue('code_lifetime'))
       ->setPurgeVerificationPhoneNumber((bool) $form_state->getValue('phone_number_purge'));
 
     foreach ($form_state->getValue('field_mapping') as $config_key => $field_name) {
@@ -266,6 +255,8 @@ class PhoneNumberSettingsForm extends EntityForm {
     }
 
     $form_state->setRedirectUrl(Url::fromRoute('sms.phone_number_settings.list'));
+
+    return $saved;
   }
 
   /**
@@ -281,7 +272,7 @@ class PhoneNumberSettingsForm extends EntityForm {
    * @return \Drupal\field\FieldConfigInterface
    *   A field config entity.
    */
-  public static function createNewField($entity_type_id, $bundle, $config_key) {
+  public static function createNewField($entity_type_id, $bundle, $config_key): FieldConfigInterface {
     $entity_type_manager = \Drupal::entityTypeManager();
 
     // Definitions for field_storage_config.

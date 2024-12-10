@@ -11,75 +11,54 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
 
   /**
    * The unique identifier for the message assigned by the gateway.
-   *
-   * @var string
    */
   protected string $messageId = '';
 
   /**
    * The recipient of the message.
-   *
-   * @var string
    */
   protected string $recipient = '';
 
   /**
    * Status code for the message.
    *
-   * A status code from \Drupal\sms\Message\SmsMessageStatus, or NULL if
-   * unknown.
-   *
-   * @var string|null
+   * @phpstan-var \Drupal\sms\Message\SmsMessageReportStatus::*|null
    */
   protected ?string $status = NULL;
 
   /**
    * The status message as provided by the gateway API.
-   *
-   * @var string
    */
   protected string $statusMessage = '';
 
   /**
    * The timestamp when the delivery report status was updated.
-   *
-   * @var int
    */
   protected ?int $statusTime = NULL;
 
   /**
    * The timestamp when the message was queued, or NULL if unknown.
-   *
-   * @var int|null
    */
   protected ?int $timeQueued = NULL;
 
   /**
    * The timestamp when the message was delivered, or NULL if unknown.
-   *
-   * @var int|null
    */
   protected ?int $timeDelivered = NULL;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getMessageId() {
+  public function getMessageId(): ?string {
     return $this->messageId;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setMessageId($message_id) {
+  public function setMessageId(?string $message_id) {
     $this->messageId = $message_id;
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getRecipient() {
+  public function getRecipient(): string {
     return $this->recipient;
   }
 
@@ -91,10 +70,7 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getStatus() {
+  public function getStatus(): ?string {
     return $this->status;
   }
 
@@ -106,62 +82,50 @@ class SmsDeliveryReport implements SmsDeliveryReportInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getStatusMessage() {
+  public function getStatusMessage(): string {
     return $this->statusMessage;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setStatusMessage($message) {
+  public function setStatusMessage(string $message) {
     $this->statusMessage = $message;
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getTimeQueued() {
+  public function getTimeQueued(): ?int {
     return $this->timeQueued;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setTimeQueued($time) {
+  public function setTimeQueued(?int $time) {
     $this->timeQueued = $time;
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getTimeDelivered() {
+  public function getTimeDelivered(): ?int {
     return $this->timeDelivered;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setTimeDelivered($time) {
+  public function setTimeDelivered(?int $time) {
     $this->timeDelivered = $time;
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getStatusTime() {
+  public function getStatusTime(): ?int {
     return $this->statusTime;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setStatusTime($time) {
+  public function setStatusTime(?int $time) {
     $this->statusTime = $time;
     return $this;
   }

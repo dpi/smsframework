@@ -21,19 +21,8 @@ class SmsSettingsForm extends ConfigFormBase {
 
   /**
    * Constructs a new SmsSettingsForm.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $routeBuilder
-   *   The route builder.
-   * @param \Drupal\Core\Routing\RequestContext $requestContext
-   *   The request context.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
    */
-  public function __construct(
+  final public function __construct(
     ConfigFactoryInterface $configFactory,
     TypedConfigManagerInterface $typedConfigManager,
     protected RouteBuilderInterface $routeBuilder,
@@ -44,10 +33,7 @@ class SmsSettingsForm extends ConfigFormBase {
     $this->setMessenger($messenger);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
+  final public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('config.factory'),
       $container->get('config.typed'),
@@ -103,7 +89,7 @@ class SmsSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     $verify = $form_state->getValue(['pages', 'verify']);
     if (\substr($verify, 0, 1) !== '/') {
       $form_state->setError($form['pages']['verify'], $this->t("Path must begin with a '/' character."));
@@ -113,7 +99,7 @@ class SmsSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $sms_settings = $this->config('sms.settings');
     $path_verify = $form_state->getValue(['pages', 'verify']);
 

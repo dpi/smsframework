@@ -15,9 +15,9 @@ use Drupal\sms\Exception\SmsDirectionException;
 use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Plugin\SmsGateway\SmsIncomingEventProcessorInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * The SMS provider that provides default messaging functionality.
@@ -26,25 +26,23 @@ class DefaultSmsProvider implements SmsProviderInterface {
 
   /**
    * Creates a new instance of the default SMS provider.
-   *
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
-   *   The event dispatcher.
    */
-  public function __construct(
-    protected EventDispatcherInterface $eventDispatcher,
+  final public function __construct(
+    private readonly EventDispatcherInterface $eventDispatcher,
   ) {
   }
 
   /**
    * {@inheritdoc}
    */
-  public function queue(SmsMessageInterface $sms_message) {
-    if (!$sms_message->getDirection()) {
+  public function queue(SmsMessageInterface $sms_message): array {
+    if ($sms_message->getDirection() === NULL) {
       throw new SmsDirectionException('Missing direction for message.');
     }
 
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_PRE_PROCESS, [$sms_message])->getMessages();
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_QUEUE_PRE_PROCESS, $sms_messages)->getMessages();
+    unset($sms_message);
 
     foreach ($sms_messages as $gateway_id => &$sms_message) {
       // Tag so SmsEvents::MESSAGE_PRE_PROCESS is not dispatched again.
@@ -60,12 +58,12 @@ class DefaultSmsProvider implements SmsProviderInterface {
           }
         }
 
-        if ($errors) {
+        if ($errors !== []) {
           throw new SmsException(\sprintf('Can not queue SMS message because there are %s validation error(s): %s', \count($errors), \implode(' ', $errors)));
         }
       }
 
-      if ($sms_message->getGateway()->getSkipQueue()) {
+      if ($sms_message->getGateway()?->getSkipQueue() === TRUE) {
         switch ($sms_message->getDirection()) {
           case Direction::INCOMING:
             $this->incoming($sms_message);
@@ -89,23 +87,19 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function send(SmsMessageInterface $sms) {
+  public function send(SmsMessageInterface $sms): array {
     $sms->setDirection(Direction::OUTGOING);
 
-    $dispatch = !$sms->getOption('_skip_preprocess_event');
+    $dispatch = $sms->getOption('_skip_preprocess_event') === NULL;
     $sms_messages = $dispatch ? $this->dispatchEvent(SmsEvents::MESSAGE_PRE_PROCESS, [$sms])->getMessages() : [$sms];
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_OUTGOING_PRE_PROCESS, $sms_messages)->getMessages();
 
     // Iterate over messages individually since pre-process can modify the
     // gateway used.
     foreach ($sms_messages as $sms_message) {
-      $plugin = $sms_message->getGateway()->getPlugin();
+      $plugin = $sms_message->getGateway()?->getPlugin() ?? throw new \LogicException('Unable to get gateway plugin');
 
       $result = $plugin->send($sms_message);
-      if ($result === NULL) {
-        // @codingStandardsIgnoreLine
-        @trigger_error('Gateway plugins returning NULL is deprecated in smsframework:2.1.0 and will be removed in smsframework:3.0.0. The contract for \Drupal\sms\Plugin\SmsGatewayPluginInterface::send does not permit returning NULL. See https://www.drupal.org/node/3262679', E_USER_DEPRECATED);
-      }
 
       $sms_message->setResult($result);
 
@@ -119,14 +113,14 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function incoming(SmsMessageInterface $sms_message) {
+  public function incoming(SmsMessageInterface $sms_message): array {
     $sms_message->setDirection(Direction::INCOMING);
 
     // Do not iterate over messages individually like outgoing, changing gateway
     // in pre-process events do not apply to incoming.
-    $plugin = $sms_message->getGateway()->getPlugin();
+    $plugin = $sms_message->getGateway()?->getPlugin() ?? throw new \LogicException('Missing gateway plugin.');
 
-    $dispatch = !$sms_message->getOption('_skip_preprocess_event');
+    $dispatch = NULL === $sms_message->getOption('_skip_preprocess_event');
     $sms_messages = $dispatch ? $this->dispatchEvent(SmsEvents::MESSAGE_PRE_PROCESS, [$sms_message])->getMessages() : [$sms_message];
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_INCOMING_PRE_PROCESS, $sms_messages)->getMessages();
 
@@ -141,12 +135,9 @@ class DefaultSmsProvider implements SmsProviderInterface {
     return $sms_messages;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function processDeliveryReport(Request $request, SmsGatewayInterface $sms_gateway) {
+  public function processDeliveryReport(Request $request, SmsGatewayInterface $gateway): Response {
     $response = new Response();
-    $reports = $sms_gateway->getPlugin()
+    $reports = $gateway->getPlugin()
       ->parseDeliveryReports($request, $response);
 
     $event = new SmsDeliveryReportEvent();
@@ -162,7 +153,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
   /**
    * Dispatch an SmsMessageEvent event for messages.
    *
-   * @param string $event_name
+   * @param \Drupal\sms\Event\SmsEvents::MESSAGE_* $event_name
    *   The event to trigger.
    * @param \Drupal\sms\Message\SmsMessageInterface[] $sms_messages
    *   The messages to dispatch.
@@ -170,7 +161,7 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * @return \Drupal\sms\Event\SmsMessageEvent
    *   The dispatched event.
    */
-  protected function dispatchEvent($event_name, array $sms_messages) {
+  private function dispatchEvent(string $event_name, array $sms_messages): SmsMessageEvent {
     $event = new SmsMessageEvent($sms_messages);
     return $this->eventDispatcher
       ->dispatch($event, $event_name);

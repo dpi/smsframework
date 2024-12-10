@@ -19,13 +19,10 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * @return \Drupal\Core\Entity\EntityInterface|null
    *   The entity who sent the SMS message, or NULL if it is missing.
    */
-  public function getSenderEntity();
+  public function getSenderEntity(): ?EntityInterface;
 
   /**
    * Set the entity who sent the SMS message.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity who sent the SMS message.
    *
    * @return $this
    *   Return SMS message for chaining.
@@ -38,13 +35,10 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * @return \Drupal\Core\Entity\EntityInterface|null
    *   The entity who will receive the SMS message, or NULL if it is missing.
    */
-  public function getRecipientEntity();
+  public function getRecipientEntity(): ?EntityInterface;
 
   /**
    * Set the entity who will receive the SMS message.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity who will receive the SMS message.
    *
    * @return $this
    *   Return SMS message for chaining.
@@ -53,49 +47,34 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
 
   /**
    * Get whether the SMS message is in the queue to be processed.
-   *
-   * @return bool
-   *   Whether the SMS message is in the queue to be processed.
    */
-  public function isQueued();
+  public function isQueued(): bool;
 
   /**
    * Get whether the SMS message is in the queue to be processed.
    *
-   * @param bool $is_queued
-   *   Whether the SMS message is in the queue to be processed.
-   *
    * @return $this
    *   Return SMS message for chaining.
    */
-  public function setQueued($is_queued);
+  public function setQueued(bool $is_queued);
 
   /**
    * Get the creation timestamp of the SMS message.
-   *
-   * @return int
-   *   Creation timestamp of the SMS message.
    */
-  public function getCreatedTime();
+  public function getCreatedTime(): int;
 
   /**
    * Get the time to send the SMS message.
-   *
-   * @return int
-   *   The timestamp after which the SMS message should be sent.
    */
-  public function getSendTime();
+  public function getSendTime(): int;
 
   /**
    * Set the time to send the SMS message.
    *
-   * @param int $send_time
-   *   The timestamp after which the SMS message should be sent.
-   *
    * @return $this
    *   Return SMS message for chaining.
    */
-  public function setSendTime($send_time);
+  public function setSendTime(int $send_time);
 
   /**
    * The time the SMS message was processed.
@@ -106,7 +85,7 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * @return int|null
    *   The timestamp when SMS message was processed, or NULL if not processed.
    */
-  public function getProcessedTime();
+  public function getProcessedTime(): ?int;
 
   /**
    * Set the time the SMS message was processed.
@@ -117,6 +96,6 @@ interface SmsMessageInterface extends ContentEntityInterface, PlainSmsMessageInt
    * @return $this
    *   Return SMS message for chaining.
    */
-  public function setProcessedTime($processed);
+  public function setProcessedTime(int $processed);
 
 }

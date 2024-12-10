@@ -31,7 +31,7 @@ sms_user.settings:
           mapping:
             status:
               type: boolean
-              label: 'Enable account creation based on unrecognised phone numbers.'
+              label: 'Enable account creation based on unrecognized phone numbers.'
             reply:
               type: mapping
               mapping:

@@ -14,7 +14,7 @@ use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\sms\Provider\SmsQueueProcessorInterface;
 
 /**
- * Tests behaviour of SMS Framework message queue.
+ * Tests behavior of SMS Framework message queue.
  *
  * @group SMS Framework
  */

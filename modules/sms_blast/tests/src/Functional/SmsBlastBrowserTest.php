@@ -83,10 +83,11 @@ final class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
     // verification messages.
     $this->resetTestMessages();
 
+    $edit = [];
     $edit['message'] = $this->randomString();
 
     $this->drupalGet(Url::fromRoute('sms_blast.blast'));
-    $this->submitForm($edit, \t('Send'));
+    $this->submitForm($edit, 'Send');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('Message sent to 3 users.');
 

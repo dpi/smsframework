@@ -240,7 +240,7 @@ final class SmsFrameworkPhoneNumberVerificationTest extends SmsFrameworkKernelBa
   public function testGetPhoneVerificationByEntityInvalidPhone(): void {
     $entity = $this->createEntityWithPhoneNumber($this->phoneNumberSettings, ['+123123123']);
     $return = $this->phoneNumberVerificationProvider->getPhoneVerificationByEntity($entity, '+456456456');
-    static::assertFalse($return);
+    static::assertNull($return);
   }
 
   /**

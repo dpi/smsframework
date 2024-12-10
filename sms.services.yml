@@ -1,41 +1,50 @@
 services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+
+  # SMS Services.
+  sms.provider:
+    alias: sms.provider.default
+  Drupal\sms\Provider\SmsProviderInterface: '@sms.provider'
+  sms.provider.default:
+    class: Drupal\sms\Provider\DefaultSmsProvider
+    arguments: ['@event_dispatcher']
+
+  sms.phone_number:
+    class: Drupal\sms\Provider\PhoneNumberProvider
+  Drupal\sms\Provider\PhoneNumberProviderInterface: '@sms.phone_number'
+
+  sms.phone_number.verification:
+    class: Drupal\sms\Provider\PhoneNumberVerification
+  Drupal\sms\Provider\PhoneNumberVerificationInterface: '@sms.phone_number.verification'
+
+  sms.queue:
+    class: Drupal\sms\Provider\SmsQueueProcessor
+  Drupal\sms\Provider\SmsQueueProcessorInterface: '@sms.queue'
+
+  # Event Subscribers:
+  Drupal\sms\EventSubscriber\SmsMessageProcessor: ~
+  Drupal\sms\EventSubscriber\SmsEntityPhoneNumberProcessor: ~
+  Drupal\sms\EventSubscriber\SmsDeliveryReportsProcessor: ~
+
+  # Routing
   sms.route_enhancer:
     class: Drupal\sms\Routing\Enhancer\SmsRouteEnhancer
     tags:
       - { name: route_enhancer }
-  sms.provider:
-    alias: sms.provider.default
-  sms.provider.default:
-    class: Drupal\sms\Provider\DefaultSmsProvider
-    arguments: ['@event_dispatcher']
-  plugin.manager.sms_gateway:
-    class: Drupal\sms\Plugin\SmsGatewayPluginManager
-    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
-  sms.phone_number:
-    class: Drupal\sms\Provider\PhoneNumberProvider
-    arguments: ['@event_dispatcher', '@sms.provider']
-  sms.phone_number.verification:
-    class: Drupal\sms\Provider\PhoneNumberVerification
-    arguments: ['@entity_type.manager', '@config.factory', '@token', '@sms.provider', '@datetime.time']
-  sms.queue:
-    class: Drupal\sms\Provider\SmsQueueProcessor
-    arguments: ['@entity_type.manager', '@queue', '@sms.provider', '@datetime.time']
-  sms.sms_message_processor:
-    class: Drupal\sms\EventSubscriber\SmsMessageProcessor
-    arguments: ['@event_dispatcher', '@config.factory']
-    tags:
-      - { name: event_subscriber }
-  sms.entity_phone_number:
-    class: Drupal\sms\EventSubscriber\SmsEntityPhoneNumberProcessor
-    arguments: ['@sms.phone_number.verification']
-    tags:
-      - { name: event_subscriber }
-  sms.delivery_reports_processor:
-    class: Drupal\sms\EventSubscriber\SmsDeliveryReportsProcessor
-    arguments: ['@entity_type.manager']
-    tags:
-      - { name: event_subscriber }
+
   access_check.sms.gateway_supports_pushed_reports:
     class: Drupal\sms\Access\SupportsPushedReportsAccessCheck
     tags:
       - { name: access_check, applies_to: _sms_gateway_supports_pushed_reports }
+
+  Drupal\sms\Routing\RouteSubscriber: ~
+
+  # Plugins.
+  plugin.manager.sms_gateway:
+    class: Drupal\sms\Plugin\SmsGatewayPluginManager
+    arguments:
+      $namespaces: '@container.namespaces'
+      $cacheBackend: '@cache.discovery'
+  Drupal\sms\Plugin\SmsGatewayPluginManagerInterface: '@plugin.manager.sms_gateway'

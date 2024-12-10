@@ -11,14 +11,12 @@ interface SmsQueueProcessorInterface {
 
   /**
    * Check for messages not in the Drupal queue and add them.
-   *
-   * @todo rename?
    */
-  public function processUnqueued();
+  public function processUnqueued(): void;
 
   /**
    * Delete messages which have been processed and are expired.
    */
-  public function garbageCollection();
+  public function garbageCollection(): void;
 
 }

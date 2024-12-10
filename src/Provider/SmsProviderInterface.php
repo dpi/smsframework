@@ -7,6 +7,7 @@ namespace Drupal\sms\Provider;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Message\SmsMessageInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Provides an interface for sending messages.
@@ -27,7 +28,7 @@ interface SmsProviderInterface {
    * @throws \Drupal\sms\Exception\RecipientRouteException
    *   Thrown if no gateway could be determined for the message.
    */
-  public function queue(SmsMessageInterface $sms_message);
+  public function queue(SmsMessageInterface $sms_message): array;
 
   /**
    * Sends an SMS using the active gateway.
@@ -40,12 +41,12 @@ interface SmsProviderInterface {
    * @return \Drupal\sms\Message\SmsMessageInterface[]
    *   The messages sent in this sending operation. The message sent can be
    *   transformed into multiple messages depending on gateway and event
-   *   subscribers. Therefore this function can return multiple messages.
+   *   subscribers. Therefore, this function can return multiple messages.
    *
    * @throws \Drupal\sms\Exception\RecipientRouteException
    *   Thrown if no gateway could be determined for the message.
    */
-  public function send(SmsMessageInterface $sms);
+  public function send(SmsMessageInterface $sms): array;
 
   /**
    * Handles a message sent from the gateway to the site.
@@ -56,7 +57,7 @@ interface SmsProviderInterface {
    * @return \Drupal\sms\Message\SmsMessageInterface[]
    *   The messages received in an incoming operation.
    */
-  public function incoming(SmsMessageInterface $sms_message);
+  public function incoming(SmsMessageInterface $sms_message): array;
 
   /**
    * Handles delivery reports pushed to the site.
@@ -66,6 +67,6 @@ interface SmsProviderInterface {
    * @param \Drupal\sms\Entity\SmsGatewayInterface $gateway
    *   The gateway designated to process the delivery report.
    */
-  public function processDeliveryReport(Request $request, SmsGatewayInterface $gateway);
+  public function processDeliveryReport(Request $request, SmsGatewayInterface $gateway): Response;
 
 }

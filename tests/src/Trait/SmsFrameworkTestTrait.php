@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\sms\Functional;
+namespace Drupal\Tests\sms\Trait;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
+use Drupal\sms\Entity\PhoneNumberVerificationInterface;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Message\SmsDeliveryReport;
+use Drupal\sms\Message\SmsDeliveryReportInterface;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
@@ -25,9 +27,10 @@ trait SmsFrameworkTestTrait {
    * @param \Drupal\sms\Entity\SmsGatewayInterface|null $sms_gateway
    *   The new site fallback SMS Gateway, or NULL to unset.
    */
-  protected function setFallbackGateway(?SmsGatewayInterface $sms_gateway = NULL) {
+  protected function setFallbackGateway(?SmsGatewayInterface $sms_gateway = NULL): void {
     $sms_gateway = $sms_gateway?->id();
-    $this->config('sms.settings')
+    \Drupal::configFactory()
+      ->getEditable('sms.settings')
       ->set('fallback_gateway', $sms_gateway)
       ->save();
   }
@@ -78,7 +81,7 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Message\SmsMessageInterface|false
    *   The last SMS message, or FALSE if no messages have been sent.
    */
-  public function getLastTestMessage(SmsGatewayInterface $sms_gateway) {
+  public function getLastTestMessage(SmsGatewayInterface $sms_gateway): SmsMessageInterface|false {
     $gateway_id = $sms_gateway->id();
     $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
     return isset($sms_messages[$gateway_id]) ? \end($sms_messages[$gateway_id]) : FALSE;
@@ -90,7 +93,7 @@ trait SmsFrameworkTestTrait {
    * @param \Drupal\sms\Entity\SmsGatewayInterface|null $sms_gateway
    *   A gateway plugin, or NULL to reset all messages.
    */
-  public function resetTestMessages(?SmsGatewayInterface $sms_gateway = NULL) {
+  public function resetTestMessages(?SmsGatewayInterface $sms_gateway = NULL): void {
     $sms_messages = \Drupal::state()->get('sms_test_gateway.memory.send', []);
     if ($sms_gateway) {
       $sms_messages[$sms_gateway->id()] = [];
@@ -125,7 +128,7 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Message\SmsMessageInterface|false
    *   The last message, or FALSE if no messages were received.
    */
-  protected function getLastIncomingMessage(SmsGatewayInterface $sms_gateway) {
+  protected function getLastIncomingMessage(SmsGatewayInterface $sms_gateway): SmsMessageInterface|false {
     $gateway_id = $sms_gateway->id();
     $sms_messages = \Drupal::state()->get(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING, []);
     return isset($sms_messages[$gateway_id]) ? \end($sms_messages[$gateway_id]) : FALSE;
@@ -137,7 +140,7 @@ trait SmsFrameworkTestTrait {
    * @param \Drupal\sms\Entity\SmsGatewayInterface|null $sms_gateway
    *   A gateway plugin, or NULL to reset all messages.
    */
-  protected function resetIncomingMessages(?SmsGatewayInterface $sms_gateway = NULL) {
+  protected function resetIncomingMessages(?SmsGatewayInterface $sms_gateway = NULL): void {
     $sms_messages = \Drupal::state()->get(SmsTestGatewayEventSubscriber::STATE_MEMORY_INCOMING, []);
     if ($sms_gateway) {
       $sms_messages[$sms_gateway->id()] = [];
@@ -172,7 +175,7 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface|false
    *   The last SMS message, or FALSE if no messages have been sent.
    */
-  protected function getLastTestMessageReport(SmsGatewayInterface $sms_gateway) {
+  protected function getLastTestMessageReport(SmsGatewayInterface $sms_gateway): SmsDeliveryReportInterface|false {
     $gateway_id = $sms_gateway->id();
     $sms_reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
     return isset($sms_reports[$gateway_id]) ? \end($sms_reports[$gateway_id]) : FALSE;
@@ -189,7 +192,7 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Message\SmsDeliveryReportInterface
    *   The last SMS message, or FALSE if no messages have been sent.
    */
-  protected function getTestMessageReport($message_id, SmsGatewayInterface $sms_gateway) {
+  protected function getTestMessageReport($message_id, SmsGatewayInterface $sms_gateway): SmsDeliveryReportInterface {
     $gateway_id = $sms_gateway->id();
     $reports = \Drupal::state()->get('sms_test_gateway.memory.report', []);
     return $reports[$gateway_id][$message_id];
@@ -238,7 +241,7 @@ trait SmsFrameworkTestTrait {
    * @param string $phone_number
    *   A phone number.
    */
-  protected function verifyPhoneNumber(EntityInterface $entity, $phone_number) {
+  protected function verifyPhoneNumber(EntityInterface $entity, $phone_number): void {
     $verifications = \Drupal::entityTypeManager()
       ->getStorage('sms_phone_number_verification')
       ->loadByProperties([
@@ -257,7 +260,7 @@ trait SmsFrameworkTestTrait {
    * @return \Drupal\sms\Entity\PhoneNumberVerificationInterface|false
    *   The last verification created, or FALSE if no verifications exist.
    */
-  protected function getLastVerification() {
+  protected function getLastVerification(): PhoneNumberVerificationInterface|false {
     $verification_storage = \Drupal::entityTypeManager()
       ->getStorage('sms_phone_number_verification');
 

@@ -6,13 +6,11 @@ namespace Drupal\sms_sendtophone\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Link;
 use Drupal\Core\Messenger\MessengerInterface;
-use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsMessage;
-use Drupal\sms\Exception\PhoneNumberSettingsException;
+use Drupal\sms\Provider\PhoneNumberProviderInterface;
 use Drupal\sms\Provider\SmsProviderInterface;
 use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -30,34 +28,20 @@ class SendToPhoneForm extends FormBase {
   protected $phoneNumbers = [];
 
   /**
-   * The SMS Provider.
-   *
-   * @var \Drupal\sms\Provider\SmsProviderInterface
-   */
-  protected $smsProvider;
-
-  /**
    * Creates an new SendForm object.
-   *
-   * @param \Drupal\sms\Provider\SmsProviderInterface $sms_provider
-   *   The SMS service provider.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
    */
-  public function __construct(
-    SmsProviderInterface $sms_provider,
+  final public function __construct(
+    private readonly SmsProviderInterface $smsProvider,
+    private readonly PhoneNumberProviderInterface $phoneNumberProvider,
     MessengerInterface $messenger,
   ) {
-    $this->smsProvider = $sms_provider;
     $this->setMessenger($messenger);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
+  final public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('sms.provider'),
+      $container->get('sms.phone_number'),
       $container->get('messenger'),
     );
   }
@@ -65,42 +49,24 @@ class SendToPhoneForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $type = NULL, $extra = NULL) {
-    /** @var \Drupal\sms\Provider\PhoneNumberProviderInterface $phone_number_provider */
-    $phone_number_provider = \Drupal::service('sms.phone_number');
+  public function buildForm(array $form, FormStateInterface $form_state, $type = NULL, $extra = NULL): array {
     /** @var \Drupal\user\UserInterface $user */
     $user = User::load($this->currentUser()->id());
 
     // @todo This block should be a route access checker.
-    try {
-      $this->phoneNumbers = $phone_number_provider->getPhoneNumbers($user);
-    }
-    catch (PhoneNumberSettingsException $e) {
-    }
+    $this->phoneNumbers = $this->phoneNumberProvider->getPhoneNumbers($user);
 
-    if ($user->hasPermission('send to any number') || \count($this->phoneNumbers)) {
-      $form = $this->getForm($form, $form_state, $type, $extra);
+    if ($user->hasPermission('send to any number') || \count($this->phoneNumbers) > 0) {
+      $form = $this->getForm($form, $type, $extra);
     }
     else {
-      if (!\count($this->phoneNumbers)) {
-        // User has no phone number, or unconfirmed.
-        $form['message'] = [
-          '#type' => 'markup',
-          '#markup' => $this->t('You need to @setup and confirm your mobile phone to send messages.', [
-            '@setup' => $user->toLink('set up', 'edit-form')->toString(),
-          ]),
-        ];
-      }
-      else {
-        $destination = ['query' => \Drupal::service('redirect.destination')->getAsArray()];
-        $form['message'] = [
-          '#markup' => $this->t('You do not have permission to send messages. You may need to @signin or @register for an account to send messages to a mobile phone.',
-            [
-              '@signin' => Link::fromTextAndUrl($this->t('sign in'), Url::fromRoute('user.page', [], $destination)),
-              '@register' => Link::fromTextAndUrl($this->t('register'), Url::fromRoute('user.register', [], $destination)),
-            ]),
-        ];
-      }
+      // User has no phone number, or unconfirmed.
+      $form['message'] = [
+        '#type' => 'markup',
+        '#markup' => $this->t('You need to @setup and confirm your mobile phone to send messages.', [
+          '@setup' => $user->toLink('set up', 'edit-form')->toString(),
+        ]),
+      ];
     }
 
     return $form;
@@ -118,7 +84,7 @@ class SendToPhoneForm extends FormBase {
    *
    * @phpstan-return array<string, mixed>
    */
-  protected function getForm(array $form, FormStateInterface $form_state, $type = NULL, $extra = NULL): array {
+  protected function getForm(array $form, $type = NULL, $extra = NULL): array {
     switch ($type) {
       case 'cck':
       case 'field':
@@ -159,7 +125,7 @@ class SendToPhoneForm extends FormBase {
       '#title' => $this->t('Phone number'),
     ];
 
-    if (\count($this->phoneNumbers)) {
+    if (\count($this->phoneNumbers) > 0) {
       $form['number']['#default_value'] = \reset($this->phoneNumbers);
     }
 
@@ -177,9 +143,11 @@ class SendToPhoneForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    $user = User::load($this->currentUser()->id());
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
+    $user = User::load($this->currentUser()->id()) ?? throw new \LogicException('Always expect a user');
+    /** @var string $number */
     $number = $form_state->getValue('number');
+    /** @var string $message */
     $message = $form_state->getValue('message');
 
     $sms_message = SmsMessage::create()

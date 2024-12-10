@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\sms\Functional;
+namespace Drupal\Tests\sms\Trait;
 
-use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Message\SmsDeliveryReportInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
@@ -129,20 +128,6 @@ trait SmsFrameworkMessageResultTestTrait {
   }
 
   /**
-   * Tests credits balance set is wrong type.
-   *
-   * @covers ::setCreditsBalance
-   */
-  public function testCreditsBalanceIncorrectType(): void {
-    $balance = 'foobar';
-    $result = $this->createMessageResult();
-
-    $this->expectException(SmsException::class);
-    $this->expectExceptionMessage('Credit balance set is a string');
-    $result->setCreditsBalance($balance);
-  }
-
-  /**
    * Tests credits used.
    *
    * @covers ::getCreditsUsed
@@ -156,20 +141,6 @@ trait SmsFrameworkMessageResultTestTrait {
     $return = $result->setCreditsUsed($used);
     static::assertTrue($return instanceof SmsMessageResultInterface);
     static::assertEquals($used, $result->getCreditsUsed());
-  }
-
-  /**
-   * Tests credits used set is wrong type.
-   *
-   * @covers ::setCreditsUsed
-   */
-  public function testCreditsUsedIncorrectType(): void {
-    $used = 'foobar';
-    $result = $this->createMessageResult();
-
-    $this->expectException(SmsException::class);
-    $this->expectExceptionMessage('Credit used is a string');
-    $result->setCreditsUsed($used);
   }
 
   /**

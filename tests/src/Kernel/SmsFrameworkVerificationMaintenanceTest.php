@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\sms\Kernel;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -20,16 +21,24 @@ use Drupal\sms\Entity\PhoneNumberVerificationInterface;
 final class SmsFrameworkVerificationMaintenanceTest extends SmsFrameworkKernelBase {
 
   protected static $modules = [
-    'sms', 'sms_test_gateway', 'entity_test', 'user', 'field', 'telephone',
+    'sms',
+    'sms_test_gateway',
+    'entity_test',
+    'user',
+    'field',
+    'telephone',
     'dynamic_entity_reference',
   ];
 
   /**
    * Phone number settings for entity_test entity type.
-   *
-   * @var \Drupal\sms\Entity\PhoneNumberSettingsInterface
    */
   private PhoneNumberSettingsInterface $phoneNumberSettings;
+
+  /**
+   * Entity for testing.
+   */
+  private EntityInterface $testEntity;
 
   /**
    * A telephone field for testing.

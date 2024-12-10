@@ -10,7 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * Event fired to determine valid gateways for a recipient.
  */
-class RecipientGatewayEvent extends Event {
+final class RecipientGatewayEvent extends Event {
 
   /**
    * The recipient phone number.
@@ -22,7 +22,7 @@ class RecipientGatewayEvent extends Event {
   /**
    * An array of gateway doubles.
    *
-   * @var array
+   * @var array<array{0: \Drupal\sms\Entity\SmsGatewayInterface, 1: int}>
    *   The array of gateway/priority doubles where:
    *     - Key 0: SmsGatewayInterface $gateway
    *     - Key 1: int $priority
@@ -35,7 +35,7 @@ class RecipientGatewayEvent extends Event {
    * @param string $recipient
    *   The recipient phone number.
    */
-  public function __construct($recipient) {
+  public function __construct(string $recipient) {
     $this->setRecipient($recipient);
   }
 
@@ -45,7 +45,7 @@ class RecipientGatewayEvent extends Event {
    * @return string
    *   The phone number for this event.
    */
-  public function getRecipient() {
+  public function getRecipient(): string {
     return $this->recipient;
   }
 
@@ -58,7 +58,7 @@ class RecipientGatewayEvent extends Event {
    * @return $this
    *   Return this event for chaining.
    */
-  public function setRecipient($recipient) {
+  public function setRecipient(string $recipient) {
     $this->recipient = $recipient;
     return $this;
   }
@@ -66,10 +66,10 @@ class RecipientGatewayEvent extends Event {
   /**
    * Get the gateways for this event.
    *
-   * @return array
+   * @return array<array{0: \Drupal\sms\Entity\SmsGatewayInterface, 1: int}>
    *   An array of doubles gateway/priority doubles.
    */
-  public function getGateways() {
+  public function getGateways(): array {
     return $this->gateways;
   }
 
@@ -79,7 +79,7 @@ class RecipientGatewayEvent extends Event {
    * @return \Drupal\sms\Entity\SmsGatewayInterface[]
    *   An array of gateways ordered by priority from highest to lowest.
    */
-  public function getGatewaysSorted() {
+  public function getGatewaysSorted(): array {
     $sorted = $this->gateways;
     \uasort($sorted, static function ($a, $b) {
       [, $priority_a] = $a;
@@ -110,7 +110,7 @@ class RecipientGatewayEvent extends Event {
    * @return $this
    *   Return this event for chaining.
    */
-  public function addGateway(SmsGatewayInterface $gateway, $priority = 0) {
+  public function addGateway(SmsGatewayInterface $gateway, int $priority = 0) {
     $this->gateways[] = [$gateway, $priority];
     return $this;
   }
@@ -127,7 +127,7 @@ class RecipientGatewayEvent extends Event {
    * @return $this
    *   Return this event for chaining.
    */
-  public function removeGateway($gateway_id, $priority = NULL) {
+  public function removeGateway(string $gateway_id, ?int $priority = NULL) {
     foreach ($this->gateways as $k => [$gateway, $gateway_priority]) {
       if ($gateway_id == $gateway->id()) {
         if (!isset($priority) || ($priority == $gateway_priority)) {

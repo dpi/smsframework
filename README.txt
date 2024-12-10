@@ -12,7 +12,7 @@ SMS Actions
 
 Status: Not upgraded for Drupal 8. See https://www.drupal.org/node/2641888
 
-Provides an action for sending outgoing messages and the ability to define 
+Provides an action for sending outgoing messages and the ability to define
 custom triggers for incoming messages.
 
 SMS Blast
@@ -23,7 +23,7 @@ Allows bulk text messages to be sent to users.
 SMS Devel
 ---------
 
-Development and testing tools to assist developers and site builders working 
+Development and testing tools to assist developers and site builders working
 with SMS Framework.
 
 SMS Send to Phone
@@ -48,11 +48,11 @@ Installation
 ------------
 
  1. Install the SMS Framework module.
- 2. Install the module for your gateway provider. See 
+ 2. Install the module for your gateway provider. See
     https://www.drupal.org/node/2641028 for a list of modules.
- 3. Add an instance of your new gateway by going to Administration » 
+ 3. Add an instance of your new gateway by going to Administration »
     Configuration » SMS Framework » Gateways. Then use the 'Add gateway' button.
- 4. (optional) Configure entity phone numbers at Administration » Configuration 
+ 4. (optional) Configure entity phone numbers at Administration » Configuration
     » SMS Framework » Phone number settings. Then user the 'Add phone number
     settings' button. Typical scenarios add the 'User/User' bundle. This form
     requires, and provides the option to automatically add, a phone number field
@@ -78,27 +78,10 @@ Support
 
 The following sites offer support for SMS Framework:
 
- * Drupal Groups
-   http://groups.drupal.org/sms-framework
  * SMS Framework issue queue
    https://www.drupal.org/project/issues/smsframework
  * Drupal Stack Exchange
    http://drupal.stackexchange.com
- * Freenode IRC
-   Channel: #drupal-support
-   https://www.drupal.org/irc
-
-Testing
--------
-
-Drupal core phpunit.xml.dist does not run unit tests located in submodules.
-Navigate to the SMS Framework directory to run. Your commands should look 
-something like:
-
-    # Run all unit tests, from SMS Framework directory:
-    $ ../../vendor/bin/phpunit
-    # Run a single test:
-    $ ../../vendor/bin/phpunit --filter SmsFrameworkQueueTest
 
 Credits
 -------
