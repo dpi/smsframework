@@ -1,0 +1,8 @@
+# total 1 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Strict comparison using \!\=\= between string and null will always evaluate to true\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGatewayPluginCollection.php

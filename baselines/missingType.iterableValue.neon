@@ -1,0 +1,848 @@
+# total 169 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Method Drupal\\sms_blast\\SmsBlastForm\:\:buildForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_blast/src/SmsBlastForm.php
+
+        -
+            message: '#^Method Drupal\\sms_blast\\SmsBlastForm\:\:buildForm\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_blast/src/SmsBlastForm.php
+
+        -
+            message: '#^Method Drupal\\sms_blast\\SmsBlastForm\:\:submitForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_blast/src/SmsBlastForm.php
+
+        -
+            message: '#^Method Drupal\\sms_devel\\Form\\SmsDevelMessageForm\:\:buildForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
+
+        -
+            message: '#^Method Drupal\\sms_devel\\Form\\SmsDevelMessageForm\:\:buildForm\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
+
+        -
+            message: '#^Method Drupal\\sms_devel\\Form\\SmsDevelMessageForm\:\:submitForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
+
+        -
+            message: '#^Method Drupal\\sms_devel\\Form\\SmsDevelMessageForm\:\:submitReceive\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
+
+        -
+            message: '#^Method Drupal\\sms_devel\\Form\\SmsDevelMessageForm\:\:submitSend\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
+
+        -
+            message: '#^Method Drupal\\sms_devel\\Form\\SmsDevelMessageForm\:\:validateForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
+
+        -
+            message: '#^Method Drupal\\sms_devel\\Form\\SmsDevelMessageForm\:\:verboseResults\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
+
+        -
+            message: '#^Function sms_sendtophone_node_links_alter\(\) has parameter \$context with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/sms_sendtophone.module
+
+        -
+            message: '#^Function sms_sendtophone_node_links_alter\(\) has parameter \$links with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/sms_sendtophone.module
+
+        -
+            message: '#^Function sms_sendtophone_page_attachments\(\) has parameter \$attachments with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/sms_sendtophone.module
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Form\\AdminOverviewForm\:\:buildForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/AdminOverviewForm.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Form\\AdminOverviewForm\:\:buildForm\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/AdminOverviewForm.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Form\\AdminOverviewForm\:\:getEditableConfigNames\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/AdminOverviewForm.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Form\\AdminOverviewForm\:\:submitForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/AdminOverviewForm.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Form\\SendToPhoneForm\:\:buildForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/SendToPhoneForm.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Form\\SendToPhoneForm\:\:buildForm\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/SendToPhoneForm.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Form\\SendToPhoneForm\:\:getForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/SendToPhoneForm.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Form\\SendToPhoneForm\:\:submitForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/SendToPhoneForm.php
+
+        -
+            message: '#^Property Drupal\\sms_sendtophone\\Form\\SendToPhoneForm\:\:\$phoneNumbers type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/SendToPhoneForm.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Plugin\\Field\\FieldFormatter\\SmsLinkFormatter\:\:viewElements\(\) has parameter \$items with no value type specified in iterable type Drupal\\Core\\Field\\FieldItemListInterface\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Field/FieldFormatter/SmsLinkFormatter.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Plugin\\Field\\FieldFormatter\\SmsLinkFormatter\:\:viewElements\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Field/FieldFormatter/SmsLinkFormatter.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Plugin\\Field\\FieldWidget\\SmsSendWidget\:\:defaultSettings\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Field/FieldWidget/SmsSendWidget.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Plugin\\Field\\FieldWidget\\SmsSendWidget\:\:formElement\(\) has parameter \$element with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Field/FieldWidget/SmsSendWidget.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Plugin\\Field\\FieldWidget\\SmsSendWidget\:\:formElement\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Field/FieldWidget/SmsSendWidget.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Plugin\\Field\\FieldWidget\\SmsSendWidget\:\:formElement\(\) has parameter \$items with no value type specified in iterable type Drupal\\Core\\Field\\FieldItemListInterface\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Field/FieldWidget/SmsSendWidget.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Plugin\\Field\\FieldWidget\\SmsSendWidget\:\:formElement\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Field/FieldWidget/SmsSendWidget.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Plugin\\Field\\FieldWidget\\SmsSendWidget\:\:settingsForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Field/FieldWidget/SmsSendWidget.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Plugin\\Field\\FieldWidget\\SmsSendWidget\:\:settingsForm\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Field/FieldWidget/SmsSendWidget.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Plugin\\Filter\\FilterInlineSms\:\:__construct\(\) has parameter \$configuration with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Filter/FilterInlineSms.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Plugin\\Filter\\FilterInlineSms\:\:create\(\) has parameter \$configuration with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Filter/FilterInlineSms.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Plugin\\Filter\\FilterInlineSms\:\:settingsForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Filter/FilterInlineSms.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Plugin\\Filter\\FilterInlineSms\:\:settingsForm\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Filter/FilterInlineSms.php
+
+        -
+            message: '#^Property Drupal\\sms_user\\ActiveHours\:\:\$ranges type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_user/src/ActiveHours.php
+
+        -
+            message: '#^Method Drupal\\sms_user\\Form\\AdminSettingsForm\:\:buildForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms_user\\Form\\AdminSettingsForm\:\:buildForm\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms_user\\Form\\AdminSettingsForm\:\:buildTokenElement\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms_user\\Form\\AdminSettingsForm\:\:getEditableConfigNames\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms_user\\Form\\AdminSettingsForm\:\:submitForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms_user\\Form\\AdminSettingsForm\:\:validateForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms_user\\Plugin\\Derivative\\SmsUserMenuLink\:\:getDerivativeDefinitions\(\) has parameter \$base_plugin_definition with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Plugin/Derivative/SmsUserMenuLink.php
+
+        -
+            message: '#^Method Drupal\\sms_user\\Plugin\\Derivative\\SmsUserMenuLink\:\:getDerivativeDefinitions\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Plugin/Derivative/SmsUserMenuLink.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms_user\\Kernel\\SmsFrameworkUserActiveHoursServiceTest\:\:createUser\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserActiveHoursServiceTest.php
+
+        -
+            message: '#^Property Drupal\\sms\\Entity\\PhoneNumberSettings\:\:\$fields type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Entity/PhoneNumberSettings.php
+
+        -
+            message: '#^Property Drupal\\sms\\Entity\\SmsGateway\:\:\$settings type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Entity/SmsGateway.php
+
+        -
+            message: '#^Method Drupal\\sms\\Entity\\SmsMessage\:\:getOptions\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Entity/SmsMessage.php
+
+        -
+            message: '#^Method Drupal\\sms\\Entity\\SmsMessage\:\:getRecipients\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Entity/SmsMessage.php
+
+        -
+            message: '#^Method Drupal\\sms\\Entity\\SmsMessage\:\:removeRecipients\(\) has parameter \$recipients with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Entity/SmsMessage.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\PhoneNumberSettingsDeleteForm\:\:submitForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsDeleteForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\PhoneNumberSettingsForm\:\:buildForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\PhoneNumberSettingsForm\:\:buildForm\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\PhoneNumberSettingsForm\:\:save\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\PhoneNumberSettingsForm\:\:updateFieldMapping\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\SmsGatewayDeleteForm\:\:submitForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayDeleteForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\SmsGatewayForm\:\:buildForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\SmsGatewayForm\:\:buildForm\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\SmsGatewayForm\:\:exists\(\) has parameter \$element with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\SmsGatewayForm\:\:save\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\SmsGatewayForm\:\:submitForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\SmsGatewayForm\:\:validateForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\SmsSettingsForm\:\:buildForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/SmsSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\SmsSettingsForm\:\:buildForm\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/SmsSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\SmsSettingsForm\:\:getEditableConfigNames\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/SmsSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\SmsSettingsForm\:\:submitForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/SmsSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\SmsSettingsForm\:\:validateForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/SmsSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\VerifyPhoneNumberForm\:\:buildForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/VerifyPhoneNumberForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\VerifyPhoneNumberForm\:\:buildForm\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/VerifyPhoneNumberForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\VerifyPhoneNumberForm\:\:submitForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/VerifyPhoneNumberForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\VerifyPhoneNumberForm\:\:validateForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/VerifyPhoneNumberForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Lists\\PhoneNumberSettingsListBuilder\:\:buildHeader\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Lists/PhoneNumberSettingsListBuilder.php
+
+        -
+            message: '#^Method Drupal\\sms\\Lists\\PhoneNumberSettingsListBuilder\:\:buildRow\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Lists/PhoneNumberSettingsListBuilder.php
+
+        -
+            message: '#^Method Drupal\\sms\\Lists\\PhoneNumberSettingsListBuilder\:\:render\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Lists/PhoneNumberSettingsListBuilder.php
+
+        -
+            message: '#^Method Drupal\\sms\\Lists\\SmsGatewayListBuilder\:\:buildHeader\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Lists/SmsGatewayListBuilder.php
+
+        -
+            message: '#^Method Drupal\\sms\\Lists\\SmsGatewayListBuilder\:\:buildRow\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Lists/SmsGatewayListBuilder.php
+
+        -
+            message: '#^Method Drupal\\sms\\Lists\\SmsGatewayListBuilder\:\:render\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Lists/SmsGatewayListBuilder.php
+
+        -
+            message: '#^Method Drupal\\sms\\Message\\SmsMessage\:\:__construct\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Message/SmsMessage.php
+
+        -
+            message: '#^Method Drupal\\sms\\Message\\SmsMessage\:\:__construct\(\) has parameter \$recipients with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Message/SmsMessage.php
+
+        -
+            message: '#^Method Drupal\\sms\\Message\\SmsMessage\:\:getOptions\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Message/SmsMessage.php
+
+        -
+            message: '#^Method Drupal\\sms\\Message\\SmsMessage\:\:getRecipients\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Message/SmsMessage.php
+
+        -
+            message: '#^Method Drupal\\sms\\Message\\SmsMessage\:\:removeRecipients\(\) has parameter \$recipients with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Message/SmsMessage.php
+
+        -
+            message: '#^Method Drupal\\sms\\Message\\SmsMessageInterface\:\:getOptions\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Message/SmsMessageInterface.php
+
+        -
+            message: '#^Method Drupal\\sms\\Message\\SmsMessageInterface\:\:getRecipients\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Message/SmsMessageInterface.php
+
+        -
+            message: '#^Method Drupal\\sms\\Message\\SmsMessageInterface\:\:removeRecipients\(\) has parameter \$recipients with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Message/SmsMessageInterface.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\Field\\FieldWidget\\SmsTelephoneWidget\:\:__construct\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/Field/FieldWidget/SmsTelephoneWidget.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\Field\\FieldWidget\\SmsTelephoneWidget\:\:__construct\(\) has parameter \$third_party_settings with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/Field/FieldWidget/SmsTelephoneWidget.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\Field\\FieldWidget\\SmsTelephoneWidget\:\:create\(\) has parameter \$configuration with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/Field/FieldWidget/SmsTelephoneWidget.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\Field\\FieldWidget\\SmsTelephoneWidget\:\:formElement\(\) has parameter \$element with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/Field/FieldWidget/SmsTelephoneWidget.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\Field\\FieldWidget\\SmsTelephoneWidget\:\:formElement\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/Field/FieldWidget/SmsTelephoneWidget.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\Field\\FieldWidget\\SmsTelephoneWidget\:\:formElement\(\) has parameter \$items with no value type specified in iterable type Drupal\\Core\\Field\\FieldItemListInterface\.$#'
+            count: 1
+            path: ../src/Plugin/Field/FieldWidget/SmsTelephoneWidget.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\Field\\FieldWidget\\SmsTelephoneWidget\:\:formElement\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/Field/FieldWidget/SmsTelephoneWidget.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\QueueWorker\\SmsProcessor\:\:__construct\(\) has parameter \$configuration with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/QueueWorker/SmsProcessor.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\QueueWorker\\SmsProcessor\:\:create\(\) has parameter \$configuration with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/QueueWorker/SmsProcessor.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\SmsGateway\\LogGateway\:\:__construct\(\) has parameter \$configuration with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGateway/LogGateway.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\SmsGateway\\LogGateway\:\:create\(\) has parameter \$configuration with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGateway/LogGateway.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\SmsGatewayPluginBase\:\:__construct\(\) has parameter \$configuration with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGatewayPluginBase.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\SmsGatewayPluginBase\:\:buildConfigurationForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGatewayPluginBase.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\SmsGatewayPluginBase\:\:buildConfigurationForm\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGatewayPluginBase.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\SmsGatewayPluginBase\:\:calculateDependencies\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGatewayPluginBase.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\SmsGatewayPluginBase\:\:defaultConfiguration\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGatewayPluginBase.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\SmsGatewayPluginBase\:\:getConfiguration\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGatewayPluginBase.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\SmsGatewayPluginBase\:\:setConfiguration\(\) has parameter \$configuration with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGatewayPluginBase.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\SmsGatewayPluginBase\:\:submitConfigurationForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGatewayPluginBase.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\SmsGatewayPluginBase\:\:validateConfigurationForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGatewayPluginBase.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\SmsGatewayPluginCollection\:\:__construct\(\) has parameter \$configuration with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGatewayPluginCollection.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\SmsGatewayPluginManager\:\:__construct\(\) has parameter \$namespaces with no value type specified in iterable type Traversable\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGatewayPluginManager.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\migrate\\destination\\PhoneNumberSettings\:\:import\(\) has parameter \$old_destination_id_values with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/PhoneNumberSettings.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\migrate\\destination\\PhoneNumberSettings\:\:import\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/PhoneNumberSettings.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\migrate\\destination\\PhoneNumberSettings\:\:rollback\(\) has parameter \$destination_identifier with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/PhoneNumberSettings.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\migrate\\destination\\SmsVerification\:\:__construct\(\) has parameter \$bundles with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/SmsVerification.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\migrate\\destination\\SmsVerification\:\:__construct\(\) has parameter \$configuration with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/SmsVerification.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\migrate\\destination\\SmsVerification\:\:create\(\) has parameter \$configuration with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/SmsVerification.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\migrate\\destination\\SmsVerification\:\:import\(\) has parameter \$old_destination_id_values with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/SmsVerification.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\migrate\\destination\\SmsVerification\:\:import\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/SmsVerification.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\migrate\\destination\\SmsVerification\:\:rollback\(\) has parameter \$destination_identifier with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/SmsVerification.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\migrate\\source\\D6SmsNumber\:\:fields\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/source/D6SmsNumber.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\migrate\\source\\D6SmsNumber\:\:getIds\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/source/D6SmsNumber.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\migrate\\source\\D7SmsNumber\:\:fields\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/source/D7SmsNumber.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\migrate\\source\\D7SmsNumber\:\:getIds\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/source/D7SmsNumber.php
+
+        -
+            message: '#^Method Drupal\\sms\\Routing\\Enhancer\\SmsRouteEnhancer\:\:enhance\(\) has parameter \$defaults with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Routing/Enhancer/SmsRouteEnhancer.php
+
+        -
+            message: '#^Method Drupal\\sms\\Routing\\Enhancer\\SmsRouteEnhancer\:\:enhance\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Routing/Enhancer/SmsRouteEnhancer.php
+
+        -
+            message: '#^Method Drupal\\sms\\Views\\SmsMessageViewsData\:\:getViewsData\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Views/SmsMessageViewsData.php
+
+        -
+            message: '#^PHPDoc tag @var for variable \$execution_order has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/modules/sms_test/src/EventSubscriber/SmsTestEventSubscriber.php
+
+        -
+            message: '#^Function sms_test_gateway_get_incoming\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/sms_test_gateway.module
+
+        -
+            message: '#^PHPDoc tag @var for variable \$result has no value type specified in iterable type array\.$#'
+            count: 2
+            path: ../tests/modules/sms_test_gateway/sms_test_gateway.module
+
+        -
+            message: '#^Method Drupal\\sms_test_gateway\\Plugin\\SmsGateway\\Memory\:\:buildConfigurationForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Method Drupal\\sms_test_gateway\\Plugin\\SmsGateway\\Memory\:\:buildConfigurationForm\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Method Drupal\\sms_test_gateway\\Plugin\\SmsGateway\\Memory\:\:defaultConfiguration\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Method Drupal\\sms_test_gateway\\Plugin\\SmsGateway\\Memory\:\:submitConfigurationForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^PHPDoc tag @var for variable \$execution_order has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Method Drupal\\sms_test_gateway\\Plugin\\SmsGateway\\MemoryChunked\:\:defaultConfiguration\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/MemoryChunked.php
+
+        -
+            message: '#^Method Drupal\\sms_test_gateway\\Plugin\\SmsGateway\\ScheduleAware\:\:defaultConfiguration\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/ScheduleAware.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD6SmsPhoneNumberTest\:\:getMigrationsToRollback\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD6SmsPhoneNumberTest\:\:getMigrationsToTest\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD6SmsPhoneNumberTest\:\:rollBackMigrations\(\) has parameter \$ids with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD7SmsPhoneNumberTest\:\:getMigrationsToRollback\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD7SmsPhoneNumberTest\:\:getMigrationsToTest\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD7SmsPhoneNumberTest\:\:rollBackMigrations\(\) has parameter \$ids with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkGatewayEntityTest\:\:createGateway\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkGatewayEntityTest.php
+
+        -
+            message: '#^PHPDoc tag @var for variable \$state has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkGatewayPluginTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkMessageEntityTest\:\:createEntityWithPhoneNumber\(\) has parameter \$phone_numbers with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkMessageEntityTest\:\:createMemoryGateway\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkMessageEntityTest\:\:createSmsMessage\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkMessageEntityTest\:\:randomPhoneNumbers\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkProviderTest\:\:createSmsMessage\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkProviderTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkQueueTest\:\:createSmsMessage\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkQueueTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkViewsTest\:\:createEntityWithPhoneNumber\(\) has parameter \$phone_numbers with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkViewsTest\:\:createMemoryGateway\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkViewsTest\:\:randomPhoneNumbers\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
+
+        -
+            message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkViewsTest\:\:\$testViews type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\FunctionalJavascript\\SmsFrameworkPhoneNumberAdminTest\:\:createEntityWithPhoneNumber\(\) has parameter \$phone_numbers with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/FunctionalJavascript/SmsFrameworkPhoneNumberAdminTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\FunctionalJavascript\\SmsFrameworkPhoneNumberAdminTest\:\:createMemoryGateway\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/FunctionalJavascript/SmsFrameworkPhoneNumberAdminTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\FunctionalJavascript\\SmsFrameworkPhoneNumberAdminTest\:\:randomPhoneNumbers\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/FunctionalJavascript/SmsFrameworkPhoneNumberAdminTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Functional\\SmsFrameworkBrowserTestBase\:\:createEntityWithPhoneNumber\(\) has parameter \$phone_numbers with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Functional/SmsFrameworkBrowserTestBase.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Functional\\SmsFrameworkBrowserTestBase\:\:createMemoryGateway\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Functional/SmsFrameworkBrowserTestBase.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Functional\\SmsFrameworkBrowserTestBase\:\:randomPhoneNumbers\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Functional/SmsFrameworkBrowserTestBase.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkDeliveryReportEntityTest\:\:createEntityWithPhoneNumber\(\) has parameter \$phone_numbers with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkDeliveryReportEntityTest\:\:createMemoryGateway\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkDeliveryReportEntityTest\:\:randomPhoneNumbers\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkDeliveryReportUpdateTest\:\:createEntityWithPhoneNumber\(\) has parameter \$phone_numbers with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkDeliveryReportUpdateTest\:\:createMemoryGateway\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkDeliveryReportUpdateTest\:\:randomPhoneNumbers\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkKernelBase\:\:createEntityWithPhoneNumber\(\) has parameter \$phone_numbers with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkKernelBase.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkKernelBase\:\:createMemoryGateway\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkKernelBase.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkKernelBase\:\:randomPhoneNumbers\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkKernelBase.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Unit\\Event\\RecipientGatewayEventTest\:\:createEntityWithPhoneNumber\(\) has parameter \$phone_numbers with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Unit/Event/RecipientGatewayEventTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Unit\\Event\\RecipientGatewayEventTest\:\:createMemoryGateway\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Unit/Event/RecipientGatewayEventTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Unit\\Event\\RecipientGatewayEventTest\:\:randomPhoneNumbers\(\) return type has no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../tests/src/Unit/Event/RecipientGatewayEventTest.php

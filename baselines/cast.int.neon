@@ -1,0 +1,28 @@
+# total 5 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Cannot cast mixed to int\.$#'
+            count: 2
+            path: ../src/Entity/PhoneNumberVerification.php
+
+        -
+            message: '#^Cannot cast mixed to int\.$#'
+            count: 1
+            path: ../src/Entity/SmsDeliveryReport.php
+
+        -
+            message: '#^Cannot cast mixed to int\.$#'
+            count: 3
+            path: ../src/Entity/SmsMessage.php
+
+        -
+            message: '#^Cannot cast mixed to int\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Cannot cast mixed to int\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/SmsVerification.php

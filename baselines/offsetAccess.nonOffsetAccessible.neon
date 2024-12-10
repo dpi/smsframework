@@ -1,0 +1,303 @@
+# total 60 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Cannot access offset ''ranges'' on mixed\.$#'
+            count: 1
+            path: ../modules/sms_user/src/ActiveHours.php
+
+        -
+            message: '#^Cannot access offset ''status'' on mixed\.$#'
+            count: 1
+            path: ../modules/sms_user/src/ActiveHours.php
+
+        -
+            message: '#^Cannot access offset ''all_options'' on mixed\.$#'
+            count: 3
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Cannot access offset ''behaviour'' on mixed\.$#'
+            count: 2
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Cannot access offset ''end'' on mixed\.$#'
+            count: 2
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Cannot access offset ''incoming_message'' on mixed\.$#'
+            count: 2
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Cannot access offset ''incoming_pattern…'' on mixed\.$#'
+            count: 9
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Cannot access offset ''message'' on mixed\.$#'
+            count: 2
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Cannot access offset ''message_failure'' on mixed\.$#'
+            count: 2
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Cannot access offset ''message_success'' on mixed\.$#'
+            count: 2
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Cannot access offset ''reply'' on mixed\.$#'
+            count: 6
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Cannot access offset ''reply_status'' on mixed\.$#'
+            count: 5
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Cannot access offset ''send_activation…'' on mixed\.$#'
+            count: 2
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Cannot access offset ''start'' on mixed\.$#'
+            count: 2
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Cannot access offset ''incoming_messages'' on mixed\.$#'
+            count: 1
+            path: ../modules/sms_user/tests/src/Functional/SmsFrameworkUserSettingsTest.php
+
+        -
+            message: '#^Cannot access offset ''incoming_pattern'' on mixed\.$#'
+            count: 8
+            path: ../modules/sms_user/tests/src/Functional/SmsFrameworkUserSettingsTest.php
+
+        -
+            message: '#^Cannot access offset ''message'' on mixed\.$#'
+            count: 2
+            path: ../modules/sms_user/tests/src/Functional/SmsFrameworkUserSettingsTest.php
+
+        -
+            message: '#^Cannot access offset ''message_failure'' on mixed\.$#'
+            count: 1
+            path: ../modules/sms_user/tests/src/Functional/SmsFrameworkUserSettingsTest.php
+
+        -
+            message: '#^Cannot access offset ''reply'' on mixed\.$#'
+            count: 5
+            path: ../modules/sms_user/tests/src/Functional/SmsFrameworkUserSettingsTest.php
+
+        -
+            message: '#^Cannot access offset ''send_activation…'' on mixed\.$#'
+            count: 1
+            path: ../modules/sms_user/tests/src/Functional/SmsFrameworkUserSettingsTest.php
+
+        -
+            message: '#^Cannot access offset ''status'' on mixed\.$#'
+            count: 8
+            path: ../modules/sms_user/tests/src/Functional/SmsFrameworkUserSettingsTest.php
+
+        -
+            message: '#^Cannot access offset ''unrecognized_sender'' on mixed\.$#'
+            count: 5
+            path: ../modules/sms_user/tests/src/Functional/SmsFrameworkUserSettingsTest.php
+
+        -
+            message: '#^Cannot access offset 0 on mixed\.$#'
+            count: 1
+            path: ../modules/sms_user/tests/src/Functional/SmsFrameworkUserSettingsTest.php
+
+        -
+            message: '#^Cannot access offset ''credit_balance…'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
+            count: 1
+            path: ../src/Entity/SmsGateway.php
+
+        -
+            message: '#^Cannot access offset ''incoming'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
+            count: 1
+            path: ../src/Entity/SmsGateway.php
+
+        -
+            message: '#^Cannot access offset ''incoming_route'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
+            count: 1
+            path: ../src/Entity/SmsGateway.php
+
+        -
+            message: '#^Cannot access offset ''outgoing_message…'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
+            count: 1
+            path: ../src/Entity/SmsGateway.php
+
+        -
+            message: '#^Cannot access offset ''reports_pull'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
+            count: 1
+            path: ../src/Entity/SmsGateway.php
+
+        -
+            message: '#^Cannot access offset ''reports_push'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
+            count: 1
+            path: ../src/Entity/SmsGateway.php
+
+        -
+            message: '#^Cannot access offset ''schedule_aware'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
+            count: 1
+            path: ../src/Entity/SmsGateway.php
+
+        -
+            message: '#^Cannot access offset ''label'' on mixed\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayForm.php
+
+        -
+            message: '#^Cannot access offset ''label'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
+            count: 1
+            path: ../src/Lists/SmsGatewayListBuilder.php
+
+        -
+            message: '#^Cannot access offset ''id'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGateway/LogGateway.php
+
+        -
+            message: '#^Cannot access offset ''provider'' on array\|Drupal\\Component\\Plugin\\Definition\\PluginDefinitionInterface\.$#'
+            count: 1
+            path: ../src/Plugin/SmsGateway/LogGateway.php
+
+        -
+            message: '#^Cannot access offset ''messages'' on mixed\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Incoming.php
+
+        -
+            message: '#^Cannot access offset ''recipients'' on mixed\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Incoming.php
+
+        -
+            message: '#^Cannot access an offset on mixed\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Cannot access offset ''message_id'' on mixed\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Cannot access offset ''recipient'' on mixed\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Cannot access offset ''reports'' on mixed\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Cannot access offset ''status'' on mixed\.$#'
+            count: 2
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Cannot access offset ''status_message'' on mixed\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Cannot access offset ''status_time'' on mixed\.$#'
+            count: 3
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Cannot access offset mixed on mixed\.$#'
+            count: 5
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
+            count: 9
+            path: ../tests/src/FunctionalJavascript/SmsFrameworkPhoneNumberAdminTest.php
+
+        -
+            message: '#^Cannot access offset string on mixed\.$#'
+            count: 1
+            path: ../tests/src/FunctionalJavascript/SmsFrameworkPhoneNumberAdminTest.php
+
+        -
+            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
+            count: 9
+            path: ../tests/src/Functional/SmsFrameworkBrowserTestBase.php
+
+        -
+            message: '#^Cannot access offset string on mixed\.$#'
+            count: 1
+            path: ../tests/src/Functional/SmsFrameworkBrowserTestBase.php
+
+        -
+            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
+            count: 9
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
+
+        -
+            message: '#^Cannot access offset string on mixed\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
+
+        -
+            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
+            count: 9
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
+
+        -
+            message: '#^Cannot access offset string on mixed\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
+
+        -
+            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
+            count: 9
+            path: ../tests/src/Kernel/SmsFrameworkKernelBase.php
+
+        -
+            message: '#^Cannot access offset string on mixed\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkKernelBase.php
+
+        -
+            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
+            count: 9
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Cannot access offset string on mixed\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
+            count: 9
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
+
+        -
+            message: '#^Cannot access offset string on mixed\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
+
+        -
+            message: '#^Cannot access offset int\|string\|null on mixed\.$#'
+            count: 9
+            path: ../tests/src/Unit/Event/RecipientGatewayEventTest.php
+
+        -
+            message: '#^Cannot access offset string on mixed\.$#'
+            count: 1
+            path: ../tests/src/Unit/Event/RecipientGatewayEventTest.php

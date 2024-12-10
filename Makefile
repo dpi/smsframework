@@ -1,5 +1,7 @@
 phpstan-baseline:
-	php -d memory_limit=-1 ./vendor/bin/phpstan analyze --memory-limit=-1 --generate-baseline=./phpstan-baseline.neon --allow-empty-baseline
+	rm baselines/*.neon
+	touch baselines/loader.neon
+	php -d memory_limit=-1 ./vendor/bin/phpstan analyse --error-format baselinePerIdentifier
 
 phpcs:
 	vendor/bin/phpcs

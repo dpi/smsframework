@@ -1,0 +1,8 @@
+# total 1 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Function sms_test_gateway_get_incoming\(\) never returns null so it can be removed from the return type\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/sms_test_gateway.module

@@ -1,0 +1,43 @@
+# total 8 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/sms_sendtophone.module
+
+        -
+            message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+            count: 2
+            path: ../modules/sms_sendtophone/tests/src/Functional/SmsSendToPhoneBrowserTest.php
+
+        -
+            message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+            count: 1
+            path: ../modules/sms_user/src/AccountRegistration.php
+
+        -
+            message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+            count: 1
+            path: ../modules/sms_user/tests/src/Functional/SmsFrameworkUserSettingsTest.php
+
+        -
+            message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+            count: 1
+            path: ../src/Entity/SmsMessage.php
+
+        -
+            message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+            count: 1
+            path: ../src/Provider/PhoneNumberVerification.php
+
+        -
+            message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php

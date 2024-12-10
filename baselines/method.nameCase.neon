@@ -1,0 +1,13 @@
+# total 2 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Call to method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD6SmsPhoneNumberTest\:\:getMigrationsToRollback\(\) with incorrect case\: getMigrationsToRollBack$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Call to method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD7SmsPhoneNumberTest\:\:getMigrationsToRollback\(\) with incorrect case\: getMigrationsToRollBack$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php

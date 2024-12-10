@@ -1,0 +1,8 @@
+# total 1 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkProcessorTest\:\:\$smsStorage is never read, only written\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkProcessorTest.php

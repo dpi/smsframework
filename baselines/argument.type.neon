@@ -1,0 +1,538 @@
+# total 107 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Parameter \#2 \$phoneNumberProvider of class Drupal\\sms_blast\\SmsBlastForm constructor expects Drupal\\sms\\Provider\\PhoneNumberProviderInterface, object given\.$#'
+            count: 1
+            path: ../modules/sms_blast/src/SmsBlastForm.php
+
+        -
+            message: '#^Parameter \#1 \$gateway of method Drupal\\sms\\Entity\\SmsMessage\:\:setGateway\(\) expects Drupal\\sms\\Entity\\SmsGatewayInterface, Drupal\\sms\\Entity\\SmsGateway\|null given\.$#'
+            count: 1
+            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
+
+        -
+            message: '#^Parameter \#1 \$result of method Drupal\\sms_devel\\Form\\SmsDevelMessageForm\:\:resultMessage\(\) expects Drupal\\sms\\Message\\SmsMessageResultInterface, Drupal\\sms\\Message\\SmsMessageResultInterface\|null given\.$#'
+            count: 2
+            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
+
+        -
+            message: '#^Parameter \#1 \$smsProvider of class Drupal\\sms_devel\\Form\\SmsDevelMessageForm constructor expects Drupal\\sms\\Provider\\SmsProviderInterface, object given\.$#'
+            count: 1
+            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
+
+        -
+            message: '#^Parameter \#1 \$value of function count expects array\|Countable, array\<int\|string, array\<string, mixed\>\|Drupal\\Core\\StringTranslation\\TranslatableMarkup\>\|string given\.$#'
+            count: 1
+            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
+
+        -
+            message: '#^Parameter \#2 \$haystack of function in_array expects array, mixed given\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/sms_sendtophone.module
+
+        -
+            message: '#^Parameter \#1 \$array of function array_filter expects array, mixed given\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/AdminOverviewForm.php
+
+        -
+            message: '#^Parameter \#1 \$smsProvider of class Drupal\\sms_sendtophone\\Form\\SendToPhoneForm constructor expects Drupal\\sms\\Provider\\SmsProviderInterface, object given\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/SendToPhoneForm.php
+
+        -
+            message: '#^Parameter \#2 \$phoneNumberProvider of class Drupal\\sms_sendtophone\\Form\\SendToPhoneForm constructor expects Drupal\\sms\\Provider\\PhoneNumberProviderInterface, object given\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/SendToPhoneForm.php
+
+        -
+            message: '#^Parameter \#1 \$text of method Drupal\\Tests\\WebAssert\:\:pageTextContains\(\) expects string, Drupal\\Core\\StringTranslation\\TranslatableMarkup given\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/tests/src/Functional/SmsSendToPhoneBrowserTest.php
+
+        -
+            message: '#^Parameter \#1 \$text of method Drupal\\Tests\\WebAssert\:\:pageTextContains\(\) expects string, mixed given\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/tests/src/Functional/SmsSendToPhoneBrowserTest.php
+
+        -
+            message: '#^Parameter \#1 \$phone_number of method Drupal\\sms\\Provider\\PhoneNumberVerificationInterface\:\:getPhoneVerificationByPhoneNumber\(\) expects string, string\|null given\.$#'
+            count: 1
+            path: ../modules/sms_user/src/AccountRegistration.php
+
+        -
+            message: '#^Parameter \#1 \$sender_number of method Drupal\\sms_user\\AccountRegistration\:\:sendReply\(\) expects string, string\|null given\.$#'
+            count: 2
+            path: ../modules/sms_user/src/AccountRegistration.php
+
+        -
+            message: '#^Parameter \#1 \$string of function strlen expects string, string\|null given\.$#'
+            count: 1
+            path: ../modules/sms_user/src/AccountRegistration.php
+
+        -
+            message: '#^Parameter \#3 \$subject of function str_replace expects array\|string, mixed given\.$#'
+            count: 4
+            path: ../modules/sms_user/src/AccountRegistration.php
+
+        -
+            message: '#^Parameter \#1 \$array of function array_values expects array\<T\>, mixed given\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Parameter \#1 \$haystack of function strpos expects string, mixed given\.$#'
+            count: 2
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Parameter \#1 \$time of class Drupal\\Core\\Datetime\\DrupalDateTime constructor expects string, mixed given\.$#'
+            count: 4
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Parameter \#2 \$subject of function preg_split expects string, mixed given\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Parameter \#3 \$phoneNumberVerificationProvider of class Drupal\\sms_user\\Form\\AdminSettingsForm constructor expects Drupal\\sms\\Provider\\PhoneNumberVerificationInterface, object given\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Parameter \#1 \$phoneNumberVerification of class Drupal\\sms_user\\Plugin\\Derivative\\SmsUserMenuLink constructor expects Drupal\\sms\\Provider\\PhoneNumberVerificationInterface, object given\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Plugin/Derivative/SmsUserMenuLink.php
+
+        -
+            message: '#^Parameter \#1 \$smsProvider of class Drupal\\sms\\DeliveryReportController constructor expects Drupal\\sms\\Provider\\SmsProviderInterface, object given\.$#'
+            count: 1
+            path: ../src/DeliveryReportController.php
+
+        -
+            message: '#^Parameter \#1 \$field of method Drupal\\Core\\Entity\\Query\\QueryInterface\:\:condition\(\) expects Drupal\\Core\\Entity\\Query\\ConditionInterface\|string, string\|false given\.$#'
+            count: 1
+            path: ../src/Entity/SmsDeliveryReport.php
+
+        -
+            message: '#^Parameter \#1 \$field of method Drupal\\Core\\Entity\\Query\\QueryInterface\:\:sort\(\) expects string, string\|false given\.$#'
+            count: 1
+            path: ../src/Entity/SmsDeliveryReport.php
+
+        -
+            message: '#^Parameter \#1 \$manager of class Drupal\\sms\\Plugin\\SmsGatewayPluginCollection constructor expects Drupal\\Component\\Plugin\\PluginManagerInterface, mixed given\.$#'
+            count: 1
+            path: ../src/Entity/SmsGateway.php
+
+        -
+            message: '#^Parameter \#1 \$entity of method Drupal\\sms\\Entity\\SmsMessage\:\:setSenderEntity\(\) expects Drupal\\Core\\Entity\\EntityInterface, Drupal\\user\\Entity\\User\|null given\.$#'
+            count: 1
+            path: ../src/Entity/SmsMessage.php
+
+        -
+            message: '#^Parameter \#1 \$uid of method Drupal\\sms\\Entity\\SmsMessage\:\:setUid\(\) expects int\<1, max\>\|null, int\<min, \-1\>\|int\<1, max\> given\.$#'
+            count: 1
+            path: ../src/Entity/SmsMessage.php
+
+        -
+            message: '#^Parameter \#1 \$map of method Drupal\\sms\\Entity\\PhoneNumberSettingsInterface\:\:setFieldName\(\) expects string, mixed given\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Parameter \#1 \$message of method Drupal\\sms\\Entity\\PhoneNumberSettingsInterface\:\:setVerificationMessage\(\) expects string, mixed given\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Parameter \#1 \$name of method Drupal\\Core\\Entity\\Display\\EntityDisplayInterface\:\:getComponent\(\) expects string, mixed given\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Parameter \#1 \$name of method Drupal\\Core\\Entity\\Display\\EntityDisplayInterface\:\:setComponent\(\) expects string, mixed given\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Parameter \#2 \$field_name of method Drupal\\sms\\Entity\\PhoneNumberSettingsInterface\:\:setFieldName\(\) expects string\|null, mixed given\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Parameter \#2 \$string of function explode expects string, mixed given\.$#'
+            count: 2
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Parameter \#3 \$config_key of method Drupal\\sms\\Form\\PhoneNumberSettingsForm\:\:createNewField\(\) expects string, mixed given\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Parameter \#1 \$path of method Drupal\\sms\\Entity\\SmsGatewayInterface\:\:setPushIncomingPath\(\) expects string\|null, mixed given\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayForm.php
+
+        -
+            message: '#^Parameter \#1 \$path of method Drupal\\sms\\Entity\\SmsGatewayInterface\:\:setPushReportPath\(\) expects string\|null, mixed given\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayForm.php
+
+        -
+            message: '#^Parameter \#1 \$status of method Drupal\\Core\\Config\\Entity\\ConfigEntityInterface\:\:setStatus\(\) expects bool, mixed given\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayForm.php
+
+        -
+            message: '#^Parameter \#1 \$string of function mb_strlen expects string, mixed given\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayForm.php
+
+        -
+            message: '#^Parameter \#1 \$string of function mb_substr expects string, mixed given\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayForm.php
+
+        -
+            message: '#^Parameter \#4 \$gatewayManager of class Drupal\\sms\\Form\\SmsGatewayForm constructor expects Drupal\\sms\\Plugin\\SmsGatewayPluginManagerInterface, object given\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayForm.php
+
+        -
+            message: '#^Parameter \#1 \$string of function substr expects string, mixed given\.$#'
+            count: 1
+            path: ../src/Form/SmsSettingsForm.php
+
+        -
+            message: '#^Parameter \#1 \$code of method Drupal\\sms\\Provider\\PhoneNumberVerificationInterface\:\:getPhoneVerificationByCode\(\) expects string, mixed given\.$#'
+            count: 2
+            path: ../src/Form/VerifyPhoneNumberForm.php
+
+        -
+            message: '#^Parameter \#1 \$entity of method Drupal\\sms\\Provider\\PhoneNumberVerificationInterface\:\:getPhoneNumberSettingsForEntity\(\) expects Drupal\\Core\\Entity\\EntityInterface, Drupal\\Core\\Entity\\EntityInterface\|null given\.$#'
+            count: 1
+            path: ../src/Form/VerifyPhoneNumberForm.php
+
+        -
+            message: '#^Parameter \#2 \$phoneNumberVerification of class Drupal\\sms\\Form\\VerifyPhoneNumberForm constructor expects Drupal\\sms\\Provider\\PhoneNumberVerificationInterface, object given\.$#'
+            count: 1
+            path: ../src/Form/VerifyPhoneNumberForm.php
+
+        -
+            message: '#^Parameter \#2 \$threshold of method Drupal\\Core\\Flood\\FloodInterface\:\:isAllowed\(\) expects int, mixed given\.$#'
+            count: 1
+            path: ../src/Form/VerifyPhoneNumberForm.php
+
+        -
+            message: '#^Parameter \#2 \$window of method Drupal\\Core\\Flood\\FloodInterface\:\:register\(\) expects int, mixed given\.$#'
+            count: 1
+            path: ../src/Form/VerifyPhoneNumberForm.php
+
+        -
+            message: '#^Parameter \#3 \$window of method Drupal\\Core\\Flood\\FloodInterface\:\:isAllowed\(\) expects int, mixed given\.$#'
+            count: 1
+            path: ../src/Form/VerifyPhoneNumberForm.php
+
+        -
+            message: '#^Parameter \#4 \$phoneNumberVerificationProvider of class Drupal\\sms\\Lists\\PhoneNumberSettingsListBuilder constructor expects Drupal\\sms\\Provider\\PhoneNumberVerificationInterface, object given\.$#'
+            count: 1
+            path: ../src/Lists/PhoneNumberSettingsListBuilder.php
+
+        -
+            message: '#^Parameter \#1 \$uid of method Drupal\\sms\\Message\\SmsMessage\:\:setUid\(\) expects int\<1, max\>\|null, int\|null given\.$#'
+            count: 1
+            path: ../src/Message/SmsMessage.php
+
+        -
+            message: '#^Parameter \#7 \$phoneNumberVerification of class Drupal\\sms\\Plugin\\Field\\FieldWidget\\SmsTelephoneWidget constructor expects Drupal\\sms\\Provider\\PhoneNumberVerificationInterface, object given\.$#'
+            count: 1
+            path: ../src/Plugin/Field/FieldWidget/SmsTelephoneWidget.php
+
+        -
+            message: '#^Parameter \#5 \$smsProvider of class Drupal\\sms\\Plugin\\QueueWorker\\SmsProcessor constructor expects Drupal\\sms\\Provider\\SmsProviderInterface, object given\.$#'
+            count: 1
+            path: ../src/Plugin/QueueWorker/SmsProcessor.php
+
+        -
+            message: '#^Parameter \#1 \$array of function reset expects array\|object, array\|true given\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/PhoneNumberSettings.php
+
+        -
+            message: '#^Parameter \#1 \$name of method Drupal\\Core\\Entity\\EntityDisplayBase\:\:removeComponent\(\) expects string, string\|null given\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/PhoneNumberSettings.php
+
+        -
+            message: '#^Parameter \#2 \$field_name of static method Drupal\\field\\Entity\\FieldStorageConfig\:\:loadByName\(\) expects string, string\|null given\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/PhoneNumberSettings.php
+
+        -
+            message: '#^Parameter \#3 \$config_key of static method Drupal\\sms\\Form\\PhoneNumberSettingsForm\:\:createNewField\(\) expects string, string\|null given\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/PhoneNumberSettings.php
+
+        -
+            message: '#^Parameter \#1 \$array of function reset expects array\|object, array\|true given\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/SmsVerification.php
+
+        -
+            message: '#^Parameter \#1 \$entity of method Drupal\\sms\\Provider\\PhoneNumberVerificationInterface\:\:getPhoneNumberSettingsForEntity\(\) expects Drupal\\Core\\Entity\\EntityInterface, Drupal\\Core\\Entity\\EntityInterface\|null given\.$#'
+            count: 2
+            path: ../src/Plugin/migrate/destination/SmsVerification.php
+
+        -
+            message: '#^Parameter \#4 \$migration of class Drupal\\sms\\Plugin\\migrate\\destination\\SmsVerification constructor expects Drupal\\migrate\\Plugin\\MigrationInterface, Drupal\\migrate\\Plugin\\MigrationInterface\|null given\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/SmsVerification.php
+
+        -
+            message: '#^Parameter \#9 \$verification of class Drupal\\sms\\Plugin\\migrate\\destination\\SmsVerification constructor expects Drupal\\sms\\Provider\\PhoneNumberVerificationInterface, object given\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/SmsVerification.php
+
+        -
+            message: '#^Parameter \#3 \$subject of function str_replace expects array\|string, mixed given\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/process/PhoneNumberSettings.php
+
+        -
+            message: '#^Parameter \#2 \$value of method Drupal\\Core\\Entity\\Query\\QueryInterface\:\:condition\(\) expects array\|bool\|int\|string\|null, mixed given\.$#'
+            count: 2
+            path: ../src/Provider/PhoneNumberVerification.php
+
+        -
+            message: '#^Parameter \#1 \$path of class Symfony\\Component\\Routing\\Route constructor expects string, mixed given\.$#'
+            count: 1
+            path: ../src/Routing/RouteSubscriber.php
+
+        -
+            message: '#^Parameter \#1 \$string of function mb_strlen expects string, mixed given\.$#'
+            count: 1
+            path: ../src/Routing/RouteSubscriber.php
+
+        -
+            message: '#^Parameter \#1 \$callback of function call_user_func_array expects callable\(\)\: mixed, array\{Drupal\\sms\\Plugin\\SmsGatewayPluginInterface, ''processIncoming''\} given\.$#'
+            count: 1
+            path: ../src/SmsIncomingController.php
+
+        -
+            message: '#^Parameter \#2 \$controller of method Symfony\\Component\\HttpKernel\\Controller\\ArgumentResolverInterface\:\:getArguments\(\) expects callable\(\)\: mixed, array\{Drupal\\sms\\Plugin\\SmsGatewayPluginInterface, ''processIncoming''\} given\.$#'
+            count: 1
+            path: ../src/SmsIncomingController.php
+
+        -
+            message: '#^Parameter \#2 \$smsProvider of class Drupal\\sms\\SmsIncomingController constructor expects Drupal\\sms\\Provider\\SmsProviderInterface, object given\.$#'
+            count: 1
+            path: ../src/SmsIncomingController.php
+
+        -
+            message: '#^Parameter \#1 \$gateway of method Drupal\\sms\\Event\\RecipientGatewayEvent\:\:addGateway\(\) expects Drupal\\sms\\Entity\\SmsGatewayInterface, Drupal\\sms\\Entity\\SmsGateway\|null given\.$#'
+            count: 2
+            path: ../tests/modules/sms_test/src/EventSubscriber/SmsTestEventSubscriber.php
+
+        -
+            message: '#^Parameter \#1 \$recipient of method Drupal\\sms\\Message\\SmsDeliveryReport\:\:setRecipient\(\) expects string, mixed given\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Incoming.php
+
+        -
+            message: '#^Parameter \#2 \$array of function array_key_exists expects array, mixed given\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Incoming.php
+
+        -
+            message: '#^Parameter \#1 \$message of method Drupal\\sms\\Message\\SmsDeliveryReport\:\:setStatusMessage\(\) expects string, mixed given\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Parameter \#1 \$message_id of method Drupal\\sms\\Message\\SmsDeliveryReport\:\:setMessageId\(\) expects string\|null, mixed given\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Parameter \#1 \$recipient of method Drupal\\sms\\Message\\SmsDeliveryReport\:\:setRecipient\(\) expects string, mixed given\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Parameter \#1 \$status of method Drupal\\sms\\Message\\SmsDeliveryReport\:\:setStatus\(\) expects ''content_invalid''\|''delivered''\|''error''\|''expired''\|''invalid_recipient''\|''queued''\|''rejected''\|null, mixed given\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Parameter \#1 \$string of static method Drupal\\Component\\Serialization\\Json\:\:decode\(\) expects string, bool\|float\|int\|string\|null given\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Parameter \#1 \$time of method Drupal\\sms\\Message\\SmsDeliveryReport\:\:setStatusTime\(\) expects int\|null, mixed given\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Parameter \#1 \$time of method Drupal\\sms\\Message\\SmsDeliveryReport\:\:setTimeDelivered\(\) expects int\|null, mixed given\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Parameter \#1 \$time of method Drupal\\sms\\Message\\SmsDeliveryReport\:\:setTimeQueued\(\) expects int\|null, mixed given\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Parameter \#1 \.\.\.\$arrays of function array_merge expects array, mixed given\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php
+
+        -
+            message: '#^Parameter \#2 \$offset of function array_slice expects int, mixed given\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/MemoryOutgoingResult.php
+
+        -
+            message: '#^Parameter \#2 \$value of method Drupal\\Tests\\WebAssert\:\:fieldValueEquals\(\) expects string, string\|null given\.$#'
+            count: 2
+            path: ../tests/src/Functional/SmsFrameworkGatewayAdminTest.php
+
+        -
+            message: '#^Parameter \#1 \$text of method Drupal\\Tests\\WebAssert\:\:pageTextContains\(\) expects string, Drupal\\Core\\StringTranslation\\TranslatableMarkup given\.$#'
+            count: 5
+            path: ../tests/src/Functional/SmsFrameworkPhoneNumberVerifyFormTest.php
+
+        -
+            message: '#^Parameter \#1 \$user of method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD6SmsPhoneNumberTest\:\:assertNoVerifiedPhoneNumber\(\) expects Drupal\\user\\UserInterface, Drupal\\user\\Entity\\User\|null given\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Parameter \#1 \$user of method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD6SmsPhoneNumberTest\:\:assertUnVerifiedPhoneNumber\(\) expects Drupal\\user\\UserInterface, Drupal\\user\\Entity\\User\|null given\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Parameter \#1 \$user of method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD6SmsPhoneNumberTest\:\:assertVerifiedPhoneNumber\(\) expects Drupal\\user\\UserInterface, Drupal\\user\\Entity\\User\|null given\.$#'
+            count: 2
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Parameter \#1 \$user of method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD7SmsPhoneNumberTest\:\:assertNoVerifiedPhoneNumber\(\) expects Drupal\\user\\UserInterface, Drupal\\user\\Entity\\User\|null given\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Parameter \#1 \$user of method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD7SmsPhoneNumberTest\:\:assertUnVerifiedPhoneNumber\(\) expects Drupal\\user\\UserInterface, Drupal\\user\\Entity\\User\|null given\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Parameter \#1 \$user of method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD7SmsPhoneNumberTest\:\:assertVerifiedPhoneNumber\(\) expects Drupal\\user\\UserInterface, Drupal\\user\\Entity\\User\|null given\.$#'
+            count: 2
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
+            count: 3
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
+
+        -
+            message: '#^Parameter \#1 \$status of method Drupal\\sms\\Entity\\SmsDeliveryReport\:\:setStatus\(\) expects ''content_invalid''\|''delivered''\|''error''\|''expired''\|''invalid_recipient''\|''queued''\|''rejected''\|null, ''delivered''\|''pending''\|''queued'' given\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
+
+        -
+            message: '#^Parameter \#1 \$status of method Drupal\\sms\\Message\\SmsDeliveryReportInterface\:\:setStatus\(\) expects ''content_invalid''\|''delivered''\|''error''\|''expired''\|''invalid_recipient''\|''queued''\|''rejected''\|null, string given\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
+
+        -
+            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
+            count: 3
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
+
+        -
+            message: '#^Parameter \#1 \$message_id of method Drupal\\Tests\\sms\\Kernel\\SmsFrameworkDeliveryReportUpdateTest\:\:buildDeliveryReportRequest\(\) expects string, string\|null given\.$#'
+            count: 2
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
+
+        -
+            message: '#^Parameter \#1 \$uid of method Drupal\\sms\\Message\\SmsMessage\:\:setUid\(\) expects int\<1, max\>\|null, int given\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
+
+        -
+            message: '#^Parameter \#1 \$direction of method Drupal\\sms\\Entity\\SmsGatewayInterface\:\:getRetentionDuration\(\) expects \-1\|1, 0 given\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkGatewayEntityTest.php
+
+        -
+            message: '#^Parameter \#1 \$haystack of function strpos expects string, string\|null given\.$#'
+            count: 2
+            path: ../tests/src/Kernel/SmsFrameworkGatewayEntityTest.php
+
+        -
+            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
+            count: 3
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Parameter \#1 \$uid of method Drupal\\sms\\Message\\SmsMessage\:\:setUid\(\) expects int\<1, max\>\|null, int given\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
+            count: 3
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
+
+        -
+            message: '#^Parameter \#1 \$rid of method Drupal\\user\\Entity\\User\:\:addRole\(\) expects string, int\|string\|null given\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
+
+        -
+            message: '#^Parameter \#1 \$view of method Drupal\\Tests\\views\\Kernel\\ViewsKernelTestBase\:\:executeView\(\) expects Drupal\\views\\ViewExecutable, Drupal\\views\\ViewExecutable\|null given\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
+
+        -
+            message: '#^Parameter \#1 \$status of method Drupal\\sms\\Message\\SmsDeliveryReportInterface\:\:setStatus\(\) expects ''content_invalid''\|''delivered''\|''error''\|''expired''\|''invalid_recipient''\|''queued''\|''rejected''\|null, string given\.$#'
+            count: 1
+            path: ../tests/src/Unit/Message/SmsFrameworkDeliveryReportUnitTest.php
+
+        -
+            message: '#^Parameter \#1 \$error of method Drupal\\sms\\Message\\SmsMessageResultInterface\:\:setError\(\) expects ''account_error''\|''authentication''\|''error''\|''flooded''\|''invalid_sender''\|''no_credit''\|''parameters''\|null, string given\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageResultEntityTest.php
+
+        -
+            message: '#^Parameter \#1 \$error of method Drupal\\sms\\Message\\SmsMessageResultInterface\:\:setError\(\) expects ''account_error''\|''authentication''\|''error''\|''flooded''\|''invalid_sender''\|''no_credit''\|''parameters''\|null, string given\.$#'
+            count: 1
+            path: ../tests/src/Unit/Message/SmsFrameworkResultUnitTest.php
+
+        -
+            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
+            count: 3
+            path: ../tests/src/FunctionalJavascript/SmsFrameworkPhoneNumberAdminTest.php
+
+        -
+            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
+            count: 3
+            path: ../tests/src/Functional/SmsFrameworkBrowserTestBase.php
+
+        -
+            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
+            count: 3
+            path: ../tests/src/Kernel/SmsFrameworkKernelBase.php
+
+        -
+            message: '#^Parameter \#1 \$array of function end expects array\|object, mixed given\.$#'
+            count: 3
+            path: ../tests/src/Unit/Event/RecipientGatewayEventTest.php

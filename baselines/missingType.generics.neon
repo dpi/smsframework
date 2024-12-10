@@ -1,0 +1,18 @@
+# total 3 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Plugin\\Field\\FieldFormatter\\SmsLinkFormatter\:\:viewElements\(\) has parameter \$items with generic interface Drupal\\Core\\Field\\FieldItemListInterface but does not specify its types\: T$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Field/FieldFormatter/SmsLinkFormatter.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Plugin\\Field\\FieldWidget\\SmsSendWidget\:\:formElement\(\) has parameter \$items with generic interface Drupal\\Core\\Field\\FieldItemListInterface but does not specify its types\: T$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Field/FieldWidget/SmsSendWidget.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\Field\\FieldWidget\\SmsTelephoneWidget\:\:formElement\(\) has parameter \$items with generic interface Drupal\\Core\\Field\\FieldItemListInterface but does not specify its types\: T$#'
+            count: 1
+            path: ../src/Plugin/Field/FieldWidget/SmsTelephoneWidget.php

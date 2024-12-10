@@ -1,0 +1,8 @@
+# total 1 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Cannot cast mixed to string\.$#'
+            count: 5
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php

@@ -1,0 +1,8 @@
+# total 1 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Variable \$verification in PHPDoc tag @var does not exist\.$#'
+            count: 1
+            path: ../tests/src/Functional/SmsFrameworkPhoneNumberAdminTest.php

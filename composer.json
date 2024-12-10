@@ -28,10 +28,13 @@
   "require-dev": {
       "drupal/core-dev": "^11",
       "mglaman/phpstan-drupal": "^1",
-      "previousnext/coding-standard": "^1.1.1",
+      "phpstan/extension-installer": "^1.4",
       "phpstan/phpstan": "^1.11",
       "phpstan/phpstan-deprecation-rules": "*",
-      "phpstan/extension-installer": "^1.4"
+      "phpstan/phpstan-phpunit": "^1.4.1",
+      "phpstan/phpstan-strict-rules": "^1.6.1",
+      "previousnext/coding-standard": "^1.1.1",
+      "shipmonk/phpstan-baseline-per-identifier": "^1.0"
   },
   "replace": {
     "drupal/sms_blast": "self.version",

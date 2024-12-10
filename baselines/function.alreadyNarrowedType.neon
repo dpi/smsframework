@@ -1,0 +1,18 @@
+# total 3 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
+            count: 1
+            path: ../modules/sms_user/tests/src/Functional/SmsFrameworkUserMenuLinksTest.php
+
+        -
+            message: '#^Call to function is_null\(\) with null will always evaluate to true\.$#'
+            count: 2
+            path: ../src/Message/SmsMessageResult.php
+
+        -
+            message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/EventSubscriber/SmsTestGatewayEventSubscriber.php

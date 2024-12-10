@@ -1,0 +1,8 @@
+# total 1 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Result of && is always true\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/EventSubscriber/SmsTestGatewayEventSubscriber.php

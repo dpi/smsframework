@@ -1,0 +1,73 @@
+# total 14 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Implicit array creation is not allowed \- variable \$elements does not exist\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Filter/FilterInlineSms.php
+
+        -
+            message: '#^Implicit array creation is not allowed \- variable \$data does not exist\.$#'
+            count: 1
+            path: ../modules/sms_user/src/AccountRegistration.php
+
+        -
+            message: '#^Implicit array creation is not allowed \- variable \$t_args does not exist\.$#'
+            count: 3
+            path: ../modules/sms_user/src/AccountRegistration.php
+
+        -
+            message: '#^Implicit array creation is not allowed \- variable \$definitions does not exist\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Implicit array creation is not allowed \- variable \$t_args does not exist\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Implicit array creation is not allowed \- variable \$row does not exist\.$#'
+            count: 1
+            path: ../src/Lists/PhoneNumberSettingsListBuilder.php
+
+        -
+            message: '#^Implicit array creation is not allowed \- variable \$header does not exist\.$#'
+            count: 1
+            path: ../src/Lists/SmsGatewayListBuilder.php
+
+        -
+            message: '#^Implicit array creation is not allowed \- variable \$row does not exist\.$#'
+            count: 1
+            path: ../src/Lists/SmsGatewayListBuilder.php
+
+        -
+            message: '#^Implicit array creation is not allowed \- variable \$messages does not exist\.$#'
+            count: 1
+            path: ../tests/src/Functional/SmsFrameworkIncomingBrowserTest.php
+
+        -
+            message: '#^Implicit array creation is not allowed \- variable \$data does not exist\.$#'
+            count: 1
+            path: ../tests/src/Functional/SmsFrameworkPhoneNumberTest.php
+
+        -
+            message: '#^Implicit array creation is not allowed \- variable \$edit does not exist\.$#'
+            count: 2
+            path: ../tests/src/Functional/SmsFrameworkPhoneNumberVerifyFormTest.php
+
+        -
+            message: '#^Implicit array creation is not allowed \- variable \$edit does not exist\.$#'
+            count: 3
+            path: ../tests/src/Functional/SmsFrameworkSettingsTest.php
+
+        -
+            message: '#^Implicit array creation is not allowed \- variable \$reports does not exist\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
+
+        -
+            message: '#^Implicit array creation is not allowed \- variable \$data does not exist\.$#'
+            count: 2
+            path: ../tests/src/Kernel/SmsFrameworkTokenTest.php

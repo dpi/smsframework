@@ -1,0 +1,8 @@
+# total 1 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Only booleans are allowed in \|\|, Drupal\\sms\\Message\\SmsMessageResultInterface\|null given on the left side\.$#'
+            count: 1
+            path: ../src/Entity/SmsMessage.php

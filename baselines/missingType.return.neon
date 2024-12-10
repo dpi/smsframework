@@ -1,0 +1,38 @@
+# total 7 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Method Drupal\\sms\\Entity\\SmsGateway\:\:postSave\(\) has no return type specified\.$#'
+            count: 1
+            path: ../src/Entity/SmsGateway.php
+
+        -
+            message: '#^Method Drupal\\sms\\Entity\\SmsGateway\:\:preCreate\(\) has no return type specified\.$#'
+            count: 1
+            path: ../src/Entity/SmsGateway.php
+
+        -
+            message: '#^Method Drupal\\sms\\Entity\\SmsMessage\:\:postDelete\(\) has no return type specified\.$#'
+            count: 1
+            path: ../src/Entity/SmsMessage.php
+
+        -
+            message: '#^Method Drupal\\sms\\Entity\\SmsMessage\:\:postSave\(\) has no return type specified\.$#'
+            count: 1
+            path: ../src/Entity/SmsMessage.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\SmsGatewayForm\:\:exists\(\) has no return type specified\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\migrate\\destination\\PhoneNumberSettings\:\:rollback\(\) has no return type specified\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/PhoneNumberSettings.php
+
+        -
+            message: '#^Method Drupal\\sms\\Plugin\\migrate\\destination\\SmsVerification\:\:rollback\(\) has no return type specified\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/SmsVerification.php

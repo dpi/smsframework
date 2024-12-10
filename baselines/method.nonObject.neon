@@ -1,0 +1,393 @@
+# total 78 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Cannot call method toUrl\(\) on Drupal\\node\\Entity\\Node\|null\.$#'
+            count: 2
+            path: ../modules/sms_sendtophone/src/Form/SendToPhoneForm.php
+
+        -
+            message: '#^Cannot call method getMessage\(\) on Drupal\\sms\\Message\\SmsMessageInterface\|false\.$#'
+            count: 3
+            path: ../modules/sms_sendtophone/tests/src/Functional/SmsSendToPhoneBrowserTest.php
+
+        -
+            message: '#^Cannot call method getRecipients\(\) on Drupal\\sms\\Message\\SmsMessageInterface\|false\.$#'
+            count: 2
+            path: ../modules/sms_sendtophone/tests/src/Functional/SmsSendToPhoneBrowserTest.php
+
+        -
+            message: '#^Cannot call method getFieldName\(\) on Drupal\\sms\\Entity\\PhoneNumberSettingsInterface\|null\.$#'
+            count: 2
+            path: ../modules/sms_user/src/AccountRegistration.php
+
+        -
+            message: '#^Cannot call method getAccountName\(\) on Drupal\\user\\UserInterface\|null\.$#'
+            count: 6
+            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserAccountRegistrationServiceTest.php
+
+        -
+            message: '#^Cannot call method getEmail\(\) on Drupal\\user\\UserInterface\|null\.$#'
+            count: 4
+            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserAccountRegistrationServiceTest.php
+
+        -
+            message: '#^Cannot call method getMessage\(\) on Drupal\\sms\\Message\\SmsMessageInterface\|false\.$#'
+            count: 2
+            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserAccountRegistrationServiceTest.php
+
+        -
+            message: '#^Cannot call method getEndDate\(\) on Drupal\\sms_user\\ActiveHoursDates\|false\.$#'
+            count: 2
+            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserActiveHoursServiceTest.php
+
+        -
+            message: '#^Cannot call method getStartDate\(\) on Drupal\\sms_user\\ActiveHoursDates\|false\.$#'
+            count: 2
+            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserActiveHoursServiceTest.php
+
+        -
+            message: '#^Cannot call method getMaxRecipientsOutgoing\(\) on Drupal\\sms\\Entity\\SmsGatewayInterface\|null\.$#'
+            count: 1
+            path: ../src/EventSubscriber/SmsMessageProcessor.php
+
+        -
+            message: '#^Cannot call method getPushReportUrl\(\) on Drupal\\sms\\Entity\\SmsGatewayInterface\|null\.$#'
+            count: 1
+            path: ../src/EventSubscriber/SmsMessageProcessor.php
+
+        -
+            message: '#^Cannot call method setStatus\(\) on Drupal\\sms\\Entity\\PhoneNumberVerificationInterface\|false\.$#'
+            count: 1
+            path: ../src/Form/VerifyPhoneNumberForm.php
+
+        -
+            message: '#^Cannot call method getVerificationCodeLifetime\(\) on Drupal\\sms\\Entity\\PhoneNumberSettingsInterface\|null\.$#'
+            count: 1
+            path: ../src/Lists/PhoneNumberSettingsListBuilder.php
+
+        -
+            message: '#^Cannot call method delete\(\) on Drupal\\field\\FieldStorageConfigInterface\|null\.$#'
+            count: 1
+            path: ../src/Plugin/migrate/destination/PhoneNumberSettings.php
+
+        -
+            message: '#^Cannot call method id\(\) on Drupal\\sms\\Entity\\SmsGatewayInterface\|null\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/EventSubscriber/SmsTestGatewayEventSubscriber.php
+
+        -
+            message: '#^Cannot call method getPushIncomingPath\(\) on Drupal\\sms\\Entity\\SmsGateway\|null\.$#'
+            count: 1
+            path: ../tests/src/Functional/SmsFrameworkGatewayAdminTest.php
+
+        -
+            message: '#^Cannot call method id\(\) on Drupal\\sms\\Entity\\SmsGateway\|null\.$#'
+            count: 2
+            path: ../tests/src/Functional/SmsFrameworkGatewayAdminTest.php
+
+        -
+            message: '#^Cannot call method getCode\(\) on Drupal\\sms\\Entity\\PhoneNumberVerificationInterface\|false\.$#'
+            count: 1
+            path: ../tests/src/Functional/SmsFrameworkPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getCode\(\) on Drupal\\sms\\Entity\\PhoneNumberVerificationInterface\|false\.$#'
+            count: 1
+            path: ../tests/src/Functional/SmsFrameworkPhoneNumberVerifyFormTest.php
+
+        -
+            message: '#^Cannot call method getStatus\(\) on Drupal\\sms\\Entity\\PhoneNumberVerificationInterface\|false\.$#'
+            count: 2
+            path: ../tests/src/Functional/SmsFrameworkPhoneNumberVerifyFormTest.php
+
+        -
+            message: '#^Cannot call method set\(\) on Drupal\\sms\\Entity\\PhoneNumberVerificationInterface\|false\.$#'
+            count: 3
+            path: ../tests/src/Functional/SmsFrameworkPhoneNumberWidgetTest.php
+
+        -
+            message: '#^Cannot call method setStatus\(\) on Drupal\\sms\\Entity\\PhoneNumberVerificationInterface\|false\.$#'
+            count: 1
+            path: ../tests/src/Functional/SmsFrameworkPhoneNumberWidgetTest.php
+
+        -
+            message: '#^Cannot call method get\(\) on Drupal\\user\\Entity\\User\|null\.$#'
+            count: 3
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getComponent\(\) on Drupal\\Core\\Entity\\Entity\\EntityFormDisplay\|null\.$#'
+            count: 2
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getName\(\) on Drupal\\field\\Entity\\FieldStorageConfig\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getPhoneNumbers\(\) on mixed\.$#'
+            count: 3
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getPhoneVerificationByPhoneNumber\(\) on mixed\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getTargetBundle\(\) on Drupal\\field\\Entity\\FieldConfig\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getTargetEntityTypeId\(\) on Drupal\\field\\Entity\\FieldConfig\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getTargetEntityTypeId\(\) on Drupal\\field\\Entity\\FieldStorageConfig\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getType\(\) on Drupal\\field\\Entity\\FieldStorageConfig\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method id\(\) on Drupal\\field\\Entity\\FieldStorageConfig\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method get\(\) on Drupal\\user\\Entity\\User\|null\.$#'
+            count: 3
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getComponent\(\) on Drupal\\Core\\Entity\\Entity\\EntityFormDisplay\|null\.$#'
+            count: 2
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getName\(\) on Drupal\\field\\Entity\\FieldStorageConfig\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getPhoneNumbers\(\) on mixed\.$#'
+            count: 3
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getPhoneVerificationByPhoneNumber\(\) on mixed\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getTargetBundle\(\) on Drupal\\field\\Entity\\FieldConfig\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getTargetEntityTypeId\(\) on Drupal\\field\\Entity\\FieldConfig\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getTargetEntityTypeId\(\) on Drupal\\field\\Entity\\FieldStorageConfig\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getType\(\) on Drupal\\field\\Entity\\FieldStorageConfig\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method id\(\) on Drupal\\field\\Entity\\FieldStorageConfig\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Cannot call method getStatusTime\(\) on Drupal\\sms\\Entity\\SmsDeliveryReportInterface\|null\.$#'
+            count: 6
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
+
+        -
+            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
+
+        -
+            message: '#^Cannot call method getStatus\(\) on Drupal\\sms\\Entity\\SmsDeliveryReport\|null\.$#'
+            count: 2
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
+
+        -
+            message: '#^Cannot call method getStatusTime\(\) on Drupal\\sms\\Entity\\SmsDeliveryReport\|null\.$#'
+            count: 2
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
+
+        -
+            message: '#^Cannot call method getTimeDelivered\(\) on Drupal\\sms\\Entity\\SmsDeliveryReport\|null\.$#'
+            count: 2
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
+
+        -
+            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
+
+        -
+            message: '#^Cannot call method getDirection\(\) on Drupal\\sms\\Entity\\SmsMessage\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Cannot call method getErrorMessage\(\) on Drupal\\sms\\Message\\SmsMessageResultInterface\|null\.$#'
+            count: 6
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Cannot call method getMessage\(\) on Drupal\\sms\\Entity\\SmsMessage\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Cannot call method getRecipient\(\) on Drupal\\sms\\Message\\SmsDeliveryReportInterface\|null\.$#'
+            count: 4
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Cannot call method getRecipients\(\) on Drupal\\sms\\Entity\\SmsMessage\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Cannot call method getReports\(\) on Drupal\\sms\\Entity\\SmsMessage\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Cannot call method getResult\(\) on Drupal\\sms\\Entity\\SmsMessage\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Cannot call method getSender\(\) on Drupal\\sms\\Entity\\SmsMessage\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Cannot call method getStatus\(\) on Drupal\\sms\\Message\\SmsDeliveryReportInterface\|null\.$#'
+            count: 2
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Cannot call method id\(\) on Drupal\\Core\\Entity\\EntityInterface\|null\.$#'
+            count: 3
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Cannot call method getRecipients\(\) on Drupal\\sms\\Message\\SmsMessageInterface\|false\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkPhoneNumberProviderTest.php
+
+        -
+            message: '#^Cannot call method getCode\(\) on Drupal\\sms\\Entity\\PhoneNumberVerificationInterface\|false\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkPhoneNumberVerificationTest.php
+
+        -
+            message: '#^Cannot call method getEntity\(\) on Drupal\\sms\\Entity\\PhoneNumberVerificationInterface\|false\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkPhoneNumberVerificationTest.php
+
+        -
+            message: '#^Cannot call method getPhoneNumber\(\) on Drupal\\sms\\Entity\\PhoneNumberVerificationInterface\|false\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkPhoneNumberVerificationTest.php
+
+        -
+            message: '#^Cannot call method id\(\) on Drupal\\Core\\Entity\\EntityInterface\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkPhoneNumberVerificationTest.php
+
+        -
+            message: '#^Cannot call method id\(\) on Drupal\\sms\\Entity\\PhoneNumberVerificationInterface\|false\.$#'
+            count: 2
+            path: ../tests/src/Kernel/SmsFrameworkPhoneNumberVerificationTest.php
+
+        -
+            message: '#^Cannot call method getProcessedTime\(\) on Drupal\\sms\\Entity\\SmsMessage\|false\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkQueueTest.php
+
+        -
+            message: '#^Cannot call method isQueued\(\) on Drupal\\sms\\Entity\\SmsMessage\|false\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkQueueTest.php
+
+        -
+            message: '#^Cannot call method isQueued\(\) on Drupal\\sms\\Entity\\SmsMessage\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkQueueTest.php
+
+        -
+            message: '#^Cannot call method id\(\) on Drupal\\sms\\Entity\\SmsGatewayInterface\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkRecipientGatewayEventTest.php
+
+        -
+            message: '#^Cannot call method setStatus\(\) on Drupal\\sms\\Entity\\PhoneNumberVerificationInterface\|false\.$#'
+            count: 5
+            path: ../tests/src/Kernel/SmsFrameworkVerificationMaintenanceTest.php
+
+        -
+            message: '#^Cannot call method setDisplay\(\) on Drupal\\views\\ViewExecutable\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
+
+        -
+            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
+
+        -
+            message: '#^Cannot call method getErrorMessage\(\) on Drupal\\sms\\Message\\SmsMessageResultInterface\|null\.$#'
+            count: 2
+            path: ../tests/src/Unit/Message/SmsMessageTest.php
+
+        -
+            message: '#^Cannot call method getStatus\(\) on Drupal\\sms\\Message\\SmsDeliveryReportInterface\|null\.$#'
+            count: 2
+            path: ../tests/src/Unit/Message/SmsMessageTest.php
+
+        -
+            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
+            count: 1
+            path: ../tests/src/FunctionalJavascript/SmsFrameworkPhoneNumberAdminTest.php
+
+        -
+            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
+            count: 1
+            path: ../tests/src/Functional/SmsFrameworkBrowserTestBase.php
+
+        -
+            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkKernelBase.php
+
+        -
+            message: '#^Cannot call method setStatus\(\) on Drupal\\Core\\Entity\\EntityInterface\|false\.$#'
+            count: 1
+            path: ../tests/src/Unit/Event/RecipientGatewayEventTest.php

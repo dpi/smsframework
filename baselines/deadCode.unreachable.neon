@@ -1,0 +1,8 @@
+# total 1 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Unreachable statement \- code above always terminates\.$#'
+            count: 2
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
