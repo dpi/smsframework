@@ -1,0 +1,8 @@
+# total 1 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Match arm is unreachable because previous comparison is always true\.$#'
+            count: 1
+            path: ../src/Entity/SmsGateway.php

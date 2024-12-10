@@ -1,9 +1,13 @@
+includes:
+  - baselines/loader.neon
+
 parameters:
-  level: 1
+  level: 9
   paths:
     - ./src
     - ./tests
     - ./modules
   reportUnmatchedIgnoredErrors: true
-#  ignoreErrors:
-#    - identifier: missingType.iterableValue
+  shipmonkBaselinePerIdentifier:
+      directory: %currentWorkingDirectory%/baselines
+      indent: '    '

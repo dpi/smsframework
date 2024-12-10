@@ -1,0 +1,28 @@
+# total 5 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Cannot access property \$value on Drupal\\Core\\TypedData\\TypedDataInterface\|null\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Plugin/Field/FieldWidget/SmsSendWidget.php
+
+        -
+            message: '#^Cannot access property \$value on mixed\.$#'
+            count: 1
+            path: ../src/Entity/SmsMessage.php
+
+        -
+            message: '#^Cannot access property \$field on Drupal\\views\\ViewExecutable\|null\.$#'
+            count: 23
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
+
+        -
+            message: '#^Cannot access property \$result on Drupal\\views\\ViewExecutable\|null\.$#'
+            count: 22
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
+
+        -
+            message: '#^Cannot access property \$total_rows on Drupal\\views\\ViewExecutable\|null\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php

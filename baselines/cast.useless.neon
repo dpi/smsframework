@@ -1,0 +1,18 @@
+# total 3 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Casting to int something that''s already int\.$#'
+            count: 2
+            path: ../src/Entity/SmsGateway.php
+
+        -
+            message: '#^Casting to int something that''s already int\.$#'
+            count: 2
+            path: ../tests/modules/sms_test_time/src/SmsTestTime.php
+
+        -
+            message: '#^Casting to int something that''s already int\.$#'
+            count: 1
+            path: ../tests/src/Functional/SmsFrameworkPhoneNumberTest.php

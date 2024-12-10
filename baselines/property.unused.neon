@@ -1,0 +1,18 @@
+# total 3 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkIncomingRouteTest\:\:\$incomingGateway is unused\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkIncomingRouteTest.php
+
+        -
+            message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkPhoneNumberProviderTest\:\:\$phoneNumberVerificationProvider is unused\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkPhoneNumberProviderTest.php
+
+        -
+            message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkPhoneNumberVerificationTest\:\:\$phoneNumberProvider is unused\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkPhoneNumberVerificationTest.php

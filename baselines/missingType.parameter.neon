@@ -1,0 +1,103 @@
+# total 20 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Function sms_sendtophone_form_alter\(\) has parameter \$form with no type specified\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/sms_sendtophone.module
+
+        -
+            message: '#^Function sms_sendtophone_form_alter\(\) has parameter \$form_id with no type specified\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/sms_sendtophone.module
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Form\\SendToPhoneForm\:\:buildForm\(\) has parameter \$extra with no type specified\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/SendToPhoneForm.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Form\\SendToPhoneForm\:\:buildForm\(\) has parameter \$type with no type specified\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/SendToPhoneForm.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Form\\SendToPhoneForm\:\:getForm\(\) has parameter \$extra with no type specified\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/SendToPhoneForm.php
+
+        -
+            message: '#^Method Drupal\\sms_sendtophone\\Form\\SendToPhoneForm\:\:getForm\(\) has parameter \$type with no type specified\.$#'
+            count: 1
+            path: ../modules/sms_sendtophone/src/Form/SendToPhoneForm.php
+
+        -
+            message: '#^Method Drupal\\sms_user\\Form\\AdminSettingsForm\:\:buildForm\(\) has parameter \$domain with no type specified\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms_user\\Form\\AdminSettingsForm\:\:buildForm\(\) has parameter \$op with no type specified\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms_user\\Kernel\\SmsFrameworkUserActiveHoursServiceTest\:\:activeHoursStatus\(\) has parameter \$status with no type specified\.$#'
+            count: 1
+            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserActiveHoursServiceTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms_user\\Kernel\\SmsFrameworkUserActiveHoursServiceTest\:\:setActiveHours\(\) has parameter \$ranges with no type specified\.$#'
+            count: 1
+            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserActiveHoursServiceTest.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\PhoneNumberSettingsForm\:\:updateFieldMapping\(\) has parameter \$form with no type specified\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\SmsGatewayForm\:\:exists\(\) has parameter \$entity_id with no type specified\.$#'
+            count: 1
+            path: ../src/Form/SmsGatewayForm.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD6SmsPhoneNumberTest\:\:assertUnVerifiedPhoneNumber\(\) has parameter \$number with no type specified\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD6SmsPhoneNumberTest\:\:assertVerificationCode\(\) has parameter \$code with no type specified\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD6SmsPhoneNumberTest\:\:assertVerificationCode\(\) has parameter \$number with no type specified\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD6SmsPhoneNumberTest\:\:assertVerifiedPhoneNumber\(\) has parameter \$number with no type specified\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD6SmsPhoneNumberTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD7SmsPhoneNumberTest\:\:assertUnVerifiedPhoneNumber\(\) has parameter \$number with no type specified\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD7SmsPhoneNumberTest\:\:assertVerificationCode\(\) has parameter \$code with no type specified\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD7SmsPhoneNumberTest\:\:assertVerificationCode\(\) has parameter \$number with no type specified\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php
+
+        -
+            message: '#^Method Drupal\\Tests\\sms\\Kernel\\Migrate\\MigrateD7SmsPhoneNumberTest\:\:assertVerifiedPhoneNumber\(\) has parameter \$number with no type specified\.$#'
+            count: 1
+            path: ../tests/src/Kernel/Migrate/MigrateD7SmsPhoneNumberTest.php

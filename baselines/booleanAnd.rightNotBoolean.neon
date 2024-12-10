@@ -1,0 +1,13 @@
+# total 2 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Only booleans are allowed in &&, mixed given on the right side\.$#'
+            count: 1
+            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
+
+        -
+            message: '#^Only booleans are allowed in &&, Drupal\\sms\\Entity\\PhoneNumberSettingsInterface given on the right side\.$#'
+            count: 2
+            path: ../src/Plugin/migrate/destination/SmsVerification.php

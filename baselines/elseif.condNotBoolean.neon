@@ -1,0 +1,18 @@
+# total 3 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Only booleans are allowed in an elseif condition, int\<0, max\> given\.$#'
+            count: 1
+            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
+
+        -
+            message: '#^Only booleans are allowed in an elseif condition, mixed given\.$#'
+            count: 1
+            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
+
+        -
+            message: '#^Only booleans are allowed in an elseif condition, Drupal\\sms\\Message\\SmsMessageResultInterface\|null given\.$#'
+            count: 1
+            path: ../src/Entity/SmsMessage.php

@@ -1,0 +1,83 @@
+# total 16 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Variable property access on Drupal\\user\\UserInterface\.$#'
+            count: 3
+            path: ../modules/sms_sendtophone/tests/src/Functional/SmsSendToPhoneBrowserTest.php
+
+        -
+            message: '#^Variable property access on Drupal\\user\\Entity\\User\.$#'
+            count: 2
+            path: ../modules/sms_user/src/AccountRegistration.php
+
+        -
+            message: '#^Variable property access on Drupal\\user\\UserInterface\.$#'
+            count: 2
+            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserAccountRegistrationServiceTest.php
+
+        -
+            message: '#^Variable property access on Drupal\\Core\\Entity\\EntityInterface\.$#'
+            count: 2
+            path: ../src/EventSubscriber/SmsEntityPhoneNumberProcessor.php
+
+        -
+            message: '#^Variable property access on Drupal\\Core\\Entity\\EntityInterface\.$#'
+            count: 2
+            path: ../src/Plugin/migrate/destination/SmsVerification.php
+
+        -
+            message: '#^Variable property access on Drupal\\Core\\Entity\\EntityInterface\.$#'
+            count: 3
+            path: ../src/Provider/PhoneNumberVerification.php
+
+        -
+            message: '#^Variable property access on mixed\.$#'
+            count: 1
+            path: ../src/Provider/PhoneNumberVerification.php
+
+        -
+            message: '#^Variable property access on Drupal\\entity_test\\Entity\\EntityTest\|null\.$#'
+            count: 2
+            path: ../tests/src/Kernel/SmsFrameworkVerificationMaintenanceTest.php
+
+        -
+            message: '#^Variable property access on Drupal\\Core\\Entity\\EntityInterface\.$#'
+            count: 1
+            path: ../tests/src/FunctionalJavascript/SmsFrameworkPhoneNumberAdminTest.php
+
+        -
+            message: '#^Variable property access on Drupal\\Core\\Entity\\EntityInterface\.$#'
+            count: 1
+            path: ../tests/src/Functional/SmsFrameworkBrowserTestBase.php
+
+        -
+            message: '#^Variable property access on Drupal\\Core\\Entity\\EntityInterface\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
+
+        -
+            message: '#^Variable property access on Drupal\\Core\\Entity\\EntityInterface\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportUpdateTest.php
+
+        -
+            message: '#^Variable property access on Drupal\\Core\\Entity\\EntityInterface\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkKernelBase.php
+
+        -
+            message: '#^Variable property access on Drupal\\Core\\Entity\\EntityInterface\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageEntityTest.php
+
+        -
+            message: '#^Variable property access on Drupal\\Core\\Entity\\EntityInterface\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php
+
+        -
+            message: '#^Variable property access on Drupal\\Core\\Entity\\EntityInterface\.$#'
+            count: 1
+            path: ../tests/src/Unit/Event/RecipientGatewayEventTest.php

@@ -1,0 +1,63 @@
+# total 12 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and non\-falsy\-string will always evaluate to true\.$#'
+            count: 1
+            path: ../tests/src/Functional/SmsFrameworkIncomingBrowserTest.php
+
+        -
+            message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
+            count: 3
+            path: ../tests/src/Kernel/SmsFrameworkGatewayEntityTest.php
+
+        -
+            message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertNotFalse\(\) with Drupal\\sms\\Entity\\PhoneNumberVerificationInterface\|null will always evaluate to true\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkPhoneNumberVerificationTest.php
+
+        -
+            message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkPhoneNumberVerificationTest.php
+
+        -
+            message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Return value is a…'' will always evaluate to true\.$#'
+            count: 2
+            path: ../tests/src/Kernel/SmsFrameworkProviderTest.php
+
+        -
+            message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkProviderTest.php
+
+        -
+            message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
+            count: 7
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
+
+        -
+            message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
+            count: 7
+            path: ../tests/src/Unit/Message/SmsFrameworkDeliveryReportUnitTest.php
+
+        -
+            message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Return type is a…'' will always evaluate to true\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageResultEntityTest.php
+
+        -
+            message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
+            count: 6
+            path: ../tests/src/Kernel/SmsFrameworkMessageResultEntityTest.php
+
+        -
+            message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Return type is a…'' will always evaluate to true\.$#'
+            count: 1
+            path: ../tests/src/Unit/Message/SmsFrameworkResultUnitTest.php
+
+        -
+            message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
+            count: 6
+            path: ../tests/src/Unit/Message/SmsFrameworkResultUnitTest.php

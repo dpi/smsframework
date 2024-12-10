@@ -1,0 +1,33 @@
+# total 6 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Only booleans are allowed in a ternary operator condition, string\|null given\.$#'
+            count: 1
+            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
+
+        -
+            message: '#^Only booleans are allowed in a ternary operator condition, array\<Drupal\\user\\Entity\\User\> given\.$#'
+            count: 1
+            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserAccountRegistrationServiceTest.php
+
+        -
+            message: '#^Only booleans are allowed in a ternary operator condition, Drupal\\Core\\Entity\\EntityInterface\|null given\.$#'
+            count: 1
+            path: ../src/Entity/SmsMessage.php
+
+        -
+            message: '#^Only booleans are allowed in a ternary operator condition, Drupal\\Core\\Field\\FieldItemInterface\|null given\.$#'
+            count: 1
+            path: ../src/Entity/SmsMessage.php
+
+        -
+            message: '#^Only booleans are allowed in a ternary operator condition, array\<Drupal\\Core\\Entity\\EntityInterface\> given\.$#'
+            count: 2
+            path: ../src/Entity/SmsMessage.php
+
+        -
+            message: '#^Only booleans are allowed in a ternary operator condition, Drupal\\sms\\Message\\SmsMessageResultInterface\|null given\.$#'
+            count: 1
+            path: ../src/Message/SmsMessage.php

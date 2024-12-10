@@ -1,0 +1,68 @@
+# total 13 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Instanceof between Drupal\\Core\\Entity\\EntityDisplayRepository and Drupal\\Core\\Entity\\EntityDisplayRepositoryInterface will always evaluate to true\.$#'
+            count: 1
+            path: ../modules/sms_user/tests/src/Functional/SmsFrameworkUserMenuLinksTest.php
+
+        -
+            message: '#^Instanceof between Drupal\\sms\\Message\\SmsMessageInterface and Drupal\\sms\\Message\\SmsMessageInterface will always evaluate to true\.$#'
+            count: 1
+            path: ../tests/modules/sms_test_gateway/src/EventSubscriber/SmsTestGatewayEventSubscriber.php
+
+        -
+            message: '#^Instanceof between Drupal\\Core\\Url and Drupal\\Core\\Url will always evaluate to true\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkGatewayEntityTest.php
+
+        -
+            message: '#^Instanceof between Drupal\\sms\\Entity\\SmsGatewayInterface and Drupal\\sms\\Entity\\SmsGatewayInterface will always evaluate to true\.$#'
+            count: 2
+            path: ../tests/src/Kernel/SmsFrameworkGatewayEntityTest.php
+
+        -
+            message: '#^Instanceof between Drupal\\sms\\Entity\\PhoneNumberSettingsInterface and Drupal\\sms\\Entity\\PhoneNumberSettingsInterface will always evaluate to true\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkPhoneNumberVerificationTest.php
+
+        -
+            message: '#^Instanceof between Drupal\\sms\\Entity\\SmsMessageInterface and Drupal\\sms\\Entity\\SmsMessageInterface will always evaluate to true\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkProviderTest.php
+
+        -
+            message: '#^Instanceof between Drupal\\sms\\Message\\SmsMessageInterface and Drupal\\sms\\Message\\SmsMessageInterface will always evaluate to true\.$#'
+            count: 2
+            path: ../tests/src/Kernel/SmsFrameworkProviderTest.php
+
+        -
+            message: '#^Instanceof between Drupal\\sms\\Message\\SmsDeliveryReportInterface and Drupal\\sms\\Message\\SmsDeliveryReportInterface will always evaluate to true\.$#'
+            count: 7
+            path: ../tests/src/Kernel/SmsFrameworkDeliveryReportEntityTest.php
+
+        -
+            message: '#^Instanceof between Drupal\\sms\\Message\\SmsDeliveryReportInterface and Drupal\\sms\\Message\\SmsDeliveryReportInterface will always evaluate to true\.$#'
+            count: 7
+            path: ../tests/src/Unit/Message/SmsFrameworkDeliveryReportUnitTest.php
+
+        -
+            message: '#^Instanceof between Drupal\\sms\\Message\\SmsDeliveryReportInterface and Drupal\\sms\\Message\\SmsDeliveryReportInterface will always evaluate to true\.$#'
+            count: 1
+            path: ../tests/src/Kernel/SmsFrameworkMessageResultEntityTest.php
+
+        -
+            message: '#^Instanceof between Drupal\\sms\\Message\\SmsMessageResultInterface and Drupal\\sms\\Message\\SmsMessageResultInterface will always evaluate to true\.$#'
+            count: 6
+            path: ../tests/src/Kernel/SmsFrameworkMessageResultEntityTest.php
+
+        -
+            message: '#^Instanceof between Drupal\\sms\\Message\\SmsDeliveryReportInterface and Drupal\\sms\\Message\\SmsDeliveryReportInterface will always evaluate to true\.$#'
+            count: 1
+            path: ../tests/src/Unit/Message/SmsFrameworkResultUnitTest.php
+
+        -
+            message: '#^Instanceof between Drupal\\sms\\Message\\SmsMessageResultInterface and Drupal\\sms\\Message\\SmsMessageResultInterface will always evaluate to true\.$#'
+            count: 6
+            path: ../tests/src/Unit/Message/SmsFrameworkResultUnitTest.php

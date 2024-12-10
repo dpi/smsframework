@@ -1,0 +1,8 @@
+# total 1 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Match arm comparison between 1 and 1 is always true\.$#'
+            count: 1
+            path: ../src/Entity/SmsGateway.php
