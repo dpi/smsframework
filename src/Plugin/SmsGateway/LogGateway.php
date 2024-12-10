@@ -40,7 +40,7 @@ class LogGateway extends SmsGatewayPluginBase implements ContainerFactoryPluginI
   final public function __construct(
     array $configuration,
     $plugin_id,
-    array $plugin_definition,
+    $plugin_definition,
     LoggerChannelFactoryInterface $logger_factory,
     protected TimeInterface $time,
   ) {

@@ -22,13 +22,10 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
   /**
    * Sets the phone number settings entity type.
    *
-   * @param string $entity_type_id
-   *   Entity type ID of phone number settings.
-   *
    * @return $this
    *   Return phone number settings for chaining.
    */
-  public function setPhoneNumberEntityTypeId($entity_type_id);
+  public function setPhoneNumberEntityTypeId(string $entity_type_id);
 
   /**
    * Gets the phone number settings bundle.
@@ -41,13 +38,10 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
   /**
    * Sets the phone number settings bundle.
    *
-   * @param string $bundle
-   *   Bundle of phone number settings.
-   *
    * @return $this
    *   Return phone number settings for chaining.
    */
-  public function setPhoneNumberBundle($bundle);
+  public function setPhoneNumberBundle(string $bundle);
 
   /**
    * Gets the message template to send for phone number verification.
@@ -60,18 +54,15 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
   /**
    * Sets the message template to send for phone number verification.
    *
-   * @param string $message
-   *   Message template to send for phone number verification.
-   *
    * @return $this
    *   Return phone number settings for chaining.
    */
-  public function setVerificationMessage($message);
+  public function setVerificationMessage(string $message);
 
   /**
    * Gets the number of seconds before phone number verifications expire.
    *
-   * @return int
+   * @return positive-int
    *   Number of seconds before phone number verifications expire.
    */
   public function getVerificationCodeLifetime(): int;
@@ -79,13 +70,10 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
   /**
    * Sets the number of seconds before phone number verifications expire.
    *
-   * @param int $lifetime
-   *   Number of seconds before phone number verifications expire.
-   *
    * @return $this
    *   Return phone number settings for chaining.
    */
-  public function setVerificationCodeLifetime($lifetime);
+  public function setVerificationCodeLifetime(int $lifetime);
 
   /**
    * Whether phone numbers are purged when verifications expire.
@@ -104,13 +92,10 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
    * Sets if phone number field values are removed when phone number
    * verifications expire.
    *
-   * @param bool $purge
-   *   Whether to remove phone number field values.
-   *
    * @return $this
    *   Return phone number settings for chaining.
    */
-  public function setPurgeVerificationPhoneNumber($purge);
+  public function setPurgeVerificationPhoneNumber(bool $purge);
 
   /**
    * Gets a field mapping.
@@ -121,7 +106,7 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
    * @return string|null
    *   A field name, or NULL if not set.
    */
-  public function getFieldName($map): ?string;
+  public function getFieldName(string $map): ?string;
 
   /**
    * Gets a field mapping.
@@ -134,6 +119,6 @@ interface PhoneNumberSettingsInterface extends ConfigEntityInterface {
    * @return $this
    *   Return phone number settings for chaining.
    */
-  public function setFieldName($map, $field_name);
+  public function setFieldName(string $map, ?string $field_name);
 
 }

@@ -46,7 +46,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    * @return $this
    *   Return this gateway for chaining.
    */
-  public function setSkipQueue($skip_queue);
+  public function setSkipQueue(bool $skip_queue);
 
   /**
    * Get the internal path where incoming messages are received.
@@ -65,7 +65,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    * @return $this
    *   Return this gateway for chaining.
    */
-  public function setPushIncomingPath($path);
+  public function setPushIncomingPath(?string $path);
 
   /**
    * Get the url where pushed delivery reports can be received.
@@ -92,7 +92,7 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    * @return $this
    *   Return this gateway for chaining.
    */
-  public function setPushReportPath($path);
+  public function setPushReportPath(?string $path);
 
   /**
    * Get how many seconds to hold messages.
@@ -117,45 +117,33 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
    * @return $this
    *   Return this gateway for chaining.
    */
-  public function setRetentionDuration(int $direction, $retention_duration);
+  public function setRetentionDuration(int $direction, int $retention_duration);
 
   /**
    * Get maximum number of recipients per outgoing message.
    *
-   * @return int
+   * @return int<-1, max>
    *   Maximum number of recipients, or -1 for no limit.
    */
   public function getMaxRecipientsOutgoing(): int;
 
   /**
    * Whether the gateway supports receiving messages.
-   *
-   * @return bool
-   *   Whether the gateway supports receiving messages.
    */
   public function supportsIncoming(): bool;
 
   /**
    * Whether to automatically create a route for receiving incoming messages.
-   *
-   * @return bool
-   *   Whether to automatically create a route for receiving incoming messages.
    */
   public function autoCreateIncomingRoute(): bool;
 
   /**
    * Get whether this gateway is schedule aware.
-   *
-   * @return bool
-   *   Whether this gateway is schedule aware.
    */
   public function isScheduleAware(): bool;
 
   /**
    * Gets whether this gateway can pull reports.
-   *
-   * @return bool
-   *   Whether this gateway can pull reports.
    *
    * @see \Drupal\sms\Annotation\SmsGateway::reports_pull
    */
@@ -164,18 +152,12 @@ interface SmsGatewayInterface extends ConfigEntityInterface {
   /**
    * Gets whether this gateway can handle reports pushed to the site.
    *
-   * @return bool
-   *   Whether this gateway can handle reports pushed to the site.
-   *
    * @see \Drupal\sms\Annotation\SmsGateway::reports_push
    */
   public function supportsReportsPush(): bool;
 
   /**
    * Get whether this gateway supports credit balance queries.
-   *
-   * @return bool
-   *   Whether this gateway supports credit balance queries.
    *
    * @see \Drupal\sms\Annotation\SmsGateway::credit_balance_available
    */

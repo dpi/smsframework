@@ -11,8 +11,8 @@ use Drupal\sms\Entity\SmsDeliveryReportInterface;
 use Drupal\sms\Entity\SmsMessage;
 use Drupal\sms\Message\SmsDeliveryReportInterface as BaseSmsDeliveryReportInterface;
 use Drupal\sms\Message\SmsMessageReportStatus;
-use Drupal\Tests\sms\Functional\SmsFrameworkDeliveryReportTestTrait;
-use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
+use Drupal\Tests\sms\Trait\SmsFrameworkDeliveryReportTestTrait;
+use Drupal\Tests\sms\Trait\SmsFrameworkTestTrait;
 
 /**
  * Tests the SMS Delivery report entity.

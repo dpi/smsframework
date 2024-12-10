@@ -36,12 +36,13 @@ class DefaultSmsProvider implements SmsProviderInterface {
    * {@inheritdoc}
    */
   public function queue(SmsMessageInterface $sms_message): array {
-    if (!$sms_message->getDirection()) {
+    if ($sms_message->getDirection() === NULL) {
       throw new SmsDirectionException('Missing direction for message.');
     }
 
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_PRE_PROCESS, [$sms_message])->getMessages();
     $sms_messages = $this->dispatchEvent(SmsEvents::MESSAGE_QUEUE_PRE_PROCESS, $sms_messages)->getMessages();
+    unset($sms_message);
 
     foreach ($sms_messages as $gateway_id => &$sms_message) {
       // Tag so SmsEvents::MESSAGE_PRE_PROCESS is not dispatched again.

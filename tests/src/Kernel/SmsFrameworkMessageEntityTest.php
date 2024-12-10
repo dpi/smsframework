@@ -13,8 +13,8 @@ use Drupal\sms\Entity\SmsMessageInterface;
 use Drupal\sms\Entity\SmsMessageResult;
 use Drupal\sms\Message\SmsMessage as StandardSmsMessage;
 use Drupal\sms\Message\SmsMessageResultInterface;
-use Drupal\Tests\sms\Functional\SmsFrameworkMessageTestTrait;
-use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
+use Drupal\Tests\sms\Trait\SmsFrameworkMessageTestTrait;
+use Drupal\Tests\sms\Trait\SmsFrameworkTestTrait;
 use Drupal\user\Entity\User;
 
 /**
@@ -249,6 +249,7 @@ final class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $original = new StandardSmsMessage('', [], '', [], NULL);
     $original
       ->setAutomated(TRUE)
+      ->setDirection(Direction::OUTGOING)
       ->setSender($this->randomMachineName())
       ->setSenderNumber($sender_number[0])
       ->addRecipients(['123123123', '456456456'])
@@ -262,6 +263,7 @@ final class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
     $sms_message = SmsMessage::convertFromSmsMessage($original);
 
     static::assertEquals($original->isAutomated(), $sms_message->isAutomated());
+    static::assertEquals($original->getDirection(), $sms_message->getDirection());
     static::assertEquals($original->getSender(), $sms_message->getSender());
     static::assertEquals($original->getSenderNumber(), $sms_message->getSenderNumber());
     static::assertEquals($original->getRecipients(), $sms_message->getRecipients());

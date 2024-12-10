@@ -41,7 +41,7 @@ interface SmsProviderInterface {
    * @return \Drupal\sms\Message\SmsMessageInterface[]
    *   The messages sent in this sending operation. The message sent can be
    *   transformed into multiple messages depending on gateway and event
-   *   subscribers. Therefore this function can return multiple messages.
+   *   subscribers. Therefore, this function can return multiple messages.
    *
    * @throws \Drupal\sms\Exception\RecipientRouteException
    *   Thrown if no gateway could be determined for the message.

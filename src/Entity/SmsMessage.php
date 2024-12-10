@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Exception\SmsStorageException;
 use Drupal\sms\Message\SmsDeliveryReportInterface;
 use Drupal\sms\Message\SmsMessageInterface as StdSmsMessageInterface;
@@ -543,7 +544,7 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
 
     $new = static::create();
     $new
-      ->setDirection($sms_message->getDirection())
+      ->setDirection($sms_message->getDirection() ?? throw new SmsException('Direction must be set before conversion.'))
       ->setAutomated($sms_message->isAutomated())
       ->setSender($sms_message->getSender())
       ->setSenderNumber($sms_message->getSenderNumber())

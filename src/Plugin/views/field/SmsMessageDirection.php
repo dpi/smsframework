@@ -21,6 +21,7 @@ class SmsMessageDirection extends FieldPluginBase {
    * {@inheritdoc}
    */
   public function render(ResultRow $values) {
+    /** @var string|null $value */
     $value = $this->getValue($values);
     // Match is strict so cast.
     $value = isset($value) ? (int) $value : NULL;

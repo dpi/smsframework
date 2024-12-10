@@ -37,7 +37,7 @@ final class MigrateD7SmsPhoneNumberTest extends MigrateDrupal7TestBase {
    */
   public function testMigrationRequirements(): void {
     $this->expectException(RequirementsException::class);
-    $this->expectExceptionMessage('/Missing migrations (d7_user|phone_number_settings), (d7_user|phone_number_settings)/');
+    $this->expectExceptionMessageMatches('/Missing migrations (d7_user|phone_number_settings), (d7_user|phone_number_settings)/');
     $this->getMigration('d7_sms_number')->checkRequirements();
   }
 

@@ -62,9 +62,6 @@ class SmsMessageProcessor implements EventSubscriberInterface {
 
   /**
    * Ensures there is a result, and reports for each recipient.
-   *
-   * @param \Drupal\sms\Event\SmsMessageEvent $event
-   *   An SMS message process event.
    */
   public function ensureReportsPreprocess(SmsMessageEvent $event): void {
     $sms_messages = $event->getMessages();
@@ -78,9 +75,6 @@ class SmsMessageProcessor implements EventSubscriberInterface {
 
   /**
    * Ensures there is a result, and reports for each recipient.
-   *
-   * @param \Drupal\sms\Event\SmsMessageEvent $event
-   *   An SMS message process event.
    */
   public function ensureReportsPostprocess(SmsMessageEvent $event): void {
     $sms_messages = $event->getMessages();
@@ -91,9 +85,6 @@ class SmsMessageProcessor implements EventSubscriberInterface {
 
   /**
    * Ensures there is a result, and reports for each recipient.
-   *
-   * @param \Drupal\sms\Message\SmsMessageInterface $sms_message
-   *   A message to validate.
    *
    * @throws \Drupal\sms\Exception\SmsPluginReportException
    *   Thrown if result or reports are invalid.
@@ -120,9 +111,6 @@ class SmsMessageProcessor implements EventSubscriberInterface {
 
   /**
    * Ensures there is at least one recipient on the message.
-   *
-   * @param \Drupal\sms\Event\SmsMessageEvent $event
-   *   The SMS message preprocess event.
    */
   public function ensureRecipients(SmsMessageEvent $event): void {
     $sms_messages = $event->getMessages();
@@ -142,9 +130,6 @@ class SmsMessageProcessor implements EventSubscriberInterface {
    *
    * Messages will be split into multiple if recipients need to be routed to
    * different gateways.
-   *
-   * @param \Drupal\sms\Event\SmsMessageEvent $event
-   *   The SMS message preprocess event.
    *
    * @throws \Drupal\sms\Exception\RecipientRouteException
    *   Guarantees a gateway is set on the message, otherwise this exception is
@@ -196,13 +181,10 @@ class SmsMessageProcessor implements EventSubscriberInterface {
   /**
    * Get a gateway for a phone number.
    *
-   * @param string $recipient
-   *   A recipient phone number.
-   *
    * @return \Drupal\sms\Entity\SmsGatewayInterface|null
    *   A gateway for the phone number, or NULL if there is no gateway.
    */
-  protected function getGatewayForPhoneNumber($recipient): ?SmsGatewayInterface {
+  protected function getGatewayForPhoneNumber(string $recipient): ?SmsGatewayInterface {
     $event = new RecipientGatewayEvent($recipient);
     /** @var \Drupal\sms\Event\RecipientGatewayEvent $event */
     $event = $this->eventDispatcher
@@ -226,9 +208,6 @@ class SmsMessageProcessor implements EventSubscriberInterface {
 
   /**
    * Add a delivery report URL to messages.
-   *
-   * @param \Drupal\sms\Event\SmsMessageEvent $event
-   *   The SMS message preprocess event.
    */
   public function deliveryReportUrl(SmsMessageEvent $event): void {
     foreach ($event->getMessages() as &$sms_message) {
@@ -246,9 +225,6 @@ class SmsMessageProcessor implements EventSubscriberInterface {
 
   /**
    * Split messages to overcome gateway limits.
-   *
-   * @param \Drupal\sms\Event\SmsMessageEvent $event
-   *   The SMS message preprocess event.
    */
   public function chunkMaxRecipients(SmsMessageEvent $event): void {
     $result = [];

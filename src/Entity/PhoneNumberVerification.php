@@ -41,7 +41,11 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
   protected $bundle;
 
   public function getCreatedTime(): int {
-    return $this->get('created')->value;
+    return (int) $this->get('created')->value;
+  }
+
+  public function getCreatedDate(): \DateTimeImmutable {
+    return new \DateTimeImmutable('@' . (int) $this->get('created')->value);
   }
 
   public function getEntity(): ?EntityInterface {
@@ -63,7 +67,7 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
   /**
    * {@inheritdoc}
    */
-  public function setPhoneNumber($phone_number) {
+  public function setPhoneNumber(string $phone_number) {
     $this->set('phone', $phone_number);
     return $this;
   }
@@ -75,7 +79,7 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
   /**
    * {@inheritdoc}
    */
-  public function setCode($code) {
+  public function setCode(string $code) {
     $this->set('code', $code);
     return $this;
   }
@@ -87,8 +91,8 @@ class PhoneNumberVerification extends ContentEntityBase implements PhoneNumberVe
   /**
    * {@inheritdoc}
    */
-  public function setStatus($status) {
-    $this->set('status', (bool) $status);
+  public function setStatus(bool $status) {
+    $this->set('status', $status);
     return $this;
   }
 

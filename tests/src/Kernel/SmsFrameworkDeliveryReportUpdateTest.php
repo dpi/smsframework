@@ -11,7 +11,7 @@ use Drupal\sms\Entity\SmsDeliveryReport;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageReportStatus;
 use Drupal\sms\Provider\SmsProviderInterface;
-use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
+use Drupal\Tests\sms\Trait\SmsFrameworkTestTrait;
 use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 

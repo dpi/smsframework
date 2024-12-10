@@ -17,8 +17,15 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
    *
    * @return int
    *   Creation timestamp of the phone number verification.
+   *
+   * @deprecated Use getCreatedDate instead.
    */
   public function getCreatedTime(): int;
+
+  /**
+   * Gets the phone number verification creation timestamp.
+   */
+  public function getCreatedDate(): \DateTimeImmutable;
 
   /**
    * Gets the entity for the phone number verification.
@@ -56,7 +63,7 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
    * @return $this
    *   Return phone number verification for chaining.
    */
-  public function setPhoneNumber($phone_number);
+  public function setPhoneNumber(string $phone_number);
 
   /**
    * Gets the code for the phone number verification.
@@ -75,7 +82,7 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
    * @return $this
    *   Return phone number verification for chaining.
    */
-  public function setCode($code);
+  public function setCode(string $code);
 
   /**
    * Gets the status for the phone number verification.
@@ -96,6 +103,6 @@ interface PhoneNumberVerificationInterface extends ContentEntityInterface {
    * @return $this
    *   Return phone number verification for chaining.
    */
-  public function setStatus($status);
+  public function setStatus(bool $status);
 
 }

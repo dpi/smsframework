@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\sms\FunctionalJavascript;
 
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
-use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
+use Drupal\Tests\sms\Trait\SmsFrameworkTestTrait;
 
 /**
  * Tests phone number administration user interface.
  *
  * @group SMS Framework
+ * @method \Drupal\FunctionalJavascriptTests\JSWebAssert assertSession($name = NULL)
  */
 final class SmsFrameworkPhoneNumberAdminTest extends WebDriverTestBase {
 
@@ -19,23 +19,22 @@ final class SmsFrameworkPhoneNumberAdminTest extends WebDriverTestBase {
 
   protected $defaultTheme = 'stark';
 
-  protected static $modules = ['sms', 'block', 'entity_test'];
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected EntityTypeManagerInterface $entityTypeManager;
+  protected static $modules = [
+    'system',
+    'user',
+    'sms',
+    'block',
+    'entity_test',
+  ];
 
   protected function setUp(): void {
     parent::setUp();
-    $this->entityTypeManager = $this->container->get('entity_type.manager');
 
     $this->drupalPlaceBlock('page_title_block');
     $this->drupalPlaceBlock('local_tasks_block');
     $this->drupalPlaceBlock('local_actions_block');
 
+    /** @var \Drupal\user\Entity\User $account */
     $account = $this->drupalCreateUser([
       'administer smsframework',
     ]);
@@ -46,8 +45,9 @@ final class SmsFrameworkPhoneNumberAdminTest extends WebDriverTestBase {
    * Test using existing fields for new phone number settings.
    */
   public function testPhoneNumberFieldExisting(): void {
-    $field_storage = $this->entityTypeManager->getStorage('field_storage_config');
-    $field_instance = $this->entityTypeManager->getStorage('field_config');
+    $entityTypeManager = \Drupal::entityTypeManager();
+    $field_storage = $entityTypeManager->getStorage('field_storage_config');
+    $field_instance = $entityTypeManager->getStorage('field_config');
 
     // Create a field so it appears as a pre-existing field.
     /** @var \Drupal\field\FieldStorageConfigInterface $field_telephone */

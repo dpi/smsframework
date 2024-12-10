@@ -200,8 +200,8 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   /**
    * {@inheritdoc}
    */
-  public function setSkipQueue($skip_queue) {
-    $this->skip_queue = (boolean) $skip_queue;
+  public function setSkipQueue(bool $skip_queue) {
+    $this->skip_queue = $skip_queue;
     return $this;
   }
 
@@ -212,7 +212,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   /**
    * {@inheritdoc}
    */
-  public function setPushIncomingPath($path) {
+  public function setPushIncomingPath(?string $path) {
     $this->incoming_push_path = $path;
     return $this;
   }
@@ -228,7 +228,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   /**
    * {@inheritdoc}
    */
-  public function setPushReportPath($path) {
+  public function setPushReportPath(?string $path) {
     $this->reports_push_path = $path;
     return $this;
   }
@@ -247,7 +247,7 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   /**
    * {@inheritdoc}
    */
-  public function setRetentionDuration($direction, $retention_duration) {
+  public function setRetentionDuration($direction, int $retention_duration) {
     switch ($direction) {
       case Direction::INCOMING:
         $this->retention_duration_incoming = $retention_duration;

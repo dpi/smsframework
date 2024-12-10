@@ -67,23 +67,21 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
-    /** @var \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification_provider */
-    $phone_number_verification_provider = $this->phoneNumberVerification;
     try {
-      $config = $phone_number_verification_provider->getPhoneNumberSettingsForEntity($items->getEntity());
+      $config = $this->phoneNumberVerification->getPhoneNumberSettingsForEntity($items->getEntity());
     }
     catch (PhoneNumberSettingsException $e) {
       return $element;
     }
 
-    $current_time = $this->time->getRequestTime();
+    $current_time = new \DateTimeImmutable('@' . $this->time->getRequestTime());
 
     $t_args = [];
     $t_args['@url'] = Url::fromRoute('sms.phone.verify')->toString();
-    $lifetime = $config->getVerificationCodeLifetime() ?: 0;
+    $lifetime = $config->getVerificationCodeLifetime();
 
     if (isset($items[$delta]->value)) {
-      $phone_verification = $phone_number_verification_provider
+      $phone_verification = $this->phoneNumberVerification
         ->getPhoneVerificationByEntity($items->getEntity(), $items[$delta]->value);
 
       if ($phone_verification !== NULL) {
@@ -92,10 +90,10 @@ class SmsTelephoneWidget extends TelephoneDefaultWidget {
         }
         else {
           $element['value']['#disabled'] = TRUE;
-          $expiration_date = $phone_verification->getCreatedTime() + $lifetime;
+          $expiration_date = $phone_verification->getCreatedDate()->modify('+ ' . $lifetime . ' seconds');
 
           if ($current_time < $expiration_date) {
-            $t_args['@time'] = $this->dateFormatter->formatTimeDiffUntil($expiration_date, [
+            $t_args['@time'] = $this->dateFormatter->formatTimeDiffUntil($expiration_date->getTimestamp(), [
               'granularity' => 2,
             ]);
             $element['value']['#description'] = $this->t('A verification code has been sent to this phone number. Go to the <a href="@url">verification form</a> and enter the code. The code will expire if it is not verified in @time.', $t_args);

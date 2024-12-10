@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\sms\Functional;
+namespace Drupal\Tests\sms\Trait;
 
 use Drupal\sms\Direction;
 use Drupal\sms\Message\SmsDeliveryReport;

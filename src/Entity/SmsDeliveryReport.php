@@ -106,7 +106,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
   /**
    * {@inheritdoc}
    */
-  public function setTimeQueued($time) {
+  public function setTimeQueued(?int $time) {
     return $this
       ->setStatus(SmsMessageReportStatus::QUEUED)
       ->setStatusTime($time);
@@ -120,7 +120,7 @@ class SmsDeliveryReport extends ContentEntityBase implements SmsDeliveryReportIn
   /**
    * {@inheritdoc}
    */
-  public function setTimeDelivered($time) {
+  public function setTimeDelivered(?int $time) {
     return $this
       ->setStatus(SmsMessageReportStatus::DELIVERED)
       ->setStatusTime($time);

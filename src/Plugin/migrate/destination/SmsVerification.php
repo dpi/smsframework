@@ -75,7 +75,7 @@ class SmsVerification extends EntityContentBase implements ContainerFactoryPlugi
       // should be updated on the corresponding user entity.
       /** @var \Drupal\sms\Entity\PhoneNumberVerification $verification */
       $verification = $this->storage->load(\reset($return));
-      $this->setVerifiedValue($verification, $row->getSourceProperty('delta'));
+      $this->setVerifiedValue($verification, (int) $row->getSourceProperty('delta'));
     }
     return $return;
   }
