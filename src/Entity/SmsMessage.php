@@ -542,7 +542,6 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
 
     $new = static::create();
     $new
-      ->setDirection($sms_message->getDirection() ?? throw new SmsException('Direction must be set before conversion.'))
       ->setAutomated($sms_message->isAutomated())
       ->setSender($sms_message->getSender())
       ->setSenderNumber($sms_message->getSenderNumber())
@@ -550,7 +549,13 @@ class SmsMessage extends ContentEntityBase implements SmsMessageInterface {
       ->setMessage($sms_message->getMessage())
       ->setResult($sms_message->getResult());
 
-    if ($gateway = $sms_message->getGateway()) {
+    $direction = $sms_message->getDirection();
+    if (NULL !== $direction) {
+      $new->setDirection($direction);
+    }
+
+    $gateway = $sms_message->getGateway();
+    if (NULL !== $gateway) {
       $new->setGateway($gateway);
     }
 

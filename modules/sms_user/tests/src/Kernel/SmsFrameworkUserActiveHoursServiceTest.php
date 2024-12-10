@@ -212,7 +212,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
   /**
    * Tests delay was applied to a SMS message.
    *
-   * Checks invokation of sms_user_entity_presave(). This happens when queue()
+   * Checks invocation of sms_user_entity_presave(). This happens when queue()
    * is called and the SMS message is saved.
    */
   public function testDelaySmsMessage(): void {

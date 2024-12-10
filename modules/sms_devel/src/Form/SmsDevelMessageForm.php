@@ -55,7 +55,7 @@ class SmsDevelMessageForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     /** @var \Drupal\sms\Message\SmsMessageResultInterface[] $results */
-    $results = $form_state->getTemporaryValue('results');
+    $results = $form_state->getTemporaryValue('results') ?? [];
 
     if ($results !== []) {
       $form = \array_merge($form, $this->verboseResults($results));
