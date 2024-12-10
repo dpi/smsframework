@@ -103,6 +103,10 @@ class PhoneNumberSettings extends ConfigEntityBase implements PhoneNumberSetting
    * {@inheritdoc}
    */
   public function id() {
+    if (!isset($this->entity_type) || !isset($this->bundle)) {
+      return NULL;
+    }
+
     return $this->entity_type . '.' . $this->bundle;
   }
 

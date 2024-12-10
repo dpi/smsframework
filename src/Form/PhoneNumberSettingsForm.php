@@ -213,7 +213,7 @@ class PhoneNumberSettingsForm extends EntityForm {
 
     $config
       ->setVerificationMessage($form_state->getValue('verification_message'))
-      ->setVerificationCodeLifetime($form_state->getValue('code_lifetime'))
+      ->setVerificationCodeLifetime((int) $form_state->getValue('code_lifetime'))
       ->setPurgeVerificationPhoneNumber((bool) $form_state->getValue('phone_number_purge'));
 
     foreach ($form_state->getValue('field_mapping') as $config_key => $field_name) {
