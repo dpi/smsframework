@@ -16,8 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Default implementation of SMS gateway plugin.
  *
- * @phpstan-import-type SmsGatewayDefinition from \Drupal\sms\Annotation\SmsGateway
- * @method SmsGatewayDefinition getPluginDefinition()
+ * @phpstan-import-type SmsGatewayDefinition from \Drupal\sms\Attribute\SmsGateway
+ * @phpstan-import-type SmsGatewayLegacyDefinition from \Drupal\sms\Annotation\SmsGateway
+ * @method SmsGatewayDefinition|SmsGatewayLegacyDefinition getPluginDefinition()
  */
 interface SmsGatewayPluginInterface extends ConfigurableInterface, DependentPluginInterface, PluginFormInterface, PluginInspectionInterface {
 

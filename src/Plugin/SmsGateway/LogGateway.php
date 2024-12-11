@@ -7,6 +7,8 @@ namespace Drupal\sms\Plugin\SmsGateway;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\sms\Attribute\SmsGateway;
 use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageReportStatus;
@@ -25,7 +27,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   outgoing_message_max_recipients = -1,
  * )
  */
-class LogGateway extends SmsGatewayPluginBase implements ContainerFactoryPluginInterface {
+#[SmsGateway(
+  id: self::PLUGIN_ID,
+  label: new TranslatableMarkup('Drupal log'),
+  outgoingMessageMaxRecipients: -1,
+)]
+final class LogGateway extends SmsGatewayPluginBase implements ContainerFactoryPluginInterface {
 
   public const PLUGIN_ID = 'log';
 

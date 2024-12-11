@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\sms\Attribute\SmsGateway;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Message\SmsDeliveryReport;
@@ -19,15 +21,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Defines a gateway supporting incoming route.
- *
- * @SmsGateway(
- *   id = "incoming",
- *   label = @Translation("Incoming"),
- *   incoming = TRUE,
- *   incoming_route = TRUE,
- * )
  */
+#[SmsGateway(
+  id: self::PLUGIN_ID,
+  label: new TranslatableMarkup('Incoming'),
+  incoming: TRUE,
+  incomingRoute: TRUE,
+)]
 final class Incoming extends SmsGatewayPluginBase {
+
+  public const PLUGIN_ID = 'incoming';
 
   public function send(SmsMessageInterface $sms): SmsMessageResultInterface {
     throw new \LogicException('Not implemented');

@@ -9,6 +9,8 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\State\StateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\sms\Attribute\SmsGateway;
 use Drupal\sms\Event\SmsMessageEvent;
 use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Message\SmsMessageInterface;
@@ -21,22 +23,19 @@ use Drupal\sms_test_gateway\EventSubscriber\SmsTestGatewayEventSubscriber;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Defines a gateway storing transmitted SMS in memory.
- *
- * @SmsGateway(
- *   id = "memory",
- *   label = @Translation("Memory"),
- *   outgoing_message_max_recipients = -1,
- *   incoming = TRUE,
- *   schedule_aware = FALSE,
- *   reports_pull = TRUE,
- *   reports_push = TRUE,
- *   credit_balance_available = TRUE,
- * )
- */
+#[SmsGateway(
+  id: self::PLUGIN_ID,
+  label: new TranslatableMarkup('Memory'),
+  outgoingMessageMaxRecipients: -1,
+  incoming: TRUE,
+  scheduleAware: FALSE,
+  reportsPull: TRUE,
+  reportsPush: TRUE,
+  creditBalanceAvailable: TRUE,
+)]
 class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorInterface {
 
+  public const PLUGIN_ID = 'memory';
   public const STATE_MESSAGES = 'sms_test_gateway.memory.send';
   public const STATE_REPORTS = 'sms_test_gateway.memory.report';
 

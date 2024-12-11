@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\sms\Attribute\SmsGateway;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
 
 /**
  * Defines a gateway with defective return values for its' send method.
- *
- * @SmsGateway(
- *   id = "memory_outgoing_result",
- *   label = @Translation("Memory Outgoing Result"),
- *   outgoing_message_max_recipients = -1
- * )
  */
+#[SmsGateway(
+  id: self::PLUGIN_ID,
+  label: new TranslatableMarkup('Memory Outgoing Result'),
+  outgoingMessageMaxRecipients: -1,
+)]
 final class MemoryOutgoingResult extends Memory {
+  public const PLUGIN_ID = 'memory_outgoing_result';
 
   public function send(SmsMessageInterface $sms): SmsMessageResultInterface {
     $result = parent::send($sms);

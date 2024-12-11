@@ -8,6 +8,8 @@ use Drupal\Core\Url;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsGatewayInterface;
+use Drupal\sms_test_gateway\Plugin\SmsGateway\Incoming;
+use Drupal\sms_test_gateway\Plugin\SmsGateway\LegacyAnnotation;
 
 /**
  * Tests SMS Framework gateway entity.
@@ -103,7 +105,7 @@ final class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
    * Tests 'incoming_route' annotation custom value.
    */
   public function testAutoCreateIncomingRoute(): void {
-    $gateway = $this->createGateway(['plugin' => 'incoming']);
+    $gateway = $this->createGateway(['plugin' => Incoming::PLUGIN_ID]);
     static::assertTrue($gateway->autoCreateIncomingRoute());
   }
 
@@ -113,6 +115,20 @@ final class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   public function testNoAutoCreateIncomingRoute(): void {
     $gateway = $this->createGateway(['plugin' => 'capabilities_default']);
     static::assertFalse($gateway->autoCreateIncomingRoute());
+  }
+
+  /**
+   * Tests gateways via annotations.
+   */
+  public function testLegacyAnnotation(): void {
+    $gateway = $this->createGateway(['plugin' => LegacyAnnotation::PLUGIN_ID]);
+    static::assertEquals(2, $gateway->getMaxRecipientsOutgoing());
+    static::assertTrue($gateway->supportsIncoming());
+    static::assertTrue($gateway->autoCreateIncomingRoute());
+    static::assertTrue($gateway->isScheduleAware());
+    static::assertTrue($gateway->supportsReportsPull());
+    static::assertTrue($gateway->supportsReportsPush());
+    static::assertTrue($gateway->supportsCreditBalanceQuery());
   }
 
   /**

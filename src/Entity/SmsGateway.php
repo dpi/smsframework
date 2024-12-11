@@ -244,9 +244,8 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   }
 
   public function getMaxRecipientsOutgoing(): int {
-    $definition = $this->getPlugin()
-      ->getPluginDefinition();
-    return $definition['outgoing_message_max_recipients'] ?? 1;
+    $definition = $this->getPlugin()->getPluginDefinition();
+    return $definition['outgoingMessageMaxRecipients'] ?? ($definition['outgoing_message_max_recipients'] ?? 1);
   }
 
   public function supportsIncoming(): bool {
@@ -256,33 +255,28 @@ class SmsGateway extends ConfigEntityBase implements SmsGatewayInterface, Entity
   }
 
   public function autoCreateIncomingRoute(): bool {
-    $definition = $this->getPlugin()
-      ->getPluginDefinition();
-    return $definition['incoming_route'] ?? FALSE;
+    $definition = $this->getPlugin()->getPluginDefinition();
+    return $definition['incomingRoute'] ?? ($definition['incoming_route'] ?? FALSE);
   }
 
   public function isScheduleAware(): bool {
-    $definition = $this->getPlugin()
-      ->getPluginDefinition();
-    return $definition['schedule_aware'] ?? FALSE;
+    $definition = $this->getPlugin()->getPluginDefinition();
+    return $definition['scheduleAware'] ?? ($definition['schedule_aware'] ?? FALSE);
   }
 
   public function supportsReportsPull(): bool {
-    $definition = $this->getPlugin()
-      ->getPluginDefinition();
-    return $definition['reports_pull'] ?? FALSE;
+    $definition = $this->getPlugin()->getPluginDefinition();
+    return $definition['reportsPull'] ?? ($definition['reports_pull'] ?? FALSE);
   }
 
   public function supportsReportsPush(): bool {
-    $definition = $this->getPlugin()
-      ->getPluginDefinition();
-    return $definition['reports_push'] ?? FALSE;
+    $definition = $this->getPlugin()->getPluginDefinition();
+    return $definition['reportsPush'] ?? ($definition['reports_push'] ?? FALSE);
   }
 
   public function supportsCreditBalanceQuery(): bool {
-    $definition = $this->getPlugin()
-      ->getPluginDefinition();
-    return $definition['credit_balance_available'] ?? FALSE;
+    $definition = $this->getPlugin()->getPluginDefinition();
+    return $definition['creditBalanceAvailable'] ?? ($definition['credit_balance_available'] ?? FALSE);
   }
 
 }

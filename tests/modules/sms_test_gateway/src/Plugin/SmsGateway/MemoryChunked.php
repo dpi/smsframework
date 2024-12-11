@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\sms\Attribute\SmsGateway;
+
 /**
  * Defines a gateway requiring chunked messages.
- *
- * @SmsGateway(
- *   id = "memory_chunked",
- *   label = @Translation("Memory Chunked"),
- *   incoming = TRUE,
- *   outgoing_message_max_recipients = 2,
- * )
  */
+#[SmsGateway(
+  id: self::PLUGIN_ID,
+  label: new TranslatableMarkup('Memory Chunked'),
+  incoming: TRUE,
+  outgoingMessageMaxRecipients: 2,
+)]
 final class MemoryChunked extends Memory {
+
+  public const PLUGIN_ID = 'memory_chunked';
 
   /**
    * {@inheritdoc}

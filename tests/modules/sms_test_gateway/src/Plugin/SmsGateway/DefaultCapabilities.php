@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\sms\Attribute\SmsGateway;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
 use Drupal\sms\Plugin\SmsGatewayPluginBase;
@@ -13,12 +15,11 @@ use Drupal\sms\Plugin\SmsGatewayPluginBase;
  *
  * This gateway does not provide any annotation values other than required
  * properties: 'id' and 'label'.
- *
- * @SmsGateway(
- *   id = "capabilities_default",
- *   label = @Translation("Default annotation capabilities")
- * )
  */
+#[SmsGateway(
+  id: 'capabilities_default',
+  label: new TranslatableMarkup('Default annotation capabilities'),
+)]
 final class DefaultCapabilities extends SmsGatewayPluginBase {
 
   public function send(SmsMessageInterface $sms): SmsMessageResultInterface {
