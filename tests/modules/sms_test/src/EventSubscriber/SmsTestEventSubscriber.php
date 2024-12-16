@@ -16,6 +16,9 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class SmsTestEventSubscriber implements EventSubscriberInterface {
 
+  public const GATEWAY_TEST_200 = 'test_gateway_200';
+  public const GATEWAY_TEST_400 = 'test_gateway_400';
+
   public function __construct(
     private readonly StateInterface $state,
   ) {
@@ -28,8 +31,8 @@ final class SmsTestEventSubscriber implements EventSubscriberInterface {
    *   The RecipientGatewayEvent event.
    */
   public function testAddGateway200(RecipientGatewayEvent $event): void {
-    if ($this->state->get('sms_test_event_subscriber__test_gateway_200', FALSE)) {
-      $gateway = SmsGateway::load('test_gateway_200');
+    if ($this->state->get('sms_test_event_subscriber__test_gateway_200') === TRUE) {
+      $gateway = SmsGateway::load(SmsTestEventSubscriber::GATEWAY_TEST_200) ?? throw new \LogicException('Missing test gateway');
       $event->addGateway($gateway, 200);
     }
   }
@@ -41,8 +44,8 @@ final class SmsTestEventSubscriber implements EventSubscriberInterface {
    *   The RecipientGatewayEvent event.
    */
   public function testAddGateway400(RecipientGatewayEvent $event): void {
-    if ($this->state->get('sms_test_event_subscriber__test_gateway_400', FALSE)) {
-      $gateway = SmsGateway::load('test_gateway_400');
+    if ($this->state->get('sms_test_event_subscriber__test_gateway_400') === TRUE) {
+      $gateway = SmsGateway::load(SmsTestEventSubscriber::GATEWAY_TEST_400) ?? throw new \LogicException('Missing test gateway');
       $event->addGateway($gateway, 400);
     }
   }

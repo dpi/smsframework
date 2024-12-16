@@ -7,6 +7,7 @@ namespace Drupal\Tests\sms\Trait;
 use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Message\SmsDeliveryReportInterface;
 use Drupal\sms\Message\SmsMessageResultInterface;
+use Drupal\sms\Message\SmsMessageResultStatus;
 
 /**
  * Provides common tests for SmsMessageResult object and entity classes.
@@ -23,11 +24,25 @@ trait SmsFrameworkMessageResultTestTrait {
     $result = $this->createMessageResult();
     static::assertNull($result->getError(), 'Default value is NULL');
 
-    $error = $this->getRandomGenerator()->string();
-    $return = $result->setError($error);
+    $return = $result->setError(SmsMessageResultStatus::ACCOUNT_ERROR);
 
     static::assertTrue($return instanceof SmsMessageResultInterface);
-    static::assertEquals($error, $result->getError());
+    static::assertEquals(SmsMessageResultStatus::ACCOUNT_ERROR, $result->getError());
+  }
+
+  /**
+   * Tests error.
+   */
+  public function testErrorInvalid(): void {
+    $result = $this->createMessageResult();
+    static::assertNull($result->getError(), 'Default value is NULL');
+
+    static::expectException(\LogicException::class);
+    static::expectExceptionMessage('Invalid error passed to ' . static::TESTING_CLASS . '::setError');
+
+    // Ignore passing invalid string.
+    // @phpstan-ignore-next-line
+    $result->setError($this->getRandomGenerator()->string());
   }
 
   /**

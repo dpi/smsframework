@@ -90,7 +90,7 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
     $edit = [];
     $expected = [];
     foreach (NodeType::loadMultiple() as $type) {
-      $this->assertSession()->pageTextContains($type->get('name'));
+      $this->assertSession()->pageTextContains((string) $type->label());
       if (\rand(0, 1) > 0.5) {
         $edit["content_types[" . $type->get('type') . "]"] = $expected[$type->get('type')] = $type->get('type');
       }
@@ -99,7 +99,7 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
     $edit["content_types[page]"] = $expected['page'] = 'page';
     $this->drupalGet('admin/config/smsframework/sendtophone');
     $this->submitForm($edit, 'Save configuration');
-    $saved = $this->config('sms_sendtophone.settings')->get('content_types', []);
+    $saved = $this->config('sms_sendtophone.settings')->get('content_types');
     static::assertEquals($expected, $saved);
 
     // Create a new node with sendtophone enabled and verify that the button is
@@ -108,12 +108,11 @@ final class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
     $node = $this->drupalCreateNode(['type' => $types[0]]);
     $this->drupalGet($node->toUrl());
     // Confirm message for user without confirmed number.
-    $this->assertSession()->pageTextContains(\t('Set up and confirm your mobile number to send to phone.'));
+    $this->assertSession()->pageTextContains('Set up and confirm your mobile number to send to phone.');
 
     // Confirm phone number.
     $phone_number = $this->randomPhoneNumbers(1)[0];
-    $user->{$this->phoneField->getName()} = [$phone_number];
-    $user->save();
+    $user->set($this->phoneField->getName(), [$phone_number])->save();
     $this->verifyPhoneNumber($user, $phone_number);
 
     $this->drupalGet($node->toUrl());

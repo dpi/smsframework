@@ -1,12 +1,7 @@
-# total 8 errors
+# total 6 errors
 
 parameters:
     ignoreErrors:
-        -
-            message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
-            count: 1
-            path: ../modules/sms_sendtophone/sms_sendtophone.module
-
         -
             message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
             count: 2
@@ -31,11 +26,6 @@ parameters:
             message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
             count: 1
             path: ../src/Entity/SmsMessage.php
-
-        -
-            message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
-            count: 1
-            path: ../src/Provider/PhoneNumberVerification.php
 
         -
             message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'

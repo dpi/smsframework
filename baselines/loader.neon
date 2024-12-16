@@ -1,16 +1,10 @@
 includes:
-    - argument.type.neon
-    - arguments.count.neon
     - assign.propertyType.neon
-    - booleanAnd.alwaysTrue.neon
     - booleanAnd.leftAlwaysTrue.neon
     - booleanAnd.leftNotBoolean.neon
-    - booleanAnd.rightAlwaysTrue.neon
-    - booleanAnd.rightNotBoolean.neon
     - booleanNot.alwaysTrue.neon
     - booleanNot.exprNotBoolean.neon
     - booleanOr.alwaysTrue.neon
-    - booleanOr.rightNotBoolean.neon
     - cast.int.neon
     - cast.string.neon
     - cast.useless.neon
@@ -20,7 +14,6 @@ includes:
     - empty.notAllowed.neon
     - foreach.nonIterable.neon
     - function.alreadyNarrowedType.neon
-    - function.impossibleType.neon
     - function.strict.neon
     - greater.alwaysTrue.neon
     - if.alwaysTrue.neon
@@ -33,11 +26,9 @@ includes:
     - method.notFound.neon
     - missingType.generics.neon
     - missingType.iterableValue.neon
-    - missingType.parameter.neon
     - notIdentical.alwaysTrue.neon
     - nullCoalesce.offset.neon
     - offsetAccess.nonOffsetAccessible.neon
-    - offsetAccess.notFound.neon
     - property.dynamicName.neon
     - property.nonObject.neon
     - property.notFound.neon

@@ -1,4 +1,4 @@
-# total 169 errors
+# total 167 errors
 
 parameters:
     ignoreErrors:
@@ -243,11 +243,6 @@ parameters:
             path: ../src/Entity/SmsMessage.php
 
         -
-            message: '#^Method Drupal\\sms\\Entity\\SmsMessage\:\:getRecipients\(\) return type has no value type specified in iterable type array\.$#'
-            count: 1
-            path: ../src/Entity/SmsMessage.php
-
-        -
             message: '#^Method Drupal\\sms\\Entity\\SmsMessage\:\:removeRecipients\(\) has parameter \$recipients with no value type specified in iterable type array\.$#'
             count: 1
             path: ../src/Entity/SmsMessage.php
@@ -269,6 +264,11 @@ parameters:
 
         -
             message: '#^Method Drupal\\sms\\Form\\PhoneNumberSettingsForm\:\:save\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+            count: 1
+            path: ../src/Form/PhoneNumberSettingsForm.php
+
+        -
+            message: '#^Method Drupal\\sms\\Form\\PhoneNumberSettingsForm\:\:updateFieldMapping\(\) has parameter \$form with no value type specified in iterable type array\.$#'
             count: 1
             path: ../src/Form/PhoneNumberSettingsForm.php
 
@@ -403,22 +403,12 @@ parameters:
             path: ../src/Message/SmsMessage.php
 
         -
-            message: '#^Method Drupal\\sms\\Message\\SmsMessage\:\:getRecipients\(\) return type has no value type specified in iterable type array\.$#'
-            count: 1
-            path: ../src/Message/SmsMessage.php
-
-        -
             message: '#^Method Drupal\\sms\\Message\\SmsMessage\:\:removeRecipients\(\) has parameter \$recipients with no value type specified in iterable type array\.$#'
             count: 1
             path: ../src/Message/SmsMessage.php
 
         -
             message: '#^Method Drupal\\sms\\Message\\SmsMessageInterface\:\:getOptions\(\) return type has no value type specified in iterable type array\.$#'
-            count: 1
-            path: ../src/Message/SmsMessageInterface.php
-
-        -
-            message: '#^Method Drupal\\sms\\Message\\SmsMessageInterface\:\:getRecipients\(\) return type has no value type specified in iterable type array\.$#'
             count: 1
             path: ../src/Message/SmsMessageInterface.php
 

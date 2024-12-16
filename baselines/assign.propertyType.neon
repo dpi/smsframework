@@ -1,4 +1,4 @@
-# total 18 errors
+# total 4 errors
 
 parameters:
     ignoreErrors:
@@ -6,31 +6,6 @@ parameters:
             message: '#^Property Drupal\\sms_user\\ActiveHours\:\:\$ranges \(array\) does not accept mixed\.$#'
             count: 1
             path: ../modules/sms_user/src/ActiveHours.php
-
-        -
-            message: '#^Property Drupal\\Tests\\sms_user\\Kernel\\SmsFrameworkUserAccountRegistrationServiceTest\:\:\$accountRegistration \(Drupal\\sms_user\\AccountRegistrationInterface\) does not accept object\.$#'
-            count: 1
-            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserAccountRegistrationServiceTest.php
-
-        -
-            message: '#^Property Drupal\\Tests\\sms_user\\Kernel\\SmsFrameworkUserAccountRegistrationServiceTest\:\:\$smsProvider \(Drupal\\sms\\Provider\\SmsProviderInterface\) does not accept object\.$#'
-            count: 1
-            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserAccountRegistrationServiceTest.php
-
-        -
-            message: '#^Property Drupal\\Tests\\sms_user\\Kernel\\SmsFrameworkUserActiveHoursServiceTest\:\:\$activeHoursService \(Drupal\\sms_user\\ActiveHoursInterface\) does not accept object\.$#'
-            count: 1
-            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserActiveHoursServiceTest.php
-
-        -
-            message: '#^Property Drupal\\Tests\\sms_user\\Kernel\\SmsFrameworkUserActiveHoursServiceTest\:\:\$smsProvider \(Drupal\\sms\\Provider\\SmsProviderInterface\) does not accept object\.$#'
-            count: 1
-            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserActiveHoursServiceTest.php
-
-        -
-            message: '#^Property Drupal\\Tests\\sms_user\\Kernel\\SmsFrameworkUserTest\:\:\$smsProvider \(Drupal\\sms\\Provider\\SmsProviderInterface\) does not accept object\.$#'
-            count: 1
-            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserTest.php
 
         -
             message: '#^Property Drupal\\sms\\Entity\\SmsMessageResult\:\:\$reports \(array\<Drupal\\sms\\Entity\\SmsDeliveryReportInterface\>\) does not accept array\<Drupal\\sms\\Message\\SmsDeliveryReportInterface\>\.$#'
@@ -43,51 +18,6 @@ parameters:
             path: ../src/Message/SmsDeliveryReport.php
 
         -
-            message: '#^Property Drupal\\Tests\\sms\\Functional\\SmsFrameworkGatewayAdminTest\:\:\$smsGatewayStorage \(Drupal\\Core\\Config\\Entity\\ConfigEntityStorageInterface\) does not accept Drupal\\Core\\Entity\\EntityStorageInterface\.$#'
-            count: 1
-            path: ../tests/src/Functional/SmsFrameworkGatewayAdminTest.php
-
-        -
-            message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkPhoneNumberProviderTest\:\:\$phoneNumberProvider \(Drupal\\sms\\Provider\\PhoneNumberProviderInterface\) does not accept mixed\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkPhoneNumberProviderTest.php
-
-        -
-            message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkPhoneNumberVerificationTest\:\:\$phoneNumberVerificationProvider \(Drupal\\sms\\Provider\\PhoneNumberVerificationInterface\) does not accept mixed\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkPhoneNumberVerificationTest.php
-
-        -
-            message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkProcessorTest\:\:\$smsProvider \(Drupal\\sms\\Provider\\SmsProviderInterface\) does not accept mixed\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkProcessorTest.php
-
-        -
-            message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkProviderTest\:\:\$smsProvider \(Drupal\\sms\\Provider\\SmsProviderInterface\) does not accept mixed\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkProviderTest.php
-
-        -
-            message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkQueueTest\:\:\$smsProvider \(Drupal\\sms\\Provider\\SmsProviderInterface\) does not accept mixed\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkQueueTest.php
-
-        -
-            message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkQueueTest\:\:\$smsQueueProcessor \(Drupal\\sms\\Provider\\SmsQueueProcessorInterface\) does not accept mixed\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkQueueTest.php
-
-        -
-            message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkSmsSendTest\:\:\$defaultSmsProvider \(Drupal\\sms\\Provider\\SmsProviderInterface\) does not accept mixed\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkSmsSendTest.php
-
-        -
             message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkVerificationMaintenanceTest\:\:\$testEntity \(Drupal\\Core\\Entity\\EntityInterface\) does not accept Drupal\\entity_test\\Entity\\EntityTest\|null\.$#'
             count: 2
             path: ../tests/src/Kernel/SmsFrameworkVerificationMaintenanceTest.php
-
-        -
-            message: '#^Property Drupal\\Tests\\sms\\Kernel\\SmsFrameworkViewsTest\:\:\$smsProvider \(Drupal\\sms\\Provider\\SmsProviderInterface\) does not accept mixed\.$#'
-            count: 1
-            path: ../tests/src/Kernel/SmsFrameworkViewsTest.php

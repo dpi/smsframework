@@ -12,6 +12,7 @@ use Drupal\sms\Exception\SmsException;
 use Drupal\sms\Exception\SmsPluginReportException;
 use Drupal\sms\Message\SmsMessageResult;
 use Drupal\sms\Provider\SmsProviderInterface;
+use Drupal\sms_test_gateway\Plugin\SmsGateway\MemoryOutgoingResult;
 
 /**
  * Tests functionality provided by the SMS message event subscriber.
@@ -114,7 +115,7 @@ final class SmsFrameworkProcessorTest extends SmsFrameworkKernelBase {
     $this->setFallbackGateway($this->gatewayOutgoingResult);
 
     $delete_count = \rand(1, 5);
-    \Drupal::state()->set('sms_test_gateway.memory_outgoing_result.delete_reports', $delete_count);
+    \Drupal::state()->set(MemoryOutgoingResult::STATE, $delete_count);
 
     // Must skip queue for send() for post-process to run.
     $this->gatewayOutgoingResult

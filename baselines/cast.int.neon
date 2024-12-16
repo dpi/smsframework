@@ -1,4 +1,4 @@
-# total 3 errors
+# total 1 errors
 
 parameters:
     ignoreErrors:
@@ -6,13 +6,3 @@ parameters:
             message: '#^Cannot cast mixed to int\.$#'
             count: 2
             path: ../src/Entity/PhoneNumberVerification.php
-
-        -
-            message: '#^Cannot cast mixed to int\.$#'
-            count: 1
-            path: ../src/Form/PhoneNumberSettingsForm.php
-
-        -
-            message: '#^Cannot cast mixed to int\.$#'
-            count: 1
-            path: ../src/Plugin/migrate/destination/SmsVerification.php

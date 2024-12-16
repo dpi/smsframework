@@ -57,7 +57,14 @@ class SmsMessageResult implements SmsMessageResultInterface {
   /**
    * {@inheritdoc}
    */
-  public function setError($error) {
+  public function setError(?string $error) {
+    if ($error !== NULL) {
+      $reflection = new \ReflectionClass(SmsMessageResultStatus::class);
+      if (\in_array($error, $reflection->getConstants(), TRUE) === FALSE) {
+        throw new \LogicException(\sprintf('Invalid error passed to %s', __METHOD__));
+      }
+    }
+
     $this->error = $error;
     return $this;
   }

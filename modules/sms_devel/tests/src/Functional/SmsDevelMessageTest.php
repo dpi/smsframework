@@ -137,7 +137,7 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $this->submitForm($edit, 'Send');
 
     $messages = SmsMessage::loadMultiple();
-    static::assertFalse($messages[\array_key_first($messages)]->isAutomated(), 'Message is not automated');
+    static::assertFalse($messages[\array_key_first($messages)]->isAutomated());
   }
 
   /**
@@ -161,7 +161,7 @@ final class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $this->submitForm($edit, 'Send');
 
     $messages = SmsMessage::loadMultiple();
-    static::assertEquals($date->getTimestamp(), $messages[\array_key_first($messages)]->getSendTime(), 'Message has send time.');
+    static::assertEquals($date->getTimestamp(), $messages[\array_key_first($messages)]->getSendTime());
   }
 
   /**

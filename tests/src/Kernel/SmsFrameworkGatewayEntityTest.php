@@ -66,6 +66,8 @@ final class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
     $gateway = $this->createGateway();
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('0 is not a valid direction.');
+    // Intentionally invalid direction.
+    // @phpstan-ignore-next-line
     $gateway->getRetentionDuration(0);
   }
 
@@ -75,8 +77,8 @@ final class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   public function testPushIncomingPath(): void {
     $gateway = $this->createGateway(['plugin' => 'incoming']);
 
-    $path = $gateway->getPushIncomingPath();
-    static::assertTrue(\strpos($path, '/sms/incoming/receive/') === 0);
+    $path = $gateway->getPushIncomingPath() ?? throw new \Exception('Needs a path');
+    static::assertTrue(\str_starts_with($path, '/sms/incoming/receive/'));
 
     $new_path = '/' . $this->randomMachineName();
     $return = $gateway->setPushIncomingPath($new_path);
@@ -137,8 +139,8 @@ final class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
   public function testPushReportPath(): void {
     $gateway = $this->createGateway();
 
-    $path = $gateway->getPushReportPath();
-    static::assertTrue(\strpos($path, '/sms/delivery-report/receive/') === 0);
+    $path = $gateway->getPushReportPath() ?? throw new \Exception('Needs a path');
+    static::assertTrue(\str_starts_with($path, '/sms/delivery-report/receive/'));
 
     $new_path = '/' . $this->randomMachineName();
     $return = $gateway->setPushReportPath($new_path);
@@ -222,7 +224,7 @@ final class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
     $gateway = $this->createGateway([
       'plugin' => 'memory',
     ]);
-    static::assertEquals(TRUE, $gateway->supportsIncoming());
+    static::assertTrue($gateway->supportsIncoming());
   }
 
   /**
@@ -232,7 +234,7 @@ final class SmsFrameworkGatewayEntityTest extends SmsFrameworkKernelBase {
     $gateway = $this->createGateway([
       'plugin' => 'capabilities_default',
     ]);
-    static::assertEquals(FALSE, $gateway->supportsIncoming());
+    static::assertFalse($gateway->supportsIncoming());
   }
 
   /**

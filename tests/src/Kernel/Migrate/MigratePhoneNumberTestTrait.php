@@ -39,7 +39,7 @@ trait MigratePhoneNumberTestTrait {
     $setting = \reset($settings);
     static::assertEquals(PhoneNumberSettingsPlugin::DEFAULT_VERIFICATION_MESSAGE, $setting->getVerificationMessage());
     static::assertEquals('phone_number', $setting->getFieldName('phone_number'));
-    static::assertEquals(TRUE, $setting->getPurgeVerificationPhoneNumber());
+    static::assertTrue($setting->getPurgeVerificationPhoneNumber());
     static::assertEquals('user', $setting->getPhoneNumberBundle());
     static::assertEquals('user', $setting->getPhoneNumberEntityTypeId());
     static::assertEquals(600, $setting->getVerificationCodeLifetime());
@@ -86,17 +86,17 @@ trait MigratePhoneNumberTestTrait {
 
     $this->executeMigrations($this->getMigrationsToTest());
 
-    $user = User::load(40);
+    $user = User::load(40) ?? throw new \LogicException('Missing user 40 from fixtures');
     static::assertEquals('1234567890', $user->get('phone_number')->value);
     $this->assertVerifiedPhoneNumber($user, '1234567890');
 
-    $user = User::load(41);
+    $user = User::load(41) ?? throw new \LogicException('Missing user 41 from fixtures');
     static::assertEquals('87654321190', $user->get('phone_number')->value);
     $this->assertUnVerifiedPhoneNumber($user, '87654321190');
     $this->assertVerificationCode('87654321190', '8002');
 
     // No phone number for user 15.
-    $user = User::load(42);
+    $user = User::load(42) ?? throw new \LogicException('Missing user 42 from fixtures');
     static::assertEquals('', $user->get('phone_number')->value);
     $this->assertNoVerifiedPhoneNumber($user);
   }
@@ -118,7 +118,7 @@ trait MigratePhoneNumberTestTrait {
 
     $this->executeMigrations($this->getMigrationsToTest());
 
-    $this->assertVerifiedPhoneNumber(User::load(40), '1234567890');
+    $this->assertVerifiedPhoneNumber(User::load(40) ?? throw new \LogicException('Expected user 40 from fixtures'), '1234567890');
     // Test that the default entity form display has the field added.
     $entity_form_display = EntityFormDisplay::load('user.user.default');
     static::assertNotNull($entity_form_display->getComponent('phone_number'));
@@ -142,19 +142,17 @@ trait MigratePhoneNumberTestTrait {
   /**
    * Asserts that the specified user has a verified phone number.
    */
-  protected function assertVerifiedPhoneNumber(UserInterface $user, $number): void {
+  protected function assertVerifiedPhoneNumber(UserInterface $user, string $number): void {
     $phone_numbers = \Drupal::service('sms.phone_number')->getPhoneNumbers($user, TRUE);
-    $phone_number = \reset($phone_numbers);
-    static::assertEquals($number, $phone_number, "Phone number '$number' is verified.");
+    static::assertEquals($number, $phone_numbers[\array_key_first($phone_numbers)], "Phone number '$number' is verified.");
   }
 
   /**
    * Asserts that the specified user has an unverified phone number.
    */
-  protected function assertUnVerifiedPhoneNumber(UserInterface $user, $number): void {
+  protected function assertUnVerifiedPhoneNumber(UserInterface $user, string $number): void {
     $phone_numbers = \Drupal::service('sms.phone_number')->getPhoneNumbers($user, FALSE);
-    $phone_number = \reset($phone_numbers);
-    static::assertEquals($number, $phone_number, "Phone number '$number' is unverified.");
+    static::assertEquals($number, $phone_numbers[\array_key_first($phone_numbers)], "Phone number '$number' is unverified.");
   }
 
   /**
@@ -168,9 +166,9 @@ trait MigratePhoneNumberTestTrait {
   /**
    * Asserts that the specified number has a pending verification code.
    */
-  protected function assertVerificationCode($number, $code): void {
+  protected function assertVerificationCode(string $number, string $code): void {
     $verification = \Drupal::service('sms.phone_number.verification')->getPhoneVerificationByPhoneNumber($number, FALSE);
-    $verification = \reset($verification);
+    $verification = $verification[\array_key_first($verification)];
     static::assertEquals($code, $verification->getCode());
   }
 

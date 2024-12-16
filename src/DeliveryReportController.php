@@ -18,18 +18,15 @@ class DeliveryReportController implements ContainerInjectionInterface {
 
   /**
    * Creates a new delivery report controller.
-   *
-   * @param \Drupal\sms\Provider\SmsProviderInterface $smsProvider
-   *   The SMS service provider.
    */
   final public function __construct(
     private SmsProviderInterface $smsProvider,
   ) {
   }
 
-  final public static function create(ContainerInterface $container): static {
+  public static function create(ContainerInterface $container): static {
     return new static(
-      $container->get(SmsProviderInterface::class),
+      $container->get('sms.provider'),
     );
   }
 
@@ -41,8 +38,14 @@ class DeliveryReportController implements ContainerInjectionInterface {
    * @param \Drupal\sms\Entity\SmsGatewayInterface $sms_gateway
    *   The gateway which is handling the delivery report.
    */
-  public function processDeliveryReport(Request $request, SmsGatewayInterface $sms_gateway): Response {
+  public function __invoke(Request $request, SmsGatewayInterface $sms_gateway): Response {
     return $this->smsProvider->processDeliveryReport($request, $sms_gateway);
+  }
+
+  public function processDeliveryReport(Request $request, SmsGatewayInterface $sms_gateway): Response {
+    // phpcs:ignore Drupal.Semantics.UnsilencedDeprecation.UnsilencedDeprecation
+    @\trigger_error(__METHOD__ . ' is deprecated. Use invoke instead.', E_USER_DEPRECATED);
+    return $this($request, $sms_gateway);
   }
 
 }

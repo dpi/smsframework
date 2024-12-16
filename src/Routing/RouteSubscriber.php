@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Drupal\sms\Routing;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteSubscriberBase;
-use Drupal\sms\Entity\SmsGateway;
+use Drupal\sms\DeliveryReportController;
+use Drupal\sms\Form\VerifyPhoneNumberForm;
+use Drupal\sms\SmsIncomingController;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -19,7 +22,8 @@ class RouteSubscriber extends RouteSubscriberBase {
    * Constructs a new SMS Framework RouteSubscriber.
    */
   public function __construct(
-    protected ConfigFactoryInterface $configFactory,
+    private ConfigFactoryInterface $configFactory,
+    private EntityTypeManagerInterface $entityTypeManager,
   ) {
   }
 
@@ -27,13 +31,14 @@ class RouteSubscriber extends RouteSubscriberBase {
     $sms_settings = $this->configFactory->get('sms.settings');
 
     // Phone number verification.
+    /** @var string|null $path_verify */
     $path_verify = $sms_settings->get('page.verify');
     // String length must include at least a slash + another character.
-    if (isset($path_verify) && \mb_strlen($path_verify) >= 2) {
+    if (\is_string($path_verify) && \strlen($path_verify) >= 2) {
       $collection->add('sms.phone.verify', new Route(
         $path_verify,
         [
-          '_form' => '\Drupal\sms\Form\VerifyPhoneNumberForm',
+          '_form' => VerifyPhoneNumberForm::class,
           '_title' => 'Verify a phone number',
         ],
         [
@@ -43,30 +48,30 @@ class RouteSubscriber extends RouteSubscriberBase {
     }
 
     /** @var \Drupal\sms\Entity\SmsGatewayInterface $gateway */
-    foreach (SmsGateway::loadMultiple() as $id => $gateway) {
+    foreach ($this->entityTypeManager->getStorage('sms_gateway')->loadMultiple() as $id => $gateway) {
       if ($gateway->supportsReportsPush()) {
         $path = $gateway->getPushReportPath();
-        if (isset($path) && \mb_strlen($path) >= 2 && \mb_substr($path, 0, 1) == '/') {
+        if ($path !== NULL && \strlen($path) >= 2 && \str_starts_with($path, '/')) {
           $route = (new Route($path))
-            ->setDefault('_controller', '\Drupal\sms\DeliveryReportController::processDeliveryReport')
+            ->setDefault('_controller', DeliveryReportController::class)
             ->setDefault('_sms_gateway_push_endpoint', $id)
             ->setRequirement('_sms_gateway_supports_pushed_reports', 'TRUE');
-          $collection->add('sms.delivery_report.receive.' . $id, $route);
+          $collection->add(\sprintf('sms.delivery_report.receive.%s', $id), $route);
         }
       }
 
       if ($gateway->autoCreateIncomingRoute()) {
         $path = $gateway->getPushIncomingPath();
-        if (isset($path) && \mb_strlen($path) >= 2 && \mb_substr($path, 0, 1) == '/') {
+        if ($path !== NULL && \strlen($path) >= 2 && \str_starts_with($path, '/')) {
           $parameters = [];
           $parameters['sms_gateway']['type'] = 'entity:sms_gateway';
           $route = (new Route($path))
             ->setDefault('sms_gateway', $id)
-            ->setDefault('_controller', '\Drupal\sms\SmsIncomingController::processIncoming')
+            ->setDefault('_controller', SmsIncomingController::class)
             ->setRequirement('_access', 'TRUE')
             ->setOption('parameters', $parameters)
             ->setMethods(['POST']);
-          $collection->add('sms.incoming.receive.' . $id, $route);
+          $collection->add(\sprintf('sms.incoming.receive.%s', $id), $route);
         }
       }
     }

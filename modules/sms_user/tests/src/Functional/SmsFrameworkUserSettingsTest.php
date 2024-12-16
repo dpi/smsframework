@@ -223,7 +223,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
     ];
     $this->drupalGet(Url::fromRoute('sms_user.options'));
     $this->submitForm($edit, 'Save configuration');
-    $this->assertSession()->responseContains('Reply message must have a value if reply is enabled.', 'Validation failed for message on all unrecognized numbers when reply status is enabled.');
+    $this->assertSession()->responseContains('Reply message must have a value if reply is enabled.');
 
     $edit = [
       'account_registration[behaviour]' => 'incoming_pattern',
@@ -232,7 +232,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
     ];
     $this->drupalGet(Url::fromRoute('sms_user.options'));
     $this->submitForm($edit, 'Save configuration');
-    $this->assertSession()->responseContains('Reply message must have a value if reply is enabled.', 'Validation failed for message_success on incoming_pattern when reply status is enabled.');
+    $this->assertSession()->responseContains('Reply message must have a value if reply is enabled.');
 
     $edit = [
       'account_registration[behaviour]' => 'incoming_pattern',
@@ -241,7 +241,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
     ];
     $this->drupalGet(Url::fromRoute('sms_user.options'));
     $this->submitForm($edit, 'Save configuration');
-    $this->assertSession()->responseContains('Reply message must have a value if reply is enabled.', 'Validation failed for message_failure on incoming_pattern when reply status is enabled.');
+    $this->assertSession()->responseContains('Reply message must have a value if reply is enabled.');
   }
 
   /**
@@ -294,7 +294,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
    */
   public function testFormNoUserPhoneNumberSettings(): void {
     $this->drupalGet(Url::fromRoute('sms_user.options'));
-    $this->assertSession()->responseContains('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings. <a href="' . Url::fromRoute('entity.phone_number_settings.add')->toString() . '">Add phone number settings</a>.', 'Warning message displayed for no phone number settings.');
+    $this->assertSession()->responseContains('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings. <a href="' . Url::fromRoute('entity.phone_number_settings.add')->toString() . '">Add phone number settings</a>.');
 
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="all"]');
     static::assertCount(1, $input, "The 'All unrecognized phone numbers' radio is disabled.");
@@ -311,7 +311,7 @@ class SmsFrameworkUserSettingsTest extends SmsFrameworkBrowserTestBase {
   public function testFormUserPhoneNumberSettings(): void {
     $this->createPhoneNumberSettings('user', 'user');
     $this->drupalGet(Url::fromRoute('sms_user.options'));
-    $this->assertSession()->responseNotContains('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings.', 'Warning message displayed for no phone number settings.');
+    $this->assertSession()->responseNotContains('There are no phone number settings configured for the user entity type. Some features cannot operate without these settings.');
 
     $input = $this->xpath('//input[@name="account_registration[behaviour]" and @disabled="disabled" and @value="all"]');
     static::assertCount(0, $input, "The 'All unrecognized phone numbers' radio is not disabled.");

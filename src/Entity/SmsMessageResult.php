@@ -11,6 +11,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\sms\Exception\SmsStorageException;
 use Drupal\sms\Message\SmsDeliveryReportInterface as PlainDeliveryReportInterface;
 use Drupal\sms\Message\SmsMessageResultInterface as StdMessageResultInterface;
+use Drupal\sms\Message\SmsMessageResultStatus;
 
 /**
  * Defines the SMS message result entity.
@@ -44,14 +45,22 @@ class SmsMessageResult extends ContentEntityBase implements SmsMessageResultInte
   protected array $reports = [];
 
   public function getError(): ?string {
-    // @phpstan-ignore-next-line
-    return $this->get('error')->value ?? NULL;
+    /** @var \Drupal\sms\Message\SmsMessageResultStatus::*|null|'' $error */
+    $error = $this->error->value;
+    return $error !== NULL && $error !== '' ? $error : NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setError($error) {
+  public function setError(?string $error) {
+    if ($error !== NULL) {
+      $reflection = new \ReflectionClass(SmsMessageResultStatus::class);
+      if (\in_array($error, $reflection->getConstants(), TRUE) === FALSE) {
+        throw new \LogicException(\sprintf('Invalid error passed to %s', __METHOD__));
+      }
+    }
+
     return $this->set('error', $error);
   }
 

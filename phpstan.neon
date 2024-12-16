@@ -9,5 +9,5 @@ parameters:
     - ./modules
   reportUnmatchedIgnoredErrors: true
   shipmonkBaselinePerIdentifier:
-      directory: %currentWorkingDirectory%/baselines
+      directory: ./baselines
       indent: '    '

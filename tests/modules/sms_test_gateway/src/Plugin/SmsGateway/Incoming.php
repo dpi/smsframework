@@ -21,6 +21,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Defines a gateway supporting incoming route.
+ *
+ * @phpstan-type JsonRequestItem array{recipients?: string[], message?: string, sender_number?: string}
  */
 #[SmsGateway(
   id: self::PLUGIN_ID,
@@ -50,21 +52,14 @@ final class Incoming extends SmsGatewayPluginBase {
    *   A SMS processing response task.
    */
   public function processIncoming(Request $request, SmsGatewayInterface $sms_gateway): SmsProcessingResponse {
+    /** @var array{messages: JsonRequestItem[]} $json */
     $json = Json::decode($request->getContent());
-    $raw_messages = $json['messages'];
-
-    // JSON property to SmsMessage method setters mapping.
-    $sms_properties = [
-      'sender_number' => 'setSenderNumber',
-      'message' => 'setMessage',
-      'recipients' => 'addRecipients',
-    ];
 
     $messages = [];
-    foreach ($raw_messages as $raw_message) {
+    foreach ($json['messages'] as $raw_message) {
       $result = new SmsMessageResult();
 
-      foreach ($raw_message['recipients'] as $recipient) {
+      foreach ($raw_message['recipients'] ?? [] as $recipient) {
         $report = (new SmsDeliveryReport())
           ->setRecipient($recipient);
         $result->addReport($report);
@@ -75,11 +70,16 @@ final class Incoming extends SmsGatewayPluginBase {
         ->setGateway($sms_gateway)
         ->setResult($result);
 
-      foreach ($sms_properties as $property => $method) {
-        if (\array_key_exists($property, $raw_message)) {
-          $value = $raw_message[$property];
-          \call_user_func_array([$message, $method], [$value]);
-        }
+      if (\array_key_exists('sender_number', $raw_message)) {
+        $message->setSenderNumber($raw_message['sender_number']);
+      }
+
+      if (\array_key_exists('message', $raw_message)) {
+        $message->setMessage($raw_message['message']);
+      }
+
+      if (\array_key_exists('recipients', $raw_message)) {
+        $message->addRecipients($raw_message['recipients']);
       }
 
       $messages[] = $message;

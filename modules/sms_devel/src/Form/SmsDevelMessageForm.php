@@ -147,7 +147,7 @@ class SmsDevelMessageForm extends FormBase {
     $number = $form_state->getValue('number');
     /** @var string $message */
     $message = $form_state->getValue('message');
-    $automated = !empty($form_state->getValue('automated'));
+    $automated = (bool) $form_state->getValue('automated');
     $this->message = SmsMessage::create()
       ->addRecipient($number)
       ->setMessage($message)
@@ -158,12 +158,14 @@ class SmsDevelMessageForm extends FormBase {
       $this->message->setSendTime($send_on->getTimestamp());
     }
 
+    /** @var array{'#type': string, '#name': string, '#value': string, '#submit': string} $triggering_element */
     $triggering_element = $form_state->getTriggeringElement();
+    /** @var string|null $gateway */
     $gateway = $form_state->getValue('gateway');
-    if (!empty($gateway)) {
-      $this->message->setGateway(SmsGateway::load($gateway));
+    if ($gateway !== NULL && $gateway !== '') {
+      $this->message->setGateway(SmsGateway::load($gateway) ?? throw new \LogicException('Impossible'));
     }
-    elseif ($triggering_element['#name'] == 'receive') {
+    elseif ($triggering_element['#name'] === 'receive') {
       $form_state->setError($form['gateway'], $this->t('Gateway must be selected if receiving a message.'));
     }
   }
@@ -193,7 +195,9 @@ class SmsDevelMessageForm extends FormBase {
       $messages = $this->smsProvider->incoming($this->message);
       foreach ($messages as $message) {
         $result = $message->getResult();
-        $this->resultMessage($result);
+        if ($result !== NULL) {
+          $this->resultMessage($result);
+        }
       }
     }
     else {
@@ -214,14 +218,16 @@ class SmsDevelMessageForm extends FormBase {
     $this->message->setDirection(Direction::OUTGOING);
 
     try {
-      $skip_queue = $form_state->getValue('skip_queue');
-      $verbose = $form_state->getValue('verbose');
+      $skip_queue = (bool) $form_state->getValue('skip_queue');
+      $verbose = (bool) $form_state->getValue('verbose');
       if ($verbose && $skip_queue) {
         $messages = $this->smsProvider->send($this->message);
         $results = [];
         foreach ($messages as $message) {
           $result = $message->getResult();
-          $this->resultMessage($result);
+          if ($result !== NULL) {
+            $this->resultMessage($result);
+          }
           $results[] = $result;
         }
         $form_state->setTemporaryValue('results', $results);
@@ -282,8 +288,10 @@ class SmsDevelMessageForm extends FormBase {
     $render = [];
 
     // Renders plain text, or 'Undefined' message if falsey.
-    $renderString = function ($value) {
-      return !empty($value) ? ['#plain_text' => $value] : ['#markup' => $this->t('<em>Undefined</em>')];
+    $renderString = function (string $value): array {
+      return $value !== ''
+        ? ['#plain_text' => $value]
+        : ['#markup' => $this->t('<em>Undefined</em>')];
     };
 
     // Renders a date text, or 'Undefined' message if falsey.
@@ -319,10 +327,12 @@ class SmsDevelMessageForm extends FormBase {
       $row[]['#plain_text'] = $this->t("#@number", ['@number' => $i]);
 
       $error = $result->getError();
-      $row[] = $error ? ['#plain_text' => $error] : ['#markup' => $this->t('<em>Success</em>')];
+      $row[] = $error !== NULL
+        ? ['#plain_text' => $error]
+        : ['#markup' => $this->t('<em>Success</em>')];
       $row[] = $renderString($result->getErrorMessage());
-      $row[] = $renderString($result->getCreditsUsed());
-      $row[] = $renderString($result->getCreditsBalance());
+      $row[] = $renderString((string) $result->getCreditsUsed());
+      $row[] = $renderString((string) $result->getCreditsBalance());
 
       $render['results'][] = $row;
 
@@ -341,8 +351,8 @@ class SmsDevelMessageForm extends FormBase {
         $row = [];
 
         $row[] = $renderString($report->getRecipient());
-        $row[] = $renderString($report->getMessageId());
-        $row[] = $renderString($report->getStatus());
+        $row[] = $renderString((string) $report->getMessageId());
+        $row[] = $renderString((string) $report->getStatus());
         $row[] = $renderString($report->getStatusMessage());
         $row[] = $renderDate($report->getTimeDelivered());
         $row[] = $renderDate($report->getTimeQueued());
@@ -352,7 +362,7 @@ class SmsDevelMessageForm extends FormBase {
 
       $render['results'][][] = [
         '#wrapper_attributes' => [
-          'colspan' => \count($render['results']['#header']),
+          'colspan' => 5,
         ],
         'data' => $reports_cell,
       ];

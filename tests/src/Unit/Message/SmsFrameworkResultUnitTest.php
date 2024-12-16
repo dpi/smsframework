@@ -19,6 +19,8 @@ final class SmsFrameworkResultUnitTest extends UnitTestCase {
 
   use SmsFrameworkMessageResultTestTrait;
 
+  public const TESTING_CLASS = SmsMessageResult::class;
+
   protected function createMessageResult(): SmsMessageResultInterface {
     return new SmsMessageResult();
   }

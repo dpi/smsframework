@@ -1,24 +1,9 @@
-# total 12 errors
+# total 8 errors
 
 parameters:
     ignoreErrors:
         -
-            message: '#^Implicit array creation is not allowed \- variable \$data does not exist\.$#'
-            count: 1
-            path: ../modules/sms_user/src/AccountRegistration.php
-
-        -
-            message: '#^Implicit array creation is not allowed \- variable \$t_args does not exist\.$#'
-            count: 3
-            path: ../modules/sms_user/src/AccountRegistration.php
-
-        -
             message: '#^Implicit array creation is not allowed \- variable \$definitions does not exist\.$#'
-            count: 1
-            path: ../src/Form/PhoneNumberSettingsForm.php
-
-        -
-            message: '#^Implicit array creation is not allowed \- variable \$t_args does not exist\.$#'
             count: 1
             path: ../src/Form/PhoneNumberSettingsForm.php
 
@@ -36,11 +21,6 @@ parameters:
             message: '#^Implicit array creation is not allowed \- variable \$row does not exist\.$#'
             count: 1
             path: ../src/Lists/SmsGatewayListBuilder.php
-
-        -
-            message: '#^Implicit array creation is not allowed \- variable \$messages does not exist\.$#'
-            count: 1
-            path: ../tests/src/Functional/SmsFrameworkIncomingBrowserTest.php
 
         -
             message: '#^Implicit array creation is not allowed \- variable \$data does not exist\.$#'

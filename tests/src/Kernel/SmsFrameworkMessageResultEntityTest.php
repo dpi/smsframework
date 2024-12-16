@@ -23,6 +23,8 @@ final class SmsFrameworkMessageResultEntityTest extends KernelTestBase {
 
   use SmsFrameworkMessageResultTestTrait;
 
+  public const TESTING_CLASS = SmsMessageResult::class;
+
   protected static $modules = [
     'user',
     'sms',

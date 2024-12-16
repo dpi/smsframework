@@ -182,7 +182,7 @@ final class SmsFrameworkQueueTest extends SmsFrameworkKernelBase {
     static::assertCount(1, $this->getTestMessages($this->gateway), 'One message was sent.');
     static::assertCount(1, $sms_messages, 'There are SMS entities in storage.');
     static::assertEquals(\Drupal::time()->getRequestTime(), $sms_message_new->getProcessedTime());
-    static::assertEquals(FALSE, $sms_message_new->isQueued());
+    static::assertFalse($sms_message_new->isQueued());
   }
 
   /**

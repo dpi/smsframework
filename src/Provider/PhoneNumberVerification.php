@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\sms\Direction;
@@ -140,7 +141,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
     try {
       $phone_number_settings = $this->getPhoneNumberSettingsForEntity($entity);
       $field_name = $phone_number_settings->getFieldName('phone_number');
-      if (!empty($field_name)) {
+      if ($field_name !== NULL) {
         $items_original = isset($entity->original) ? $entity->original->{$field_name} : NULL;
         $items = $entity->{$field_name};
       }
@@ -161,7 +162,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
       $phone_number = $item->value;
       $numbers[] = $phone_number;
 
-      if (!$this->getPhoneVerificationByEntity($entity, $phone_number)) {
+      if (NULL === $this->getPhoneVerificationByEntity($entity, $phone_number)) {
         $this->newPhoneVerification($entity, $phone_number);
       }
     }
@@ -170,8 +171,9 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
       foreach ($items_original as $item) {
         $phone_number = $item->value;
         // A phone number was deleted.
-        if (!\in_array($phone_number, $numbers)) {
-          if ($phone_verification = $this->getPhoneVerificationByEntity($entity, $phone_number)) {
+        if (!\in_array($phone_number, $numbers, TRUE)) {
+          $phone_verification = $this->getPhoneVerificationByEntity($entity, $phone_number);
+          if ($phone_verification !== NULL) {
             $phone_verification->delete();
           }
         }
@@ -193,7 +195,7 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
         ]);
       $this->phoneNumberVerificationStorage()->delete($verification_entities);
     }
-    catch (PhoneNumberSettingsException $e) {
+    catch (PhoneNumberSettingsException) {
     }
   }
 
@@ -201,30 +203,35 @@ class PhoneNumberVerification implements PhoneNumberVerificationInterface {
     $current_time = $this->time->getRequestTime();
 
     $verification_ids = [];
-    foreach ($this->configFactory->listAll('sms.phone.') as $config_id) {
-      $config = $this->configFactory->get($config_id);
-      $lifetime = $config->get('verification_code_lifetime');
-      if (!empty($lifetime)) {
-        $verification_ids += $this->phoneNumberVerificationStorage()->getQuery()
-          ->accessCheck(FALSE)
-          ->condition('entity__target_type', $config->get('entity_type'))
-          ->condition('bundle', $config->get('bundle'))
-          ->condition('status', 0)
-          ->condition('created', ($current_time - $lifetime), '<')
-          ->execute();
-      }
+    $prefix = 'sms.phone.';
+    $ids = \array_map(
+      static fn (string $id) => \substr($id, \strlen($prefix)),
+      $this->configFactory->listAll($prefix),
+    );
+
+    foreach ($this->entityTypeManager->getStorage('phone_number_settings')->loadMultiple($ids) as $phoneNumberSetting) {
+      \assert($phoneNumberSetting instanceof PhoneNumberSettingsInterface);
+      $verification_ids += $this->phoneNumberVerificationStorage()->getQuery()
+        ->accessCheck(FALSE)
+        ->condition('entity__target_type', $phoneNumberSetting->getPhoneNumberEntityTypeId())
+        ->condition('bundle', $phoneNumberSetting->getPhoneNumberBundle())
+        ->condition('status', 0)
+        ->condition('created', ($current_time - $phoneNumberSetting->getVerificationCodeLifetime()), '<')
+        ->execute();
     }
 
     /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $phone_number_verification */
     foreach ($this->phoneNumberVerificationStorage()->loadMultiple($verification_ids) as $phone_number_verification) {
-      if ($entity = $phone_number_verification->getEntity()) {
+      $entity = $phone_number_verification->getEntity();
+      if ($entity !== NULL) {
         try {
           $config = $this->getPhoneNumberSettingsForEntity($entity);
           $purge = $config->getPurgeVerificationPhoneNumber();
           $field_name = $config->getFieldName('phone_number');
-          if (!empty($purge) && isset($entity->{$field_name})) {
-            $entity->{$field_name}->filter(static function ($item) use ($phone_number_verification) {
-              return $item->value != $phone_number_verification->getPhoneNumber();
+          if ($purge && $field_name !== NULL && $entity instanceof FieldableEntityInterface && $entity->hasField($field_name)) {
+            $fieldList = $entity->get($field_name);
+            $fieldList->filter(static function ($item) use ($phone_number_verification) {
+              return $item->value !== $phone_number_verification->getPhoneNumber();
             });
             $entity->save();
           }

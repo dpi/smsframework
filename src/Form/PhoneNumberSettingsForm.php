@@ -75,7 +75,7 @@ class PhoneNumberSettingsForm extends EntityForm {
       }
     }
 
-    $bundle_default_value = !$config->isNew() ? $config->getPhoneNumberEntityTypeId() . '|' . $config->getPhoneNumberBundle() : NULL;
+    $bundle_default_value = !$config->isNew() ? ($config->getPhoneNumberEntityTypeId() . '|' . $config->getPhoneNumberBundle()) : NULL;
 
     // Field cannot be called 'bundle' or odd behavior will happen on re-saves.
     $form['entity_bundle'] = [
@@ -91,7 +91,7 @@ class PhoneNumberSettingsForm extends EntityForm {
       ],
     ];
 
-    if (!$bundles) {
+    if ($bundles === []) {
       $form['entity_bundle']['#empty_option'] = $this->t('No Bundles Available');
     }
 
@@ -99,16 +99,15 @@ class PhoneNumberSettingsForm extends EntityForm {
     $field_options['telephone'][self::CREATE_NEW_FIELD] = $this->t('- Create a new telephone field -');
     $field_options['boolean'][self::CREATE_NEW_FIELD] = $this->t('- Create a new boolean field -');
 
-    if ($entity_bundle = $form_state->getValue('entity_bundle', $bundle_default_value ?: NULL)) {
+    /** @var string|null $entity_bundle */
+    $entity_bundle = $form_state->getValue('entity_bundle', $bundle_default_value);
+    if ($entity_bundle !== NULL) {
       [$entity_type_id, $bundle] = \explode('|', $entity_bundle);
-      if (!empty($entity_type_id) && !empty($bundle)) {
-        $field_definitions = $this->entityFieldManager
-          ->getFieldDefinitions($entity_type_id, $bundle);
-        foreach ($field_definitions as $field_definition) {
-          $field_type = $field_definition->getType();
-          if (isset($field_options[$field_type])) {
-            $field_options[$field_type][$field_definition->getName()] = $field_definition->getLabel();
-          }
+      $field_definitions = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle);
+      foreach ($field_definitions as $field_definition) {
+        $field_type = $field_definition->getType();
+        if (isset($field_options[$field_type])) {
+          $field_options[$field_type][$field_definition->getName()] = $field_definition->getLabel();
         }
       }
     }
@@ -187,7 +186,7 @@ class PhoneNumberSettingsForm extends EntityForm {
       '#type' => 'checkbox',
       '#title' => $this->t('Purge phone numbers'),
       '#description' => $this->t('Remove phone number if verification code expires.'),
-      '#default_value' => $config->isNew() ?: $config->getPurgeVerificationPhoneNumber(),
+      '#default_value' => $config->isNew() || $config->getPurgeVerificationPhoneNumber(),
     ];
 
     return $form;
@@ -195,6 +194,8 @@ class PhoneNumberSettingsForm extends EntityForm {
 
   /**
    * Handles AJAX callback for bundle field on new phone number settings.
+   *
+   * @phpstan-param array{field_mapping: array} $form
    */
   public function updateFieldMapping($form, FormStateInterface $form_state): array {
     return $form['field_mapping'];
@@ -206,36 +207,45 @@ class PhoneNumberSettingsForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state): int {
     $config = &$this->entity;
 
-    [$entity_type_id, $bundle] = \explode('|', $form_state->getValue('entity_bundle'));
+    /** @var string $entityBundle */
+    $entityBundle = $form_state->getValue('entity_bundle');
+    [$entity_type_id, $bundle] = \explode('|', $entityBundle);
     $config
       ->setPhoneNumberEntityTypeId($entity_type_id)
       ->setPhoneNumberBundle($bundle);
 
     /** @var int<60, max> $lifetime */
+    // @phpstan-ignore-next-line
     $lifetime = (int) $form_state->getValue('code_lifetime');
 
+    /** @var string $verification_message */
+    $verification_message = $form_state->getValue('verification_message');
+
     $config
-      ->setVerificationMessage($form_state->getValue('verification_message'))
+      ->setVerificationMessage($verification_message)
       ->setVerificationCodeLifetime($lifetime)
       ->setPurgeVerificationPhoneNumber((bool) $form_state->getValue('phone_number_purge'));
 
-    foreach ($form_state->getValue('field_mapping') as $config_key => $field_name) {
+    /** @var array<string, string|\Drupal\sms\Form\PhoneNumberSettingsForm::CREATE_NEW_FIELD> $mapping */
+    $mapping = $form_state->getValue('field_mapping');
+
+    foreach ($mapping as $config_key => $field_name) {
       if ($field_name == self::CREATE_NEW_FIELD) {
-        $field_config = $this->createNewField($entity_type_id, $bundle, $config_key);
+        $field_config = static::createNewField($entity_type_id, $bundle, $config_key);
         $field_name = $field_config->getName();
       }
       else {
         // Use existing field.
-        /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
-        $entity_form_display = $field_storage_config = $this->entityTypeManager
+        /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface|null $entity_form_display */
+        $entity_form_display = $this->entityTypeManager
           ->getStorage('entity_form_display')
           ->load($entity_type_id . '.' . $bundle . '.default');
 
-        if ($entity_form_display) {
-          $component = $entity_form_display->getComponent($field_name) ?: [];
+        if ($entity_form_display !== NULL) {
+          $component = $entity_form_display->getComponent($field_name) ?? [];
           // Only change existing form formatter if it is using default
           // widget, or none at all.
-          if (!$component || ($component && $component['type'] == 'telephone_default')) {
+          if ($component === [] || ($component['type'] == 'telephone_default')) {
             $component['type'] = SmsTelephoneWidget::PLUGIN_ID;
             $entity_form_display
               ->setComponent($field_name, $component)
@@ -248,6 +258,7 @@ class PhoneNumberSettingsForm extends EntityForm {
     }
 
     $saved = $config->save();
+    $t_args = [];
     $t_args['%id'] = $config->id();
 
     if ($saved == SAVED_NEW) {

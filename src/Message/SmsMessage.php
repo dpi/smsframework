@@ -104,7 +104,7 @@ class SmsMessage implements SmsMessageInterface {
    *   (optional) The actual SMS message to be sent.
    * @param array $options
    *   (optional) Additional options.
-   * @param int|null $uid
+   * @param positive-int|null $uid
    *   (optional) The user who created the SMS message.
    */
   public function __construct(

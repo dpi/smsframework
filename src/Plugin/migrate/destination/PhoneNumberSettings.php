@@ -25,7 +25,7 @@ class PhoneNumberSettings extends EntityConfigBase {
    */
   public function import(Row $row, array $old_destination_id_values = []) {
     $return = parent::import($row, $old_destination_id_values);
-    if ($return) {
+    if (\is_array($return) && $return !== []) {
       // After successful import of the phone_number_setting, the phone number
       // field should be created and attached to the user entity type.
       /** @var \Drupal\sms\Entity\PhoneNumberSettingsInterface $phone_number_setting */
@@ -44,14 +44,14 @@ class PhoneNumberSettings extends EntityConfigBase {
 
     $entity_type_id = $phone_number_settings->getPhoneNumberEntityTypeId();
     $bundle = $phone_number_settings->getPhoneNumberBundle();
-    $field_name = $phone_number_settings->getFieldName('phone_number');
+    $field_name = $phone_number_settings->getFieldName('phone_number') ?? throw new \Exception('Missing phone number config.');
 
     // Delete entity form display component.
     $entity_form_display = EntityFormDisplay::load($entity_type_id . '.' . $bundle . '.default');
     $entity_form_display?->removeComponent($field_name);
 
     // Delete the field storage and field instance.
-    FieldStorageConfig::loadByName($entity_type_id, $field_name)->delete();
+    FieldStorageConfig::loadByName($entity_type_id, $field_name)?->delete();
 
     // Remove the phone number settings.
     parent::rollback($destination_identifier);
@@ -66,10 +66,11 @@ class PhoneNumberSettings extends EntityConfigBase {
    * @see \Drupal\sms\Form\PhoneNumberSettingsForm::createNewField()
    */
   protected function createPhoneNumberField(PhoneNumberSettingsInterface $phone_number_settings): void {
+    $fieldName = $phone_number_settings->getFieldName('phone_number') ?? throw new \Exception('Missing phone number config.');
     PhoneNumberSettingsForm::createNewField(
       $phone_number_settings->getPhoneNumberEntityTypeId(),
       $phone_number_settings->getPhoneNumberBundle(),
-      $phone_number_settings->getFieldName('phone_number'),
+      $fieldName,
     );
   }
 

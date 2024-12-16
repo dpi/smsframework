@@ -14,7 +14,7 @@ interface SmsMessageInterface {
   /**
    * Gets the list of recipients of this SMS message.
    *
-   * @return array
+   * @return string[]
    *   The list of recipients of this SMS message.
    */
   public function getRecipients(): array;

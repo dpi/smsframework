@@ -33,18 +33,22 @@ final class SmsTestGatewayEventSubscriber implements EventSubscriberInterface {
    * @see sms_test_gateway_get_incoming()
    */
   public function memoryIncomingMessage(SmsMessageEvent $event): void {
-    $sms_message = $event->getMessages()[0];
-
     // Save incoming result for later retrieval.
     /** @var array<string, mixed> $result */
     $result = &\drupal_static(static::STATE_SMS_INCOMING_PREPROCESS);
 
-    if (!\is_null($sms_message->getRecipients()) && !\is_null($sms_message->getMessage())) {
-      $recipients = $sms_message->getRecipients();
-      $result['number'] = $recipients !== [] ? \reset($recipients) : NULL;
-      $result['message'] = $sms_message->getMessage();
+    foreach ($event->getMessages() as $message) {
+      $recipients = $message->getRecipients();
+      $messageStr = $message->getMessage();
+      $result['number'] = \reset($recipients);
+      $result['message'] = $messageStr;
       $this->state->set(static::STATE_SMS_INCOMING_PREPROCESS, $result);
+
+      // Only first.
+      break;
     }
+
+    unset($message);
 
     /** @var array<string, array<\Drupal\sms\Message\SmsMessageInterface>> $incoming_messages */
     $incoming_messages = &\drupal_static(static::STATE_MEMORY_INCOMING, []);

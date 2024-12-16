@@ -11,11 +11,13 @@ use Drupal\sms\Direction;
 
 /**
  * Implements hook_requirements().
+ *
+ * @phpstan-return array<string, array{title: \Drupal\Core\StringTranslation\TranslatableMarkup, severity: int, value: \Drupal\Core\StringTranslation\TranslatableMarkup}>
  */
-function sms_requirements($phase): array {
+function sms_requirements(string $phase): array {
   $requirements = [];
 
-  if ($phase == 'runtime') {
+  if ($phase === 'runtime') {
     $base_query = \Drupal::entityTypeManager()
       ->getStorage('sms')
       ->getQuery()
@@ -31,7 +33,7 @@ function sms_requirements($phase): array {
 
     $requirements['sms_queue_incoming'] = [
       'title' => t('SMS incoming queue'),
-      'severity' => REQUIREMENT_INFO,
+      'severity' => \REQUIREMENT_INFO,
       'value' => \Drupal::translation()->formatPlural(
         $count,
         'There are @count messages in the incoming queue.',
@@ -49,7 +51,7 @@ function sms_requirements($phase): array {
 
     $requirements['sms_queue_outgoing'] = [
       'title' => t('SMS outgoing queue'),
-      'severity' => REQUIREMENT_INFO,
+      'severity' => \REQUIREMENT_INFO,
       'value' => \Drupal::translation()->formatPlural(
         $count,
         'There are @count messages in the outgoing queue.',
@@ -62,19 +64,8 @@ function sms_requirements($phase): array {
 }
 
 /**
- * Install the "sms_result" and "sms_report" entity types.
+ * Implements hook_update_last_removed().
  */
-function sms_update_8101(): void {
-  $update_manager = \Drupal::entityDefinitionUpdateManager();
-  $entity_type_manager = \Drupal::entityTypeManager();
-
-  if ($update_manager->getEntityType('sms')) {
-    // Add storage definitions for the sms_result and sms_report entities.
-    if (!$update_manager->getEntityType('sms_result')) {
-      $update_manager->installEntityType($entity_type_manager->getDefinition('sms_result'));
-    }
-    if (!$update_manager->getEntityType('sms_report')) {
-      $update_manager->installEntityType($entity_type_manager->getDefinition('sms_report'));
-    }
-  }
+function sms_last_update_last_removed(): int {
+  return 8101;
 }

@@ -1,15 +1,10 @@
-# total 10 errors
+# total 5 errors
 
 parameters:
     ignoreErrors:
         -
             message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
             count: 3
-            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
-
-        -
-            message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
-            count: 7
             path: ../modules/sms_user/src/AccountRegistration.php
 
         -
@@ -26,26 +21,6 @@ parameters:
             message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
             count: 3
             path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserAccountRegistrationServiceTest.php
-
-        -
-            message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
-            count: 2
-            path: ../src/Form/PhoneNumberSettingsForm.php
-
-        -
-            message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
-            count: 2
-            path: ../src/Form/SmsGatewayForm.php
-
-        -
-            message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
-            count: 1
-            path: ../src/Plugin/migrate/process/PhoneNumberSettings.php
-
-        -
-            message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
-            count: 3
-            path: ../src/Provider/PhoneNumberVerification.php
 
         -
             message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'

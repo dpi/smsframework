@@ -30,8 +30,8 @@ final class SmsFrameworkPhoneNumberVerifyFormTest extends SmsFrameworkBrowserTes
     $this->drupalLogin($account);
     $this->drupalGet(Url::fromRoute('sms.phone.verify'));
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains(\t('Verify a phone number'));
-    $this->assertSession()->pageTextContains(\t('Enter the code you received from a SMS message.'));
+    $this->assertSession()->pageTextContains('Verify a phone number');
+    $this->assertSession()->pageTextContains('Enter the code you received from a SMS message.');
   }
 
   /**
@@ -58,13 +58,13 @@ final class SmsFrameworkPhoneNumberVerifyFormTest extends SmsFrameworkBrowserTes
     $edit['code'] = $this->randomMachineName();
     $this->drupalGet(Url::fromRoute('sms.phone.verify'));
     $this->submitForm($edit, 'Verify code');
-    $this->assertSession()->pageTextContains(\t('Invalid verification code.'));
+    $this->assertSession()->pageTextContains('Invalid verification code.');
 
     // Valid code.
     $edit['code'] = $code;
     $this->drupalGet(Url::fromRoute('sms.phone.verify'));
     $this->submitForm($edit, 'Verify code');
-    $this->assertSession()->pageTextContains(\t('Phone number is now verified.'));
+    $this->assertSession()->pageTextContains('Phone number is now verified.');
 
     // Reset verification code static cache.
     $this->resetAll();
@@ -92,7 +92,7 @@ final class SmsFrameworkPhoneNumberVerifyFormTest extends SmsFrameworkBrowserTes
     $this->assertSession()->responseNotContains(\t('There has been too many failed verification attempts. Try again later.'));
     $this->drupalGet(Url::fromRoute('sms.phone.verify'));
     $this->submitForm($edit, 'Verify code');
-    $this->assertSession()->pageTextContains(\t('There has been too many failed verification attempts. Try again later.'));
+    $this->assertSession()->pageTextContains('There has been too many failed verification attempts. Try again later.');
   }
 
   /**
@@ -107,7 +107,7 @@ final class SmsFrameworkPhoneNumberVerifyFormTest extends SmsFrameworkBrowserTes
 
     // Hard code path, don't use Url::fromRoute.
     $this->drupalGet('/verify');
-    $this->assertSession()->statusCodeEquals(200, 'Default phone number verification route exists at /verify');
+    $this->assertSession()->statusCodeEquals(200);
 
     $path_verify = '/' . $this->randomMachineName() . '/' . $this->randomMachineName();
     $this->drupalGet(Url::fromRoute('sms.settings'));
@@ -117,9 +117,9 @@ final class SmsFrameworkPhoneNumberVerifyFormTest extends SmsFrameworkBrowserTes
 
     // Ensure the route cache is rebuilt by getting the verify route.
     $this->drupalGet($path_verify);
-    $this->assertSession()->statusCodeEquals(200, 'Phone number verification route changed to ' . $path_verify);
+    $this->assertSession()->statusCodeEquals(200);
     $this->drupalGet('/verify');
-    $this->assertSession()->statusCodeEquals(404, 'Previous route path was invalidated.');
+    $this->assertSession()->statusCodeEquals(404);
   }
 
 }

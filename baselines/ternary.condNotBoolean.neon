@@ -1,12 +1,7 @@
-# total 3 errors
+# total 2 errors
 
 parameters:
     ignoreErrors:
-        -
-            message: '#^Only booleans are allowed in a ternary operator condition, string\|null given\.$#'
-            count: 1
-            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php
-
         -
             message: '#^Only booleans are allowed in a ternary operator condition, array\<Drupal\\user\\Entity\\User\> given\.$#'
             count: 1

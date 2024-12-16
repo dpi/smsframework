@@ -4,5 +4,5 @@ parameters:
     ignoreErrors:
         -
             message: '#^If condition is always true\.$#'
-            count: 2
+            count: 1
             path: ../src/Form/PhoneNumberSettingsForm.php

@@ -9,6 +9,7 @@ use Drupal\Core\Flood\FloodInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\sms\Entity\PhoneNumberVerificationInterface as EntityPhoneNumberVerificationInterface;
 use Drupal\sms\Provider\PhoneNumberVerificationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -16,6 +17,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Form to accept a verification code.
  */
 class VerifyPhoneNumberForm extends FormBase {
+
+  private const FLOOD = 'sms.verify_phone_number';
 
   /**
    * Constructs a VerifyPhoneNumberForm object.
@@ -29,7 +32,7 @@ class VerifyPhoneNumberForm extends FormBase {
     $this->setMessenger($messenger);
   }
 
-  final public static function create(ContainerInterface $container): static {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('flood'),
       $container->get('sms.phone_number.verification'),
@@ -69,23 +72,30 @@ class VerifyPhoneNumberForm extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state): void {
+    /** @var positive-int $flood_window */
     $flood_window = $this->config('sms.settings')->get('flood.verify_window');
+    /** @var positive-int $flood_limit */
     $flood_limit = $this->config('sms.settings')->get('flood.verify_limit');
 
-    if (!$this->flood->isAllowed('sms.verify_phone_number', $flood_limit, $flood_window)) {
+    if (FALSE === $this->flood->isAllowed(self::FLOOD, $flood_limit, $flood_window)) {
       $form_state->setError($form, $this->t('There has been too many failed verification attempts. Try again later.'));
       return;
     }
 
     $current_time = new \DateTimeImmutable('@' . $this->time->getRequestTime());
+    /** @var string $code */
     $code = $form_state->getValue('code');
     $phone_verification = $this->phoneNumberVerification
       ->getPhoneVerificationByCode($code);
 
-    if ($phone_verification && !$phone_verification->getStatus()) {
+    if ($phone_verification instanceof EntityPhoneNumberVerificationInterface && FALSE === $phone_verification->getStatus()) {
       $entity = $phone_verification->getEntity();
-      $phone_number_settings = $this->phoneNumberVerification
-        ->getPhoneNumberSettingsForEntity($entity);
+      if ($entity === NULL) {
+        $form_state->setError($form['code'], $this->t('Entity for this verification disappeared.'));
+        return;
+      }
+
+      $phone_number_settings = $this->phoneNumberVerification->getPhoneNumberSettingsForEntity($entity);
       $lifetime = $phone_number_settings->getVerificationCodeLifetime();
 
       if ($current_time > $phone_verification->getCreatedDate()->modify('+' . $lifetime . ' seconds')) {
@@ -97,16 +107,19 @@ class VerifyPhoneNumberForm extends FormBase {
     }
 
     $this->flood
-      ->register('sms.verify_phone_number', $flood_window);
+      ->register(self::FLOOD, $flood_window);
   }
 
   /**
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
+    /** @var string $code */
     $code = $form_state->getValue('code');
-    $phone_verification = $this->phoneNumberVerification
-      ->getPhoneVerificationByCode($code);
+
+    // Guaranteed by validateForm:
+    /** @var \Drupal\sms\Entity\PhoneNumberVerificationInterface $phone_verification */
+    $phone_verification = $this->phoneNumberVerification->getPhoneVerificationByCode($code);
     $phone_verification
       ->setStatus(TRUE)
       ->setCode('')

@@ -25,10 +25,10 @@ class PhoneNumberSettings extends ProcessPluginBase {
    * {@inheritdoc}
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
+    /** @var string|null $value */
     if ($row->getSourceProperty('id') === 'sms_user_confirmation_message') {
       // If still using the D6/D7 default message, swap for the new D8 default.
-      if (empty($value) || $value == static::DEFAULT_D6_VERIFICATION_MESSAGE
-        || $value == static::DEFAULT_D7_VERIFICATION_MESSAGE) {
+      if ($value === NULL || $value === '' || $value == static::DEFAULT_D6_VERIFICATION_MESSAGE || $value == static::DEFAULT_D7_VERIFICATION_MESSAGE) {
         $value = static::DEFAULT_VERIFICATION_MESSAGE;
       }
       else {

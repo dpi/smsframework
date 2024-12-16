@@ -56,7 +56,7 @@ class AdminSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $op = NULL, $domain = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $form['#attached']['library'][] = 'sms_user/admin';
     $config = $this->config('sms_user.settings');
 
@@ -96,9 +96,11 @@ class AdminSettingsForm extends ConfigFormBase {
 
     // Convert configuration into days.
     $day_defaults = [];
-    foreach ($config->get('active_hours.ranges') as $range) {
-      $start = new DrupalDateTime($range['start']);
-      $end = new DrupalDateTime($range['end']);
+    /** @var array<array{start: string, end: string}> $ranges */
+    $ranges = $config->get('active_hours.ranges');
+    foreach ($ranges as ['start' => $rangeStart, 'end' => $rangeEnd]) {
+      $start = new DrupalDateTime($rangeStart);
+      $end = new DrupalDateTime($rangeEnd);
       $start_day = \strtolower($start->format('l'));
 
       $day_defaults[$start_day]['start'] = $start->format('G');
@@ -332,7 +334,9 @@ class AdminSettingsForm extends ConfigFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state): void {
     // Active hours.
-    foreach ($form_state->getValue(['active_hours', 'days']) as $day => $row) {
+    /** @var array<string, array<int, string>> $days */
+    $days = $form_state->getValue(['active_hours', 'days']);
+    foreach ($days as $day => $row) {
       foreach ($row as $position => $hour) {
         if ($hour == -1) {
           $form_state->unsetValue(['active_hours', 'days', $day]);
@@ -357,7 +361,9 @@ class AdminSettingsForm extends ConfigFormBase {
     }
 
     // Ensure end times are greater than start times.
-    foreach ($form_state->getValue(['active_hours', 'days']) as $day => $row) {
+    /** @var array<string, array{start: string, end: string}> $days */
+    $days = $form_state->getValue(['active_hours', 'days']);
+    foreach ($days as $day => $row) {
       $start = new DrupalDateTime($row['start']);
       $end = new DrupalDateTime($row['end']);
       if ($end < $start) {
@@ -373,14 +379,15 @@ class AdminSettingsForm extends ConfigFormBase {
     }
 
     // Incoming message.
+    /** @var string $incoming_message */
     $incoming_message = $account_registration['incoming_pattern_options']['incoming_message'];
     if ($account_registration['behaviour'] == 'incoming_pattern' && empty($incoming_message)) {
       // Empty incoming message.
       $form_state->setError($form['account_registration']['behaviour']['incoming_pattern_options']['incoming_message'], $this->t('Incoming message must be filled if using pre-incoming_pattern option.'));
     }
     elseif (!empty($incoming_message)) {
-      $contains_email = \strpos($incoming_message, '[email]') !== FALSE;
-      $contains_password = \strpos($incoming_message, '[password]') !== FALSE;
+      $contains_email = \str_contains($incoming_message, '[email]');
+      $contains_password = \str_contains($incoming_message, '[password]');
       $activation_email = $account_registration['incoming_pattern_options']['send_activation_email'];
       if ($activation_email && !$contains_email) {
         // Email placeholder must be present if activation email is on.
@@ -434,6 +441,8 @@ class AdminSettingsForm extends ConfigFormBase {
     $account_registration = $form_state->getValue('account_registration');
     $behaviour = $account_registration['behaviour'];
 
+    /** @var array<string, array<int, string>> $days */
+    $days = $form_state->getValue(['active_hours', 'days']);
     $config
       ->set('account_registration.unrecognized_sender.status', $behaviour == 'all')
       ->set('account_registration.incoming_pattern.status', $behaviour == 'incoming_pattern')
@@ -448,7 +457,7 @@ class AdminSettingsForm extends ConfigFormBase {
       ->set('active_hours.status', (bool) $form_state->getValue(['active_hours', 'status']))
       // Days make sense for this form, however storage uses generic 'range'
       // term. Remove keys so it is a raw sequence.
-      ->set('active_hours.ranges', \array_values($form_state->getValue(['active_hours', 'days'])))
+      ->set('active_hours.ranges', \array_values($days))
       ->save();
 
     parent::submitForm($form, $form_state);

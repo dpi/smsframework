@@ -1,4 +1,4 @@
-# total 6 errors
+# total 4 errors
 
 parameters:
     ignoreErrors:
@@ -11,16 +11,6 @@ parameters:
             message: '#^Dynamic call to static method PHPUnit\\Framework\\Assert\:\:assertNotFalse\(\)\.$#'
             count: 1
             path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserAccountRegistrationServiceTest.php
-
-        -
-            message: '#^Dynamic call to static method PHPUnit\\Framework\\Assert\:\:assertNotEquals\(\)\.$#'
-            count: 1
-            path: ../modules/sms_user/tests/src/Kernel/SmsFrameworkUserActiveHoursServiceTest.php
-
-        -
-            message: '#^Dynamic call to static method Drupal\\sms\\Form\\PhoneNumberSettingsForm\:\:createNewField\(\)\.$#'
-            count: 1
-            path: ../src/Form/PhoneNumberSettingsForm.php
 
         -
             message: '#^Dynamic call to static method PHPUnit\\Framework\\Assert\:\:markTestSkipped\(\)\.$#'

@@ -227,12 +227,13 @@ class SmsGatewayForm extends EntityForm {
 
     foreach ($path_elements_parents as $parents) {
       $element = NestedArray::getValue($form, $parents);
+      /** @var string $path */
       $path = $form_state->getValue($parents);
-      $path_length = \mb_strlen($path);
+      $path_length = \strlen($path);
 
       // Length must be more than 2 chars, including leading slash character.
       if ($path_length > 0) {
-        if (\mb_substr($path, 0, 1) !== '/') {
+        if (FALSE === \str_starts_with($path, '/')) {
           $form_state->setError($element, $this->t("Path must begin with a '/' character."));
         }
         if ($path_length == 1) {
@@ -265,12 +266,16 @@ class SmsGatewayForm extends EntityForm {
     $sms_gateway = $this->getEntity();
 
     $incoming_push_path_original = $sms_gateway->getPushIncomingPath();
+    /** @var string $incoming_push_path */
     $incoming_push_path = $form_state->getValue(['incoming_messages', 'push_path']);
     $reports_push_path_original = $sms_gateway->getPushReportPath();
+    /** @var string $reports_push_path */
     $reports_push_path = $form_state->getValue(['delivery_reports', 'push_path']);
 
+    $status = (bool) $form_state->getValue('status');
+
     $sms_gateway
-      ->setStatus($form_state->getValue('status'))
+      ->setStatus($status)
       ->setPushReportPath($reports_push_path)
       ->setPushIncomingPath($incoming_push_path);
 
@@ -278,7 +283,7 @@ class SmsGatewayForm extends EntityForm {
 
     if ($saved == SAVED_NEW) {
       $this->messenger()->addMessage($this->t('Gateway created.'));
-      $rebuild = !empty($incoming_push_path) || !empty($reports_push_path);
+      $rebuild = $incoming_push_path !== '' || $reports_push_path !== '';
 
       // Redirect to edit form.
       $form_state->setRedirectUrl(Url::fromRoute('entity.sms_gateway.edit_form', [
@@ -289,8 +294,8 @@ class SmsGatewayForm extends EntityForm {
       $this->messenger()->addMessage($this->t('Gateway saved.'));
 
       // Only rebuild routes if the paths changed.
-      $rebuild_incoming = $incoming_push_path_original != $incoming_push_path;
-      $rebuild_reports = $reports_push_path_original != $reports_push_path;
+      $rebuild_incoming = $incoming_push_path_original !== $incoming_push_path;
+      $rebuild_reports = $reports_push_path_original !== $reports_push_path;
       $rebuild = $rebuild_incoming || $rebuild_reports;
 
       // Back to list page.

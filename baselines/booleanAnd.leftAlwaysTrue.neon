@@ -1,4 +1,4 @@
-# total 2 errors
+# total 1 errors
 
 parameters:
     ignoreErrors:
@@ -6,8 +6,3 @@ parameters:
             message: '#^Left side of && is always true\.$#'
             count: 1
             path: ../modules/sms_user/tests/src/Functional/SmsFrameworkUserSettingsTest.php
-
-        -
-            message: '#^Left side of && is always true\.$#'
-            count: 1
-            path: ../src/Form/PhoneNumberSettingsForm.php

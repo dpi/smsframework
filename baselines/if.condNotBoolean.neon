@@ -1,4 +1,4 @@
-# total 19 errors
+# total 13 errors
 
 parameters:
     ignoreErrors:
@@ -19,38 +19,8 @@ parameters:
 
         -
             message: '#^Only booleans are allowed in an if condition, Drupal\\Core\\Entity\\Display\\EntityFormDisplayInterface given\.$#'
-            count: 2
-            path: ../src/Form/PhoneNumberSettingsForm.php
-
-        -
-            message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
             count: 1
             path: ../src/Form/PhoneNumberSettingsForm.php
-
-        -
-            message: '#^Only booleans are allowed in an if condition, array\|bool given\.$#'
-            count: 1
-            path: ../src/Plugin/migrate/destination/PhoneNumberSettings.php
-
-        -
-            message: '#^Only booleans are allowed in an if condition, array\|bool given\.$#'
-            count: 1
-            path: ../src/Plugin/migrate/destination/SmsVerification.php
-
-        -
-            message: '#^Only booleans are allowed in an if condition, Drupal\\Core\\Entity\\EntityInterface\|null given\.$#'
-            count: 1
-            path: ../src/Provider/PhoneNumberVerification.php
-
-        -
-            message: '#^Only booleans are allowed in an if condition, Drupal\\sms\\Entity\\PhoneNumberVerificationInterface\|null given\.$#'
-            count: 1
-            path: ../src/Provider/PhoneNumberVerification.php
-
-        -
-            message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
-            count: 2
-            path: ../tests/modules/sms_test/src/EventSubscriber/SmsTestEventSubscriber.php
 
         -
             message: '#^Only booleans are allowed in an if condition, Drupal\\Core\\Entity\\EntityInterface\|null given\.$#'

@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
  * Tests the update of SMS Delivery report entities.
  *
  * @group SMS Framework
+ * @phpstan-import-type ReportJsonItem from \Drupal\sms_test_gateway\Plugin\SmsGateway\Memory
  */
 final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
 
@@ -54,11 +55,13 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
       ->save();
     \Drupal::service('router.builder')->rebuild();
 
+    /** @var int<1, max> $uid */
+    $uid = (int) $user->id();
     $sms_message = (new SmsMessage())
       ->setSender($this->randomMachineName())
       ->addRecipients(['1234567890', '987654321'])
       ->setMessage($this->randomString())
-      ->setUid((int) $user->id())
+      ->setUid($uid)
       ->setGateway($test_gateway)
       ->setDirection(Direction::OUTGOING);
 
@@ -73,15 +76,15 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
     $first_report = \reset($saved_reports);
     static::assertEquals($request_time, $first_report->getStatusTime());
 
-    $message_id = $first_report->getMessageId();
+    $message_id = $first_report->getMessageId() ?? throw new \Exception('Missing message ID');
     $status_time = $request_time + 100;
 
     // Simulate push delivery report.
-    $request = $this->buildDeliveryReportRequest($message_id, $first_report->getRecipient(), 'pending', $status_time);
+    $request = $this->buildDeliveryReportRequest($message_id, $first_report->getRecipient(), SmsMessageReportStatus::QUEUED, $status_time);
     static::smsProvider()->processDeliveryReport($request, $test_gateway);
     \Drupal::service('entity_type.manager')->getStorage('sms_report')->resetCache();
     $updated_report = SmsDeliveryReport::load($first_report->id());
-    static::assertEquals('pending', $updated_report->getStatus());
+    static::assertEquals(SmsMessageReportStatus::QUEUED, $updated_report->getStatus());
     static::assertEquals($status_time, $updated_report->getStatusTime());
     static::assertNull($updated_report->getTimeDelivered());
 
@@ -103,7 +106,7 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
    *   The delivery report message ID.
    * @param string $recipient
    *   The delivery report recipient number.
-   * @param string $status
+   * @param \Drupal\sms\Message\SmsMessageReportStatus::* $status
    *   The message delivery status.
    * @param int $status_time
    *   The time for the current status update.
@@ -112,6 +115,7 @@ final class SmsFrameworkDeliveryReportUpdateTest extends KernelTestBase {
    *   A request object containing JSON-encoded delivery reports.
    */
   protected function buildDeliveryReportRequest(string $message_id, string $recipient, string $status, int $status_time): Request {
+    /** @var ReportJsonItem[] $reports */
     $reports = [];
     $reports[] = [
       'message_id' => $message_id,

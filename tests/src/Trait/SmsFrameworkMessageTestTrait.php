@@ -248,11 +248,11 @@ trait SmsFrameworkMessageTestTrait {
     $sms_message1 = $this->createSmsMessage();
 
     // Default.
-    static::assertEquals(TRUE, $sms_message1->isAutomated());
+    static::assertTrue($sms_message1->isAutomated());
 
     $sms_message2 = $this->createSmsMessage();
     $sms_message2->setAutomated(FALSE);
-    static::assertEquals(FALSE, $sms_message2->isAutomated());
+    static::assertFalse($sms_message2->isAutomated());
   }
 
   /**

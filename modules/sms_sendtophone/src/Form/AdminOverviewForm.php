@@ -24,10 +24,9 @@ class AdminOverviewForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $node_types = NodeType::loadMultiple();
     $types = [];
-    foreach ($node_types as $type) {
-      $types[$type->get('type')] = $type->get('name');
+    foreach (NodeType::loadMultiple() as $type) {
+      $types[$type->id()] = $type->label();
     }
     $form['content_types'] = [
       '#type' => 'checkboxes',
@@ -43,8 +42,10 @@ class AdminOverviewForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
+    /** @var string[] $types */
+    $types = $form_state->getValue('content_types');
     $this->config('sms_sendtophone.settings')
-      ->set('content_types', \array_filter($form_state->getValue('content_types')))
+      ->set('content_types', \array_filter($types))
       ->save();
 
     $this->messenger()->addMessage($this->t('The configuration options have been saved.'));

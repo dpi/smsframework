@@ -241,7 +241,8 @@ final class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
    */
   public function testConvertToEntityFromStandardSmsMessage(): void {
     // Need ID otherwise we have to install system module and 'sequences' table.
-    $user = User::create(['uid' => 1, 'name' => 'user']);
+    $userId = 1;
+    $user = User::create(['uid' => $userId, 'name' => 'user']);
     $user->save();
 
     $gateway = $this->createMemoryGateway();
@@ -254,7 +255,7 @@ final class SmsFrameworkMessageEntityTest extends SmsFrameworkKernelBase {
       ->setSenderNumber($sender_number[0])
       ->addRecipients(['123123123', '456456456'])
       ->setMessage($this->randomMachineName())
-      ->setUid((int) $user->id())
+      ->setUid($userId)
       ->setGateway($gateway)
       ->setOption('foo', $this->randomMachineName())
       ->setOption('bar', $this->randomMachineName())

@@ -1,4 +1,4 @@
-# total 10 errors
+# total 6 errors
 
 parameters:
     ignoreErrors:
@@ -11,11 +11,6 @@ parameters:
             message: '#^Only booleans are allowed in a negated boolean, Drupal\\Core\\Entity\\Entity\\EntityViewDisplay\|null given\.$#'
             count: 1
             path: ../modules/sms_sendtophone/tests/src/Functional/SmsSendToPhoneBrowserTest.php
-
-        -
-            message: '#^Only booleans are allowed in a negated boolean, Drupal\\sms\\Entity\\PhoneNumberSettingsInterface\|null given\.$#'
-            count: 1
-            path: ../modules/sms_user/src/AccountRegistration.php
 
         -
             message: '#^Only booleans are allowed in a negated boolean, bool\|null given\.$#'
@@ -36,18 +31,3 @@ parameters:
             message: '#^Only booleans are allowed in a negated boolean, Drupal\\Core\\Entity\\EntityInterface\|null given\.$#'
             count: 1
             path: ../src/Form/PhoneNumberSettingsForm.php
-
-        -
-            message: '#^Only booleans are allowed in a negated boolean, array given\.$#'
-            count: 1
-            path: ../src/Form/PhoneNumberSettingsForm.php
-
-        -
-            message: '#^Only booleans are allowed in a negated boolean, array\<string, array\<string, mixed\>\> given\.$#'
-            count: 1
-            path: ../src/Form/PhoneNumberSettingsForm.php
-
-        -
-            message: '#^Only booleans are allowed in a negated boolean, Drupal\\sms\\Entity\\PhoneNumberVerificationInterface\|null given\.$#'
-            count: 1
-            path: ../src/Provider/PhoneNumberVerification.php

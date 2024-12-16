@@ -1,12 +1,7 @@
-# total 9 errors
+# total 8 errors
 
 parameters:
     ignoreErrors:
-        -
-            message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and non\-falsy\-string will always evaluate to true\.$#'
-            count: 1
-            path: ../tests/src/Functional/SmsFrameworkIncomingBrowserTest.php
-
         -
             message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
             count: 3

@@ -52,13 +52,13 @@ final class AccountRegistration implements AccountRegistrationInterface, LoggerA
   public function createAccount(SmsMessageInterface $sms_message): void {
     $this->userPhoneNumberSettings = $this->phoneNumberVerificationProvider
       ->getPhoneNumberSettings('user', 'user');
-    if (!$this->userPhoneNumberSettings) {
+    if ($this->userPhoneNumberSettings === NULL) {
       // Can't do anything if there is no phone number settings for user.
       return;
     }
 
     $sender_number = $sms_message->getSenderNumber();
-    if (\strlen($sender_number) > 0) {
+    if ($sender_number !== NULL && \strlen($sender_number) > 0) {
       // Any users with this phone number?
       $entities = $this->phoneNumberVerificationProvider
         ->getPhoneVerificationByPhoneNumber($sender_number, NULL, 'user');
@@ -85,6 +85,7 @@ final class AccountRegistration implements AccountRegistrationInterface, LoggerA
 
     // Sender phone number.
     $sender_number = $sms_message->getSenderNumber();
+    $t_args = [];
     $t_args['%sender_phone_number'] = $sender_number;
     $phone_field_name = $this->userPhoneNumberSettings
       ->getFieldName('phone_number');
@@ -105,7 +106,9 @@ final class AccountRegistration implements AccountRegistrationInterface, LoggerA
       $this->logger?->info('Creating new account for %sender_phone_number. Username: %name. User ID: %uid', $t_args);
 
       // Optionally send a reply.
-      if (!empty($this->settings('unrecognized_sender.reply.status'))) {
+      $replyStatus = (bool) $this->settings('unrecognized_sender.reply.status');
+      if ($sender_number !== NULL && $replyStatus) {
+        /** @var string $message */
         $message = $this->settings('unrecognized_sender.reply.message');
         $message = \str_replace('[user:password]', $password, $message);
         $this->sendReply($sender_number, $user, $message);
@@ -124,11 +127,11 @@ final class AccountRegistration implements AccountRegistrationInterface, LoggerA
    *   An incoming SMS message.
    */
   protected function incomingPatternMessage(SmsMessageInterface $sms_message): void {
-    if (empty($this->settings('incoming_pattern.incoming_messages.0'))) {
+    $incoming_form = (string) $this->settings('incoming_pattern.incoming_messages.0');
+    if ($incoming_form === '') {
       return;
     }
 
-    $incoming_form = $this->settings('incoming_pattern.incoming_messages.0');
     $incoming_form = \str_replace("\r\n", "\n", $incoming_form);
     $compiled = $this->compileFormRegex($incoming_form, '/');
     $matches = [];
@@ -143,6 +146,7 @@ final class AccountRegistration implements AccountRegistrationInterface, LoggerA
 
       // Sender phone number.
       $sender_number = $sms_message->getSenderNumber();
+      $t_args = [];
       $t_args['%sender_phone_number'] = $sender_number;
 
       // Sender phone number.
@@ -163,6 +167,7 @@ final class AccountRegistration implements AccountRegistrationInterface, LoggerA
 
         // @todo autoconfirm the number?
         // @see https://www.drupal.org/node/2709911
+        /** @var string $message */
         $message = $this->settings('incoming_pattern.reply.message');
         $message = \str_replace('[user:password]', $password, $message);
 
@@ -172,11 +177,13 @@ final class AccountRegistration implements AccountRegistrationInterface, LoggerA
         ]);
 
         // Send an activation email if no password placeholder is found.
-        if (!$contains_password && !empty($this->settings('incoming_pattern.send_activation_email'))) {
+        $send_activation_email = (bool) $this->settings('incoming_pattern.send_activation_email');
+        if (!$contains_password && $send_activation_email) {
           \_user_mail_notify('register_no_approval_required', $user);
         }
       }
       else {
+        /** @var string $message */
         $message = $this->settings('incoming_pattern.reply.message_failure');
 
         $error = $this->buildError($validate);
@@ -188,8 +195,11 @@ final class AccountRegistration implements AccountRegistrationInterface, LoggerA
       }
 
       // Optionally send a reply.
-      if (!empty($this->settings('incoming_pattern.reply.status'))) {
-        $this->sendReply($sender_number, $user, $message);
+      if ($sender_number !== NULL) {
+        $replyStatus = (bool) $this->settings('incoming_pattern.reply.status');
+        if ($replyStatus) {
+          $this->sendReply($sender_number, $user, $message);
+        }
       }
     }
   }
@@ -211,6 +221,7 @@ final class AccountRegistration implements AccountRegistrationInterface, LoggerA
       ->addRecipient($sender_number)
       ->setDirection(Direction::OUTGOING);
 
+    $data = [];
     $data['sms-message'] = $sms_message;
     $data['user'] = $user;
     $sms_message->setMessage($this->token->replace($message, $data));
@@ -221,6 +232,7 @@ final class AccountRegistration implements AccountRegistrationInterface, LoggerA
       $this->smsProvider->queue($sms_message);
     }
     catch (\Exception $e) {
+      $t_args = [];
       $t_args['%recipient'] = $sender_number;
       $t_args['%error'] = $e->getMessage();
       $this->logger?->warning('Reply message could not be sent to recipient %recipient: %error', $t_args);

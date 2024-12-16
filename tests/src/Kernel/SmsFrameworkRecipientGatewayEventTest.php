@@ -32,11 +32,11 @@ final class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase
    * @see \Drupal\sms_test\EventSubscriber\SmsTestEventSubscriber
    */
   public function testGatewayEventSubscriber(): void {
-    $gateway_200 = $this->createMemoryGateway(['id' => 'test_gateway_200']);
+    $gateway_200 = $this->createMemoryGateway(['id' => \Drupal\sms_test\EventSubscriber\SmsTestEventSubscriber::GATEWAY_TEST_200]);
     $gateway_200
       ->setSkipQueue(TRUE)
       ->save();
-    $gateway_400 = $this->createMemoryGateway(['id' => 'test_gateway_400']);
+    $gateway_400 = $this->createMemoryGateway(['id' => \Drupal\sms_test\EventSubscriber\SmsTestEventSubscriber::GATEWAY_TEST_400]);
     $gateway_400
       ->setSkipQueue(TRUE)
       ->save();
@@ -53,7 +53,7 @@ final class SmsFrameworkRecipientGatewayEventTest extends SmsFrameworkKernelBase
     $smsProvider = \Drupal::service(SmsProviderInterface::class);
     $sms_messages = $smsProvider->queue($sms_message);
     static::assertCount(1, $sms_messages, 'One message dispatched.');
-    static::assertEquals('test_gateway_400', $sms_messages[0]->getGateway()->id());
+    static::assertEquals(\Drupal\sms_test\EventSubscriber\SmsTestEventSubscriber::GATEWAY_TEST_400, $sms_messages[0]->getGateway()->id());
 
     static::assertCount(0, $this->getTestMessages($gateway_200), 'Message not sent through gateway_200');
     static::assertCount(1, $this->getTestMessages($gateway_400), 'Message sent through gateway_400');

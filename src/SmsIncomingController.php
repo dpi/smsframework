@@ -10,6 +10,7 @@ use Drupal\sms\Provider\SmsProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 /**
  * Provides a controller for receiving incoming messages.
@@ -25,10 +26,10 @@ class SmsIncomingController extends ControllerBase {
   ) {
   }
 
-  final public static function create(ContainerInterface $container): static {
+  public static function create(ContainerInterface $container): static {
     return new static(
-      $container->get('http_kernel.controller.argument_resolver'),
-      $container->get(SmsProviderInterface::class),
+      $container->get(ArgumentResolverInterface::class),
+      $container->get('sms.provider'),
     );
   }
 
@@ -42,20 +43,33 @@ class SmsIncomingController extends ControllerBase {
    *
    * @return mixed
    *   A response to return.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException
+   *   When gateway doesn't have processIncoming method.
    */
-  public function processIncoming(Request $request, SmsGatewayInterface $sms_gateway): mixed {
+  public function __invoke(Request $request, SmsGatewayInterface $sms_gateway): mixed {
     $controller = [$sms_gateway->getPlugin(), 'processIncoming'];
-    $arguments = $this->argumentResolver
-      ->getArguments($request, $controller);
+    if (\method_exists(...$controller) !== TRUE) {
+      throw new ServiceUnavailableHttpException('Malformed gateway plugin');
+    }
 
-    /** @var \Drupal\sms\SmsProcessingResponse $response */
-    $response = \call_user_func_array($controller, $arguments);
+    /** @var callable(): \Drupal\sms\SmsProcessingResponse $callback */
+    // @phpstan-ignore-next-line
+    $callback = $controller(...);
+    $arguments = $this->argumentResolver->getArguments($request, $callback);
+    $response = $callback(...$arguments);
 
     foreach ($response->getMessages() as $message) {
       $this->smsProvider->queue($message);
     }
 
     return $response->getResponse();
+  }
+
+  public function processIncoming(Request $request, SmsGatewayInterface $sms_gateway): mixed {
+    // phpcs:ignore Drupal.Semantics.UnsilencedDeprecation.UnsilencedDeprecation
+    @\trigger_error(__METHOD__ . ' is deprecated. Use invoke instead.', E_USER_DEPRECATED);
+    return $this($request, $sms_gateway);
   }
 
 }

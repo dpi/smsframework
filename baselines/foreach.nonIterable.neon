@@ -1,4 +1,4 @@
-# total 6 errors
+# total 2 errors
 
 parameters:
     ignoreErrors:
@@ -11,23 +11,3 @@ parameters:
             message: '#^Argument of an invalid type array\<int, string\>\|false supplied for foreach, only iterables are supported\.$#'
             count: 1
             path: ../modules/sms_user/src/Form/AdminSettingsForm.php
-
-        -
-            message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
-            count: 4
-            path: ../modules/sms_user/src/Form/AdminSettingsForm.php
-
-        -
-            message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
-            count: 1
-            path: ../src/Form/PhoneNumberSettingsForm.php
-
-        -
-            message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
-            count: 2
-            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Incoming.php
-
-        -
-            message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
-            count: 1
-            path: ../tests/modules/sms_test_gateway/src/Plugin/SmsGateway/Memory.php

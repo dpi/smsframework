@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\sms_test_gateway\Plugin\SmsGateway;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\State\StateInterface;
@@ -23,6 +22,9 @@ use Drupal\sms_test_gateway\EventSubscriber\SmsTestGatewayEventSubscriber;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @phpstan-type ReportJsonItem array{message_id: string, recipient: string, status: \Drupal\sms\Message\SmsMessageReportStatus::*, status_time: int, status_message: string}
+ */
 #[SmsGateway(
   id: self::PLUGIN_ID,
   label: new TranslatableMarkup('Memory'),
@@ -116,7 +118,11 @@ class Memory extends SmsGatewayPluginBase implements SmsIncomingEventProcessorIn
     /** @var array<string, array<string, \Drupal\sms\Message\SmsDeliveryReportInterface>> $memory_reports */
     $memory_reports = static::state()->get(Memory::STATE_REPORTS, []);
 
-    $data = Json::decode($request->request->get('delivery_report'));
+    /** @var string $reportParam */
+    $reportParam = $request->request->get('delivery_report');
+    /** @var array{reports: ReportJsonItem[]} $data */
+    $data = \json_decode($reportParam, TRUE);
+
     $return = [];
     foreach ($data['reports'] as $report) {
       $message_id = $report['message_id'];

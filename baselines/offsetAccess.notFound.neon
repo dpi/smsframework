@@ -1,8 +1,0 @@
-# total 1 errors
-
-parameters:
-    ignoreErrors:
-        -
-            message: '#^Offset ''\#name'' does not exist on array\|null\.$#'
-            count: 1
-            path: ../modules/sms_devel/src/Form/SmsDevelMessageForm.php

@@ -1,8 +1,0 @@
-# total 1 errors
-
-parameters:
-    ignoreErrors:
-        -
-            message: '#^Right side of && is always true\.$#'
-            count: 2
-            path: ../src/Plugin/migrate/destination/SmsVerification.php

@@ -14,7 +14,7 @@ use Drupal\Core\Entity\EntityInterface;
  * Implements hook_cron().
  */
 function sms_cron(): void {
-  /** @var \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification */
+  /** @var \Drupal\sms\Provider\PhoneNumberVerificationInterface $phone_number_verification_provider */
   $phone_number_verification_provider = \Drupal::service('sms.phone_number.verification');
   $phone_number_verification_provider->purgeExpiredVerifications();
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\sms\Functional;
 
-use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Url;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsGateway;
@@ -19,16 +18,8 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
 
   protected static $modules = ['block'];
 
-  /**
-   * SMS Gateway entity storage.
-   *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
-   */
-  protected ConfigEntityStorageInterface $smsGatewayStorage;
-
   protected function setUp(): void {
     parent::setUp();
-    $this->smsGatewayStorage = \Drupal::entityTypeManager()->getStorage('sms_gateway');
     $this->drupalPlaceBlock('page_title_block');
   }
 
@@ -51,7 +42,10 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
     $this->assertSession()->responseContains('<td>Memory</td>');
 
     // Delete all gateways.
-    $this->smsGatewayStorage->delete($this->smsGatewayStorage->loadMultiple());
+    foreach (SmsGateway::loadMultiple() as $gateway) {
+      $gateway->delete();
+    }
+
     $this->drupalGet(Url::fromRoute('sms.gateway.list'));
     $this->assertSession()->responseContains(\t('No gateways found.'));
   }
@@ -63,7 +57,7 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
     $test_gateway = $this->createMemoryGateway(['skip_queue' => TRUE]);
 
     // Test initial fallback gateway.
-    $sms_gateway_fallback = SmsGateway::load($this->config('sms.settings')->get('fallback_gateway'));
+    $sms_gateway_fallback = SmsGateway::load($this->config('sms.settings')->get('fallback_gateway')) ?? throw new \LogicException('Missing fallback gateway.');
 
     static::assertEquals($sms_gateway_fallback->id(), LogGateway::PLUGIN_ID, 'Initial fallback gateway is "log".');
 
@@ -106,7 +100,7 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
     $this->assertSession()->responseContains(\t('Gateway created.'));
 
     $this->drupalGet(Url::fromRoute('sms.gateway.list'));
-    $this->assertSession()->responseContains('<td>' . \t('@label', ['@label' => $edit['label']]) . '</td>', 'New gateway appears on list.');
+    $this->assertSession()->responseContains('<td>' . \t('@label', ['@label' => $edit['label']]) . '</td>');
   }
 
   /**
@@ -114,6 +108,8 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
    *
    * Ensures gateway plugin custom configuration form is shown, and new
    * configuration is saved to the config entity.
+   *
+   * @covers \Drupal\sms\Form\SmsGatewayForm
    */
   public function testGatewayEdit(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer smsframework']));
@@ -129,13 +125,13 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
     $this->assertSession()->fieldValueEquals('retention_duration_outgoing', '0');
 
     // Memory gateway supports pushed reports, so the URL should display.
-    $this->assertSession()->fieldValueEquals('delivery_reports[push_path]', $test_gateway->getPushReportPath());
+    $this->assertSession()->fieldValueEquals('delivery_reports[push_path]', $test_gateway->getPushReportPath() ?? throw new \LogicException('Missing path.'));
 
     // Memory gateway has a decoy configuration form.
     $widget = $this->randomString();
     $this->submitForm([
       'widget' => $widget,
-      'skip_queue' => '1',
+      'skip_queue' => TRUE,
       'retention_duration_incoming' => '3600',
       'retention_duration_outgoing' => '-1',
     ], 'Save');
@@ -144,18 +140,16 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
     $this->assertSession()->responseContains('Gateway saved.');
 
     // Reload the gateway, check configuration saved to config entity.
-    /** @var \Drupal\sms\Entity\SmsGatewayInterface $test_gateway */
-    $test_gateway = $this->smsGatewayStorage
-      ->load($test_gateway->id());
+    $test_gateway = SmsGateway::load($test_gateway->id());
+    self::assertNotNull($test_gateway);
 
     // Gateway settings.
-    static::assertEquals(TRUE, $test_gateway->getSkipQueue());
-    static::assertEquals('3600', $test_gateway->getRetentionDuration(Direction::INCOMING));
-    static::assertEquals('-1', $test_gateway->getRetentionDuration(Direction::OUTGOING));
+    static::assertTrue($test_gateway->getSkipQueue());
+    static::assertEquals(3600, $test_gateway->getRetentionDuration(Direction::INCOMING));
+    static::assertEquals(-1, $test_gateway->getRetentionDuration(Direction::OUTGOING));
 
     // Plugin form.
-    $config = $test_gateway->getPlugin()
-      ->getConfiguration();
+    $config = $test_gateway->getPlugin()->getConfiguration();
     static::assertEquals($widget, $config['widget'], 'Plugin configuration changed.');
   }
 
@@ -217,7 +211,7 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
 
     // Memory gateway supports incoming messages, so the URL should display.
     $this->assertSession()
-      ->fieldValueEquals('incoming_messages[push_path]', $gateway->getPushIncomingPath());
+      ->fieldValueEquals('incoming_messages[push_path]', $gateway->getPushIncomingPath() ?? throw new \LogicException('Missing path'));
 
     $incoming_route = '/' . $this->randomMachineName();
     $this->submitForm([
@@ -225,8 +219,8 @@ final class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
     ], 'Save');
 
     // Reload the gateway, check properties modified.
-    $gateway = SmsGateway::load($gateway->id());
-    static::assertEquals($incoming_route, $gateway->getPushIncomingPath());
+    $gateway = SmsGateway::load($gateway->id()) ?? throw new \LogicException('Missing gateway');
+    static::assertEquals($incoming_route, $gateway->getPushIncomingPath() ?? throw new \LogicException('Missing path'));
   }
 
   /**

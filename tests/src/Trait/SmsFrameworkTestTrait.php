@@ -11,7 +11,6 @@ use Drupal\sms\Entity\SmsGateway;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Message\SmsDeliveryReport;
 use Drupal\sms\Message\SmsDeliveryReportInterface;
-use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsMessageInterface;
 use Drupal\sms\Message\SmsMessageResult;
 use Drupal\sms_test_gateway\EventSubscriber\SmsTestGatewayEventSubscriber;
@@ -49,7 +48,7 @@ trait SmsFrameworkTestTrait {
   protected function createMemoryGateway(array $values = []): SmsGatewayInterface {
     $id = $values['id'] ?? \mb_strtolower($this->randomMachineName(16));
     $gateway = SmsGateway::create($values + [
-      'plugin' => 'memory',
+      'plugin' => Memory::PLUGIN_ID,
       'id' => $id,
       'label' => $this->randomString(),
       'settings' => ['gateway_id' => $id],
@@ -306,20 +305,6 @@ trait SmsFrameworkTestTrait {
     return (new SmsMessageResult())
       ->setErrorMessage($this->randomString())
       ->setReports($reports);
-  }
-
-  /**
-   * Generates a random SMS message by the specified user.
-   *
-   * @param int $uid
-   *   (optional) The user ID to generate the message as. Defaults to 1.
-   *
-   * @return \Drupal\sms\Message\SmsMessageInterface
-   *   A random SMS message by the specified user.
-   */
-  protected function randomSmsMessage(int $uid = 1): SmsMessageInterface {
-    $phone_numbers = $this->randomPhoneNumbers(1);
-    return new SmsMessage($phone_numbers[0], $this->randomPhoneNumbers(), $this->randomString(), [], $uid);
   }
 
   /**

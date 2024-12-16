@@ -7,15 +7,16 @@
 
 declare(strict_types=1);
 
-use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Url;
-use Drupal\sms\Message\SmsMessageInterface;
 
 /**
  * Implements hook_token_info().
+ *
+ * @phpstan-return array{types: array<string, mixed>, tokens: array<string, mixed>}
  */
 function sms_token_info(): array {
+  $info = [];
   $info['types']['sms'] = [
     'name' => t('SMS'),
     'description' => t("SMS Framework tokens."),
@@ -46,8 +47,13 @@ function sms_token_info(): array {
 
 /**
  * Implements hook_tokens().
+ *
+ * @phpstan-param array<string, string> $tokens
+ * @phpstan-param array<string, mixed> $data
+ * @phpstan-param array<string, mixed> $options
+ * @phpstan-return array<string, mixed>
  */
-function sms_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata): array {
+function sms_tokens(string $type, array $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata): array {
   $replacements = [];
 
   if ($type == 'sms') {
@@ -56,7 +62,6 @@ function sms_tokens($type, $tokens, array $data, array $options, BubbleableMetad
         case 'verification-url':
           $url_options = ['absolute' => TRUE];
           $result = Url::fromRoute('sms.phone.verify', [], $url_options)->toString(TRUE);
-          assert($result instanceof GeneratedUrl);
           $replacements[$original] = $result->getGeneratedUrl();
           break;
       }
@@ -64,15 +69,16 @@ function sms_tokens($type, $tokens, array $data, array $options, BubbleableMetad
   }
 
   if ($type == 'sms-message') {
-    if (!empty($data['sms-message']) && ($data['sms-message'] instanceof SmsMessageInterface)) {
-      /** @var \Drupal\sms\Message\SmsMessageInterface $sms_message */
-      $sms_message = $data['sms-message'];
-
+    /** @var \Drupal\sms\Message\SmsMessageInterface|null $sms_message */
+    $sms_message = $data['sms-message'] ?? NULL;
+    if ($sms_message !== NULL) {
       foreach ($tokens as $name => $original) {
         switch ($name) {
           case 'phone-number':
             $recipients = $sms_message->getRecipients();
-            $replacements[$original] = reset($recipients) ?: '';
+            if (count($recipients) > 0) {
+              $replacements[$original] = $recipients[array_key_first($recipients)];
+            }
             break;
 
           case 'message':
@@ -85,7 +91,8 @@ function sms_tokens($type, $tokens, array $data, array $options, BubbleableMetad
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'verification-code':
-          if (!empty($data['sms_verification_code'])) {
+          $code = $data['sms_verification_code'];
+          if (\is_string($code) && \strlen($code) > 0) {
             $replacements[$original] = $data['sms_verification_code'];
           }
           break;

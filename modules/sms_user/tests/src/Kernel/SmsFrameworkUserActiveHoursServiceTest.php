@@ -168,6 +168,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
     $user = $this->createUser(['timezone' => 'America/New_York']);
     $now = '2016-03-16 Wednesday 1pm America/New_York';
     $range = $this->activeHoursService->findNextTime($user, $now);
+    self::assertNotFalse($range);
     static::assertEquals(new DrupalDateTime('2016-03-16 Wednesday 9am America/New_York'), $range->getStartDate());
     static::assertEquals(new DrupalDateTime('2016-03-16 Wednesday 5pm America/New_York'), $range->getEndDate());
   }
@@ -184,6 +185,7 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
     $user = $this->createUser(['timezone' => 'America/New_York']);
     $now = '2016-03-12 saturday 5:00:01pm America/New_York';
     $range = $this->activeHoursService->findNextTime($user, $now);
+    self::assertNotFalse($range);
     static::assertEquals(new DrupalDateTime('2016-03-13 Sunday 9am America/New_York'), $range->getStartDate());
     static::assertEquals(new DrupalDateTime('2016-03-13 Sunday 5pm America/New_York'), $range->getEndDate());
   }
@@ -255,13 +257,13 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
       ->setAutomated(FALSE);
     $this->smsProvider->queue($sms_message);
 
-    $this->assertNotEquals($timestamp, $sms_message->getSendTime());
+    static::assertNotEquals($timestamp, $sms_message->getSendTime());
   }
 
   /**
    * Helper to set status of active hours.
    */
-  protected function activeHoursStatus($status): void {
+  protected function activeHoursStatus(bool $status): void {
     \Drupal::configFactory()
       ->getEditable('sms_user.settings')
       ->set('active_hours.status', $status)
@@ -270,8 +272,10 @@ class SmsFrameworkUserActiveHoursServiceTest extends SmsFrameworkKernelBase {
 
   /**
    * Helper to set and replace existing active hours ranges.
+   *
+   * @phpstan-param array<array{start: string, end: string}> $ranges
    */
-  protected function setActiveHours($ranges): void {
+  protected function setActiveHours(array $ranges): void {
     \Drupal::configFactory()
       ->getEditable('sms_user.settings')
       ->set('active_hours.ranges', $ranges)

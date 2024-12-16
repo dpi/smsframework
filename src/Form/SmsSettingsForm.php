@@ -90,8 +90,9 @@ class SmsSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state): void {
+    /** @var string $verify */
     $verify = $form_state->getValue(['pages', 'verify']);
-    if (\substr($verify, 0, 1) !== '/') {
+    if (FALSE === \str_starts_with($verify, '/')) {
       $form_state->setError($form['pages']['verify'], $this->t("Path must begin with a '/' character."));
     }
   }

@@ -81,8 +81,9 @@ final class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     // Create a role and user which has permission to view the entity links
     // generated for 'gateway', 'sender_entity__target_id', and
     // 'recipient_entity__target_id' columns.
+    $roleId = \strtolower($this->randomMachineName());
     $role = Role::create([
-      'id' => $this->randomMachineName(),
+      'id' => $roleId,
       'label' => 'Test role',
     ]);
     $role->grantPermission('access user profiles');
@@ -90,7 +91,7 @@ final class SmsFrameworkViewsTest extends ViewsKernelTestBase {
     $role->save();
 
     $user0 = User::create(['name' => $this->randomMachineName()]);
-    $user0->addRole($role->id());
+    $user0->addRole($roleId);
     $user0->save();
 
     \Drupal::service('current_user')->setAccount($user0);
@@ -126,7 +127,7 @@ final class SmsFrameworkViewsTest extends ViewsKernelTestBase {
 
     Views::viewsData()->clear();
 
-    $view = Views::getView('sms_messages');
+    $view = Views::getView('sms_messages') ?? throw new \Exception('Missing view');
     $view->setDisplay('default');
     $this->executeView($view);
 

@@ -49,7 +49,7 @@ class SendToPhoneForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $type = NULL, $extra = NULL): array {
+  public function buildForm(array $form, FormStateInterface $form_state, ?string $type = NULL, ?int $extra = NULL): array {
     /** @var \Drupal\user\UserInterface $user */
     $user = User::load($this->currentUser()->id());
 
@@ -84,7 +84,7 @@ class SendToPhoneForm extends FormBase {
    *
    * @phpstan-return array<string, mixed>
    */
-  protected function getForm(array $form, $type = NULL, $extra = NULL): array {
+  protected function getForm(array $form, ?string $type = NULL, ?int $extra = NULL): array {
     switch ($type) {
       case 'cck':
       case 'field':
