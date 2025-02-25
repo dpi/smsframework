@@ -1,0 +1,9 @@
+name: SMS Framework
+description: 'Integrates the Texter and SMS channel capabilities of Symfony Notifier with Drupal.'
+type: module
+core_version_requirement: '>=11'
+php: 8.3
+dependencies:
+  - drupal:telephone
+  - another_entity_iterator:another_entity_iterator
+  - dynamic_entity_reference:dynamic_entity_reference
