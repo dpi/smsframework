@@ -1,0 +1,4 @@
+name: SMS Entity Test
+description: 'Provides an entity implementing \Symfony\Component\Notifier\Recipient\SmsRecipientInterface'
+type: module
+package: Testing

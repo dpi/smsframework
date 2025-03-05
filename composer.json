@@ -1,0 +1,42 @@
+{
+    "name": "drupal/sms",
+    "description": "Integrates the Texter and SMS channel capabilities of Symfony Notifier with Drupal.",
+    "type": "drupal-module",
+    "require": {
+        "php": ">=8.3",
+        "drupal/another_entity_iterator": "^1@alpha",
+        "drupal/core": "^11.0",
+        "drupal/dynamic_entity_reference": "^3.2 || ^4",
+        "drupal/notifier": "^3@alpha",
+        "ramsey/collection": "^2"
+    },
+    "require-dev": {
+        "composer/installers": "^2",
+        "drupal/bca": "^1",
+        "drupal/coder": "^8.3.25",
+        "drupal/core-dev": "^11.0",
+        "mockery/mockery": "^1.5",
+        "phpstan/extension-installer": "^1.3",
+        "phpstan/phpstan": "^1.12.7",
+        "phpstan/phpstan-deprecation-rules": "*",
+        "phpstan/phpstan-phpunit": "1.4.x-dev",
+        "phpstan/phpstan-strict-rules": "^1.5",
+        "previousnext/coding-standard": "^1",
+        "symfony/fake-sms-notifier": "^7.2"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    ],
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true,
+            "tbachert/spi": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}

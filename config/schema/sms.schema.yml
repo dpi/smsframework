@@ -1,0 +1,2 @@
+field.widget.settings.sms_telephone:
+  type: field.widget.settings.telephone_default

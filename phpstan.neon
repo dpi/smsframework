@@ -1,0 +1,19 @@
+parameters:
+  level: 9
+  paths:
+    - src
+    - tests
+  reportUnmatchedIgnoredErrors: true
+  treatPhpDocTypesAsCertain: false
+  fileExtensions:
+    - php
+    - module
+    - theme
+    - profile
+    - install
+    - inc
+  ignoreErrors:
+    -
+      identifier: class.notFound
+      path: src/SmsCompilerPass.php
+

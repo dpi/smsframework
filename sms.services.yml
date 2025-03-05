@@ -1,0 +1,97 @@
+parameters:
+  # Equivalent to Symfony Frameworks `framework.notifier.texter_transports`:
+  sms.transports: []
+
+  # Parameters implemented by SMS Framework, not Symfony/Texter/Notifier.
+  sms.verification:
+    # Disabling verification will remove associated services.
+    enabled: true
+    route:
+      path: '/verify'
+      success: '/user'
+    # Whether to enforce unique phone numbers. If a newly verified phone number
+    # also exists on another account, the phone number verification will be
+    # deleted. If unverified.purge_fields is true, field data will be purged.
+    unique: true
+    unverified:
+      lifetime: 900
+      # Phone number data may not necessarily come from fields, but fields will be checked for this data.
+      purge_fields: true
+    message: |-
+      Your verification code is '[sms-message:verification-code]'.
+      Go to [sms:verification-url] to verify your phone number.
+      - [site:name]
+
+services:
+  _defaults:
+    public: false
+    autoconfigure: true
+    autowire: true
+
+  # SMS Framework services:
+  Drupal\sms\PhoneNumber\SmsPhoneNumberInterface:
+    class: Drupal\sms\PhoneNumber\SmsPhoneNumber
+    public: true # Reconsider
+
+  Drupal\sms\PhoneNumberVerification\SmsPhoneNumberVerification:
+    arguments:
+      $logger: '@logger.channel.sms.phone_number_verification'
+  Drupal\sms\PhoneNumberVerification\SmsPhoneNumberVerificationInterface: '@Drupal\sms\PhoneNumberVerification\SmsPhoneNumberVerification'
+
+  Drupal\sms\PhoneNumberVerification\CodeGenerator\CodeGeneratorInterface:
+    class: Drupal\sms\PhoneNumberVerification\CodeGenerator\NumberCodeGenerator
+
+  # Internal
+  Drupal\sms\EntityMapping:
+    public: true
+
+  Drupal\sms\Hook\SmsVerificationHooks:
+    public: true
+
+  Drupal\sms\PhoneNumber\EventListener\NotifierRecipients:
+    public: true
+  Drupal\sms\PhoneNumberVerification\EventListener\Routes:
+    public: true
+
+  # Notifier/Texter services:
+  notifier.channel.sms:
+    class: Symfony\Component\Notifier\Channel\SmsChannel
+    arguments:
+      $transport: '@texter.transports'
+
+    tags:
+      - { name: notifier.channel, channel: sms }
+    public: true # Reconsider
+
+  texter.transports:
+    class: Symfony\Component\Notifier\Transport\Transports
+    factory: ['@texter.transport_factory', 'fromStrings']
+    arguments:
+      $dsns: '%sms.transports%'
+
+  texter.transport_factory:
+    class: Symfony\Component\Notifier\Transport
+    arguments:
+      - !tagged_iterator texter.transport_factory
+
+  texter.messenger.sms_handler:
+    class: Symfony\Component\Notifier\Messenger\MessageHandler
+    arguments:
+      $transport: '@texter.transports'
+    tags:
+      - { name: messenger.message_handler, handles: Symfony\Component\Notifier\Message\SmsMessage }
+
+  # Logger conditionally available if verification services are available.
+  # Phone numbers get logged to this, if projects don't want phone numbers
+  # logged, they can send logs to NULL w/ Monolog, or by redefining this service
+  # and setting class to \Psr\Log\NullLogger.
+  logger.channel.sms.phone_number_verification:
+    parent: logger.channel_base
+    arguments:
+      $channel: 'sms.phone_number_verification'
+
+  # Logger conditionally available if the `fake-sms` is available.
+  logger.channel.sms.fake:
+    parent: logger.channel_base
+    arguments:
+      $channel: 'sms.fake'

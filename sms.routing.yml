@@ -1,0 +1,9 @@
+sms.phone.verify:
+  # This route is conditionally enabled, and path configured, via
+  # \Drupal\sms\PhoneNumberVerification\EventListener\Routes
+  path: '/sms/verify'
+  defaults:
+    _form: '\Drupal\sms\PhoneNumberVerification\Form\Verification'
+    _title: 'Verify phone number'
+  requirements:
+    _permission: 'sms verify phone number'
