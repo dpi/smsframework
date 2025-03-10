@@ -7,7 +7,7 @@
         "drupal/another_entity_iterator": "^1@alpha",
         "drupal/core": "^11.0",
         "drupal/dynamic_entity_reference": "^3.2 || ^4",
-        "drupal/notifier": "^3@alpha",
+        "drupal/notifier": "^3.0.0alpha5",
         "ramsey/collection": "^2"
     },
     "require-dev": {

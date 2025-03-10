@@ -4,6 +4,7 @@ type: module
 core_version_requirement: '>=11'
 php: 8.3
 dependencies:
+  - drupal:notifier
   - drupal:telephone
   - another_entity_iterator:another_entity_iterator
   - dynamic_entity_reference:dynamic_entity_reference

@@ -15,7 +15,7 @@ interface SmsPhoneNumberInterface {
    *
    * Since entities can have more than one phone number, the message will be
    * sent to the first phone number found. You can control the positioning of
-   * phone numbers (first, and others) by reacting to the EntityPhoneNumbers
+   * phone numbers (first, and others) by reacting to the ObjectPhoneNumbers
    * event and modifying the collection value returned by getPhoneNumbers.
    *
    * @throws \Drupal\sms\PhoneNumber\Exception\NoPhoneNumberException

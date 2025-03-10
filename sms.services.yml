@@ -48,6 +48,8 @@ services:
   Drupal\sms\Hook\SmsVerificationHooks:
     public: true
 
+  Drupal\sms\PhoneNumber\EventListener\FilterSmsRecipientsByVerification:
+    public: true
   Drupal\sms\PhoneNumber\EventListener\NotifierRecipients:
     public: true
   Drupal\sms\PhoneNumberVerification\EventListener\Routes:

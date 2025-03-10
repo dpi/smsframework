@@ -10,7 +10,7 @@ use Drupal\sms\PhoneNumber\PhoneNumbers;
 use Drupal\sms\PhoneNumber\QueryOptions;
 use Drupal\sms\PhoneNumberVerification\Object\ObjectWithPhoneNumberInterface;
 
-final class EntityPhoneNumbers {
+final class ObjectPhoneNumbers {
 
   private PhoneNumbers $phoneNumbers;
 
